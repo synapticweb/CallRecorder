@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/listened_phone"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+   android:layout_marginStart="15dp"
+    android:layout_marginEnd="15dp">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/contact_photo"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
+        android:layout_alignParentStart="true"
+        android:paddingTop="7dp"
+        android:paddingBottom="7dp" />
+
+    <TextView
+        android:id="@+id/contact_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/contact_photo"
+        android:textColor="#333"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="13dp"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/phone_number"
+        android:layout_toEndOf="@id/contact_photo"
+        android:layout_below="@id/contact_name"
+        android:textColor="#333"
+        android:layout_marginStart="15dp"
+       />
+<!--Pentru marginea de jos: -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@drawable/line"
+        android:layout_below="@id/contact_photo"
+        />
+
+</RelativeLayout>

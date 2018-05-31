@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="15dp"
+        android:layout_marginStart="15dp"
+        >
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/contact_photo_detail"
+        android:layout_width="90dp"
+        android:layout_height="90dp"
+        android:paddingTop="7dp"
+        android:paddingBottom="7dp"
+        app:civ_border_width="2dp"
+        app:civ_border_color="#FFFFFFFF"
+       />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@+id/contact_photo_detail"
+        android:layout_marginStart="20dp"
+        android:id="@+id/contact_name_detail"
+        />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/contact_photo_detail"
+            android:layout_below="@id/contact_name_detail"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="10dp"
+            android:id="@+id/phone_type_detail"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/contact_photo_detail"
+            android:layout_below="@id/phone_type_detail"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="10dp"
+            android:id="@+id/phone_number_detail"
+            />
+    </RelativeLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_gravity="top"
+        android:text="@string/sync_contact"
+        android:background="@color/colorAccent"
+        android:paddingTop="5dp"
+        android:gravity="center"
+        android:id="@+id/sync_contact"
+        android:visibility="gone"
+        />
+
+</RelativeLayout>
