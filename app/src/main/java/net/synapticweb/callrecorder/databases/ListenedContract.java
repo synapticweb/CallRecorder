@@ -9,7 +9,6 @@ public class ListenedContract {
         public static final String TABLE_NAME = "listened";
 
         public static final String COLUMN_NAME_NUMBER_ID = "number_id";
-        public static final String COLUMN_NAME_LOOKUP_KEY = "lookup_key";
-        public static final String COLUMN_NAME_NUMBER_IF_UNKNOWN = "phone_number_if_unknown";
+        public static final String COLUMN_NAME_NUMBER = "phone_number";
     }
 }

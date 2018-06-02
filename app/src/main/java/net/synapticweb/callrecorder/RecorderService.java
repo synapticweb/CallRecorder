@@ -71,30 +71,30 @@ public class RecorderService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId)
     {
         Intent notificationIntent;
-        List<String> lookupKeys = new ArrayList<>();
+        List<Long> numberIds = new ArrayList<>();
 
         super.onStartCommand(intent, flags, startId);
 
         RecordingsDbHelper mDbHelper = new RecordingsDbHelper(getApplicationContext());
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
-        String[] projection = {Listened.COLUMN_NAME_LOOKUP_KEY};
+        String[] projection = {Listened.COLUMN_NAME_NUMBER_ID};
         Cursor cursor = db.query(
                 Listened.TABLE_NAME, projection, null, null, null, null, null
         );
 
         while(cursor.moveToNext())
         {
-            String lookupKey = cursor.getString(cursor.getColumnIndex(Listened.COLUMN_NAME_LOOKUP_KEY));
-            lookupKeys.add(lookupKey);
+            Long numberId = cursor.getLong(cursor.getColumnIndex(Listened.COLUMN_NAME_NUMBER_ID));
+            numberIds.add(numberId);
         }
         cursor.close();
 
-        for(String lookupKey : lookupKeys)
+        for(Long numberId : numberIds)
         {
             cursor = getContentResolver().
                     query(ContactsContract.Data.CONTENT_URI, new String[]{ContactsContract.CommonDataKinds.Phone.NUMBER},
-                            ContactsContract.Data.LOOKUP_KEY + "='" + lookupKey + "'", null, null);
+                            ContactsContract.Data._ID + "=" + numberId, null, null);
 
             if(cursor != null) {
                 cursor.moveToFirst();
@@ -188,7 +188,7 @@ public class RecorderService extends Service {
         if(unknownPhone)
         {
             values = new ContentValues();
-            values.put(Listened.COLUMN_NAME_NUMBER_IF_UNKNOWN, numPhone);
+            values.put(Listened.COLUMN_NAME_NUMBER, numPhone);
             db.insert(Listened.TABLE_NAME, null, values);
         }
     }

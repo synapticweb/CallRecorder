@@ -19,8 +19,7 @@ public class RecordingsDbHelper extends SQLiteOpenHelper {
 
     private static final String SQL_CREATE_LISTENED = "CREATE TABLE " + Listened.TABLE_NAME + " (" + Listened._ID + " INTEGER PRIMARY KEY, " +
             Listened.COLUMN_NAME_NUMBER_ID + " INTEGER, " +
-            Listened.COLUMN_NAME_LOOKUP_KEY + " TEXT, " +
-            Listened.COLUMN_NAME_NUMBER_IF_UNKNOWN + " TEXT, " +
+            Listened.COLUMN_NAME_NUMBER + " TEXT, " +
             "CONSTRAINT no_duplicates UNIQUE(" + Listened.COLUMN_NAME_NUMBER_ID + ") )";
 
     private static final int DATABASE_VERSION = 1;
