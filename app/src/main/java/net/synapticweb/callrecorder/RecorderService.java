@@ -8,13 +8,13 @@ import android.app.Service;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.IBinder;
+import android.provider.ContactsContract;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 //import android.support.v4.media.app.NotificationCompat.MediaStyle;device
@@ -71,22 +71,37 @@ public class RecorderService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId)
     {
         Intent notificationIntent;
+        List<String> lookupKeys = new ArrayList<>();
+
         super.onStartCommand(intent, flags, startId);
 
         RecordingsDbHelper mDbHelper = new RecordingsDbHelper(getApplicationContext());
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
-        String[] projection = {Listened.COLUMN_NAME_PHONE_NUMBER};
+        String[] projection = {Listened.COLUMN_NAME_LOOKUP_KEY};
         Cursor cursor = db.query(
                 Listened.TABLE_NAME, projection, null, null, null, null, null
         );
 
         while(cursor.moveToNext())
         {
-            String phoneNum = cursor.getString(cursor.getColumnIndex(Listened.COLUMN_NAME_PHONE_NUMBER));
-            numbers.add(phoneNum);
+            String lookupKey = cursor.getString(cursor.getColumnIndex(Listened.COLUMN_NAME_LOOKUP_KEY));
+            lookupKeys.add(lookupKey);
         }
         cursor.close();
+
+        for(String lookupKey : lookupKeys)
+        {
+            cursor = getContentResolver().
+                    query(ContactsContract.Data.CONTENT_URI, new String[]{ContactsContract.CommonDataKinds.Phone.NUMBER},
+                            ContactsContract.Data.LOOKUP_KEY + "='" + lookupKey + "'", null, null);
+
+            if(cursor != null) {
+                cursor.moveToFirst();
+                String number = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                numbers.add(number);
+            }
+        }
 
         numPhone = intent.getStringExtra("phoneNumber");
         incoming = intent.getBooleanExtra("incoming", false);
@@ -172,12 +187,8 @@ public class RecorderService extends Service {
 
         if(unknownPhone)
         {
-            Resources res = getResources();
             values = new ContentValues();
-            values.put(Listened.COLUMN_NAME_UNKNOWN_PHONE, 1);
-            values.put(Listened.COLUMN_NAME_PHONE_TYPE, "Unknown type of phone: ");
-            values.put(Listened.COLUMN_NAME_CONTACT_NAME, res.getString(R.string.unkown_contact));
-            values.put(Listened.COLUMN_NAME_PHONE_NUMBER, numPhone);
+            values.put(Listened.COLUMN_NAME_NUMBER_IF_UNKNOWN, numPhone);
             db.insert(Listened.TABLE_NAME, null, values);
         }
     }

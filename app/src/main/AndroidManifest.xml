@@ -51,7 +51,6 @@
         </receiver>
 
         <service android:name=".RecorderService"/>
-        <service android:name=".KAService" />
     </application>
 
 </manifest>

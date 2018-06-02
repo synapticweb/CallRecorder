@@ -2,7 +2,6 @@ package net.synapticweb.callrecorder;
 
 import android.content.ContentValues;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
@@ -27,6 +26,7 @@ public class PhoneNumberDetail extends AppCompatActivity {
     String typePhone = null;
     String contactName = null;
     String photoUri = null;
+    long numberId = 0;
     TextView contactNameView;
     TextView typePhoneView;
     TextView phoneNumberView;
@@ -36,16 +36,16 @@ public class PhoneNumberDetail extends AppCompatActivity {
     static final int ERROR = -1;
 
     private int getFieldsFromSyncedContact(String phoneNumber) {
-        Uri phoneLookupUri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI,
-                Uri.encode(phoneNumber) );
         Cursor cursor = getContentResolver()
-                .query(phoneLookupUri, new String[]{ContactsContract.PhoneLookup.TYPE, ContactsContract.PhoneLookup.LOOKUP_KEY},
-                        null, null, null);
+                .query(ContactsContract.Data.CONTENT_URI, new String[]{ContactsContract.CommonDataKinds.Phone.TYPE,
+                                ContactsContract.CommonDataKinds.Phone.LOOKUP_KEY, ContactsContract.Data._ID},
+                        ContactsContract.CommonDataKinds.Phone.NUMBER + "='" + phoneNumber + "'", null, null);
         if(cursor != null) {
             if (cursor.getCount() > 0) {
                 cursor.moveToFirst();
-                lookupKey = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.LOOKUP_KEY));
-                int typeCode = cursor.getInt(cursor.getColumnIndex(ContactsContract.PhoneLookup.TYPE));
+                lookupKey = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.LOOKUP_KEY));
+                int typeCode = cursor.getInt(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
+                numberId = cursor.getLong(cursor.getColumnIndex(ContactsContract.Data._ID));
 
                 switch (typeCode) {
                     case 1:
@@ -59,10 +59,13 @@ public class PhoneNumberDetail extends AppCompatActivity {
                 }
                 cursor.close();
 
+                Uri lookupUri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_LOOKUP_URI, lookupKey);
                 cursor = getContentResolver().
-                        query(ContactsContract.Contacts.CONTENT_URI,
-                                new String[]{ContactsContract.Contacts.DISPLAY_NAME, ContactsContract.Contacts.PHOTO_URI},
-                                ContactsContract.Contacts.LOOKUP_KEY + "='" + lookupKey + "'", null, null);
+                        query(lookupUri,
+                                new String[]{ContactsContract.Contacts.DISPLAY_NAME,
+                                        ContactsContract.Contacts.PHOTO_URI},
+                                null, null, null);
+
                 if (cursor != null) {
                     cursor.moveToFirst();
                     contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
@@ -84,13 +87,14 @@ public class PhoneNumberDetail extends AppCompatActivity {
         RecordingsDbHelper mDbHelper = new RecordingsDbHelper(getApplicationContext());
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(ListenedContract.Listened.COLUMN_NAME_UNKNOWN_PHONE, 0);
-        values.put(ListenedContract.Listened.COLUMN_NAME_CONTACT_PHOTO_URI, photoUri);
-        values.put(ListenedContract.Listened.COLUMN_NAME_PHONE_TYPE, typePhone);
-        values.put(ListenedContract.Listened.COLUMN_NAME_CONTACT_NAME, contactName);
+
+        values.put(ListenedContract.Listened.COLUMN_NAME_NUMBER_ID, numberId);
+        values.put(ListenedContract.Listened.COLUMN_NAME_LOOKUP_KEY, lookupKey);
+        values.putNull(ListenedContract.Listened.COLUMN_NAME_NUMBER_IF_UNKNOWN);
 
         db.update(ListenedContract.Listened.TABLE_NAME,
-                values, "phone_number='" + intent.getStringExtra("phone_number") + "'", null);
+                values, ListenedContract.Listened.COLUMN_NAME_NUMBER_IF_UNKNOWN + "='" +
+                        intent.getStringExtra("phone_number") + "'", null);
 
         syncContact.setVisibility(View.GONE);
         if(photoUri != null)
@@ -112,7 +116,7 @@ public class PhoneNumberDetail extends AppCompatActivity {
         super.onResume();
         if(hasSyncedContact)
         {
-           updateDBRepopulateViews();
+            updateDBRepopulateViews();
             hasSyncedContact = false;
             }
         }
@@ -173,8 +177,6 @@ public class PhoneNumberDetail extends AppCompatActivity {
                         startActivity(intent);
                 } else
                     updateDBRepopulateViews();
-                //comm
-
             }
 
         });

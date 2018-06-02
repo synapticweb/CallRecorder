@@ -34,6 +34,9 @@ import net.synapticweb.callrecorder.databases.RecordingsDbHelper;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -43,35 +46,96 @@ public class CallRecorderMainActivity extends AppCompatActivity  {
     private static final int REQUEST_NUMBER = 1;
     private RecyclerView listenedPhones;
     ListenedAdapter adapter;
-    private RecorderService recorderService;
-    private boolean bound = false;
-
 
     @Override
     protected void onResume(){
         super.onResume();
-        RecordingsDbHelper mDbHelper = new RecordingsDbHelper(getApplicationContext());
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
-        adapter.listenedCursor = db.
-                query(ListenedContract.Listened.TABLE_NAME, null, null, null, null, null,
-                        ListenedContract.Listened.COLUMN_NAME_UNKNOWN_PHONE + " DESC, " +
-                                ListenedContract.Listened.COLUMN_NAME_CONTACT_NAME + ", " +
-                                ListenedContract.Listened.COLUMN_NAME_PHONE_TYPE);
-
+        adapter.phoneNumbers = this.getPhoneNumbersList();
         adapter.notifyDataSetChanged();
+    }
+
+    private List<PhoneNumber> getPhoneNumbersList() {
+        RecordingsDbHelper mDbHelper = new RecordingsDbHelper(getApplicationContext());
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        List<PhoneNumber> phoneNumbers = new ArrayList<>();
+
+        Cursor cursor = db.
+                query(ListenedContract.Listened.TABLE_NAME, null, null, null, null, null, null);
+
+        while(cursor.moveToNext())
+        {
+            PhoneNumber phoneNumber = new PhoneNumber();
+            String lookupKey = cursor.
+                    getString(cursor.getColumnIndex(ListenedContract.Listened.COLUMN_NAME_LOOKUP_KEY));
+            long idNumber = cursor.getLong(cursor.getColumnIndex(ListenedContract.Listened.COLUMN_NAME_NUMBER_ID));
+
+            if(lookupKey != null) {
+                Cursor cursor2 = getContentResolver().
+                        query(ContactsContract.Data.CONTENT_URI, new String[]{ContactsContract.CommonDataKinds.Phone.NUMBER,
+                                        ContactsContract.CommonDataKinds.Phone.TYPE},
+                                ContactsContract.Data._ID + "=" + idNumber, null, null);
+
+                if (cursor2 != null) {
+                    cursor2.moveToFirst();
+                    phoneNumber.setPhoneNumber(
+                            cursor2.getString(cursor2.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)));
+                    int typeCode = cursor2.getInt(cursor2.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
+                    switch (typeCode) {
+                        case 1:
+                            phoneNumber.setPhoneType("Home: ");
+                            break;
+                        case 2:
+                            phoneNumber.setPhoneType("Mobile: ");
+                            break;
+                        default:
+                            phoneNumber.setPhoneType("Other phone type: ");
+                    }
+                    cursor2.close();
+                }
+
+                Uri lookupUri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_LOOKUP_URI, lookupKey);
+                cursor2 = getContentResolver().
+                        query(lookupUri,
+                                new String[]{ContactsContract.Contacts.DISPLAY_NAME,
+                                        ContactsContract.Contacts.PHOTO_URI},
+                                null, null, null);
+
+                if (cursor2 != null) {
+                    cursor2.moveToFirst();
+                    phoneNumber.
+                            setContactName(cursor2.getString(cursor2.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)));
+                    String photoUriStr = cursor2.getString(cursor2.getColumnIndex(ContactsContract.Contacts.PHOTO_URI));
+                    cursor2.close();
+                    if (photoUriStr != null)
+                        phoneNumber.setPhotoUri(Uri.parse(photoUriStr));
+                    else
+                        phoneNumber.setPhotoUri(null);
+                }
+            }
+            else {
+                phoneNumber.setUnknownPhone(true);
+                phoneNumber.setPhoneNumber(cursor.getString(cursor.
+                        getColumnIndex(ListenedContract.Listened.COLUMN_NAME_NUMBER_IF_UNKNOWN)));
+                phoneNumber.setContactName("UNKNOWN");
+                phoneNumber.setPhoneType("Unknown type: ");
+            }
+            phoneNumbers.add(phoneNumber);
+        }
+
+        cursor.close();
+        Collections.sort(phoneNumbers);
+        return phoneNumbers;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
         setContentView(R.layout.activity_call_recorder_main);
 
         if(Build.MANUFACTURER.equalsIgnoreCase("huawei"))
         {
             huaweiAlert();
-            KAService.setServiceAlarm(this);
         }
 
         FloatingActionButton fab = findViewById(R.id.add_numbers);
@@ -84,27 +148,18 @@ public class CallRecorderMainActivity extends AppCompatActivity  {
             }
         });
 
-        RecordingsDbHelper mDbHelper = new RecordingsDbHelper(getApplicationContext());
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
-        Cursor cursor = db
-                .query(ListenedContract.Listened.TABLE_NAME, null, null, null, null, null,
-                        ListenedContract.Listened.COLUMN_NAME_UNKNOWN_PHONE + " DESC, " +
-                                ListenedContract.Listened.COLUMN_NAME_CONTACT_NAME + ", " + ListenedContract.Listened.COLUMN_NAME_PHONE_TYPE);
 
         listenedPhones = findViewById(R.id.listened_phones);
         listenedPhones.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new ListenedAdapter(cursor);
+        adapter = new ListenedAdapter(this.getPhoneNumbersList());
         listenedPhones.setAdapter(adapter);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Uri numberUri;
-        String phoneNumber = null;
-        String lookupKey = null;
-        String type = null;
-        String contactName = null;
-        String photoUri = null;
+        long idNewNumber = 0;
+        String lookupKeyNewNumber = null;
 
         if (resultCode != Activity.RESULT_OK) {
             return;
@@ -112,37 +167,13 @@ public class CallRecorderMainActivity extends AppCompatActivity  {
 
         if (requestCode == REQUEST_NUMBER && (numberUri = data.getData()) != null) {
                 Cursor cursor = getContentResolver().
-                        query(numberUri, new String[]{ContactsContract.CommonDataKinds.Phone.NUMBER,
-                                        ContactsContract.CommonDataKinds.Phone.TYPE, ContactsContract.CommonDataKinds.Phone.LOOKUP_KEY},
+                        query(numberUri, new String[]{ContactsContract.Data._ID, ContactsContract.CommonDataKinds.Phone.LOOKUP_KEY},
                                 null, null, null);
                 if(cursor != null)
                 {
                     cursor.moveToFirst();
-                    phoneNumber = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                    lookupKey =  cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.LOOKUP_KEY));
-                    int typeCode = cursor.getInt(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
-                    switch (typeCode)
-                    {
-                        case 1:type = "Home: ";
-                            break;
-                        case 2:type = "Mobile: ";
-                            break;
-                        default: type = "Other phone type: ";
-                    }
-                    cursor.close();
-                }
-
-                cursor = getContentResolver().
-                        query(ContactsContract.Contacts.CONTENT_URI,
-                                new String[]{ContactsContract.Contacts.DISPLAY_NAME,
-                                        ContactsContract.Contacts.PHOTO_URI},
-                                ContactsContract.Contacts.LOOKUP_KEY + "='" + lookupKey + "'", null, null);
-
-                if(cursor != null)
-                {
-                    cursor.moveToFirst();
-                    contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-                    photoUri = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.PHOTO_URI));
+                    idNewNumber =  cursor.getLong(cursor.getColumnIndex(ContactsContract.Data._ID));
+                    lookupKeyNewNumber = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.LOOKUP_KEY));
                     cursor.close();
                 }
 
@@ -150,17 +181,14 @@ public class CallRecorderMainActivity extends AppCompatActivity  {
             SQLiteDatabase db = mDbHelper.getWritableDatabase();
             ContentValues values = new ContentValues();
 
-            values.put(ListenedContract.Listened.COLUMN_NAME_UNKNOWN_PHONE, 0);
-            values.put(ListenedContract.Listened.COLUMN_NAME_CONTACT_PHOTO_URI, photoUri);
-            values.put(ListenedContract.Listened.COLUMN_NAME_PHONE_TYPE, type);
-            values.put(ListenedContract.Listened.COLUMN_NAME_CONTACT_NAME, contactName);
-            values.put(ListenedContract.Listened.COLUMN_NAME_PHONE_NUMBER, phoneNumber);
+            values.put(ListenedContract.Listened.COLUMN_NAME_NUMBER_ID, idNewNumber);
+            values.put(ListenedContract.Listened.COLUMN_NAME_LOOKUP_KEY, lookupKeyNewNumber);
 
             try {
                 db.insertOrThrow(ListenedContract.Listened.TABLE_NAME, null, values);
             }
-            catch (SQLException exc)
-            {
+            catch (SQLException exc) {
+
                 if(exc.toString().contains("UNIQUE"))
                 {
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -171,26 +199,19 @@ public class CallRecorderMainActivity extends AppCompatActivity  {
                                 }
                             }
         );
-
                     AlertDialog dialog = builder.create();
                     dialog.show();
                 }
             }
 
-            cursor = db.
-                query(ListenedContract.Listened.TABLE_NAME, null, null, null, null, null,
-                        ListenedContract.Listened.COLUMN_NAME_UNKNOWN_PHONE + " DESC, " +
-                                ListenedContract.Listened.COLUMN_NAME_CONTACT_NAME + ", " +
-                                ListenedContract.Listened.COLUMN_NAME_PHONE_TYPE);
-
-            adapter.listenedCursor = cursor;
+            adapter.phoneNumbers = this.getPhoneNumbersList();
             adapter.notifyDataSetChanged();
         }
     }
 
     public class PhoneHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         ImageView contactPhoto;
-        String contactPhotoUri;
+        Uri contactPhotoUri;
         TextView mContactName;
         String contactName;
         TextView mPhoneNumber;
@@ -212,7 +233,7 @@ public class CallRecorderMainActivity extends AppCompatActivity  {
             Intent detailIntent = new Intent(CallRecorderMainActivity.this, PhoneNumberDetail.class);
             detailIntent.putExtra("phone_number", phoneNumber);
             detailIntent.putExtra("phone_type", phoneType);
-            detailIntent.putExtra("contact_photo_uri", contactPhotoUri);
+            detailIntent.putExtra("contact_photo_uri", (contactPhotoUri == null) ? null : contactPhotoUri.toString() );
             detailIntent.putExtra("contact_name", contactName);
             detailIntent.putExtra("unknown_phone", unknownPhone);
             startActivity(detailIntent);
@@ -220,10 +241,9 @@ public class CallRecorderMainActivity extends AppCompatActivity  {
     }
 
     class ListenedAdapter extends RecyclerView.Adapter<PhoneHolder> {
-        Cursor listenedCursor;
-
-        ListenedAdapter(Cursor cursor){
-            listenedCursor = cursor;
+        List<PhoneNumber> phoneNumbers;
+        ListenedAdapter(List<PhoneNumber> list){
+            phoneNumbers = list;
         }
 
         @Override
@@ -235,45 +255,29 @@ public class CallRecorderMainActivity extends AppCompatActivity  {
 
         @Override
         public void onBindViewHolder(@NonNull PhoneHolder holder, int position) {
-            listenedCursor.moveToPosition(position);
+            PhoneNumber phoneNumber = phoneNumbers.get(position);
 
-            String phoneNumber = listenedCursor
-                    .getString(listenedCursor.getColumnIndex(ListenedContract.Listened.COLUMN_NAME_PHONE_NUMBER));
-            String type = listenedCursor
-                    .getString(listenedCursor.getColumnIndex(ListenedContract.Listened.COLUMN_NAME_PHONE_TYPE));
-            String contactName = listenedCursor
-                    .getString(listenedCursor.getColumnIndex(ListenedContract.Listened.COLUMN_NAME_CONTACT_NAME));
-            String photoUriStr = listenedCursor
-                    .getString(listenedCursor.getColumnIndex(ListenedContract.Listened.COLUMN_NAME_CONTACT_PHOTO_URI));
-            boolean unknownPhone = (listenedCursor
-                    .getInt(listenedCursor.getColumnIndex(ListenedContract.Listened.COLUMN_NAME_UNKNOWN_PHONE)) == 1);
-
-            Uri photoUri = null;
-
-            if(photoUriStr != null)
-                photoUri = Uri.parse(photoUriStr);
-
-            if(photoUri != null)
-                holder.contactPhoto.setImageURI(photoUri);
+            if(phoneNumber.getPhotoUri() != null)
+                holder.contactPhoto.setImageURI(phoneNumber.getPhotoUri());
             else {
-                holder.contactPhotoUri = null;
-                if(unknownPhone)
+                if(phoneNumber.isUnknownPhone())
                     holder.contactPhoto.setImageResource(R.drawable.user_contact_red);
                 else
                     holder.contactPhoto.setImageResource(R.drawable.user_contact_blue);
             }
-            holder.mContactName.setText(contactName);
-            holder.contactName = contactName;
-            holder.phoneType = type;
-            holder.phoneNumber = phoneNumber;
-            holder.unknownPhone = unknownPhone;
-            holder.contactPhotoUri = photoUriStr;
-            holder.mPhoneNumber.setText(type + phoneNumber);
+
+            holder.mContactName.setText(phoneNumber.getContactName());
+            holder.contactName = phoneNumber.getContactName();
+            holder.phoneType = phoneNumber.getPhoneType();
+            holder.phoneNumber = phoneNumber.getPhoneNumber();
+            holder.unknownPhone = phoneNumber.isUnknownPhone();
+            holder.contactPhotoUri = phoneNumber.getPhotoUri();
+            holder.mPhoneNumber.setText(phoneNumber.getPhoneType() + phoneNumber.getPhoneNumber());
         }
 
         @Override
         public int getItemCount() {
-            return listenedCursor.getCount();
+            return phoneNumbers.size();
         }
 
     }
