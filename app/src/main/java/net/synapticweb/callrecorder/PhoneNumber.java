@@ -10,6 +10,16 @@ class PhoneNumber implements Comparable<PhoneNumber> {
     private Uri photoUri;
     private boolean unknownPhone = false;
 
+    public boolean isPrivateNumber() {
+        return privateNumber;
+    }
+
+    public void setPrivateNumber(boolean privateNumber) {
+        this.privateNumber = privateNumber;
+    }
+
+    private boolean privateNumber = false;
+
     public int compareTo(@NonNull  PhoneNumber numberToCompare)
     {
         if(this.isUnknownPhone() && !numberToCompare.isUnknownPhone() )

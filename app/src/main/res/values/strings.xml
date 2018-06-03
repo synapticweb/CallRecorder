@@ -6,6 +6,7 @@
     <string name="number_exists_title">Information</string>
     <string name="unkown_contact">UNKNOWN CONTACT</string>
     <string name="unkown_type">Unknown type: </string>
+    <string name="private_number">Private number</string>
     <string name="home_type_phone">Home: </string>
     <string name="mobile_type_phone">Mobile: </string>
     <string name="other_type_phone">Other type: </string>

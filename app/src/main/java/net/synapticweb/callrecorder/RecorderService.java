@@ -37,6 +37,7 @@ public class RecorderService extends Service {
     public static final int NOTIFICATION_ID = 1;
     private static final String CHANNEL_ID = "call_recorder_channel";
     private boolean unknownPhone = false;
+    private boolean privateCall = false;
 
 
     @Override
@@ -92,6 +93,8 @@ public class RecorderService extends Service {
 
         for(Long numberId : numberIds)
         {
+            if(numberId == 0) //cazul intrării pentru numere private e setat la 0 și nu la null, cum mi se pare logic.
+                continue;
             cursor = getContentResolver().
                     query(ContactsContract.Data.CONTENT_URI, new String[]{ContactsContract.CommonDataKinds.Phone.NUMBER},
                             ContactsContract.Data._ID + "=" + numberId, null, null);
@@ -116,7 +119,10 @@ public class RecorderService extends Service {
             createChannel();
 
         if(!numbers.contains(numPhone)) {
-            unknownPhone = true;
+            if(numPhone == null)
+                privateCall = true;
+            else
+                unknownPhone = true;
             notificationIntent = new Intent(this, ControlRecordingReceiver.class);
             notificationIntent.setAction(RecorderBox.ACTION_START_RECORDING);
             notificationIntent.putExtra("channel_id", CHANNEL_ID);
@@ -176,8 +182,41 @@ public class RecorderService extends Service {
         RecordingsDbHelper mDbHelper = new RecordingsDbHelper(getApplicationContext());
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
+        long idToInsert = 0;
 
-        values.put(Recordings.COLUMN_NAME_PHONE_NUM, numPhone);
+        if(unknownPhone)
+        {
+            values = new ContentValues();
+            values.put(Listened.COLUMN_NAME_NUMBER, numPhone);
+           idToInsert = db.insert(Listened.TABLE_NAME, null, values);
+        }
+        else if(privateCall)
+        {
+            Cursor cursor = db.query(Listened.TABLE_NAME, new String[]{Listened._ID},
+                    Listened.COLUMN_NAME_NUMBER + "='" + GlobalConstants.PRIVATE_CALL_DB_NUMBER + "'", null, null, null, null);
+
+            if(cursor.getCount() == 0) {
+                values.clear();
+                values.putNull(Listened.COLUMN_NAME_NUMBER_ID);
+                values.put(Listened.COLUMN_NAME_NUMBER, GlobalConstants.PRIVATE_CALL_DB_NUMBER);
+              idToInsert = db.insert(Listened.TABLE_NAME, null, values);
+            }
+            else
+                idToInsert = cursor.getInt(cursor.getColumnIndex(Listened._ID));
+
+            cursor.close();
+        }
+
+        if(!unknownPhone && !privateCall)
+        {
+            Cursor cursor = db.query(Listened.TABLE_NAME, new String[]{Listened._ID},
+                    Listened.COLUMN_NAME_NUMBER + "='" + numPhone + "'", null, null, null, null);
+            idToInsert = cursor.getLong(cursor.getColumnIndex(Listened._ID));
+            cursor.close();
+        }
+
+        values.clear();
+        values.put(Recordings.COLUMN_NAME_PHONE_NUM_ID, idToInsert);
         values.put(Recordings.COLUMN_NAME_INCOMING, (incoming) ? 1 : 0);
         values.put(Recordings.COLUMN_NAME_PATH, RecorderBox.getAudioFilePath());
         values.put(Recordings.COLUMN_NAME_START_TIMESTAMP, RecorderBox.getStartTimestamp());
@@ -185,11 +224,5 @@ public class RecorderService extends Service {
 
         db.insert(Recordings.TABLE_NAME, null, values);
 
-        if(unknownPhone)
-        {
-            values = new ContentValues();
-            values.put(Listened.COLUMN_NAME_NUMBER, numPhone);
-            db.insert(Listened.TABLE_NAME, null, values);
-        }
     }
 }

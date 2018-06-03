@@ -162,8 +162,17 @@ public class CallRecorderMainActivity extends AppCompatActivity  {
                         phoneNumber.setPhotoUri(null);
                 }
             }
-            else //dacă este număr neinregistrat în contacte:
-                this.makeUnknownPhoneNumber(phoneNumber, cursor);
+            else { //dacă nu are un id valid atunci este nr unknown sau privat:
+                if(phoneNumberListened.equals(GlobalConstants.PRIVATE_CALL_DB_NUMBER))
+                {
+                    phoneNumber.setPrivateNumber(true);
+                    phoneNumber.setPhoneNumber("");
+                    phoneNumber.setPhoneType("");
+                    phoneNumber.setContactName(getResources().getString(R.string.private_number));
+                }
+                else //e unknown
+                    this.makeUnknownPhoneNumber(phoneNumber, cursor);
+            }
 
             phoneNumbers.add(phoneNumber);
         }
@@ -313,6 +322,8 @@ public class CallRecorderMainActivity extends AppCompatActivity  {
             else {
                 if(phoneNumber.isUnknownPhone())
                     holder.contactPhoto.setImageResource(R.drawable.user_contact_red);
+                else if(phoneNumber.isPrivateNumber())
+                    holder.contactPhoto.setImageResource(R.drawable.user_contact_yellow);
                 else
                     holder.contactPhoto.setImageResource(R.drawable.user_contact_blue);
             }

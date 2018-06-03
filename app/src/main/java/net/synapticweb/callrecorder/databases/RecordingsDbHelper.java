@@ -12,9 +12,10 @@ import java.util.List;
 public class RecordingsDbHelper extends SQLiteOpenHelper {
     private static final String SQL_CREATE_RECORDINGS = "CREATE TABLE " +
             Recordings.TABLE_NAME + " (" + Recordings._ID +
-            " INTEGER PRIMARY KEY, " + Recordings.COLUMN_NAME_PHONE_NUM + " TEXT, "
-            + Recordings.COLUMN_NAME_INCOMING + " INTEGER, " + Recordings.COLUMN_NAME_PATH +
-            " TEXT, " + Recordings.COLUMN_NAME_START_TIMESTAMP + " INTEGER, " +
+            " INTEGER PRIMARY KEY, " + Recordings.COLUMN_NAME_PHONE_NUM_ID + " INTEGER, "
+            + Recordings.COLUMN_NAME_INCOMING + " INTEGER, " +
+            Recordings.COLUMN_NAME_PATH + " TEXT, " +
+            Recordings.COLUMN_NAME_START_TIMESTAMP + " INTEGER, " +
             Recordings.COLUMN_NAME_END_TIMESTAMP + " INTEGER )";
 
     private static final String SQL_CREATE_LISTENED = "CREATE TABLE " + Listened.TABLE_NAME + " (" + Listened._ID + " INTEGER PRIMARY KEY, " +
