@@ -19,9 +19,9 @@ public class RecordingsDbHelper extends SQLiteOpenHelper {
             Recordings.COLUMN_NAME_END_TIMESTAMP + " INTEGER )";
 
     private static final String SQL_CREATE_LISTENED = "CREATE TABLE " + Listened.TABLE_NAME + " (" + Listened._ID + " INTEGER PRIMARY KEY, " +
-            Listened.COLUMN_NAME_NUMBER_ID + " INTEGER, " +
             Listened.COLUMN_NAME_NUMBER + " TEXT, " +
-            "CONSTRAINT no_duplicates UNIQUE(" + Listened.COLUMN_NAME_NUMBER_ID + ") )";
+            Listened.COLUMN_NAME_UNKNOWN + " INTEGER DEFAULT 0, " +
+            "CONSTRAINT no_duplicates UNIQUE(" + Listened.COLUMN_NAME_NUMBER + ") )";
 
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "recordings.db";

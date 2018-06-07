@@ -25,6 +25,7 @@ import java.util.List;
 import net.synapticweb.callrecorder.databases.ListenedContract.*;
 import net.synapticweb.callrecorder.databases.RecordingsContract.*;
 import net.synapticweb.callrecorder.databases.RecordingsDbHelper;
+import static net.synapticweb.callrecorder.GlobalConstants.*;
 
 
 public class RecorderService extends Service {
@@ -33,7 +34,6 @@ public class RecorderService extends Service {
     private String numPhone;
     private Boolean incoming;
 
-    private List<String> numbers = new ArrayList<>();
     public static final int NOTIFICATION_ID = 1;
     private static final String CHANNEL_ID = "call_recorder_channel";
     private boolean unknownPhone = false;
@@ -72,39 +72,24 @@ public class RecorderService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId)
     {
         Intent notificationIntent;
-        List<Long> numberIds = new ArrayList<>();
+        List<String> numbers = new ArrayList<>();
 
         super.onStartCommand(intent, flags, startId);
 
         RecordingsDbHelper mDbHelper = new RecordingsDbHelper(getApplicationContext());
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
-        String[] projection = {Listened.COLUMN_NAME_NUMBER_ID};
+        String[] projection = {Listened.COLUMN_NAME_NUMBER};
         Cursor cursor = db.query(
                 Listened.TABLE_NAME, projection, null, null, null, null, null
         );
 
         while(cursor.moveToNext())
         {
-            Long numberId = cursor.getLong(cursor.getColumnIndex(Listened.COLUMN_NAME_NUMBER_ID));
-            numberIds.add(numberId);
+            String number = cursor.getString(cursor.getColumnIndex(Listened.COLUMN_NAME_NUMBER));
+            numbers.add(number);
         }
         cursor.close();
-
-        for(Long numberId : numberIds)
-        {
-            if(numberId == 0) //cazul intrării pentru numere private e setat la 0 și nu la null, cum mi se pare logic.
-                continue;
-            cursor = getContentResolver().
-                    query(ContactsContract.Data.CONTENT_URI, new String[]{ContactsContract.CommonDataKinds.Phone.NUMBER},
-                            ContactsContract.Data._ID + "=" + numberId, null, null);
-
-            if(cursor != null) {
-                cursor.moveToFirst();
-                String number = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                numbers.add(number);
-            }
-        }
 
         numPhone = intent.getStringExtra("phoneNumber");
         incoming = intent.getBooleanExtra("incoming", false);
@@ -187,22 +172,25 @@ public class RecorderService extends Service {
         if(unknownPhone)
         {
             values = new ContentValues();
+            values.put(Listened.COLUMN_NAME_UNKNOWN, SQLITE_TRUE);
             values.put(Listened.COLUMN_NAME_NUMBER, numPhone);
            idToInsert = db.insert(Listened.TABLE_NAME, null, values);
         }
         else if(privateCall)
         {
             Cursor cursor = db.query(Listened.TABLE_NAME, new String[]{Listened._ID},
-                    Listened.COLUMN_NAME_NUMBER + "='" + GlobalConstants.PRIVATE_CALL_DB_NUMBER + "'", null, null, null, null);
+                    Listened.COLUMN_NAME_NUMBER + "='" + PRIVATE_CALL_DB_NUMBER + "'", null, null, null, null);
 
             if(cursor.getCount() == 0) {
                 values.clear();
-                values.putNull(Listened.COLUMN_NAME_NUMBER_ID);
-                values.put(Listened.COLUMN_NAME_NUMBER, GlobalConstants.PRIVATE_CALL_DB_NUMBER);
+                values.put(Listened.COLUMN_NAME_UNKNOWN, 0);
+                values.put(Listened.COLUMN_NAME_NUMBER, PRIVATE_CALL_DB_NUMBER);
               idToInsert = db.insert(Listened.TABLE_NAME, null, values);
             }
-            else
+            else {
+                cursor.moveToFirst();
                 idToInsert = cursor.getInt(cursor.getColumnIndex(Listened._ID));
+            }
 
             cursor.close();
         }
@@ -211,13 +199,14 @@ public class RecorderService extends Service {
         {
             Cursor cursor = db.query(Listened.TABLE_NAME, new String[]{Listened._ID},
                     Listened.COLUMN_NAME_NUMBER + "='" + numPhone + "'", null, null, null, null);
+            cursor.moveToFirst();
             idToInsert = cursor.getLong(cursor.getColumnIndex(Listened._ID));
             cursor.close();
         }
 
         values.clear();
         values.put(Recordings.COLUMN_NAME_PHONE_NUM_ID, idToInsert);
-        values.put(Recordings.COLUMN_NAME_INCOMING, (incoming) ? 1 : 0);
+        values.put(Recordings.COLUMN_NAME_INCOMING, incoming ? SQLITE_TRUE : SQLITE_FALSE);
         values.put(Recordings.COLUMN_NAME_PATH, RecorderBox.getAudioFilePath());
         values.put(Recordings.COLUMN_NAME_START_TIMESTAMP, RecorderBox.getStartTimestamp());
         values.put(Recordings.COLUMN_NAME_END_TIMESTAMP, System.currentTimeMillis());

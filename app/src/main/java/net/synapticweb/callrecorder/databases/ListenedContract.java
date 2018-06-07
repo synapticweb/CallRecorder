@@ -8,7 +8,7 @@ public class ListenedContract {
     public static class Listened implements BaseColumns {
         public static final String TABLE_NAME = "listened";
 
-        public static final String COLUMN_NAME_NUMBER_ID = "number_id";
+        public static final String COLUMN_NAME_UNKNOWN = "unknown";
         public static final String COLUMN_NAME_NUMBER = "phone_number";
     }
 }

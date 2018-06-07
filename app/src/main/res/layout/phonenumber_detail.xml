@@ -53,16 +53,34 @@
             />
     </RelativeLayout>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:layout_gravity="top"
-        android:text="@string/sync_contact"
-        android:background="@color/colorAccent"
-        android:paddingTop="5dp"
-        android:gravity="center"
-        android:id="@+id/sync_contact"
-        android:visibility="gone"
-        />
+   <LinearLayout
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:orientation="horizontal"
+       android:weightSum="2"
+       android:id="@+id/sync_contact"
+       android:visibility="gone"
+       >
+
+       <TextView
+           android:layout_width="0dp"
+           android:layout_height="48dp"
+           android:layout_weight="1"
+           android:id="@+id/sync_new_contact"
+           android:gravity="center"
+           android:layout_gravity="top"
+           android:background="@color/colorAccent"
+           android:text="Make new contact"/>
+
+       <TextView
+           android:layout_width="0dp"
+           android:layout_height="48dp"
+           android:layout_weight="1"
+           android:id="@+id/sync_assign_existing"
+           android:gravity="center"
+           android:layout_gravity="top"
+           android:background="@color/complementaryAccent"
+           android:text="Assign to existing number"/>
+   </LinearLayout>
 
 </RelativeLayout>

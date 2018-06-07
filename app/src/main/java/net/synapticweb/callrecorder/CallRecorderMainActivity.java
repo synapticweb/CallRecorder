@@ -22,7 +22,6 @@ import android.os.Bundle;
 import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,6 +36,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import static net.synapticweb.callrecorder.GlobalConstants.*;
 
 
 public class CallRecorderMainActivity extends AppCompatActivity  {
@@ -54,14 +54,6 @@ public class CallRecorderMainActivity extends AppCompatActivity  {
         adapter.notifyDataSetChanged();
     }
 
-    private void makeUnknownPhoneNumber(PhoneNumber phoneNumber, Cursor cursor)
-    {
-        phoneNumber.setUnknownPhone(true);
-        phoneNumber.setPhoneNumber(cursor.getString(cursor.
-                getColumnIndex(ListenedContract.Listened.COLUMN_NAME_NUMBER)));
-        phoneNumber.setContactName(getResources().getString(R.string.unkown_contact));
-        phoneNumber.setPhoneType(getResources().getString(R.string.unkown_type));
-    }
 
 //Această funcție produce o listă sortată de obiecte PhoneNumber care corespunde numerelor
 // de telefon stocate în baza de date. Lista va fi folosită pentru a inițializa adapterul recyclerview.
@@ -76,102 +68,36 @@ public class CallRecorderMainActivity extends AppCompatActivity  {
 
         while(cursor.moveToNext())
         {
-            PhoneNumber phoneNumber = new PhoneNumber();
-            long idNumber = 0;
-            String lookupKey = null;
-            String phoneNumberListened = null;
-            //dacă este un număr necunoscut (care nu corespunde unui contact) cîmpul id în tabelul listened va fi null.
-            //În această situație idNumber va rămîne 0.
-            if(!cursor.isNull(cursor.getColumnIndex(ListenedContract.Listened.COLUMN_NAME_NUMBER_ID)))
-                idNumber = cursor.getLong(cursor.getColumnIndex(ListenedContract.Listened.COLUMN_NAME_NUMBER_ID));
-            phoneNumberListened = cursor.getString(cursor.getColumnIndex(ListenedContract.Listened.COLUMN_NAME_NUMBER));
+            PhoneNumber phoneNumber = new PhoneNumber(getApplicationContext());
+           boolean unknown = cursor.getInt(cursor.getColumnIndex(ListenedContract.Listened.COLUMN_NAME_UNKNOWN)) == 
+                   SQLITE_TRUE;
+           String phoneNumberListened = cursor.getString(cursor.getColumnIndex(ListenedContract.Listened.COLUMN_NAME_NUMBER));
 
-            if(idNumber != 0) {     //doar în cazul în care este un număr cunoscut
-                // Pe baza id-ului stocat anterior se interoghează ContactsContract.Data pentru a se obține numărul,
-                // tipul de număr și cheia lookup, necesară pentru a interoga ContactsContract.Contacts.
-                Cursor cursor2 = getContentResolver().
-                        query(ContactsContract.Data.CONTENT_URI,
-                                new String[]{ContactsContract.CommonDataKinds.Phone.NUMBER,
-                                        ContactsContract.CommonDataKinds.Phone.TYPE,
-                                ContactsContract.CommonDataKinds.Phone.LOOKUP_KEY},
-                                ContactsContract.Data._ID + "=" + idNumber, null, null);
-
-                if (cursor2 != null) {
-                    //Dacă numărul a fost cumva șters interogarea de mai sus va returna 0 rezultate.
-                    if(cursor2.getCount() == 0)
-                    {
-                        //în această situație trebuie să modificăm linia din listened corespunzătoare acestui număr încît să
-                        //devină din nou număr necunoscut, adică să setăm number_id la null.
-                        ContentValues values = new ContentValues();
-                        values.putNull(ListenedContract.Listened.COLUMN_NAME_NUMBER_ID);
-                        values.put(ListenedContract.Listened.COLUMN_NAME_NUMBER, //E NEVOIE DE ASTA?
-                                cursor.getString(cursor.getColumnIndex(ListenedContract.Listened.COLUMN_NAME_NUMBER)));
-
-                        db.update(ListenedContract.Listened.TABLE_NAME,
-                                values, ListenedContract.Listened.COLUMN_NAME_NUMBER_ID + "=" + idNumber, null);
-                        //se construiește un PhoneNumber unknown:
-                        this.makeUnknownPhoneNumber(phoneNumber, cursor);
-                        phoneNumbers.add(phoneNumber);
-                        continue;
-                    }
-            //Acum populăm cîmpurile obiectului PhoneNumber cu valorile obținute în timp real din tabelele de contacte:
-                    cursor2.moveToFirst();
-                    phoneNumber.setPhoneNumber(
-                            cursor2.getString(cursor2.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)));
-                    //aici trebuie să verificăm dacă numărul extras din contacte este același cu cel pe care îl avem în
-                    //listened; dacă nu, vom updata.
-                    if(!phoneNumber.getPhoneNumber().equals(phoneNumberListened))
-                    {
-                        ContentValues values = new ContentValues();
-                        values.put(ListenedContract.Listened.COLUMN_NAME_NUMBER_ID, idNumber);
-                        values.put(ListenedContract.Listened.COLUMN_NAME_NUMBER, phoneNumber.getPhoneNumber());
-                        db.update(ListenedContract.Listened.TABLE_NAME, values,
-                                ListenedContract.Listened.COLUMN_NAME_NUMBER_ID + "=" + idNumber, null);
-                    }
-                    int typeCode = cursor2.getInt(cursor2.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
-                    switch (typeCode) {
-                        case 1:
-                            phoneNumber.setPhoneType(getResources().getString(R.string.home_type_phone));
-                            break;
-                        case 2:
-                            phoneNumber.setPhoneType(getResources().getString(R.string.mobile_type_phone));
-                            break;
-                        default:
-                            phoneNumber.setPhoneType(getResources().getString(R.string.other_type_phone));
-                    }
-                    lookupKey = cursor2.getString(cursor2.getColumnIndex(ContactsContract.CommonDataKinds.Phone.LOOKUP_KEY));
-                    cursor2.close();
+            if(unknown)
+            {
+                //Dacă este nr necunoscut, verificăm dacă nu cumva a fost introdus între timp un contact cu acest nr. Rezultatul
+                // acestei căutări în avans este următorul: dacă există un contact cu un nr, dar nr respectiv nu e introdus
+                // în aplicație și la apelul de pe acel nr se solicită "record", nr este introdus automat în aplicație.
+                if(phoneNumber.searchContactData(phoneNumberListened) == PhoneNumber.FOUND_CONTACT) {
+                    phoneNumber.toggleUnknownFlag(false, null); //dacă da, modificăm în db flagul unknown
                 }
+                else
+                    phoneNumber.makeUnknownPhoneNumber(phoneNumberListened);
 
-                Uri lookupUri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_LOOKUP_URI, lookupKey);
-                cursor2 = getContentResolver().
-                        query(lookupUri,
-                                new String[]{ContactsContract.Contacts.DISPLAY_NAME,
-                                        ContactsContract.Contacts.PHOTO_URI},
-                                null, null, null);
-
-                if (cursor2 != null) {
-                    cursor2.moveToFirst();
-                    phoneNumber.
-                            setContactName(cursor2.getString(cursor2.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)));
-                    String photoUriStr = cursor2.getString(cursor2.getColumnIndex(ContactsContract.Contacts.PHOTO_URI));
-                    cursor2.close();
-                    if (photoUriStr != null)
-                        phoneNumber.setPhotoUri(Uri.parse(photoUriStr));
-                    else
-                        phoneNumber.setPhotoUri(null);
-                }
             }
-            else { //dacă nu are un id valid atunci este nr unknown sau privat:
-                if(phoneNumberListened.equals(GlobalConstants.PRIVATE_CALL_DB_NUMBER))
+            else if(phoneNumberListened.equals(PRIVATE_CALL_DB_NUMBER))
+                   phoneNumber.makePrivatePhoneNumber();
+
+            else { //dacă nu e nici nr necunoscut, nici nr privat verificăm dacă nu suntem în situația cînd nu există niciun 
+                // contact asociat cu acest nr.
+                if(phoneNumber.searchContactData(phoneNumberListened) == PhoneNumber.NOTFOUND_CONTACT)
                 {
-                    phoneNumber.setPrivateNumber(true);
-                    phoneNumber.setPhoneNumber("");
-                    phoneNumber.setPhoneType("");
-                    phoneNumber.setContactName(getResources().getString(R.string.private_number));
+                    phoneNumber.setPhoneNumber(phoneNumberListened);//aici trebuie să setăm nr pentru toggleUnknownFlag.
+                    //La apelul precedent nu a fost nevoie, fiindcă searchContactData întorsese CONTACT_FOUND și setate deja nr
+                    //în obiectul PhoneNumber.
+                    phoneNumber.toggleUnknownFlag(true, null);
+                    phoneNumber.makeUnknownPhoneNumber(phoneNumberListened);
                 }
-                else //e unknown
-                    this.makeUnknownPhoneNumber(phoneNumber, cursor);
             }
 
             phoneNumbers.add(phoneNumber);
@@ -214,24 +140,20 @@ public class CallRecorderMainActivity extends AppCompatActivity  {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Uri numberUri;
-        long idNewNumber = 0;
         String newNumber = null;
 
         if (resultCode != Activity.RESULT_OK) {
             return;
         }
-        //la selectarea unui număr nou se interoghează ContactsContract.Data și se extrage id-ul numărului și numărul.
-        //Id-ul este necesar pentru obținerea ulterioară - in timp real - a datelor relevante despre contact iar numărul
-        //trebuie stocat pentru situația în care contactul asociat este șters. În această situație numărul va figura ca unknown.
+        //la selectarea unui număr nou se interoghează ContactsContract.Data și se extrage numărul de telefon.
+       //Numărul va funcționa ca cheie după care sunt extrase datele contactului.
         if (requestCode == REQUEST_NUMBER && (numberUri = data.getData()) != null) {
                 Cursor cursor = getContentResolver().
-                        query(numberUri, new String[]{ContactsContract.Data._ID,
-                                        ContactsContract.CommonDataKinds.Phone.NUMBER},
+                        query(numberUri, new String[]{ContactsContract.CommonDataKinds.Phone.NUMBER},
                                 null, null, null);
                 if(cursor != null)
                 {
                     cursor.moveToFirst();
-                    idNewNumber =  cursor.getLong(cursor.getColumnIndex(ContactsContract.Data._ID));
                     newNumber = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
                     cursor.close();
                 }
@@ -240,10 +162,7 @@ public class CallRecorderMainActivity extends AppCompatActivity  {
             SQLiteDatabase db = mDbHelper.getWritableDatabase();
             ContentValues values = new ContentValues();
 
-            values.put(ListenedContract.Listened.COLUMN_NAME_NUMBER_ID, idNewNumber);
             values.put(ListenedContract.Listened.COLUMN_NAME_NUMBER, newNumber);
-            //în cazul în care este selectat un număr care există deja în baza de date, acesta trebuie să aibă același
-            //id și inserarea va eșua din cauza clauzei unique din baza de date.
             try {
                 db.insertOrThrow(ListenedContract.Listened.TABLE_NAME, null, values);
             }
@@ -271,13 +190,9 @@ public class CallRecorderMainActivity extends AppCompatActivity  {
 
     public class PhoneHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         ImageView contactPhoto;
-        Uri contactPhotoUri;
         TextView mContactName;
-        String contactName;
         TextView mPhoneNumber;
-        String phoneNumber;
-        String phoneType;
-        boolean unknownPhone;
+        PhoneNumber number;
 
         PhoneHolder(LayoutInflater inflater, ViewGroup parent)
         {
@@ -291,11 +206,12 @@ public class CallRecorderMainActivity extends AppCompatActivity  {
         @Override
         public void onClick(View view) {
             Intent detailIntent = new Intent(CallRecorderMainActivity.this, PhoneNumberDetail.class);
-            detailIntent.putExtra("phone_number", phoneNumber);
-            detailIntent.putExtra("phone_type", phoneType);
-            detailIntent.putExtra("contact_photo_uri", (contactPhotoUri == null) ? null : contactPhotoUri.toString() );
-            detailIntent.putExtra("contact_name", contactName);
-            detailIntent.putExtra("unknown_phone", unknownPhone);
+            detailIntent.putExtra("phone_number", number.getPhoneNumber());
+            detailIntent.putExtra("phone_type", number.getPhoneType());
+            detailIntent.putExtra("contact_photo_uri", (number.getPhotoUri() == null) ? null : number.getPhotoUri().toString() );
+            detailIntent.putExtra("contact_name", number.getContactName());
+            detailIntent.putExtra("unknown_phone", number.isUnknownPhone());
+            detailIntent.putExtra("private_number", number.isPrivateNumber());
             startActivity(detailIntent);
         }
     }
@@ -329,11 +245,7 @@ public class CallRecorderMainActivity extends AppCompatActivity  {
             }
 
             holder.mContactName.setText(phoneNumber.getContactName());
-            holder.contactName = phoneNumber.getContactName();
-            holder.phoneType = phoneNumber.getPhoneType();
-            holder.phoneNumber = phoneNumber.getPhoneNumber();
-            holder.unknownPhone = phoneNumber.isUnknownPhone();
-            holder.contactPhotoUri = phoneNumber.getPhotoUri();
+            holder.number = phoneNumber;
             holder.mPhoneNumber.setText(phoneNumber.getPhoneType() + phoneNumber.getPhoneNumber());
         }
 
