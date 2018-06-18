@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v7.widget.Toolbar
+        android:layout_height="?attr/actionBarSize"
+        android:layout_width="match_parent"
+        android:background="?attr/colorPrimary"
+        app:titleTextColor="@color/textOnDark"
+        android:id="@+id/toolbar_settings"
+        app:title="Settings"
+        android:elevation="2dp"
+        android:theme="@style/toolbar_theme"
+        app:titleTextAppearance="@style/toolbar_font"
+        >
+
+    </android.support.v7.widget.Toolbar>
+
+</LinearLayout>

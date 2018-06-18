@@ -5,6 +5,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <android.support.v7.widget.Toolbar
+        android:layout_height="?attr/actionBarSize"
+        android:layout_width="match_parent"
+        android:background="?attr/colorPrimary"
+        app:titleTextColor="@color/textOnDark"
+        android:id="@+id/toolbar_detail"
+        android:elevation="2dp"
+        android:theme="@style/toolbar_theme"
+        app:titleTextAppearance="@style/toolbar_font"
+        >
+
+    </android.support.v7.widget.Toolbar>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:id="@+id/filler">
+    </TextView>
 
     <RelativeLayout
         android:layout_width="wrap_content"
@@ -12,6 +30,7 @@
         android:orientation="horizontal"
         android:layout_marginTop="15dp"
         android:layout_marginStart="15dp"
+        android:layout_below="@id/filler"
         >
 
     <de.hdodenhof.circleimageview.CircleImageView
@@ -24,33 +43,26 @@
         app:civ_border_color="#FFFFFFFF"
        />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toEndOf="@+id/contact_photo_detail"
-        android:layout_marginStart="20dp"
-        android:id="@+id/contact_name_detail"
-        />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toEndOf="@+id/contact_photo_detail"
-            android:layout_below="@id/contact_name_detail"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:id="@+id/phone_number_detail"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/contact_photo_detail"
             android:layout_marginStart="20dp"
             android:layout_marginTop="10dp"
             android:id="@+id/phone_type_detail"
+            android:layout_below="@id/phone_number_detail"
             />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toEndOf="@+id/contact_photo_detail"
-            android:layout_below="@id/phone_type_detail"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="10dp"
-            android:id="@+id/phone_number_detail"
-            />
     </RelativeLayout>
 
    <LinearLayout
@@ -60,6 +72,7 @@
        android:weightSum="2"
        android:id="@+id/sync_contact"
        android:visibility="gone"
+       android:layout_below="@+id/toolbar_detail"
        >
 
        <TextView

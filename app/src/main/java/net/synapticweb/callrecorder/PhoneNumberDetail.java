@@ -6,7 +6,9 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.text.Spanned;
 import android.view.View;
@@ -19,7 +21,6 @@ public class PhoneNumberDetail extends AppCompatActivity {
     LinearLayout syncContact;
     Intent intent;
     boolean hasSyncedContact;
-    TextView contactNameView;
     TextView typePhoneView;
     TextView phoneNumberView;
     ImageView contactPhotoView;
@@ -29,8 +30,6 @@ public class PhoneNumberDetail extends AppCompatActivity {
 
     //populează view-urile din activitatea phonenumberdetail cu ajutorul cîmpurilor din obiectul PhoneNumber:
     private void repaintViews(){
-        contactNameView.setText(getSpannedText(String.format(getResources().getString(
-                R.string.detail_contactname_intro), phoneNumber.getContactName())));
         typePhoneView.setText(getSpannedText(String.format(getResources().getString(
                 R.string.detail_phonetype_intro), phoneNumber.getPhoneType())));
         phoneNumberView.setText(getSpannedText(String.format(getResources().getString(
@@ -57,6 +56,9 @@ public class PhoneNumberDetail extends AppCompatActivity {
         {
             if(phoneNumber.searchContactData(phoneNumber.getPhoneNumber()) == PhoneNumber.FOUND_CONTACT) {
                 this.repaintViews();
+                ActionBar actionBar = getSupportActionBar();
+                if(actionBar != null)
+                    actionBar.setTitle(phoneNumber.getContactName());
                 phoneNumber.toggleUnknownFlag(false, null);
                 syncContact.setVisibility(View.GONE);
             }
@@ -78,7 +80,6 @@ public class PhoneNumberDetail extends AppCompatActivity {
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.phonenumber_detail);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         intent = getIntent();
         //este refăcut obiectul PhoneNumber cu ajutorul date transmise în intent:
@@ -92,6 +93,13 @@ public class PhoneNumberDetail extends AppCompatActivity {
         phoneNumber.setPrivateNumber(intent.getBooleanExtra("private_number", false));
 
 
+        Toolbar toolbar = findViewById(R.id.toolbar_detail);
+        toolbar.setTitle(phoneNumber.getContactName());
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if(actionBar != null)
+            actionBar.setDisplayHomeAsUpEnabled(true);
+
         syncContact = findViewById(R.id.sync_contact); //butonul de sync devine vizibil doar cînd avem un telefon unoknown:
         if(phoneNumber.isUnknownPhone()) {
             //înainte de a face vizibile butoanele de sync mai verificăm o dată dacă nu cumva nr a fost introdus în contacte:
@@ -99,7 +107,6 @@ public class PhoneNumberDetail extends AppCompatActivity {
                 syncContact.setVisibility(View.VISIBLE);
         }
 
-        contactNameView = findViewById(R.id.contact_name_detail);
         typePhoneView = findViewById(R.id.phone_type_detail);
         phoneNumberView = findViewById(R.id.phone_number_detail);
         contactPhotoView = findViewById(R.id.contact_photo_detail);
@@ -154,6 +161,9 @@ public class PhoneNumberDetail extends AppCompatActivity {
                     phoneNumber.searchContactData(number);
                     phoneNumber.toggleUnknownFlag(false, oldNumber);
                     this.repaintViews();
+                    ActionBar actionBar = getSupportActionBar();
+                    if(actionBar != null)
+                        actionBar.setTitle(phoneNumber.getContactName());
                     syncContact.setVisibility(View.GONE);
                 }
             }

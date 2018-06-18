@@ -16,15 +16,18 @@ import android.os.Build;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -114,6 +117,12 @@ public class CallRecorderMainActivity extends AppCompatActivity  {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_call_recorder_main);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if(actionBar != null)
+            actionBar.setDisplayShowTitleEnabled(false);
+
 
         if(Build.MANUFACTURER.equalsIgnoreCase("huawei"))
         {
@@ -130,6 +139,14 @@ public class CallRecorderMainActivity extends AppCompatActivity  {
             }
         });
 
+        Button settings = findViewById(R.id.settings);
+        settings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(CallRecorderMainActivity.this, SettingsActivity.class);
+                startActivity(intent);
+            }
+        });
 
         listenedPhones = findViewById(R.id.listened_phones);
         listenedPhones.setLayoutManager(new LinearLayoutManager(this));

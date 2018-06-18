@@ -14,7 +14,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.IBinder;
-import android.provider.ContactsContract;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 //import android.support.v4.media.app.NotificationCompat.MediaStyle;device

@@ -32,6 +32,10 @@
             android:parentActivityName=".CallRecorderMainActivity">
         </activity>
 
+        <activity android:name=".SettingsActivity"
+            android:parentActivityName=".CallRecorderMainActivity">
+        </activity>
+
 
         <receiver android:name=".CallReceiver">
             <intent-filter>

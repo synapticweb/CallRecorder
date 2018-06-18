@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">CallRecorder</string>
+    <string name="app_name">SCall Recorder</string>
     <string name="device_description">device description</string>
     <string name="device_admin_label">device admin label</string>
     <string name="number_exists_message">The number you selected already exists in the database.</string>
