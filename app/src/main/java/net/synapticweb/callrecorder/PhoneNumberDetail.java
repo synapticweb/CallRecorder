@@ -18,18 +18,14 @@ import android.widget.TextView;
 
 
 public class PhoneNumberDetail extends AppCompatActivity {
-    LinearLayout syncContact;
     Intent intent;
-    boolean hasSyncedContact;
     TextView typePhoneView;
     TextView phoneNumberView;
     ImageView contactPhotoView;
     PhoneNumber phoneNumber;
-    static final int PICK_EXISTING_NUMBER = 1;
     private static String TAG = "CallRecorder";
 
-    //populează view-urile din activitatea phonenumberdetail cu ajutorul cîmpurilor din obiectul PhoneNumber:
-    private void repaintViews(){
+    private void paintViews(){
         typePhoneView.setText(getSpannedText(String.format(getResources().getString(
                 R.string.detail_phonetype_intro), phoneNumber.getPhoneType())));
         phoneNumberView.setText(getSpannedText(String.format(getResources().getString(
@@ -38,32 +34,14 @@ public class PhoneNumberDetail extends AppCompatActivity {
         if(phoneNumber.getPhotoUri() != null)
             contactPhotoView.setImageURI(phoneNumber.getPhotoUri());
         else {
-            if(phoneNumber.isUnknownPhone())
-                contactPhotoView.setImageResource(R.drawable.user_contact_red);
-            else if(phoneNumber.isPrivateNumber())
+            if(phoneNumber.isPrivateNumber())
                 contactPhotoView.setImageResource(R.drawable.user_contact_yellow);
+            else if(phoneNumber.isUnkownNumber())
+                contactPhotoView.setImageResource(R.drawable.user_contact_red);
             else
                 contactPhotoView.setImageResource(R.drawable.user_contact_blue);
         }
 
-    }
-
-    @Override
-    protected void onResume()
-    {
-        super.onResume();
-        if(hasSyncedContact)
-        {
-            if(phoneNumber.searchContactData(phoneNumber.getPhoneNumber()) == PhoneNumber.FOUND_CONTACT) {
-                this.repaintViews();
-                ActionBar actionBar = getSupportActionBar();
-                if(actionBar != null)
-                    actionBar.setTitle(phoneNumber.getContactName());
-                phoneNumber.toggleUnknownFlag(false, null);
-                syncContact.setVisibility(View.GONE);
-            }
-            hasSyncedContact = false;
-            }
     }
 
     private Spanned getSpannedText(String text) {
@@ -74,7 +52,6 @@ public class PhoneNumberDetail extends AppCompatActivity {
 
     }
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -83,14 +60,13 @@ public class PhoneNumberDetail extends AppCompatActivity {
 
         intent = getIntent();
         //este refăcut obiectul PhoneNumber cu ajutorul date transmise în intent:
-        phoneNumber = new PhoneNumber(getApplicationContext());
+        phoneNumber = new PhoneNumber();
         phoneNumber.setContactName(intent.getStringExtra("contact_name"));
         phoneNumber.setPhoneNumber(intent.getStringExtra("phone_number"));
         phoneNumber.setPhoneType(intent.getStringExtra("phone_type"));
-        phoneNumber.setPhotoUri( (intent.getStringExtra("contact_photo_uri") != null)
-        ? Uri.parse(intent.getStringExtra("contact_photo_uri")) : null);
-        phoneNumber.setUnknownPhone(intent.getBooleanExtra("unknown_phone", false));
+        phoneNumber.setPhotoUri(intent.getStringExtra("contact_photo_uri"));
         phoneNumber.setPrivateNumber(intent.getBooleanExtra("private_number", false));
+        phoneNumber.setUnkownNumber(intent.getBooleanExtra("unknown_number", false));
 
 
         Toolbar toolbar = findViewById(R.id.toolbar_detail);
@@ -100,75 +76,13 @@ public class PhoneNumberDetail extends AppCompatActivity {
         if(actionBar != null)
             actionBar.setDisplayHomeAsUpEnabled(true);
 
-        syncContact = findViewById(R.id.sync_contact); //butonul de sync devine vizibil doar cînd avem un telefon unoknown:
-        if(phoneNumber.isUnknownPhone()) {
-            //înainte de a face vizibile butoanele de sync mai verificăm o dată dacă nu cumva nr a fost introdus în contacte:
-            if (phoneNumber.searchContactData(intent.getStringExtra("phone_number")) == PhoneNumber.NOTFOUND_CONTACT)
-                syncContact.setVisibility(View.VISIBLE);
-        }
-
         typePhoneView = findViewById(R.id.phone_type_detail);
         phoneNumberView = findViewById(R.id.phone_number_detail);
         contactPhotoView = findViewById(R.id.contact_photo_detail);
 
-        this.repaintViews();
-
-        TextView syncNewContact = findViewById(R.id.sync_new_contact);
-        TextView syncAssignExisting = findViewById(R.id.sync_assign_existing);
-
-        syncNewContact.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(ContactsContract.Intents.Insert.ACTION);
-                intent.setType(ContactsContract.Contacts.CONTENT_TYPE);
-                intent.putExtra(ContactsContract.Intents.Insert.PHONE, phoneNumber.getPhoneNumber());
-                hasSyncedContact = true;
-                startActivity(intent);
-            }
-        });
-
-        syncAssignExisting.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent pickNumber = new Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
-                startActivityForResult(pickNumber, PICK_EXISTING_NUMBER);
-            }
-        });
-
+        this.paintViews();
 
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        String number = null;
-        if(requestCode == PICK_EXISTING_NUMBER)
-        {
-            if(resultCode == RESULT_OK)
-            {
-                Uri numberUri = data.getData();
-                if(numberUri != null) {
-                    Cursor cursor = getContentResolver().
-                            query(numberUri, new String[]{ContactsContract.CommonDataKinds.Phone.NUMBER},
-                                    null, null, null);
-
-                    if(cursor != null)
-                    {
-                        cursor.moveToFirst();
-                        number = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                        cursor.close();
-                    }
-                    String oldNumber = phoneNumber.getPhoneNumber();
-                    phoneNumber.searchContactData(number);
-                    phoneNumber.toggleUnknownFlag(false, oldNumber);
-                    this.repaintViews();
-                    ActionBar actionBar = getSupportActionBar();
-                    if(actionBar != null)
-                        actionBar.setTitle(phoneNumber.getContactName());
-                    syncContact.setVisibility(View.GONE);
-                }
-            }
-        }
-
-    }
 
 }

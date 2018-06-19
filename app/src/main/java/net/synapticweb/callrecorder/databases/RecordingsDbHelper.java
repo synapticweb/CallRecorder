@@ -6,8 +6,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 import net.synapticweb.callrecorder.databases.RecordingsContract.*;
 import net.synapticweb.callrecorder.databases.ListenedContract.*;
 
-import java.util.List;
-
 
 public class RecordingsDbHelper extends SQLiteOpenHelper {
     private static final String SQL_CREATE_RECORDINGS = "CREATE TABLE " +
@@ -20,7 +18,12 @@ public class RecordingsDbHelper extends SQLiteOpenHelper {
 
     private static final String SQL_CREATE_LISTENED = "CREATE TABLE " + Listened.TABLE_NAME + " (" + Listened._ID + " INTEGER PRIMARY KEY, " +
             Listened.COLUMN_NAME_NUMBER + " TEXT, " +
-            Listened.COLUMN_NAME_UNKNOWN + " INTEGER DEFAULT 0, " +
+            Listened.COLUMN_NAME_CONTACT_NAME + " TEXT, " +
+            Listened.COLUMN_NAME_PHOTO_URI + " TEXT, " +
+            Listened.COLUMN_NAME_PHONE_TYPE + " INTEGER, " +
+            Listened.COLUMN_NAME_SHOULD_RECORD + " INTEGER DEFAULT  1, " +
+            Listened.COLUMN_NAME_PRIVATE_NUMBER + " INTEGER DEFAULT 0, " +
+            Listened.COLUMN_NAME_UNKNOWN_NUMBER + " INTEGER DEFAULT 0, " +
             "CONSTRAINT no_duplicates UNIQUE(" + Listened.COLUMN_NAME_NUMBER + ") )";
 
     private static final int DATABASE_VERSION = 1;

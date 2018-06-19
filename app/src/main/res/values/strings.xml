@@ -5,6 +5,7 @@
     <string name="number_exists_message">The number you selected already exists in the database.</string>
     <string name="number_exists_title">Information</string>
     <string name="unkown_contact">UNKNOWN CONTACT</string>
+    <string name="private_number_name">Private number</string>
     <string name="unkown_type">Unknown type: </string>
     <string name="private_number">Private number</string>
     <string name="home_type_phone">Home: </string>
@@ -14,4 +15,5 @@
     <string name="detail_contactname_intro"><![CDATA[<b>Name: </b>]]>%s</string>
     <string name="detail_phonetype_intro"><![CDATA[<b>Phone type: </b>]]>%s</string>
     <string name="detail_phonenumber_intro"><![CDATA[<b>Phone number: </b>]]>%s</string>
+    <string name="main_activity_title">Phone numbers</string>
 </resources>

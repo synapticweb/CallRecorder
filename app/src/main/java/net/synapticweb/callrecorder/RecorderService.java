@@ -9,6 +9,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -16,6 +17,7 @@ import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 //import android.support.v4.media.app.NotificationCompat.MediaStyle;device
 
 import java.util.ArrayList;
@@ -105,8 +107,27 @@ public class RecorderService extends Service {
         if(!numbers.contains(numPhone)) {
             if(numPhone == null)
                 privateCall = true;
-            else
-                unknownPhone = true;
+            else {
+                PhoneNumber phoneNumber;
+                if((phoneNumber = PhoneNumber.searchNumberInContacts(numPhone, getApplicationContext())) != null)
+                {
+                    ContentValues values = new ContentValues();
+                    values.put(Listened.COLUMN_NAME_NUMBER, phoneNumber.getPhoneNumber());
+                    values.put(Listened.COLUMN_NAME_CONTACT_NAME, phoneNumber.getContactName());
+                    values.put(Listened.COLUMN_NAME_PHONE_TYPE, phoneNumber.getPhoneTypeCode());
+                    values.put(Listened.COLUMN_NAME_PHOTO_URI,
+                            (phoneNumber.getPhotoUri() == null) ? null : phoneNumber.getPhotoUri().toString());
+                    try {
+                        db.insert(Listened.TABLE_NAME, null, values);
+                    }
+                    catch (SQLException exception) {
+                        Log.wtf(TAG, exception.getMessage());
+                    }
+                }
+                else
+                    unknownPhone = true;
+            }
+
             notificationIntent = new Intent(this, ControlRecordingReceiver.class);
             notificationIntent.setAction(RecorderBox.ACTION_START_RECORDING);
             notificationIntent.putExtra("channel_id", CHANNEL_ID);
@@ -171,19 +192,20 @@ public class RecorderService extends Service {
         if(unknownPhone)
         {
             values = new ContentValues();
-            values.put(Listened.COLUMN_NAME_UNKNOWN, SQLITE_TRUE);
+            values.put(Listened.COLUMN_NAME_UNKNOWN_NUMBER, true);
             values.put(Listened.COLUMN_NAME_NUMBER, numPhone);
+            values.put(Listened.COLUMN_NAME_PHONE_TYPE, UNKNOWN_TYPE_PHONE_CODE);
            idToInsert = db.insert(Listened.TABLE_NAME, null, values);
         }
         else if(privateCall)
         {
             Cursor cursor = db.query(Listened.TABLE_NAME, new String[]{Listened._ID},
-                    Listened.COLUMN_NAME_NUMBER + "='" + PRIVATE_CALL_DB_NUMBER + "'", null, null, null, null);
+                    Listened.COLUMN_NAME_PRIVATE_NUMBER + "=" + SQLITE_TRUE, null, null, null, null);
 
             if(cursor.getCount() == 0) {
                 values.clear();
-                values.put(Listened.COLUMN_NAME_UNKNOWN, 0);
-                values.put(Listened.COLUMN_NAME_NUMBER, PRIVATE_CALL_DB_NUMBER);
+                values.put(Listened.COLUMN_NAME_PRIVATE_NUMBER, SQLITE_TRUE);
+                values.put(Listened.COLUMN_NAME_PHONE_TYPE, UNKNOWN_TYPE_PHONE_CODE);
               idToInsert = db.insert(Listened.TABLE_NAME, null, values);
             }
             else {
