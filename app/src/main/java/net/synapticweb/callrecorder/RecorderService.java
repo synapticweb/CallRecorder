@@ -21,7 +21,9 @@ import android.util.Log;
 //import android.support.v4.media.app.NotificationCompat.MediaStyle;device
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.synapticweb.callrecorder.databases.ListenedContract.*;
 import net.synapticweb.callrecorder.databases.RecordingsContract.*;
@@ -39,6 +41,7 @@ public class RecorderService extends Service {
     private static final String CHANNEL_ID = "call_recorder_channel";
     private boolean unknownPhone = false;
     private boolean privateCall = false;
+    private PhoneNumber phoneNumber = null;
 
 
     @Override
@@ -70,107 +73,100 @@ public class RecorderService extends Service {
         mNotificationManager.createNotificationChannel(mChannel);
     }
 
-    public int onStartCommand(Intent intent, int flags, int startId)
-    {
-        Intent notificationIntent;
-        List<String> numbers = new ArrayList<>();
-
-        super.onStartCommand(intent, flags, startId);
-
-        RecordingsDbHelper mDbHelper = new RecordingsDbHelper(getApplicationContext());
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
-
-        String[] projection = {Listened.COLUMN_NAME_NUMBER};
-        Cursor cursor = db.query(
-                Listened.TABLE_NAME, projection, null, null, null, null, null
-        );
-
-        while(cursor.moveToNext())
-        {
-            String number = cursor.getString(cursor.getColumnIndex(Listened.COLUMN_NAME_NUMBER));
-            numbers.add(number);
-        }
-        cursor.close();
-
-        numPhone = intent.getStringExtra("phoneNumber");
-        incoming = intent.getBooleanExtra("incoming", false);
-
-        notificationIntent = new Intent(this, CallRecorderMainActivity.class);
+    private Notification buildNotification(boolean startRecording) {
+        Intent notificationIntent = new Intent(this, CallRecorderMainActivity.class);
         PendingIntent tapNotificationPi = PendingIntent.getBroadcast(this, 0, notificationIntent, 0);
-
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.record);
-        RecorderBox.setAudioFile(this, numPhone);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             createChannel();
+        NotificationCompat.Builder builder;
 
-        if(!numbers.contains(numPhone)) {
-            if(numPhone == null)
-                privateCall = true;
-            else {
-                PhoneNumber phoneNumber;
-                if((phoneNumber = PhoneNumber.searchNumberInContacts(numPhone, getApplicationContext())) != null)
-                {
-                    ContentValues values = new ContentValues();
-                    values.put(Listened.COLUMN_NAME_NUMBER, phoneNumber.getPhoneNumber());
-                    values.put(Listened.COLUMN_NAME_CONTACT_NAME, phoneNumber.getContactName());
-                    values.put(Listened.COLUMN_NAME_PHONE_TYPE, phoneNumber.getPhoneTypeCode());
-                    values.put(Listened.COLUMN_NAME_PHOTO_URI,
-                            (phoneNumber.getPhotoUri() == null) ? null : phoneNumber.getPhotoUri().toString());
-                    try {
-                        db.insert(Listened.TABLE_NAME, null, values);
-                    }
-                    catch (SQLException exception) {
-                        Log.wtf(TAG, exception.getMessage());
-                    }
-                }
-                else
-                    unknownPhone = true;
-            }
+        if(startRecording)
+        {
+            notificationIntent = new Intent(this, ControlRecordingReceiver.class);
+            notificationIntent.setAction(RecorderBox.ACTION_PAUSE_RECORDING);
+            PendingIntent pauseRecordingPi = PendingIntent.getBroadcast(this, 0, notificationIntent, 0);
 
+            notificationIntent = new Intent(this, ControlRecordingReceiver.class);
+            notificationIntent.setAction(RecorderBox.ACTION_STOP_RECORDING);
+            PendingIntent stopRecordingPi = PendingIntent.getBroadcast(this, 0, notificationIntent, 0);
+
+            builder = new NotificationCompat.Builder(this, CHANNEL_ID)
+                    .setSmallIcon(R.drawable.ic_album_white_24dp)
+                    .setContentTitle("CallRecorder")
+                    .setContentIntent(tapNotificationPi)
+                    .setLargeIcon(bitmap);
+
+            if (Build.VERSION.SDK_INT >= 24)
+                builder.addAction(new NotificationCompat.Action.Builder(
+                        R.drawable.ic_pause_grey600_24dp, "Pause recording", pauseRecordingPi).build());
+
+            builder.addAction(new NotificationCompat.Action.Builder(
+                    R.drawable.ic_stop_grey600_24dp, "Stop recording", stopRecordingPi).build())
+                    .setStyle(new NotificationCompat.BigTextStyle().bigText("Recording..."));
+
+        }
+        else
+        {
             notificationIntent = new Intent(this, ControlRecordingReceiver.class);
             notificationIntent.setAction(RecorderBox.ACTION_START_RECORDING);
             notificationIntent.putExtra("channel_id", CHANNEL_ID);
             PendingIntent startRecordingPi = PendingIntent.getBroadcast(this, 0, notificationIntent, 0);
 
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
+            builder = new NotificationCompat.Builder(this, CHANNEL_ID)
                     .setSmallIcon(R.drawable.ic_album_white_24dp)
                     .setContentTitle("CallRecorder")
                     .setContentIntent(tapNotificationPi)
                     .setLargeIcon(bitmap)
                     .addAction(new NotificationCompat.Action.Builder(R.drawable.ic_play_grey600_24dp,
                             "Start recording", startRecordingPi).build() )
-            .setStyle(new NotificationCompat.BigTextStyle()); //Fiindcă încă nu înregistrăm, nu scriem nimic deasupra butonului.
+                    .setStyle(new NotificationCompat.BigTextStyle()); //Fiindcă încă nu înregistrăm, nu scriem nimic deasupra
+        }
+        return builder.build();
+    }
 
-            startForeground(NOTIFICATION_ID, builder.build());
-            return START_NOT_STICKY;
+    public int onStartCommand(Intent intent, int flags, int startId)
+    {
+        Map<String, Boolean> numbers = new HashMap<>();
+
+        super.onStartCommand(intent, flags, startId);
+
+        RecordingsDbHelper mDbHelper = new RecordingsDbHelper(getApplicationContext());
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+
+        String[] projection = {Listened.COLUMN_NAME_NUMBER, Listened.COLUMN_NAME_SHOULD_RECORD};
+        Cursor cursor = db.query(
+                Listened.TABLE_NAME, projection, null, null, null, null, null);
+
+        while(cursor.moveToNext())
+        {
+            String number = cursor.getString(cursor.getColumnIndex(Listened.COLUMN_NAME_NUMBER));
+            Boolean shouldRecord = cursor.getInt(cursor.getColumnIndex(Listened.COLUMN_NAME_SHOULD_RECORD)) == 1;
+            numbers.put(number, shouldRecord);
+        }
+        cursor.close();
+
+        numPhone = intent.getStringExtra("phoneNumber");
+        incoming = intent.getBooleanExtra("incoming", false);
+        RecorderBox.setAudioFile(this, numPhone);
+
+        if(!numbers.containsKey(numPhone)) {
+            if (numPhone == null)
+                privateCall = true;
+            else {
+                if ((phoneNumber = PhoneNumber.searchNumberInContacts(numPhone, getApplicationContext())) == null)
+                    unknownPhone = true;
+            }
+
         }
 
-       notificationIntent = new Intent(this, ControlRecordingReceiver.class);
-        notificationIntent.setAction(RecorderBox.ACTION_PAUSE_RECORDING);
-        PendingIntent pauseRecordingPi = PendingIntent.getBroadcast(this, 0, notificationIntent, 0);
-
-        notificationIntent = new Intent(this, ControlRecordingReceiver.class);
-        notificationIntent.setAction(RecorderBox.ACTION_STOP_RECORDING);
-        PendingIntent stopRecordingPi = PendingIntent.getBroadcast(this, 0, notificationIntent, 0);
-
-        NotificationCompat.Builder  builder = new NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_album_white_24dp)
-            .setContentTitle("CallRecorder")
-            .setContentIntent(tapNotificationPi)
-                .setLargeIcon(bitmap);
-
-            if(Build.VERSION.SDK_INT >= 24)
-                builder.addAction(new NotificationCompat.Action.Builder(
-                        R.drawable.ic_pause_grey600_24dp, "Pause recording", pauseRecordingPi).build() );
-
-                builder.addAction(new NotificationCompat.Action.Builder(
-                        R.drawable.ic_stop_grey600_24dp, "Stop recording", stopRecordingPi).build() )
-                .setStyle(new NotificationCompat.BigTextStyle().bigText("Recording..."));
-
-        startForeground(NOTIFICATION_ID, builder.build());
-
-        RecorderBox.doRecording();
+        if(!numbers.containsKey(numPhone) || !numbers.get(numPhone))
+            startForeground(NOTIFICATION_ID, buildNotification(false));
+        else {
+            startForeground(NOTIFICATION_ID, buildNotification(true));
+            RecorderBox.doRecording();
+        }
         return START_NOT_STICKY;
     }
 
@@ -191,11 +187,14 @@ public class RecorderService extends Service {
 
         if(unknownPhone)
         {
-            values = new ContentValues();
-            values.put(Listened.COLUMN_NAME_UNKNOWN_NUMBER, true);
-            values.put(Listened.COLUMN_NAME_NUMBER, numPhone);
-            values.put(Listened.COLUMN_NAME_PHONE_TYPE, UNKNOWN_TYPE_PHONE_CODE);
-           idToInsert = db.insert(Listened.TABLE_NAME, null, values);
+           PhoneNumber phoneNumber =  new PhoneNumber(getApplicationContext(), null, numPhone, null, null, -1);
+           phoneNumber.setUnkownNumber(true);
+           try {
+               phoneNumber.insertInDatabase();
+           }
+           catch (SQLException exc) {
+               Log.wtf(TAG, exc.getMessage());
+           }
         }
         else if(privateCall)
         {
@@ -203,10 +202,10 @@ public class RecorderService extends Service {
                     Listened.COLUMN_NAME_PRIVATE_NUMBER + "=" + SQLITE_TRUE, null, null, null, null);
 
             if(cursor.getCount() == 0) {
-                values.clear();
-                values.put(Listened.COLUMN_NAME_PRIVATE_NUMBER, SQLITE_TRUE);
-                values.put(Listened.COLUMN_NAME_PHONE_TYPE, UNKNOWN_TYPE_PHONE_CODE);
-              idToInsert = db.insert(Listened.TABLE_NAME, null, values);
+                PhoneNumber phoneNumber =  new PhoneNumber(getApplicationContext());
+                phoneNumber.setPrivateNumber(true);
+                phoneNumber.setContactName(null);
+                phoneNumber.insertInDatabase();
             }
             else {
                 cursor.moveToFirst();
@@ -215,9 +214,18 @@ public class RecorderService extends Service {
 
             cursor.close();
         }
-
-        if(!unknownPhone && !privateCall)
+        else
         {
+            if(phoneNumber != null)
+            {
+                try {
+                    phoneNumber.insertInDatabase();
+                }
+                catch (SQLException exception) {
+                    Log.wtf(TAG, exception.getMessage());
+                }
+            }
+
             Cursor cursor = db.query(Listened.TABLE_NAME, new String[]{Listened._ID},
                     Listened.COLUMN_NAME_NUMBER + "='" + numPhone + "'", null, null, null, null);
             cursor.moveToFirst();

@@ -5,4 +5,7 @@
     <color name="colorAccent">#FF4081</color>
     <color name="complementaryAccent">#9DFF40</color>
     <color name="textOnDark">#FFFFFF</color>
+    <color name="white">#FFF</color>
+    <color name="green">#008000</color>
+    <color name="red">#ff0000</color>
 </resources>

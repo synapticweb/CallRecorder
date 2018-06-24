@@ -6,6 +6,8 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
+
     </style>
 
     <style name="toolbar_theme" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
@@ -15,5 +17,11 @@
     <style name="toolbar_font" parent="@style/Base.TextAppearance.AppCompat.Title">
         <item name="android:textSize">15sp</item>
     </style>
+<!-- Pentru background-ul alb: https://stackoverflow.com/questions/22320663/change-background-popupmenu-in-android -->
+    <style name="PopupMenu" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:popupBackground">@color/white</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
 
 </resources>

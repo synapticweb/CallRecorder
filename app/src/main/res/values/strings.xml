@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SCall Recorder</string>
+    <string name="app_name">Call Recorder</string>
     <string name="device_description">device description</string>
     <string name="device_admin_label">device admin label</string>
     <string name="number_exists_message">The number you selected already exists in the database.</string>
@@ -16,4 +16,13 @@
     <string name="detail_phonetype_intro"><![CDATA[<b>Phone type: </b>]]>%s</string>
     <string name="detail_phonenumber_intro"><![CDATA[<b>Phone number: </b>]]>%s</string>
     <string name="main_activity_title">Phone numbers</string>
+    <string name="edit_phone_number">Edit</string>
+    <string name="delete_phone_number">Delete</string>
+    <string name="delete_number_confirm_title">Delete number</string>
+    <string name="delete_number_confirm_message">Are you sure you want to delete this number?
+        All associated records will be deleted too.</string>
+    <string name="stop_recording">Stop recording calls</string>
+    <string name="start_recording">Start recording calls</string>
+    <string name="rec_status_recording">Recording new calls</string>
+    <string name="rec_status_not_recording">Not recording new calls</string>
 </resources>
