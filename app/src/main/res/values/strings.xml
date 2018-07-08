@@ -25,4 +25,7 @@
     <string name="start_recording">Start recording calls</string>
     <string name="rec_status_recording">Recording new calls</string>
     <string name="rec_status_not_recording">Not recording new calls</string>
+    <string name="discard_edit_title">Warning</string>
+    <string name="discard_edit_message">Discard your changes?</string>
+
 </resources>

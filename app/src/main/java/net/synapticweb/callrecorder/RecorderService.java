@@ -187,10 +187,10 @@ public class RecorderService extends Service {
 
         if(unknownPhone)
         {
-           PhoneNumber phoneNumber =  new PhoneNumber(getApplicationContext(), null, numPhone, null, null, -1);
+           PhoneNumber phoneNumber =  new PhoneNumber(null, numPhone, null, null, -1);
            phoneNumber.setUnkownNumber(true);
            try {
-               phoneNumber.insertInDatabase();
+               phoneNumber.insertInDatabase(this);
            }
            catch (SQLException exc) {
                Log.wtf(TAG, exc.getMessage());
@@ -202,10 +202,10 @@ public class RecorderService extends Service {
                     Listened.COLUMN_NAME_PRIVATE_NUMBER + "=" + SQLITE_TRUE, null, null, null, null);
 
             if(cursor.getCount() == 0) {
-                PhoneNumber phoneNumber =  new PhoneNumber(getApplicationContext());
+                PhoneNumber phoneNumber =  new PhoneNumber();
                 phoneNumber.setPrivateNumber(true);
                 phoneNumber.setContactName(null);
-                phoneNumber.insertInDatabase();
+                phoneNumber.insertInDatabase(this);
             }
             else {
                 cursor.moveToFirst();
@@ -219,7 +219,7 @@ public class RecorderService extends Service {
             if(phoneNumber != null)
             {
                 try {
-                    phoneNumber.insertInDatabase();
+                    phoneNumber.insertInDatabase(this);
                 }
                 catch (SQLException exception) {
                     Log.wtf(TAG, exception.getMessage());

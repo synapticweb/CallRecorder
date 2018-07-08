@@ -34,16 +34,19 @@ public class PhoneNumberDetail extends AppCompatActivity implements PopupMenu.On
     TextView recordingStatusView;
     ImageView contactPhotoView;
     PhoneNumber phoneNumber;
-    private static String TAG = "CallRecorder";
+    private static final String TAG = "CallRecorder";
+    private static final int EDIT_REQUEST_CODE = 1;
 
     private void paintViews(){
         typePhoneView.setText(getSpannedText(String.format(getResources().getString(
-                R.string.detail_phonetype_intro), phoneNumber.getPhoneType())));
+                R.string.detail_phonetype_intro), phoneNumber.getPhoneTypeName())));
         phoneNumberView.setText(getSpannedText(String.format(getResources().getString(
                 R.string.detail_phonenumber_intro), phoneNumber.getPhoneNumber())));
 
-        if(phoneNumber.getPhotoUri() != null)
+        if(phoneNumber.getPhotoUri() != null) {
+            contactPhotoView.setImageURI(null); //cînd se schimbă succesiv 2 poze făcute de cameră se folosește același fișier și optimizările android fac necesar acest hack pentru a obține refresh-ul pozei
             contactPhotoView.setImageURI(phoneNumber.getPhotoUri());
+        }
         else {
             if(phoneNumber.isPrivateNumber())
                 contactPhotoView.setImageResource(R.drawable.user_contact_yellow);
@@ -53,6 +56,8 @@ public class PhoneNumberDetail extends AppCompatActivity implements PopupMenu.On
                 contactPhotoView.setImageResource(R.drawable.user_contact_blue);
         }
         toggleRecordingStatus();
+        Toolbar toolbar = findViewById(R.id.toolbar_detail);
+        toolbar.setTitle(phoneNumber.getContactName());
     }
 
     private void toggleRecordingStatus(){
@@ -82,7 +87,7 @@ public class PhoneNumberDetail extends AppCompatActivity implements PopupMenu.On
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         try {
-                           phoneNumber.delete();
+                           phoneNumber.delete(PhoneNumberDetail.this);
                         }
                         catch (Exception exc) {
                             Log.wtf(TAG, exc.getMessage());
@@ -106,6 +111,12 @@ public class PhoneNumberDetail extends AppCompatActivity implements PopupMenu.On
         toggleRecordingStatus();
     }
 
+    private void editPhoneNumber() {
+        Intent intent = new Intent(PhoneNumberDetail.this, EditPhoneNumberActivity.class);
+        intent.putExtra("phoneNumber", phoneNumber);
+        startActivityForResult(intent, EDIT_REQUEST_CODE);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -113,16 +124,7 @@ public class PhoneNumberDetail extends AppCompatActivity implements PopupMenu.On
         setContentView(R.layout.phonenumber_detail);
 
         intent = getIntent();
-        //este refăcut obiectul PhoneNumber cu ajutorul datelor transmise în intent:
-        phoneNumber = new PhoneNumber(getApplicationContext());
-        phoneNumber.setId(intent.getLongExtra("phone_row_id", 0));
-        phoneNumber.setContactName(intent.getStringExtra("contact_name"));
-        phoneNumber.setPhoneNumber(intent.getStringExtra("phone_number"));
-        phoneNumber.setPhoneType(intent.getStringExtra("phone_type"));
-        phoneNumber.setPhotoUri(intent.getStringExtra("contact_photo_uri"));
-        phoneNumber.setPrivateNumber(intent.getBooleanExtra("private_number", false));
-        phoneNumber.setUnkownNumber(intent.getBooleanExtra("unknown_number", false));
-        phoneNumber.setShouldRecord(intent.getBooleanExtra("should_record", true));
+        phoneNumber = intent.getExtras().getParcelable("phoneNumber");
 
         Toolbar toolbar = findViewById(R.id.toolbar_detail);
         toolbar.setTitle(phoneNumber.getContactName());
@@ -168,12 +170,29 @@ public class PhoneNumberDetail extends AppCompatActivity implements PopupMenu.On
                 deletePhoneNumber();
                 return true;
             case R.id.edit_phone_number:
+                editPhoneNumber();
                 return true;
             case R.id.should_record:
                 toggleShouldRecord();
             default:
                 return false;
 
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent){
+        if (resultCode != RESULT_OK) {
+            Log.wtf(TAG, "The result code is error");
+            return;
+        }
+
+        if(requestCode == EDIT_REQUEST_CODE)
+        {
+            Bundle extras = intent.getExtras();
+            if(extras != null)
+                phoneNumber = intent.getParcelableExtra("edited_number");
+            paintViews();
         }
     }
 

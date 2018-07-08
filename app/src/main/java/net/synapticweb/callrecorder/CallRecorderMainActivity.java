@@ -45,7 +45,7 @@ import static net.synapticweb.callrecorder.GlobalConstants.*;
 
 
 public class CallRecorderMainActivity extends AppCompatActivity  {
-    private static String TAG = "CallRecorder";
+    private static final String TAG = "CallRecorder";
     private static final int REQUEST_NUMBER = 1;
     ListenedAdapter adapter;
 
@@ -68,20 +68,21 @@ public class CallRecorderMainActivity extends AppCompatActivity  {
 
         while(cursor.moveToNext())
         {
-            PhoneNumber phoneNumber = new PhoneNumber(getApplicationContext());
+            PhoneNumber phoneNumber = new PhoneNumber();
             String number = cursor.getString(cursor.getColumnIndex(ListenedContract.Listened.COLUMN_NAME_NUMBER));
 
             if(cursor.getInt(
                     cursor.getColumnIndex(ListenedContract.Listened.COLUMN_NAME_UNKNOWN_NUMBER)) == SQLITE_TRUE) {
                 if((phoneNumber = PhoneNumber.searchNumberInContacts(number, this)) != null)
                 {
-                    phoneNumber.syncUnknownNumber();
+                    phoneNumber.setUnkownNumber(true);
+                    phoneNumber.updateNumber(this, true);
                     phoneNumber.setId(cursor.getLong(cursor.getColumnIndex(ListenedContract.Listened._ID)));
                     phoneNumbers.add(phoneNumber);
                     continue;
                 }
                 else {
-                    phoneNumber = new PhoneNumber(this);
+                    phoneNumber = new PhoneNumber();
                     phoneNumber.setUnkownNumber(true);
                 }
             }
@@ -179,10 +180,9 @@ public class CallRecorderMainActivity extends AppCompatActivity  {
                     cursor.close();
                 }
 
-            PhoneNumber phoneNumber =
-                    new PhoneNumber(getApplicationContext(), null, newNumber, contactName, photoUri, phoneType);
+            PhoneNumber phoneNumber = new PhoneNumber(null, newNumber, contactName, photoUri, phoneType);
             try {
-                phoneNumber.insertInDatabase();
+                phoneNumber.insertInDatabase(this);
             }
             catch (SQLException exc) {
 
@@ -224,14 +224,7 @@ public class CallRecorderMainActivity extends AppCompatActivity  {
         @Override
         public void onClick(View view) {
             Intent detailIntent = new Intent(CallRecorderMainActivity.this, PhoneNumberDetail.class);
-            detailIntent.putExtra("phone_row_id", number.getId());
-            detailIntent.putExtra("phone_number", number.getPhoneNumber());
-            detailIntent.putExtra("phone_type", number.getPhoneType());
-            detailIntent.putExtra("contact_photo_uri", (number.getPhotoUri() == null) ? null : number.getPhotoUri().toString() );
-            detailIntent.putExtra("contact_name", number.getContactName());
-            detailIntent.putExtra("private_number", number.isPrivateNumber());
-            detailIntent.putExtra("unknown_number", number.isUnkownNumber());
-            detailIntent.putExtra("should_record", number.shouldRecord());
+            detailIntent.putExtra("phoneNumber", number);
             startActivity(detailIntent);
         }
     }
@@ -253,8 +246,10 @@ public class CallRecorderMainActivity extends AppCompatActivity  {
         public void onBindViewHolder(@NonNull PhoneHolder holder, int position) {
             PhoneNumber phoneNumber = phoneNumbers.get(position);
 
-            if(phoneNumber.getPhotoUri() != null)
+            if(phoneNumber.getPhotoUri() != null) {
+                holder.contactPhoto.setImageURI(null); //cînd se schimbă succesiv 2 poze făcute de cameră se folosește același fișier și optimizările android fac necesar acest hack pentru a obține refresh-ul pozei
                 holder.contactPhoto.setImageURI(phoneNumber.getPhotoUri());
+            }
             else {
                 if(phoneNumber.isPrivateNumber())
                     holder.contactPhoto.setImageResource(R.drawable.user_contact_yellow);

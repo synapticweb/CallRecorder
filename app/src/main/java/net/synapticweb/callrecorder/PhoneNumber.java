@@ -6,6 +6,8 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -14,60 +16,60 @@ import android.util.Log;
 import net.synapticweb.callrecorder.databases.ListenedContract;
 import net.synapticweb.callrecorder.databases.RecordingsContract;
 import net.synapticweb.callrecorder.databases.RecordingsDbHelper;
-import static net.synapticweb.callrecorder.GlobalConstants.*;
 
 
-class PhoneNumber implements Comparable<PhoneNumber> {
-    private Context context;
+class PhoneNumber implements Comparable<PhoneNumber>, Parcelable {
     private Long id;
     private String phoneNumber = null;
-    private String phoneType = null;
-    private int phoneTypeCode = -1;
+    private int phoneType = -1;
     private String contactName = null;
     private Uri photoUri = null;
     private boolean unkownNumber = false;
     private boolean privateNumber = false;
     private boolean shouldRecord = true;
-    private static String TAG = "CallRecorder";
+    private static final String TAG = "CallRecorder";
 
-    PhoneNumber(Context context)
-    {
-        this.context = context;
+    PhoneNumber(){
     }
 
-    PhoneNumber(Context context, Long id, String phoneNumber, String contactName, String photoUriStr, int phoneTypeCode)
+    PhoneNumber(Long id, String phoneNumber, String contactName, String photoUriStr, int phoneTypeCode)
     {
-        this.context = context;
         setId(id);
         setPhoneNumber(phoneNumber);
         setContactName(contactName);
         setPhotoUri(photoUriStr);
         setPhoneType(phoneTypeCode);
-        setPhoneTypeCode(phoneTypeCode);
+        setPhoneType(phoneTypeCode);
     }
 
-    public void syncUnknownNumber() {
+    public void updateNumber(Context context, boolean byNumber) {
         RecordingsDbHelper mDbHelper = new RecordingsDbHelper(context);
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(ListenedContract.Listened.COLUMN_NAME_UNKNOWN_NUMBER, getPhoneNumber());
+        values.put(ListenedContract.Listened.COLUMN_NAME_NUMBER, getPhoneNumber());
         values.put(ListenedContract.Listened.COLUMN_NAME_CONTACT_NAME, getContactName());
         values.put(ListenedContract.Listened.COLUMN_NAME_PHONE_TYPE, getPhoneTypeCode());
         values.put(ListenedContract.Listened.COLUMN_NAME_PHOTO_URI,
                 (getPhotoUri() == null) ? null : getPhotoUri().toString());
-        values.put(ListenedContract.Listened.COLUMN_NAME_UNKNOWN_NUMBER, SQLITE_FALSE);
+        values.put(ListenedContract.Listened.COLUMN_NAME_UNKNOWN_NUMBER, isUnkownNumber());
+        values.put(ListenedContract.Listened.COLUMN_NAME_SHOULD_RECORD, shouldRecord());
+        values.put(ListenedContract.Listened.COLUMN_NAME_PRIVATE_NUMBER, isPrivateNumber());
 
         try {
-            db.update(ListenedContract.Listened.TABLE_NAME, values,
+            if(byNumber)
+                db.update(ListenedContract.Listened.TABLE_NAME, values,
                     ListenedContract.Listened.COLUMN_NAME_NUMBER + "='" + getPhoneNumber() + "'", null);
+            else
+                db.update(ListenedContract.Listened.TABLE_NAME, values,
+                        ListenedContract.Listened._ID + "=" + getId(), null);
         }
         catch (SQLException exception) {
             Log.wtf(TAG, exception.getMessage());
         }
     }
 
-    public void insertInDatabase() throws SQLException
+    public void insertInDatabase(Context context) throws SQLException
     {
         RecordingsDbHelper mDbHelper = new RecordingsDbHelper(context);
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
@@ -77,7 +79,7 @@ class PhoneNumber implements Comparable<PhoneNumber> {
         values.put(ListenedContract.Listened.COLUMN_NAME_NUMBER, phoneNumber);
         values.put(ListenedContract.Listened.COLUMN_NAME_CONTACT_NAME, contactName);
         values.put(ListenedContract.Listened.COLUMN_NAME_PHOTO_URI, photoUri == null ? null : photoUri.toString());
-        values.put(ListenedContract.Listened.COLUMN_NAME_PHONE_TYPE, phoneTypeCode);
+        values.put(ListenedContract.Listened.COLUMN_NAME_PHONE_TYPE, phoneType);
         values.put(ListenedContract.Listened.COLUMN_NAME_SHOULD_RECORD, shouldRecord);
         values.put(ListenedContract.Listened.COLUMN_NAME_UNKNOWN_NUMBER, unkownNumber);
         values.put(ListenedContract.Listened.COLUMN_NAME_PRIVATE_NUMBER, privateNumber);
@@ -85,7 +87,7 @@ class PhoneNumber implements Comparable<PhoneNumber> {
         setId(db.insertOrThrow(ListenedContract.Listened.TABLE_NAME, null, values));
     }
 
-    public void delete() throws SQLException
+    public void delete(Context context) throws SQLException
     {
         RecordingsDbHelper mDbHelper = new RecordingsDbHelper(context);
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
@@ -122,7 +124,7 @@ class PhoneNumber implements Comparable<PhoneNumber> {
         if(cursor != null) {
             if (cursor.getCount() > 0) {
                 cursor.moveToFirst();
-                PhoneNumber phoneNumber = new PhoneNumber(context);
+                PhoneNumber phoneNumber = new PhoneNumber();
                 phoneNumber.setPhoneType(cursor.getInt(cursor.getColumnIndex(ContactsContract.PhoneLookup.TYPE)));
                 phoneNumber.setContactName(cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME)));
                 phoneNumber.setPhotoUri(cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.PHOTO_URI)));
@@ -145,14 +147,6 @@ class PhoneNumber implements Comparable<PhoneNumber> {
         this.shouldRecord = shouldRecord;
     }
 
-
-    private void setPhoneTypeCode(int phoneTypeCode) {
-        this.phoneTypeCode = phoneTypeCode;
-    }
-
-    public int getPhoneTypeCode() {
-        return phoneTypeCode;
-    }
 
     public boolean isUnkownNumber() {
         return unkownNumber;
@@ -194,31 +188,30 @@ class PhoneNumber implements Comparable<PhoneNumber> {
             this.phoneNumber = phoneNumber;
     }
 
-    public String getPhoneType() {
+    public int getPhoneTypeCode() {
         return phoneType;
+    }
+
+    public String getPhoneTypeName(){
+        for(PhoneTypeContainer typeContainer : GlobalConstants.PHONE_TYPES)
+            if(typeContainer.getTypeCode() == this.phoneType)
+                return typeContainer.getTypeName();
+
+        return null;
     }
 
     public void setPhoneType(String phoneType)
     {
-        this.phoneType = phoneType;
+        for(PhoneTypeContainer typeContainer : GlobalConstants.PHONE_TYPES)
+            if(typeContainer.getTypeName().equals(phoneType)) {
+                this.phoneType = typeContainer.getTypeCode();
+                break;
+            }
+
     }
 
     public void setPhoneType(int phoneTypeCode) {
-        this.phoneTypeCode = phoneTypeCode;
-        switch (phoneTypeCode) {
-            case 1:
-                this.phoneType = "Home";
-                break;
-            case 2:
-                this.phoneType = "Mobile";
-                break;
-            case -1:
-                this.phoneType = "Unknown";
-                break;
-            default:
-                this.phoneType = "Other";
-        }
-
+        this.phoneType = phoneTypeCode;
     }
 
     public String getContactName() {
@@ -247,6 +240,11 @@ class PhoneNumber implements Comparable<PhoneNumber> {
             this.photoUri = null;
     }
 
+    public void setPhotoUri(Uri photoUri)
+    {
+        this.photoUri = photoUri;
+    }
+
     public long getId() {
         return id;
     }
@@ -254,4 +252,44 @@ class PhoneNumber implements Comparable<PhoneNumber> {
     public void setId(Long id) {
         this.id = id;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeValue(this.id);
+        dest.writeString(this.phoneNumber);
+        dest.writeInt(this.phoneType);
+        dest.writeString(this.contactName);
+        dest.writeParcelable(this.photoUri, flags);
+        dest.writeByte(this.unkownNumber ? (byte) 1 : (byte) 0);
+        dest.writeByte(this.privateNumber ? (byte) 1 : (byte) 0);
+        dest.writeByte(this.shouldRecord ? (byte) 1 : (byte) 0);
+    }
+
+    private PhoneNumber(Parcel in) {
+        this.id = (Long) in.readValue(Long.class.getClassLoader());
+        this.phoneNumber = in.readString();
+        this.phoneType = in.readInt();
+        this.contactName = in.readString();
+        this.photoUri = in.readParcelable(Uri.class.getClassLoader());
+        this.unkownNumber = in.readByte() != 0;
+        this.privateNumber = in.readByte() != 0;
+        this.shouldRecord = in.readByte() != 0;
+    }
+
+    public static final Parcelable.Creator<PhoneNumber> CREATOR = new Parcelable.Creator<PhoneNumber>() {
+        @Override
+        public PhoneNumber createFromParcel(Parcel source) {
+            return new PhoneNumber(source);
+        }
+
+        @Override
+        public PhoneNumber[] newArray(int size) {
+            return new PhoneNumber[size];
+        }
+    };
 }

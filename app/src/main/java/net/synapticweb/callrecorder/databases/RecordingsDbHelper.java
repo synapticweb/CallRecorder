@@ -26,6 +26,7 @@ public class RecordingsDbHelper extends SQLiteOpenHelper {
             Listened.COLUMN_NAME_UNKNOWN_NUMBER + " INTEGER DEFAULT 0, " +
             "CONSTRAINT no_duplicates UNIQUE(" + Listened.COLUMN_NAME_NUMBER + ") )";
 
+
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "recordings.db";
 
