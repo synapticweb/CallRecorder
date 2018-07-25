@@ -9,6 +9,7 @@
         <item name="android:popupMenuStyle">@style/PopupMenu</item>
     </style>
 
+    <!--Necesar pentru a albi săgeata back a toolbarului -->
     <style name="toolbar_theme" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
         <item name="colorControlNormal">@color/textOnDark</item>
     </style>
@@ -20,6 +21,11 @@
     <style name="PopupMenu" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:popupBackground">@color/white</item>
         <item name="android:textSize">14sp</item>
+    </style>
+<!--Ca să poată fi folosit cu android:theme, pentru a fi aplicat tuturor copiilor unui View trebuie să moștenească
+ dintr-o temă: parent="Theme.AppCompat.Light"-->
+    <style name="recyclerview_text">
+        <item name="android:textColor">@color/textOnLight</item>
     </style>
 
 </resources>

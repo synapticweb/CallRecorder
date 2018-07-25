@@ -14,7 +14,6 @@ class RecorderBox {
     private static final String TAG = "CallRecorder";
     private static MediaRecorder recorder;
     private static File audioFile;
-    private static boolean isSetup = false;
     private static long startTimestamp;
     private static boolean recordingDone = false;
 

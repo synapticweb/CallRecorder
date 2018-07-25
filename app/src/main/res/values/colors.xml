@@ -9,4 +9,5 @@
     <color name="green">#008000</color>
     <color name="red">#ff0000</color>
     <color name="gray">#999</color>
+    <color name="textOnLight">#a0000000</color>
 </resources>

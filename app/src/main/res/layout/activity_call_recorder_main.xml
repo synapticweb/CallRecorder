@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/drawer_layout"
+    android:fitsSystemWindows="true">
+
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -11,15 +19,16 @@
         android:background="?attr/colorPrimary"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        android:id="@+id/toolbar"
+        android:id="@+id/toolbar_main"
         android:elevation="2dp"
         >
 
-        <ImageView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@drawable/app_icon"
-            android:layout_gravity="start"/>
+        <Button
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="start"
+            android:background="@drawable/baseline_menu_white_24"
+            android:id="@+id/hamburger"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -28,13 +37,13 @@
             android:textColor="@color/textOnDark"
             android:layout_gravity="center"/>
 
-        <Button
-            android:id="@+id/settings"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:background="@drawable/settings"
-            android:layout_gravity="end"
-            android:layout_marginEnd="10dp"/>
+        <!--<Button-->
+            <!--android:id="@+id/settings"-->
+            <!--android:layout_width="30dp"-->
+            <!--android:layout_height="30dp"-->
+            <!--android:background="@drawable/settings"-->
+            <!--android:layout_gravity="end"-->
+            <!--android:layout_marginEnd="10dp"/>-->
 
     </android.support.v7.widget.Toolbar>
 
@@ -55,3 +64,16 @@
         android:src="@drawable/ic_plus"
         android:layout_margin="16dp" />
 </FrameLayout>
+
+    <android.support.design.widget.NavigationView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:fitsSystemWindows="true"
+        app:menu="@menu/drawer_view"
+        app:headerLayout="@layout/navdraw_header"
+        android:id="@+id/navigation_view">
+
+    </android.support.design.widget.NavigationView>
+
+</android.support.v4.widget.DrawerLayout>

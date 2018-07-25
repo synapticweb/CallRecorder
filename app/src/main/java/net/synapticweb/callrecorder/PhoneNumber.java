@@ -98,9 +98,10 @@ class PhoneNumber implements Comparable<PhoneNumber>, Parcelable {
 
         while(cursor.moveToNext()) {
            Recording recording =
-                    new Recording(context, cursor.getLong(cursor.getColumnIndex(RecordingsContract.Recordings._ID)),
-                            cursor.getString(cursor.getColumnIndex(RecordingsContract.Recordings.COLUMN_NAME_PATH)));
-           recording.delete();
+                    new Recording(cursor.getLong(cursor.getColumnIndex(RecordingsContract.Recordings._ID)),
+                            cursor.getString(cursor.getColumnIndex(RecordingsContract.Recordings.COLUMN_NAME_PATH)),
+                            null, null, null);
+           recording.delete(context);
         }
 
         cursor.close();

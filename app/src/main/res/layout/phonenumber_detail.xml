@@ -41,6 +41,7 @@
         android:layout_marginTop="15dp"
         android:layout_marginStart="15dp"
         android:layout_below="@id/filler"
+        android:id="@+id/header"
         >
 
     <de.hdodenhof.circleimageview.CircleImageView
@@ -83,5 +84,16 @@
             android:layout_toEndOf="@+id/contact_photo_detail"/>
 
     </RelativeLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="vertical"
+        android:id="@+id/recordings"
+        android:layout_marginTop="30dp"
+        android:layout_below="@id/header"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        />
 
 </RelativeLayout>

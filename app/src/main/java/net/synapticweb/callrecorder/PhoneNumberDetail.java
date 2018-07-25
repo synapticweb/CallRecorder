@@ -4,27 +4,37 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ContextThemeWrapper;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import net.synapticweb.callrecorder.databases.ListenedContract;
+import net.synapticweb.callrecorder.databases.RecordingsContract.*;
 import net.synapticweb.callrecorder.databases.RecordingsDbHelper;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class PhoneNumberDetail extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener {
@@ -36,6 +46,12 @@ public class PhoneNumberDetail extends AppCompatActivity implements PopupMenu.On
     PhoneNumber phoneNumber;
     private static final String TAG = "CallRecorder";
     private static final int EDIT_REQUEST_CODE = 1;
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        paintViews();
+    }
 
     private void paintViews(){
         typePhoneView.setText(getSpannedText(String.format(getResources().getString(
@@ -58,6 +74,10 @@ public class PhoneNumberDetail extends AppCompatActivity implements PopupMenu.On
         toggleRecordingStatus();
         Toolbar toolbar = findViewById(R.id.toolbar_detail);
         toolbar.setTitle(phoneNumber.getContactName());
+
+        RecyclerView recordings = findViewById(R.id.recordings);
+        recordings.setLayoutManager(new LinearLayoutManager(this));
+        recordings.setAdapter(new RecordingAdapter(getRecordings()));
     }
 
     private void toggleRecordingStatus(){
@@ -138,6 +158,11 @@ public class PhoneNumberDetail extends AppCompatActivity implements PopupMenu.On
         contactPhotoView = findViewById(R.id.contact_photo_detail);
         recordingStatusView = findViewById(R.id.recording_status);
 
+        //workaround necesar pentru că, dacă recyclerul cu recordinguri conține imagini poza asta devine neagră.
+        // Se pare că numai pe lolipop, de verificat. https://github.com/hdodenhof/CircleImageView/issues/31
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && Build.VERSION.SDK_INT < Build.VERSION_CODES.N)
+            contactPhotoView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+
         this.paintViews();
 
         final ImageButton menuButton = findViewById(R.id.phone_number_detail_menu);
@@ -162,8 +187,7 @@ public class PhoneNumberDetail extends AppCompatActivity implements PopupMenu.On
     }
 
     @Override
-    public boolean onMenuItemClick(MenuItem item)
-    {
+    public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId())
         {
             case R.id.delete_phone_number:
@@ -187,13 +211,80 @@ public class PhoneNumberDetail extends AppCompatActivity implements PopupMenu.On
             return;
         }
 
-        if(requestCode == EDIT_REQUEST_CODE)
-        {
+        if(requestCode == EDIT_REQUEST_CODE) {
             Bundle extras = intent.getExtras();
             if(extras != null)
                 phoneNumber = intent.getParcelableExtra("edited_number");
-            paintViews();
+//            paintViews(); odată ce refac widgeturile în onResume() nu mai este nevoie de asta.
         }
+    }
+
+    private List<Recording> getRecordings() {
+        RecordingsDbHelper mDbHelper = new RecordingsDbHelper(getApplicationContext());
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        List<Recording> list =  new ArrayList<>();
+
+        Cursor cursor = db.query(Recordings.TABLE_NAME,
+            null, Recordings.COLUMN_NAME_PHONE_NUM_ID + "=" + phoneNumber.getId(), null, null, null, null);
+
+        while(cursor.moveToNext())
+        {
+            Recording recording = new Recording(cursor.getLong(cursor.getColumnIndex(Recordings._ID)),
+                    cursor.getString(cursor.getColumnIndex(Recordings.COLUMN_NAME_PATH)),
+                    cursor.getInt(cursor.getColumnIndex(Recordings.COLUMN_NAME_INCOMING)) == 1,
+                    cursor.getLong(cursor.getColumnIndex(Recordings.COLUMN_NAME_START_TIMESTAMP)),
+                    cursor.getLong(cursor.getColumnIndex(Recordings.COLUMN_NAME_END_TIMESTAMP)));
+            list.add(recording);
+        }
+        cursor.close();
+        return list;
+    }
+
+    class RecordingHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        ImageView typeOfRecording;
+        TextView recordingDate, recordingLength;
+
+        RecordingHolder(LayoutInflater inflater, ViewGroup parent) {
+            super(inflater.inflate(R.layout.recording, parent, false));
+            typeOfRecording = itemView.findViewById(R.id.type_of_recording);
+            recordingDate = itemView.findViewById(R.id.recording_date);
+            recordingLength = itemView.findViewById(R.id.recording_length);
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+
+        }
+    }
+
+    class RecordingAdapter extends RecyclerView.Adapter<RecordingHolder> {
+        List<Recording> recordings;
+
+        RecordingAdapter(List<Recording> recordings) {
+            this.recordings = recordings;
+        }
+
+        @Override
+        @NonNull
+        public RecordingHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            LayoutInflater layoutInflater = LayoutInflater.from(getApplicationContext());
+            return new RecordingHolder(layoutInflater, parent);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull RecordingHolder holder, int position) {
+            Recording recording = recordings.get(position);
+            holder.typeOfRecording.setImageResource(recording.isIncoming() ? R.drawable.incoming : R.drawable.outgoing);
+            holder.recordingDate.setText(recording.getDate());
+            holder.recordingLength.setText(recording.getDuration());
+        }
+
+        @Override
+        public int getItemCount() {
+            return recordings.size();
+        }
+
     }
 
 

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:layout_marginStart="15dp"
+    android:layout_marginEnd="15dp"
+    >
+<!-- android:theme de mai sus are rolul să aplice stilul recyclerview_text tuturor copiilor acestui View care suportă
+proprietatea android:textColor. Dacă aș fi folosit style nu ar fi mers - ar fi trebuit să aplic stilul fiecărui TextView
+în parte. (Din motive necunoscute, toți copiii TextView ai recyclerview apar cu text alb, deși tema e light.)
+Am folosit FrameLayout pentru că dacă aș fi folosit LinearLayout layout_gravity:end sau layout_gravity:center_horizontal
+nu ar fi funcționat. În LinearView layout_gravity funcționează numai pe axa opusă orientării. Deci dacă avem
+orientation:horizontal va funcționa layout_gravity:center_vertical, dar center_horizontal sau start sau end nu vor
+funcționa. layout_gravity:center centrează atît vertical cît și orizontal.
+În FrameLayout este obligatorie declararea explicită a înălțimii. Dacă pun wrap_content, centrarea pe verticală a ImageView
+nu mai funcționează.
+Declararea lățimii primului TextView are rolul să împingă un pic mai spre stînga textul - cu cît e mai lung, cu atît se
+duce spre stînga. Dacă aș fi pus wrap_content ar fi fost chiar în centru, ceea ce nu e foarte estetic.-->
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:id="@+id/recording_info"
+        >
+
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:id="@+id/type_of_recording"
+            android:layout_gravity="start|center_vertical"
+            />
+
+        <TextView
+            android:id="@+id/recording_date"
+            android:layout_width="170dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="70dp"
+            android:layout_gravity="center_vertical"
+            style="@style/recyclerview_text"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/recording_length"
+            android:layout_gravity="end|center_vertical"
+            style="@style/recyclerview_text"
+            />
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0.1dp"
+        android:background="#80777777"
+        android:layout_alignParentBottom="true"
+        />
+
+</RelativeLayout>

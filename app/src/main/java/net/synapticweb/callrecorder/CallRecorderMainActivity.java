@@ -16,6 +16,9 @@ import android.os.Build;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -26,6 +29,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -71,17 +75,22 @@ public class CallRecorderMainActivity extends AppCompatActivity  {
             PhoneNumber phoneNumber = new PhoneNumber();
             String number = cursor.getString(cursor.getColumnIndex(ListenedContract.Listened.COLUMN_NAME_NUMBER));
 
+            //dacă avem un nr necunoscut în db încercăm să vedem dacă nu cumva a fost între timp introdus în contacte.
+            // Dacă îl găsim în contacte populăm un obiect PhoneNumber cu datele sale: numele și tipul.
+            //Apoi modificăm cu PhoneNumber::updateNumber() recordul din baza de date, setăm id-ul obiectului nou creat și
+            //îl introducem în lista phoneNumbers. Cum cursorul conține datele de dinainte de updatarea db, nu are rost
+            // să mergem mai jos și ne ducem la următoarea iterație cu continue.
             if(cursor.getInt(
                     cursor.getColumnIndex(ListenedContract.Listened.COLUMN_NAME_UNKNOWN_NUMBER)) == SQLITE_TRUE) {
                 if((phoneNumber = PhoneNumber.searchNumberInContacts(number, this)) != null)
                 {
-                    phoneNumber.setUnkownNumber(true);
                     phoneNumber.updateNumber(this, true);
                     phoneNumber.setId(cursor.getLong(cursor.getColumnIndex(ListenedContract.Listened._ID)));
                     phoneNumbers.add(phoneNumber);
                     continue;
                 }
-                else {
+                else { //dacă nu a fost găsit în contacte, trebuie să recreem phoneNumber întrucît acum este null.
+                    // Apoi setăm unknownNumber la true, pentru că nefiind găsit rămîne necunoscut.
                     phoneNumber = new PhoneNumber();
                     phoneNumber.setUnkownNumber(true);
                 }
@@ -117,7 +126,7 @@ public class CallRecorderMainActivity extends AppCompatActivity  {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_call_recorder_main);
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar_main);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         if(actionBar != null)
@@ -136,14 +145,31 @@ public class CallRecorderMainActivity extends AppCompatActivity  {
             }
         });
 
-        Button settings = findViewById(R.id.settings);
-        settings.setOnClickListener(new View.OnClickListener() {
+        Button hamburger = findViewById(R.id.hamburger);
+        final DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        NavigationView navigationView = findViewById(R.id.navigation_view);
+
+        hamburger.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(CallRecorderMainActivity.this, SettingsActivity.class);
-                startActivity(intent);
+                drawer.openDrawer(GravityCompat.START);
             }
         });
+
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.settings:
+                        Intent intent = new Intent(CallRecorderMainActivity.this, SettingsActivity.class);
+                        startActivity(intent);
+                        break;
+                }
+                drawer.closeDrawers();
+                return true;
+            }
+        });
+
 
         listenedPhones = findViewById(R.id.listened_phones);
         listenedPhones.setLayoutManager(new LinearLayoutManager(this));

@@ -20,9 +20,7 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 //import android.support.v4.media.app.NotificationCompat.MediaStyle;device
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import net.synapticweb.callrecorder.databases.ListenedContract.*;
@@ -32,8 +30,7 @@ import static net.synapticweb.callrecorder.GlobalConstants.*;
 
 
 public class RecorderService extends Service {
-    private static String TAG = "CallRecorder";
-
+    private static final String TAG = "CallRecorder";
     private String numPhone;
     private Boolean incoming;
 
@@ -151,20 +148,25 @@ public class RecorderService extends Service {
         incoming = intent.getBooleanExtra("incoming", false);
         RecorderBox.setAudioFile(this, numPhone);
 
+        //Dacă numărul primit de la receiver nu se regăsește printre numerele Listened
         if(!numbers.containsKey(numPhone)) {
-            if (numPhone == null)
+            if (numPhone == null) //în cazul în care nr primit e null, atunci se sună de pe nr privat
                 privateCall = true;
-            else {
+            else { //dacă nu e null, atunci e un nr care s-ar putea să fie contacte, dar nu e în baza de date a aplicației.
+                //verificăm chestia asta și dacă îl găsim în contacte populăm RecorderService.phoneNumber.
                 if ((phoneNumber = PhoneNumber.searchNumberInContacts(numPhone, getApplicationContext())) == null)
-                    unknownPhone = true;
+                    unknownPhone = true; //dacă nu e nici în contacte îl declarăm nr. necunoscut.
             }
 
         }
 
+        //dacă nr nu există în db sau dacă setările interzic înregistrarea convorbirilor nr punem doar o notificare
+        //cu posibilitatea de a porni înregistrarea:
         if(!numbers.containsKey(numPhone) || !numbers.get(numPhone))
             startForeground(NOTIFICATION_ID, buildNotification(false));
         else {
-            startForeground(NOTIFICATION_ID, buildNotification(true));
+            startForeground(NOTIFICATION_ID, buildNotification(true)); //altfel, pornim înregistrarea și notificarea conține
+            //buton pentru oprire.
             RecorderBox.doRecording();
         }
         return START_NOT_STICKY;
@@ -177,24 +179,25 @@ public class RecorderService extends Service {
         super.onDestroy();
         RecorderBox.disposeRecorder();
 
-        if(!RecorderBox.getRecordingDone())
+        if(!RecorderBox.getRecordingDone()) //dacă nu s-a pornit înregistrarea nu avem nimic de făcut
             return ;
 
         RecordingsDbHelper mDbHelper = new RecordingsDbHelper(getApplicationContext());
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
-        long idToInsert = 0;
+        long idToInsert;
 
         if(unknownPhone)
         {
            PhoneNumber phoneNumber =  new PhoneNumber(null, numPhone, null, null, -1);
            phoneNumber.setUnkownNumber(true);
            try {
-               phoneNumber.insertInDatabase(this);
+               phoneNumber.insertInDatabase(this); //introducerea în db setează id-ul în obiect
            }
            catch (SQLException exc) {
                Log.wtf(TAG, exc.getMessage());
            }
+           idToInsert = phoneNumber.getId();
         }
         else if(privateCall)
         {
@@ -205,7 +208,13 @@ public class RecorderService extends Service {
                 PhoneNumber phoneNumber =  new PhoneNumber();
                 phoneNumber.setPrivateNumber(true);
                 phoneNumber.setContactName(null);
-                phoneNumber.insertInDatabase(this);
+                try {
+                    phoneNumber.insertInDatabase(this);
+                }
+                catch (SQLException exc) {
+                    Log.wtf(TAG, exc.getMessage());
+                }
+                idToInsert = phoneNumber.getId();
             }
             else {
                 cursor.moveToFirst();
@@ -214,9 +223,11 @@ public class RecorderService extends Service {
 
             cursor.close();
         }
-        else
+        else //dacă nu e nici unknown nici privat se poate ca nr să existe în db sau să nu existe, dar să fi fost
+        // găsit în contacte.
         {
-            if(phoneNumber != null)
+            if(phoneNumber != null) //în cazul în care nr nu exista în db dar a fost găsit în contacte și deci
+                //RecorderService::phoneNumber e nonnul, inserăm în db numărul găsit
             {
                 try {
                     phoneNumber.insertInDatabase(this);

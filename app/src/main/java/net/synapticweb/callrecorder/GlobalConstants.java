@@ -14,5 +14,7 @@ class GlobalConstants {
             new PhoneTypeContainer(1, "Home"),
             new PhoneTypeContainer(2, "Mobile"),
             new PhoneTypeContainer(3, "Work"),
-            new PhoneTypeContainer(-1, "Unknown")));
+            new PhoneTypeContainer(-1, "Unknown"),
+            new PhoneTypeContainer(7, "Other")
+    ));
 }
