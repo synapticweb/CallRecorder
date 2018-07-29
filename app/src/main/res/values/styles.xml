@@ -28,4 +28,9 @@
         <item name="android:textColor">@color/textOnLight</item>
     </style>
 
+    <style name="recyclerview_checkbox">
+        <!--<item name="android:textColorSecondary">#000</item>-->
+        <item name="colorControlNormal">#000</item>
+    </style>
+
 </resources>

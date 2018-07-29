@@ -1,5 +1,6 @@
 package net.synapticweb.callrecorder;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
@@ -17,6 +18,8 @@ import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -50,6 +53,7 @@ import static net.synapticweb.callrecorder.GlobalConstants.*;
 
 public class CallRecorderMainActivity extends AppCompatActivity  {
     private static final String TAG = "CallRecorder";
+    private static final int PERMISSION_REQUEST = 2;
     private static final int REQUEST_NUMBER = 1;
     ListenedAdapter adapter;
 
@@ -134,6 +138,9 @@ public class CallRecorderMainActivity extends AppCompatActivity  {
 
         if(Build.MANUFACTURER.equalsIgnoreCase("huawei"))
             huaweiAlert();
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            askForPermissions();
 
         FloatingActionButton fab = findViewById(R.id.add_numbers);
         fab.setOnClickListener(new View.OnClickListener(){
@@ -301,6 +308,58 @@ public class CallRecorderMainActivity extends AppCompatActivity  {
     @Override
     public void onDestroy(){
         super.onDestroy();
+    }
+
+    private void askForPermissions() {
+        boolean outgoingCalls = ContextCompat.checkSelfPermission(this, Manifest.permission.PROCESS_OUTGOING_CALLS)
+                == PackageManager.PERMISSION_GRANTED;
+        boolean phoneState = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
+                == PackageManager.PERMISSION_GRANTED;
+        boolean recordAudio = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
+                == PackageManager.PERMISSION_GRANTED;
+        boolean readContacts = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS)
+                == PackageManager.PERMISSION_GRANTED;
+
+        if(!(outgoingCalls && phoneState && recordAudio && readContacts))
+            ActivityCompat.requestPermissions(this, new String[] {
+                    Manifest.permission.PROCESS_OUTGOING_CALLS,
+                    Manifest.permission.READ_PHONE_STATE,
+                    Manifest.permission.RECORD_AUDIO,
+                    Manifest.permission.READ_CONTACTS
+            }, PERMISSION_REQUEST);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
+        boolean notGranted = false;
+        if(requestCode == PERMISSION_REQUEST) {
+
+            if(grantResults.length == 0)
+                notGranted = true;
+            else
+            {
+                for(int result : grantResults)
+                    if(result != PackageManager.PERMISSION_GRANTED) {
+                        notGranted = true;
+                        break;
+                    }
+            }
+
+            if(notGranted) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setMessage("The app did not gain the necessary permissions for proper functioning. " +
+                        "As a result, some or all of the app functionality will be lost.")
+                        .setTitle("Warning")
+                        .setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                    }
+                                }
+                        );
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+
+        }
     }
 
     private void huaweiAlert() {

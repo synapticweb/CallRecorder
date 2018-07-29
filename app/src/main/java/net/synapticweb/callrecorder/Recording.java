@@ -50,7 +50,7 @@ public class Recording {
     }
 
     public String getDate() {
-        return new SimpleDateFormat("d MMM yyyy", Locale.US).format(new Date(startTimestamp));
+        return new SimpleDateFormat("d MMM yyyy - HH:mm:ss", Locale.US).format(new Date(startTimestamp));
     }
 
     public void delete(Context context) throws SQLException, SecurityException

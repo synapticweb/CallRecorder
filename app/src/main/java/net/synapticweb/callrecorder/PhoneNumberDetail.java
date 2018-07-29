@@ -25,8 +25,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import net.synapticweb.callrecorder.databases.ListenedContract;
@@ -44,6 +47,11 @@ public class PhoneNumberDetail extends AppCompatActivity implements PopupMenu.On
     TextView recordingStatusView;
     ImageView contactPhotoView;
     PhoneNumber phoneNumber;
+    ActionBar actionBar;
+    RecyclerView recordings;
+    List<Integer> longTouchedItems = new ArrayList<>();
+    List<Integer> selectedItems = new ArrayList<>();
+    boolean selectMode = false;
     private static final String TAG = "CallRecorder";
     private static final int EDIT_REQUEST_CODE = 1;
 
@@ -72,12 +80,16 @@ public class PhoneNumberDetail extends AppCompatActivity implements PopupMenu.On
                 contactPhotoView.setImageResource(R.drawable.user_contact_blue);
         }
         toggleRecordingStatus();
-        Toolbar toolbar = findViewById(R.id.toolbar_detail);
-        toolbar.setTitle(phoneNumber.getContactName());
+        if(!selectMode) { //fără această condiție, dacă aplicația se duce în background în timp ce există recordinguri
+            // selectate, la întoarcere selecția se pierde.
+            Toolbar toolbar = findViewById(R.id.toolbar_detail);
+            toolbar.setTitle(phoneNumber.getContactName());
 
-        RecyclerView recordings = findViewById(R.id.recordings);
-        recordings.setLayoutManager(new LinearLayoutManager(this));
-        recordings.setAdapter(new RecordingAdapter(getRecordings()));
+
+            recordings = findViewById(R.id.recordings);
+            recordings.setLayoutManager(new LinearLayoutManager(this));
+            recordings.setAdapter(new RecordingAdapter(getRecordings()));
+        }
     }
 
     private void toggleRecordingStatus(){
@@ -149,7 +161,7 @@ public class PhoneNumberDetail extends AppCompatActivity implements PopupMenu.On
         Toolbar toolbar = findViewById(R.id.toolbar_detail);
         toolbar.setTitle(phoneNumber.getContactName());
         setSupportActionBar(toolbar);
-        ActionBar actionBar = getSupportActionBar();
+        actionBar = getSupportActionBar();
         if(actionBar != null)
             actionBar.setDisplayHomeAsUpEnabled(true);
 
@@ -166,7 +178,6 @@ public class PhoneNumberDetail extends AppCompatActivity implements PopupMenu.On
         this.paintViews();
 
         final ImageButton menuButton = findViewById(R.id.phone_number_detail_menu);
-
         menuButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -184,6 +195,25 @@ public class PhoneNumberDetail extends AppCompatActivity implements PopupMenu.On
             }
         });
 
+        ImageButton closeBtn = findViewById(R.id.close_select_mode);
+        closeBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clearSelectMode();
+            }
+        });
+
+    }
+
+    private void clearSelectMode() {
+        toggleSelectMode();
+        for(int item : longTouchedItems)
+        {
+            View recordingSlot = recordings.getLayoutManager().findViewByPosition(item);
+            toggleSelectItem(recordingSlot, null);
+        }
+        selectedItems.clear();
+        longTouchedItems.clear();
     }
 
     @Override
@@ -240,21 +270,131 @@ public class PhoneNumberDetail extends AppCompatActivity implements PopupMenu.On
         return list;
     }
 
-    class RecordingHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    private void toggleSelectMode() {
+        ImageButton closeBtn = findViewById(R.id.close_select_mode);
+        TextView selectTitle = findViewById(R.id.actionbar_select_title);
+        ImageButton exportBtn = findViewById(R.id.actionbar_select_export);
+        ImageButton deleteBtn = findViewById(R.id.actionbar_select_delete);
+        ImageButton menuRightBtn = findViewById(R.id.phone_number_detail_menu);
+
+        actionBar.setDisplayHomeAsUpEnabled(selectMode);
+        actionBar.setDisplayShowTitleEnabled(selectMode);
+
+        closeBtn.setVisibility(selectMode ? View.GONE : View.VISIBLE);
+        selectTitle.setText(phoneNumber.getContactName());
+        selectTitle.setVisibility(selectMode ? View.GONE : View.VISIBLE);
+        exportBtn.setVisibility(selectMode ? View.GONE : View.VISIBLE);
+        deleteBtn.setVisibility(selectMode ? View.GONE : View.VISIBLE);
+        menuRightBtn.setVisibility(selectMode ? View.VISIBLE : View.GONE);
+
+        selectMode = !selectMode;
+    }
+
+    /*Cînd este apăsat lung un recording activitatea intră în selectMode. În select mode butonul de back din
+    actionbar este înlocuit de un buton close, butonul meniu din dreapta dispare și apar 2 butoane noi: delete
+    și export. Această funcționalitate este asigurată de toggleSelectMode(). Cîmpul selectMode este indicatorul.
+    Deoarece nu am putut să ascund titlul generat automat de actionbar l-am scos cu setDisplayShowTitleEnabled(false)
+    și am adăugat un TextView (@+id/actionbar_select_title) al cărui text afișează numele contactului. La fel am
+    procedat cu butonul back: setDisplayHomeAsUpEnabled(false).
+    În selectMode clickurile simple pe recordinguri au ca efect selectarea acestora.
+    După intrarea în selectMode, recordingul este selectat automat cu toggleSelectIntem(). Aceasta presupune afișarea
+    checkboxului, selectarea acestuia, schimbarea backgroundului în gri. toggleSelectItem ia ca parametri View-ul
+    recordingului (primit în onLongClick()) - pentru că trebuie să schimbe chestii în recording și poziția recordingului
+    în adapter - pentru că este salvată în cîmpul selectedItems, pentru operații ca ștergere și export. toggleSelectItem
+    ia ca parametru un Integer și nu un int pentru că trebuie să accepte null. Cînd un item este selectat poziția lui
+    este salvată. Dar cînd aceeași funcție e apelată de clearSelectMode(), nu mai are rost să fie scoase din
+    selectedItems pozițiile și se pasează null.
+    Lista selectedItems mai este accesată de clicklistenerul checkboxului. Cînd checkboxul este selectat poziția
+    recordingului este salvată în listă, cînd este deselectat poziția este ștearsă din listă. Cînd a fost deselectat
+    ultimul recorder, clicklistenerul amintit invocă funcția clearSelectedMode, despre care voi povesti mai jos.
+    Ultimul lucru pe care îl face listenerul de longclick este să bage poziția recordingului în lista longTouchedItems,
+    care ține evidența recordingurilor care au fost modificate prin long click.
+    clearSelectMode este apelată la apăsarea butonului close sau cînd clicklistenerul checkboxului detectează că nu
+    mai este niciun item selectat. Aceasta readuce actionbarul la starea inițială și schimbă înapoi aspectul tuturor
+    itemilor care au fost selectați, prin longclick sau normal click. Ultimul lucru pe care îl face este să devalizeze
+    cele 2 liste selectedItems și longTouchedItems. Distincția este necesară pentru că un item poate să fie modificat
+    dar să nu mai fie în mod curent selectat.
+    */
+    private void toggleSelectItem(@NonNull View v, Integer position) {
+        CheckBox checkBox = v.findViewById(R.id.checkbox);
+        TextView date = v.findViewById(R.id.recording_date);
+        ImageView image = v.findViewById(R.id.type_of_recording);
+        RelativeLayout recording = v.findViewById(R.id.recording);
+
+        checkBox.setChecked(selectMode);
+        checkBox.setVisibility(selectMode ? View.VISIBLE : View.GONE);
+        //https://android--code.blogspot.com/2015/05/android-textview-layout-margin.html
+        //https://stackoverflow.com/questions/35354032/how-to-set-layout-params-to-units-dp-android
+        FrameLayout.LayoutParams lpTextView = (FrameLayout.LayoutParams) date.getLayoutParams();
+        int marginLeftTextView = (int) getResources().getDimension(selectMode ?
+                R.dimen.date_recording_left_margin_selected : R.dimen.date_recording_left_margin_unselected);
+        lpTextView.setMarginStart(marginLeftTextView);
+        date.setLayoutParams(lpTextView);
+
+        FrameLayout.LayoutParams lpImage = (FrameLayout.LayoutParams) image.getLayoutParams();
+        int marginStartImageView = (int) getResources().getDimension(selectMode ?
+                R.dimen.type_of_recording_left_margin_selected : R.dimen.type_of_recording_left_margin_unselected);
+        lpImage.setMarginStart(marginStartImageView);
+        image.setLayoutParams(lpImage);
+
+        recording.setBackgroundColor(selectMode ?
+                getResources().getColor(R.color.light_gray) : getResources().getColor(android.R.color.transparent));
+
+        if(selectMode && position != null)
+            selectedItems.add(position);
+    }
+
+    class RecordingHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         ImageView typeOfRecording;
         TextView recordingDate, recordingLength;
+        CheckBox checkBox;
 
         RecordingHolder(LayoutInflater inflater, ViewGroup parent) {
             super(inflater.inflate(R.layout.recording, parent, false));
             typeOfRecording = itemView.findViewById(R.id.type_of_recording);
             recordingDate = itemView.findViewById(R.id.recording_date);
             recordingLength = itemView.findViewById(R.id.recording_length);
+            checkBox = itemView.findViewById(R.id.checkbox);
+            checkBox.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(((CheckBox) v).isChecked())
+                        selectedItems.add(getAdapterPosition());
+                    else {
+                        selectedItems.remove(Integer.valueOf(getAdapterPosition()));
+                        if(selectedItems.size() == 0)
+                            clearSelectMode();
+                    }
+
+                }
+            });
             itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+           if(!selectMode)
+               toggleSelectMode();
+
+            int position = this.getAdapterPosition();
+            if(!longTouchedItems.contains(position)) { //necesar pentru că dacă se face de mai multe ori click lung
+                //pe un recording se introduce poziția acestuia de mai multe ori în longTouchedItems, ceea ce creează probleme.
+                toggleSelectItem(v, position);
+                longTouchedItems.add(position);
+            }
+            return true;
         }
 
         @Override
         public void onClick(View v) {
-
+            if(selectMode) {
+                int position = this.getAdapterPosition();
+                if(!longTouchedItems.contains(position)) {
+                    toggleSelectItem(v, position);
+                    longTouchedItems.add(position);
+                }
+            }
         }
     }
 
