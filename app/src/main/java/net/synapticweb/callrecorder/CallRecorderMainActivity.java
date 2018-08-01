@@ -319,13 +319,19 @@ public class CallRecorderMainActivity extends AppCompatActivity  {
                 == PackageManager.PERMISSION_GRANTED;
         boolean readContacts = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS)
                 == PackageManager.PERMISSION_GRANTED;
+        boolean readStorage = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED;
+        boolean writeStorage = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED;
 
-        if(!(outgoingCalls && phoneState && recordAudio && readContacts))
+        if(!(outgoingCalls && phoneState && recordAudio && readContacts && readStorage && writeStorage))
             ActivityCompat.requestPermissions(this, new String[] {
                     Manifest.permission.PROCESS_OUTGOING_CALLS,
                     Manifest.permission.READ_PHONE_STATE,
                     Manifest.permission.RECORD_AUDIO,
-                    Manifest.permission.READ_CONTACTS
+                    Manifest.permission.READ_CONTACTS,
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
             }, PERMISSION_REQUEST);
     }
 
@@ -347,7 +353,7 @@ public class CallRecorderMainActivity extends AppCompatActivity  {
 
             if(notGranted) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setMessage("The app did not gain the necessary permissions for proper functioning. " +
+                builder.setMessage("The app was not granted the necessary permissions for proper functioning. " +
                         "As a result, some or all of the app functionality will be lost.")
                         .setTitle("Warning")
                         .setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {

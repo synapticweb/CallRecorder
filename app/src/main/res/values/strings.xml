@@ -19,13 +19,20 @@
     <string name="edit_phone_number">Edit</string>
     <string name="delete_phone_number">Delete</string>
     <string name="delete_number_confirm_title">Delete number</string>
-    <string name="delete_number_confirm_message">Are you sure you want to delete this number?
-        All associated records will be deleted too.</string>
+    <string name="delete_number_confirm_message">Delete this number?
+        All associated records will be deleted too and this action cannot be undone.</string>
     <string name="stop_recording">Stop recording calls</string>
     <string name="start_recording">Start recording calls</string>
     <string name="rec_status_recording">Recording new calls</string>
     <string name="rec_status_not_recording">Not recording new calls</string>
     <string name="discard_edit_title">Warning</string>
     <string name="discard_edit_message">Discard your changes?</string>
+    <string name="delete_recording_confirm_title">Delete recordings</string>
+    <string name="delete_recording_confirm_message">Delete %1$d recording(s)? This action cannot be undone.</string>
+    <string name="export_heading">Choose where to export the selected recording(s).</string>
+    <string name="error">Error</string>
+    <string name="succes">Succes</string>
+    <string name="error_export">An error occurred while exporting the recordings.</string>
+    <string name="succes_export">The selected recordings were successfully exported.</string>
 
 </resources>

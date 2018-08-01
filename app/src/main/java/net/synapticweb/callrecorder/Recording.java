@@ -3,10 +3,17 @@ package net.synapticweb.callrecorder;
 import android.content.Context;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
+
 import net.synapticweb.callrecorder.databases.RecordingsContract;
 import net.synapticweb.callrecorder.databases.RecordingsDbHelper;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -62,6 +69,24 @@ public class Recording {
             throw new SQLException("The Recording row was not deleted");
 
         new File(path).delete();
+    }
+
+    public void export(String folderPath, PhoneNumberDetail.ExportAsyncTask asyncTask, long totalSize) throws IOException {
+        String fileName = new SimpleDateFormat("d_MMM_yyyy_HH_mm_ss", Locale.US).format(new Date(startTimestamp)) + ".amr";
+        InputStream in = new FileInputStream(path);
+        OutputStream out = new FileOutputStream(new File(folderPath, fileName));
+
+        byte[] buffer = new byte[1048576]; //dacă folosesc 1024 merge foarte încet
+        int read;
+        while ((read = in.read(buffer)) != -1) {
+            asyncTask.alreadyCopied += read;
+            out.write(buffer, 0, read);
+            asyncTask.callPublishProgress(Math.round(100 * asyncTask.alreadyCopied / totalSize));
+            if(asyncTask.isCancelled())
+                break;
+        }
+        in.close();
+        out.flush();
     }
 
     public long getId() {
