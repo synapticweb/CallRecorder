@@ -87,7 +87,7 @@ public class PhoneNumberDetail extends AppCompatActivity implements PopupMenu.On
             else
                 contactPhotoView.setImageResource(R.drawable.user_contact_blue);
         }
-        toggleRecordingStatus();
+        displayRecordingStatus();
         toggleSelectMode();
 
         if(!selectMode) {
@@ -100,7 +100,7 @@ public class PhoneNumberDetail extends AppCompatActivity implements PopupMenu.On
 
     }
 
-    private void toggleRecordingStatus(){
+    private void displayRecordingStatus(){
         if(phoneNumber.shouldRecord()) {
             recordingStatusView.setText(R.string.rec_status_recording);
             recordingStatusView.setTextColor(getResources().getColor(R.color.green));
@@ -150,7 +150,7 @@ public class PhoneNumberDetail extends AppCompatActivity implements PopupMenu.On
         db.update(ListenedContract.Listened.TABLE_NAME, values,
                 ListenedContract.Listened._ID + '=' + phoneNumber.getId(), null);
         phoneNumber.setShouldRecord(!phoneNumber.shouldRecord());
-        toggleRecordingStatus();
+        displayRecordingStatus();
     }
 
     private void editPhoneNumber() {
@@ -493,21 +493,20 @@ public class PhoneNumberDetail extends AppCompatActivity implements PopupMenu.On
         ImageButton deleteBtn = findViewById(R.id.actionbar_select_delete);
         ImageButton menuRightBtn = findViewById(R.id.phone_number_detail_menu);
 
-        actionBar.setDisplayHomeAsUpEnabled(selectMode);
-        actionBar.setDisplayShowTitleEnabled(selectMode);
+        actionBar.setDisplayHomeAsUpEnabled(!selectMode);
+        actionBar.setDisplayShowTitleEnabled(!selectMode);
 
-        closeBtn.setVisibility(selectMode ? View.GONE : View.VISIBLE);
+        closeBtn.setVisibility(selectMode ? View.VISIBLE : View.GONE);
         selectTitle.setText(phoneNumber.getContactName());
-        selectTitle.setVisibility(selectMode ? View.GONE : View.VISIBLE);
-        exportBtn.setVisibility(selectMode ? View.GONE : View.VISIBLE);
-        deleteBtn.setVisibility(selectMode ? View.GONE : View.VISIBLE);
-        menuRightBtn.setVisibility(selectMode ? View.VISIBLE : View.GONE);
-
-        selectMode = !selectMode;
+        selectTitle.setVisibility(selectMode ? View.VISIBLE : View.GONE);
+        exportBtn.setVisibility(selectMode ? View.VISIBLE : View.GONE);
+        deleteBtn.setVisibility(selectMode ? View.VISIBLE : View.GONE);
+        menuRightBtn.setVisibility(selectMode ? View.GONE : View.VISIBLE);
     }
 
 
     private void clearSelectMode() {
+        selectMode = false;
         toggleSelectMode();
         for(int item : longTouchedItems)
         {
@@ -573,9 +572,10 @@ public class PhoneNumberDetail extends AppCompatActivity implements PopupMenu.On
 
         @Override
         public boolean onLongClick(View v) {
-           if(!selectMode)
+           if(!selectMode) {
+               selectMode = true;
                toggleSelectMode();
-
+           }
             int position = this.getAdapterPosition();
             if(!longTouchedItems.contains(position)) { //necesar pentru că dacă se face de mai multe ori click lung
                 //pe un recording se introduce poziția acestuia de mai multe ori în longTouchedItems, ceea ce creează probleme.

@@ -41,16 +41,37 @@ public class EditPhoneNumberActivity extends AppCompatActivity implements Adapte
     private Spinner phoneType;
     private boolean dataChanged = false;
     private boolean setInitialPhoneType = false;
-    private File savedPhotoPath;
-    private Uri savedPhotoUri;
+    private File savedPhotoPath = null;
+    private Uri oldPhotoUri = null;
     private static final String TAG = "CallRecorder";
     private static final int PICK_IMAGE_REQUEST = 1;
     private static final int TAKE_PICTURE = 2;
 
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable("phoneNumber", phoneNumber);
+        outState.putBoolean("dataChanged", dataChanged);
+        outState.putBoolean("setInitialPhoneType", setInitialPhoneType);
+        outState.putSerializable("savedPhotoPath", savedPhotoPath);
+        outState.putParcelable("oldPhotoUri", oldPhotoUri);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.edit_phone_number);
+
+        if(savedInstanceState != null) {
+            phoneNumber = savedInstanceState.getParcelable("phoneNumber");
+            dataChanged = savedInstanceState.getBoolean("dataChanged");
+            setInitialPhoneType = savedInstanceState.getBoolean("setInitialPhoneType");
+            savedPhotoPath = (File) savedInstanceState.getSerializable("savedPhotoPath");
+            oldPhotoUri = savedInstanceState.getParcelable("oldPhotoUri");
+        }
+        else
+            phoneNumber = getIntent().getExtras().getParcelable("phoneNumber");
+
         Button cancelButton = findViewById(R.id.edit_phone_number_cancel);
 
         cancelButton.setOnClickListener(new View.OnClickListener() {
@@ -63,14 +84,20 @@ public class EditPhoneNumberActivity extends AppCompatActivity implements Adapte
                             .setMessage(R.string.discard_edit_message)
                             .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
+                                    if(savedPhotoPath != null) {
+                                        getContentResolver().delete(phoneNumber.getPhotoUri(), null, null);
+                                    }
+                                    setResult(RESULT_CANCELED);
                                     finish();
                                 }
                             })
                             .setNegativeButton(android.R.string.cancel, null)
                             .show();
                 }
-                else
+                else {
+                    setResult(RESULT_CANCELED);
                     finish();
+                }
             }
         });
 
@@ -79,12 +106,14 @@ public class EditPhoneNumberActivity extends AppCompatActivity implements Adapte
             @Override
             public void onClick(View v) {
                 if(dataChanged) {
-                    phoneNumber.setContactName(contactName.getText().toString());
-                    phoneNumber.setPhoneNumber(contactPhone.getText().toString());
 //                    Cursor cursor = (Cursor) phoneType.getSelectedItem(); //https://stackoverflow.com/questions/5787809/get-spinner-selected-items-text
-                    phoneNumber.setPhoneType(phoneType.getSelectedItem().toString());
                     phoneNumber.setUnkownNumber(false);
-                    //Uri-ul pozei a fost deja setat
+                    if(oldPhotoUri != null) { //a fost selectată altă poză din galerie sau a fost luată altă poză cu camera
+                        String oldPhotoPath = oldPhotoUri.getPath();
+                        if(oldPhotoPath.matches("^/callrecorder_photos/.*")) //ștergem doar dacă este poza noastră
+                            getContentResolver().delete(oldPhotoUri, null, null);
+                    }
+
                     phoneNumber.updateNumber(EditPhoneNumberActivity.this, false);
                     Intent intent = new Intent();
                     intent.putExtra("edited_number", phoneNumber);
@@ -97,7 +126,6 @@ public class EditPhoneNumberActivity extends AppCompatActivity implements Adapte
         });
 
         contactPhoto = findViewById(R.id.edit_phone_number_photo);
-        phoneNumber = getIntent().getExtras().getParcelable("phoneNumber");
 
         if(phoneNumber.getPhotoUri() != null)
             contactPhoto.setImageURI(phoneNumber.getPhotoUri());
@@ -122,18 +150,17 @@ public class EditPhoneNumberActivity extends AppCompatActivity implements Adapte
         contactName.setText(phoneNumber.getContactName(), TextView.BufferType.EDITABLE);
         contactName.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
 
             @Override
             public void afterTextChanged(Editable s) {
-                dataChanged = true;
+                if(!contactName.getText().toString().equals(phoneNumber.getContactName())) {
+                    phoneNumber.setContactName(contactName.getText().toString());
+                    dataChanged = true;
+                }
             }
         });
 
@@ -141,18 +168,17 @@ public class EditPhoneNumberActivity extends AppCompatActivity implements Adapte
         contactPhone.setText(phoneNumber.getPhoneNumber(), TextView.BufferType.EDITABLE);
         contactPhone.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
 
             @Override
             public void afterTextChanged(Editable s) {
-                dataChanged = true;
+                if(!contactPhone.getText().toString().equals(phoneNumber.getPhoneNumber())) {
+                    phoneNumber.setPhoneNumber(contactPhone.getText().toString());
+                    dataChanged = true;
+                }
             }
         });
 
@@ -170,9 +196,6 @@ public class EditPhoneNumberActivity extends AppCompatActivity implements Adapte
                 break;
         //https://stackoverflow.com/questions/11072576/set-selected-item-of-spinner-programmatically
         phoneType.setSelection(adapter.getPosition(GlobalConstants.PHONE_TYPES.get(position)));
-
-        savedPhotoPath = new File(getFilesDir(), phoneNumber.getPhoneNumber() + ".jpg");
-        savedPhotoUri = FileProvider.getUriForFile(this, "net.synapticweb.callrecorder.fileprovider", savedPhotoPath);
     }
 
     @Override
@@ -199,8 +222,13 @@ public class EditPhoneNumberActivity extends AppCompatActivity implements Adapte
             menuItem.setEnabled(false);
     }
 
-//http://codetheory.in/android-pick-select-image-from-gallery-with-intents/
+    private void setPhotoPath() {
+        savedPhotoPath = new File(getFilesDir(), phoneNumber.getPhoneNumber() + System.currentTimeMillis() + ".jpg");
+    }
+
+    //http://codetheory.in/android-pick-select-image-from-gallery-with-intents/
     private void selectPhoto() {
+        setPhotoPath();
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
@@ -211,6 +239,21 @@ public class EditPhoneNumberActivity extends AppCompatActivity implements Adapte
         phoneNumber.setPhotoUri((Uri) null); //ambigous method call
         contactPhoto.setImageResource(R.drawable.user_contact_blue);
         dataChanged = true;
+    }
+
+    private void takePhoto(){
+        setPhotoPath();
+        try {
+            savedPhotoPath.createNewFile();
+        }
+        catch (IOException ioe) {
+            Log.wtf(TAG, ioe.getMessage());
+        }
+
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(this, "net.synapticweb.callrecorder.fileprovider", savedPhotoPath));
+        if (intent.resolveActivity(getPackageManager()) != null)
+            startActivityForResult(intent, TAKE_PICTURE);
     }
 
     @Override
@@ -228,7 +271,8 @@ public class EditPhoneNumberActivity extends AppCompatActivity implements Adapte
 
         if (requestCode == PICK_IMAGE_REQUEST && (photoUri = data.getData()) != null) {
             CropImage.activity(photoUri).setCropShape(CropImageView.CropShape.OVAL)
-                    .setOutputUri(savedPhotoUri).setMaxCropResultSize(2000, 2000) //vezi mai jos comentariul
+                    .setOutputUri(FileProvider.getUriForFile(this, "net.synapticweb.callrecorder.fileprovider", savedPhotoPath))
+                    .setMaxCropResultSize(2000, 2000) //vezi mai jos comentariul
                     .start(this);
         }
         else if(requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
@@ -236,12 +280,15 @@ public class EditPhoneNumberActivity extends AppCompatActivity implements Adapte
             photoUri = result.getUri();
             contactPhoto.setImageURI(null); //cînd se schimbă succesiv 2 poze făcute de cameră se folosește același fișier și optimizările android fac necesar acest hack pentru a obține refresh-ul pozei
             contactPhoto.setImageURI(photoUri);
+            this.oldPhotoUri = phoneNumber.getPhotoUri();
             phoneNumber.setPhotoUri(photoUri);
             dataChanged = true;
         }
         else if(requestCode == TAKE_PICTURE) {
-            CropImage.activity(savedPhotoUri).setCropShape(CropImageView.CropShape.OVAL)
-                    .setOutputUri(savedPhotoUri).setMaxCropResultSize(2000, 2000) //necesar, pentru că dacă poza e prea mare apare un rotund negru
+            CropImage.activity(FileProvider.getUriForFile(this, "net.synapticweb.callrecorder.fileprovider", savedPhotoPath))
+                    .setCropShape(CropImageView.CropShape.OVAL)
+                    .setOutputUri(FileProvider.getUriForFile(this, "net.synapticweb.callrecorder.fileprovider", savedPhotoPath))
+                    .setMaxCropResultSize(2000, 2000) //necesar, pentru că dacă poza e prea mare apare un rotund negru
                     .start(this);
         }
     }
@@ -253,26 +300,15 @@ public class EditPhoneNumberActivity extends AppCompatActivity implements Adapte
             setInitialPhoneType = true;
             return ;
         }
-        dataChanged = true;
+        if(!phoneType.getSelectedItem().toString().equals(phoneNumber.getPhoneTypeName())) {
+            phoneNumber.setPhoneType(phoneType.getSelectedItem().toString());
+            dataChanged = true;
+        }
     }
 
     @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-    }
+    public void onNothingSelected(AdapterView<?> parent) {}
 
-    private void takePhoto(){
-        try {
-            savedPhotoPath.createNewFile();
-        }
-        catch (IOException ioe) {
-            Log.wtf(TAG, ioe.getMessage());
-        }
-
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, savedPhotoUri);
-        if (intent.resolveActivity(getPackageManager()) != null)
-            startActivityForResult(intent, TAKE_PICTURE);
-    }
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
