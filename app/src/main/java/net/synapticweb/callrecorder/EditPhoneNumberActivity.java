@@ -108,7 +108,8 @@ public class EditPhoneNumberActivity extends AppCompatActivity implements Adapte
                 if(dataChanged) {
 //                    Cursor cursor = (Cursor) phoneType.getSelectedItem(); //https://stackoverflow.com/questions/5787809/get-spinner-selected-items-text
                     phoneNumber.setUnkownNumber(false);
-                    if(oldPhotoUri != null) { //a fost selectată altă poză din galerie sau a fost luată altă poză cu camera
+                    if(oldPhotoUri != null) { //a fost selectată altă poză din galerie sau a fost luată altă poză cu camera. Dacă
+                        //se scoate poza oldPhotoUri va fi null.
                         String oldPhotoPath = oldPhotoUri.getPath();
                         if(oldPhotoPath.matches("^/callrecorder_photos/.*")) //ștergem doar dacă este poza noastră
                             getContentResolver().delete(oldPhotoUri, null, null);

@@ -2,7 +2,6 @@ package net.synapticweb.callrecorder;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -30,7 +29,6 @@ import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -213,12 +211,16 @@ public class CallRecorderMainActivity extends AppCompatActivity  {
                     cursor.close();
                 }
 
+                //adesea, nr din contactele telefonului conțin spații. Cind sună un nr telefonul primește nr fără spații. Softul
+            //de contacte se descurcă, aplicația mea nu, încît trebuie să scot spațiile din numerele importate din agendă.
+            if(newNumber !=  null)
+                newNumber = newNumber.replaceAll("\\s","");
+
             PhoneNumber phoneNumber = new PhoneNumber(null, newNumber, contactName, photoUri, phoneType);
             try {
                 phoneNumber.insertInDatabase(this);
             }
             catch (SQLException exc) {
-
                 if(exc.toString().contains("UNIQUE"))
                 {
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
