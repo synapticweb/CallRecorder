@@ -173,6 +173,7 @@ public class PhoneNumberDetail extends AppCompatActivity implements PopupMenu.On
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.phonenumber_detail);
+        intent = getIntent();
 
         if(savedInstanceState != null) {
             phoneNumber = savedInstanceState.getParcelable("phoneNumber");
@@ -180,9 +181,8 @@ public class PhoneNumberDetail extends AppCompatActivity implements PopupMenu.On
             longTouchedItems = savedInstanceState.getIntegerArrayList("longTouched");
             selectedItems = savedInstanceState.getIntegerArrayList("selectedItems");
         }
-
-        intent = getIntent();
-        phoneNumber = intent.getExtras().getParcelable("phoneNumber");
+        else
+            phoneNumber = intent.getExtras().getParcelable("phoneNumber");
 
         Toolbar toolbar = findViewById(R.id.toolbar_detail);
         toolbar.setTitle(phoneNumber.getContactName());

@@ -104,7 +104,7 @@ public class CallReceiver extends BroadcastReceiver {
             if(countryCode == null)
                 countryCode = "US";
 
-            if(!serviceStarted && phoneUtil.isPossibleNumber(outCall, countryCode))
+            if(!serviceStarted && phoneUtil.isPossibleNumber(outCall, countryCode)) //evit pornirea serviciului în caz de ussd, etc.
             {
                 Intent intentService = new Intent(context, RecorderService.class);
                 serviceName = intentService.getComponent();
@@ -121,6 +121,7 @@ public class CallReceiver extends BroadcastReceiver {
     }
 
     //https://stackoverflow.com/questions/3659809/where-am-i-get-country
+    //De văzut și https://stackoverflow.com/questions/26971806/unexpected-telephonymanager-getsimcountryiso-behaviour
     @Nullable
     private String getUserCountry(Context context) {
             final TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);

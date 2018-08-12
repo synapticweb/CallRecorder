@@ -273,6 +273,7 @@ public class EditPhoneNumberActivity extends AppCompatActivity implements Adapte
         if (requestCode == PICK_IMAGE_REQUEST && (photoUri = data.getData()) != null) {
             CropImage.activity(photoUri).setCropShape(CropImageView.CropShape.OVAL)
                     .setOutputUri(FileProvider.getUriForFile(this, "net.synapticweb.callrecorder.fileprovider", savedPhotoPath))
+                    .setAspectRatio(1,1)
                     .setMaxCropResultSize(2000, 2000) //vezi mai jos comentariul
                     .start(this);
         }
