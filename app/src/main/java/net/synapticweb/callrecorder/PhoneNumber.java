@@ -11,7 +11,10 @@ import android.os.Parcelable;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
 
 import net.synapticweb.callrecorder.databases.ListenedContract;
 import net.synapticweb.callrecorder.databases.RecordingsContract;
@@ -111,33 +114,35 @@ class PhoneNumber implements Comparable<PhoneNumber>, Parcelable {
          throw new SQLException("This Listened row was not deleted");
     }
 
-  @Nullable static public PhoneNumber searchNumberInContacts(String number,  @NonNull Context context)
-    {
-        Uri phoneLookupUri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI,
-                Uri.encode(number));
-        Cursor cursor = context.getContentResolver().
-                query(phoneLookupUri,
-                        new String[]{ContactsContract.PhoneLookup.TYPE,
-                                ContactsContract.PhoneLookup.DISPLAY_NAME,
-                                ContactsContract.PhoneLookup.PHOTO_URI},
-                        null, null, null);
+  @Nullable static public PhoneNumber searchNumberInContacts(final String number, @NonNull final Context context) {
+        PhoneNumber phoneNumber = null;
+      Cursor cursor = context.getContentResolver()
+              .query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, new String[]{
+                              ContactsContract.CommonDataKinds.Phone.NUMBER,
+                              ContactsContract.CommonDataKinds.Phone.TYPE,
+                              ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
+                              ContactsContract.CommonDataKinds.Phone.PHOTO_URI},
+                      null, null, null);
 
-        if(cursor != null) {
-            if (cursor.getCount() > 0) {
-                cursor.moveToFirst();
-                PhoneNumber phoneNumber = new PhoneNumber();
-                phoneNumber.setPhoneType(cursor.getInt(cursor.getColumnIndex(ContactsContract.PhoneLookup.TYPE)));
-                phoneNumber.setContactName(cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME)));
-                phoneNumber.setPhotoUri(cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.PHOTO_URI)));
-                phoneNumber.setPhoneNumber(number);
-
-                cursor.close();
-                return phoneNumber;
-            }
-            else
-                return null;
-        }
-            return null;
+      if(cursor != null) {
+          PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
+          while (cursor.moveToNext()) {
+              String numberContacts = cursor.getString(
+                      cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+              PhoneNumberUtil.MatchType matchType = phoneUtil.isNumberMatch(numberContacts, number);
+              if(matchType != PhoneNumberUtil.MatchType.NO_MATCH && matchType != PhoneNumberUtil.MatchType.NOT_A_NUMBER) {
+                  phoneNumber = new PhoneNumber();
+                  phoneNumber.setPhoneType(cursor.getInt(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE)));
+                  phoneNumber.setContactName(cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)));
+                  phoneNumber.setPhotoUri(cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_URI)));
+                  phoneNumber.setPhoneNumber(cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)));
+                  break;
+              }
+          }
+          cursor.close();
+          return  phoneNumber;
+      }
+        return null;
     }
 
     public boolean shouldRecord() {

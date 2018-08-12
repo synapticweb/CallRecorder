@@ -39,4 +39,5 @@ dependencies {
     implementation 'com.theartofdev.edmodo:android-image-cropper:2.7.0'
     implementation 'com.github.codekidX:storage-chooser:2.0.4.2'
     implementation 'com.afollestad.material-dialogs:core:0.9.6.0'
+    implementation 'com.googlecode.libphonenumber:libphonenumber:8.9.10'
 }

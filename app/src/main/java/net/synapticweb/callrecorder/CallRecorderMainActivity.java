@@ -211,10 +211,6 @@ public class CallRecorderMainActivity extends AppCompatActivity  {
                     cursor.close();
                 }
 
-                //adesea, nr din contactele telefonului conțin spații. Cind sună un nr telefonul primește nr fără spații. Softul
-            //de contacte se descurcă, aplicația mea nu, încît trebuie să scot spațiile din numerele importate din agendă.
-            if(newNumber !=  null)
-                newNumber = newNumber.replaceAll("\\s","");
 
             PhoneNumber phoneNumber = new PhoneNumber(null, newNumber, contactName, photoUri, phoneType);
             try {

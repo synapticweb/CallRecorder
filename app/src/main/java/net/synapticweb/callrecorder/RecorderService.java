@@ -20,6 +20,8 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 //import android.support.v4.media.app.NotificationCompat.MediaStyle;device
 
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,7 +33,8 @@ import static net.synapticweb.callrecorder.GlobalConstants.*;
 
 public class RecorderService extends Service {
     private static final String TAG = "CallRecorder";
-    private String numPhone;
+    private String receivedNumPhone;
+    private String dbNumPhone = null;
     private Boolean incoming;
 
     public static final int NOTIFICATION_ID = 1;
@@ -144,25 +147,36 @@ public class RecorderService extends Service {
         }
         cursor.close();
 
-        numPhone = intent.getStringExtra("phoneNumber");
+        receivedNumPhone = intent.getStringExtra("phoneNumber");
         incoming = intent.getBooleanExtra("incoming", false);
-        RecorderBox.setAudioFile(this, numPhone);
+        RecorderBox.setAudioFile(this, receivedNumPhone);
+        boolean match = false;
 
-        //Dacă numărul primit de la receiver nu se regăsește printre numerele Listened
-        if(!numbers.containsKey(numPhone)) {
-            if (numPhone == null) //în cazul în care nr primit e null, atunci se sună de pe nr privat
-                privateCall = true;
-            else { //dacă nu e null, atunci e un nr care s-ar putea să fie contacte, dar nu e în baza de date a aplicației.
-                //verificăm chestia asta și dacă îl găsim în contacte populăm RecorderService.phoneNumber.
-                if ((phoneNumber = PhoneNumber.searchNumberInContacts(numPhone, getApplicationContext())) == null)
+        if(receivedNumPhone == null) //în cazul în care nr primit e null înseamnă că se sună de pe nr privat
+            privateCall = true;
+
+        if(!privateCall) { //și nu trebuie să mai verificăm dacă nr este în baza de date sau dacă nu
+            // este în baza de date dacă este în contacte.
+            PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
+            for (Map.Entry<String, Boolean> entry : numbers.entrySet()) {
+                dbNumPhone = entry.getKey();
+                PhoneNumberUtil.MatchType matchType = phoneUtil.isNumberMatch(receivedNumPhone, dbNumPhone);
+                if (matchType != PhoneNumberUtil.MatchType.NO_MATCH && matchType != PhoneNumberUtil.MatchType.NOT_A_NUMBER) {
+                    match = true;
+                    break;
+                }
+            }
+            if(!match) { //chiar dacă nu se găsește în db,  s-ar putea să fie contacte. Verificăm chestia asta
+                // și dacă îl găsim în contacte populăm RecorderService.phoneNumber.
+                if ((phoneNumber = PhoneNumber.searchNumberInContacts(receivedNumPhone, getApplicationContext())) == null)
                     unknownPhone = true; //dacă nu e nici în contacte îl declarăm nr. necunoscut.
             }
-
         }
 
         //dacă nr nu există în db sau dacă setările interzic înregistrarea convorbirilor nr punem doar o notificare
-        //cu posibilitatea de a porni înregistrarea:
-        if(!numbers.containsKey(numPhone) || !numbers.get(numPhone))
+        //cu posibilitatea de a porni înregistrarea. Dacă s-a găsit un match, atunci dbNumPhone este setat la nr din baza de date care
+        //se potrivește
+        if(!match || !numbers.get(dbNumPhone))
             startForeground(NOTIFICATION_ID, buildNotification(false));
         else {
             startForeground(NOTIFICATION_ID, buildNotification(true)); //altfel, pornim înregistrarea și notificarea conține
@@ -189,7 +203,7 @@ public class RecorderService extends Service {
 
         if(unknownPhone)
         {
-           PhoneNumber phoneNumber =  new PhoneNumber(null, numPhone, null, null, -1);
+           PhoneNumber phoneNumber =  new PhoneNumber(null, receivedNumPhone, null, null, -1);
            phoneNumber.setUnkownNumber(true);
            try {
                phoneNumber.insertInDatabase(this); //introducerea în db setează id-ul în obiect
@@ -223,7 +237,7 @@ public class RecorderService extends Service {
 
             cursor.close();
         }
-        else //dacă nu e nici unknown nici privat se poate ca nr să existe în db sau să nu existe, dar să fi fost
+        else //dacă nu e nici unknown nici privat: se poate ca nr să existe în db, sau să nu existe dar să fi fost
         // găsit în contacte.
         {
             if(phoneNumber != null) //în cazul în care nr nu exista în db dar a fost găsit în contacte și deci
@@ -235,13 +249,16 @@ public class RecorderService extends Service {
                 catch (SQLException exception) {
                     Log.wtf(TAG, exception.getMessage());
                 }
+                idToInsert = phoneNumber.getId();
             }
+            else { //dacă nr există în baza de date
 
-            Cursor cursor = db.query(Listened.TABLE_NAME, new String[]{Listened._ID},
-                    Listened.COLUMN_NAME_NUMBER + "='" + numPhone + "'", null, null, null, null);
-            cursor.moveToFirst();
-            idToInsert = cursor.getLong(cursor.getColumnIndex(Listened._ID));
-            cursor.close();
+                Cursor cursor = db.query(Listened.TABLE_NAME, new String[]{Listened._ID},
+                        Listened.COLUMN_NAME_NUMBER + "='" + dbNumPhone + "'", null, null, null, null);
+                cursor.moveToFirst();
+                idToInsert = cursor.getLong(cursor.getColumnIndex(Listened._ID));
+                cursor.close();
+            }
         }
 
         values.clear();

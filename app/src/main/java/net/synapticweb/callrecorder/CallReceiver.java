@@ -5,9 +5,13 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+
+import java.util.Locale;
 
 
 public class CallReceiver extends BroadcastReceiver {
@@ -94,9 +98,13 @@ public class CallReceiver extends BroadcastReceiver {
         {
             Log.wtf(TAG, intent.getAction());
             outCall = intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER);
-
             Log.wtf(TAG, "Outgoing number: " + outCall);
-            if(!serviceStarted)
+            PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
+            String countryCode = getUserCountry(context);
+            if(countryCode == null)
+                countryCode = "US";
+
+            if(!serviceStarted && phoneUtil.isPossibleNumber(outCall, countryCode))
             {
                 Intent intentService = new Intent(context, RecorderService.class);
                 serviceName = intentService.getComponent();
@@ -106,10 +114,28 @@ public class CallReceiver extends BroadcastReceiver {
                 context.startService(intentService);
                 serviceStarted = true;
                 Log.wtf(TAG, "Service started at outgoing call");
-
             }
 
         }
 
     }
+
+    //https://stackoverflow.com/questions/3659809/where-am-i-get-country
+    @Nullable
+    private String getUserCountry(Context context) {
+            final TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+            if(tm != null) {
+                final String simCountry = tm.getSimCountryIso();
+                if (simCountry != null && simCountry.length() == 2) { // SIM country code is available
+                    return simCountry.toUpperCase(Locale.US);
+                } else if (tm.getPhoneType() != TelephonyManager.PHONE_TYPE_CDMA) { // device is not 3G (would be unreliable)
+                    String networkCountry = tm.getNetworkCountryIso();
+                    if (networkCountry != null && networkCountry.length() == 2) { // network country code is available
+                        return networkCountry.toUpperCase(Locale.US);
+                    }
+                }
+            }
+        return null;
+    }
+
 }
