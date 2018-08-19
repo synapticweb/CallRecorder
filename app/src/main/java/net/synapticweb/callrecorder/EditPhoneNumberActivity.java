@@ -187,16 +187,16 @@ public class EditPhoneNumberActivity extends AppCompatActivity implements Adapte
         phoneType = findViewById(R.id.edit_types);
         phoneType.setOnItemSelectedListener(this);
         ArrayAdapter<PhoneTypeContainer> adapter =
-                new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, GlobalConstants.PHONE_TYPES);
+                new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, AppLibrary.PHONE_TYPES);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         phoneType.setAdapter(adapter);
 
         int position;
-        for(position = 0; position < GlobalConstants.PHONE_TYPES.size(); ++position)
-            if(GlobalConstants.PHONE_TYPES.get(position).getTypeCode() == phoneNumber.getPhoneTypeCode())
+        for(position = 0; position < AppLibrary.PHONE_TYPES.size(); ++position)
+            if(AppLibrary.PHONE_TYPES.get(position).getTypeCode() == phoneNumber.getPhoneTypeCode())
                 break;
         //https://stackoverflow.com/questions/11072576/set-selected-item-of-spinner-programmatically
-        phoneType.setSelection(adapter.getPosition(GlobalConstants.PHONE_TYPES.get(position)));
+        phoneType.setSelection(adapter.getPosition(AppLibrary.PHONE_TYPES.get(position)));
     }
 
     @Override

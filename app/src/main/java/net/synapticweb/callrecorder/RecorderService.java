@@ -28,7 +28,7 @@ import java.util.Map;
 import net.synapticweb.callrecorder.databases.ListenedContract.*;
 import net.synapticweb.callrecorder.databases.RecordingsContract.*;
 import net.synapticweb.callrecorder.databases.RecordingsDbHelper;
-import static net.synapticweb.callrecorder.GlobalConstants.*;
+import static net.synapticweb.callrecorder.AppLibrary.*;
 
 
 public class RecorderService extends Service {

@@ -11,7 +11,6 @@ import android.os.Parcelable;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
@@ -199,7 +198,7 @@ class PhoneNumber implements Comparable<PhoneNumber>, Parcelable {
     }
 
     public String getPhoneTypeName(){
-        for(PhoneTypeContainer typeContainer : GlobalConstants.PHONE_TYPES)
+        for(PhoneTypeContainer typeContainer : AppLibrary.PHONE_TYPES)
             if(typeContainer.getTypeCode() == this.phoneType)
                 return typeContainer.getTypeName();
 
@@ -208,7 +207,7 @@ class PhoneNumber implements Comparable<PhoneNumber>, Parcelable {
 
     public void setPhoneType(String phoneType)
     {
-        for(PhoneTypeContainer typeContainer : GlobalConstants.PHONE_TYPES)
+        for(PhoneTypeContainer typeContainer : AppLibrary.PHONE_TYPES)
             if(typeContainer.getTypeName().equals(phoneType)) {
                 this.phoneType = typeContainer.getTypeCode();
                 break;

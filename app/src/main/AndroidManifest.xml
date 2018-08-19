@@ -45,6 +45,10 @@
         <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat"/>
 
+        <activity android:name=".player.PlayerActivity"
+            android:parentActivityName=".PhoneNumberDetail"
+            android:configChanges="orientation|screenSize"/> <!--Fără screenSize continuă să se restarteze. -->
+
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="net.synapticweb.callrecorder.fileprovider"

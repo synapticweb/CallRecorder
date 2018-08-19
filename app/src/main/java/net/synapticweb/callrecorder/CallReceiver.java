@@ -100,7 +100,7 @@ public class CallReceiver extends BroadcastReceiver {
             outCall = intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER);
             Log.wtf(TAG, "Outgoing number: " + outCall);
             PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
-            String countryCode = getUserCountry(context);
+            String countryCode = AppLibrary.getUserCountry(context);
             if(countryCode == null)
                 countryCode = "US";
 
@@ -118,25 +118,6 @@ public class CallReceiver extends BroadcastReceiver {
 
         }
 
-    }
-
-    //https://stackoverflow.com/questions/3659809/where-am-i-get-country
-    //De văzut și https://stackoverflow.com/questions/26971806/unexpected-telephonymanager-getsimcountryiso-behaviour
-    @Nullable
-    private String getUserCountry(Context context) {
-            final TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-            if(tm != null) {
-                final String simCountry = tm.getSimCountryIso();
-                if (simCountry != null && simCountry.length() == 2) { // SIM country code is available
-                    return simCountry.toUpperCase(Locale.US);
-                } else if (tm.getPhoneType() != TelephonyManager.PHONE_TYPE_CDMA) { // device is not 3G (would be unreliable)
-                    String networkCountry = tm.getNetworkCountryIso();
-                    if (networkCountry != null && networkCountry.length() == 2) { // network country code is available
-                        return networkCountry.toUpperCase(Locale.US);
-                    }
-                }
-            }
-        return null;
     }
 
 }

@@ -3,7 +3,8 @@ package net.synapticweb.callrecorder;
 import android.content.Context;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.AsyncTask;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import net.synapticweb.callrecorder.databases.RecordingsContract;
 import net.synapticweb.callrecorder.databases.RecordingsDbHelper;
@@ -18,7 +19,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class Recording {
+public class Recording implements Parcelable {
     private long id;
     private String path;
     private Boolean incoming;
@@ -113,4 +114,37 @@ public class Recording {
         this.incoming = incoming;
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(this.id);
+        dest.writeString(this.path);
+        dest.writeValue(this.incoming);
+        dest.writeValue(this.startTimestamp);
+        dest.writeValue(this.endTimestamp);
+    }
+
+    private Recording(Parcel in) {
+        this.id = in.readLong();
+        this.path = in.readString();
+        this.incoming = (Boolean) in.readValue(Boolean.class.getClassLoader());
+        this.startTimestamp = (Long) in.readValue(Long.class.getClassLoader());
+        this.endTimestamp = (Long) in.readValue(Long.class.getClassLoader());
+    }
+
+    public static final Parcelable.Creator<Recording> CREATOR = new Parcelable.Creator<Recording>() {
+        @Override
+        public Recording createFromParcel(Parcel source) {
+            return new Recording(source);
+        }
+
+        @Override
+        public Recording[] newArray(int size) {
+            return new Recording[size];
+        }
+    };
 }

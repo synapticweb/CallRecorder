@@ -40,6 +40,7 @@ import com.codekidlabs.storagechooser.StorageChooser;
 import net.synapticweb.callrecorder.databases.ListenedContract;
 import net.synapticweb.callrecorder.databases.RecordingsContract.*;
 import net.synapticweb.callrecorder.databases.RecordingsDbHelper;
+import net.synapticweb.callrecorder.player.PlayerActivity;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
@@ -597,6 +598,12 @@ public class PhoneNumberDetail extends AppCompatActivity implements PopupMenu.On
                     longTouchedItems.add(position);
                     selectedItems.add(position);
                 }
+            }
+            else { //usual short click
+                Intent playIntent = new Intent(PhoneNumberDetail.this, PlayerActivity.class);
+                RecordingAdapter adapter = (RecordingAdapter) recordingsRecycler.getAdapter();
+                playIntent.putExtra("recording", adapter.getItem(getAdapterPosition()));
+                startActivity(playIntent);
             }
         }
     }

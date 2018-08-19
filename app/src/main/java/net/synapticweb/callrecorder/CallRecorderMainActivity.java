@@ -46,7 +46,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static net.synapticweb.callrecorder.GlobalConstants.*;
+import static net.synapticweb.callrecorder.AppLibrary.*;
 
 
 public class CallRecorderMainActivity extends AppCompatActivity  {
