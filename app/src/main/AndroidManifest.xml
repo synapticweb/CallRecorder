@@ -47,7 +47,8 @@
 
         <activity android:name=".player.PlayerActivity"
             android:parentActivityName=".PhoneNumberDetail"
-            android:configChanges="orientation|screenSize"/> <!--Fără screenSize continuă să se restarteze. -->
+            android:configChanges="orientation|screenSize"
+            android:theme="@style/PlayerStyle"/> <!--Fără screenSize continuă să se restarteze. -->
 
         <provider
             android:name="android.support.v4.content.FileProvider"

@@ -5,8 +5,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -14,6 +16,7 @@ import android.widget.TextView;
 import net.synapticweb.callrecorder.AppLibrary;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.Recording;
+
 
 public class PlayerActivity extends AppCompatActivity {
     ImageButton playPause, stopPlaying;
@@ -28,6 +31,11 @@ public class PlayerActivity extends AppCompatActivity {
         Log.wtf(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.play_activity);
+
+        DisplayMetrics metrics = getResources().getDisplayMetrics();
+        int screenHeight = (int) (metrics.heightPixels * 0.40);
+        getWindow().setLayout(WindowManager.LayoutParams.WRAP_CONTENT, screenHeight);
+
 
         playPause = findViewById(R.id.player_button_play_pause);
         stopPlaying = findViewById(R.id.player_button_stop);
@@ -82,6 +90,7 @@ public class PlayerActivity extends AppCompatActivity {
         mediaPlayerHolder = new MediaPlayerHolder(this);
         mediaPlayerHolder.setPlaybackInfoListener(new PlaybackListener());
     }
+
 
     @Override
     public void onStart() {

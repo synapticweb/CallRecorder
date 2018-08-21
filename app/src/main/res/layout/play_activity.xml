@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    >
 
     <android.support.v7.widget.Toolbar
         android:layout_height="?attr/actionBarSize"
@@ -18,12 +19,43 @@
 
     </android.support.v7.widget.Toolbar>
 
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_above="@id/play_controls"-->
+        <!--android:weightSum="10"-->
+        <!--android:gravity="center">-->
+
+        <!--&lt;!&ndash;<com.chibde.visualizer.BarVisualizer&ndash;&gt;-->
+            <!--&lt;!&ndash;android:layout_width="0dp"&ndash;&gt;-->
+            <!--&lt;!&ndash;android:layout_height="100dp"&ndash;&gt;-->
+            <!--&lt;!&ndash;android:layout_weight="8"&ndash;&gt;-->
+            <!--&lt;!&ndash;android:id="@+id/player_visualization"&ndash;&gt;-->
+            <!--&lt;!&ndash;android:background="@drawable/grid_repeat"&ndash;&gt;-->
+            <!--&lt;!&ndash;/>&ndash;&gt;-->
+
+
+        <!--<ak.sh.ay.musicwave.MusicWave-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="100dp"-->
+            <!--android:layout_weight="8"-->
+            <!--android:id="@+id/player_visualization"-->
+            <!--app:colorGradient="true"-->
+            <!--app:waveThickness="6"-->
+            <!--app:startColor="@color/colorAccent"-->
+            <!--app:endColor="@color/colorPrimary"-->
+            <!--android:background="@drawable/grid_repeat"-->
+            <!--/>-->
+
+    <!--</LinearLayout>-->
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:id="@+id/play_controls"
-        android:layout_alignParentBottom="true">
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="50dp">
 
         <LinearLayout
             android:id="@+id/play_buttons"
@@ -34,15 +66,15 @@
 
             <ImageButton
                 android:id="@+id/player_button_play_pause"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_marginEnd="15dp"
                  />
 
             <ImageButton
                 android:id="@+id/player_button_stop"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_marginStart="15dp"
                 android:background="@drawable/player_stop" />
 
@@ -52,12 +84,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:weightSum="10">
+            android:weightSum="14">
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_weight="2"
                 android:layout_marginTop="27dp"
                 android:id="@+id/play_time_played"
                 android:textSize="13sp"
@@ -70,13 +102,13 @@
                 android:layout_marginTop="20dp"
                 android:layout_marginBottom="20dp"
                 android:id="@+id/play_seekbar"
-                android:layout_weight="8"
+                android:layout_weight="10"
                 />
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_weight="2"
                 android:layout_marginTop="27dp"
                 android:id="@+id/play_total_time"
                 android:textSize="13sp"
