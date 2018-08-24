@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -33,33 +34,26 @@ public class Recording implements Parcelable {
         this.endTimestamp = endTimestamp;
     }
 
-    public String getDuration() {
-        String date = "";
-        long hours, minutes, seconds, remaining;
-        long durationSeconds =  Math.round((endTimestamp - startTimestamp) / 1000);
-
-        hours = (long) Math.floor(durationSeconds / 3600);
-        remaining = durationSeconds % 3600;
-        minutes = (long) Math.floor(remaining / 60);
-        seconds = remaining % 60;
-
-        if(hours > 0)
-            date = hours + ":";
-        if(hours > 0 && minutes < 10)
-            date += "0" + minutes + ":";
-        else
-            date += minutes + ":";
-        if(seconds < 10)
-            date += "0" + seconds;
-        else
-            date += seconds;
-
-        return date;
-    }
-
     public String getDate() {
-        return new SimpleDateFormat("d MMM yyyy - HH:mm:ss", Locale.US).format(new Date(startTimestamp));
+        Calendar recordingCal = Calendar.getInstance();
+        recordingCal.setTimeInMillis(startTimestamp);
+        if(recordingCal.get(Calendar.YEAR) < Calendar.getInstance().get(Calendar.YEAR) )
+            return new SimpleDateFormat("d MMM ''yy", Locale.US).format(new Date(startTimestamp)); //22 Aug '17
+        else
+            return new SimpleDateFormat("d MMM", Locale.US).format(new Date(startTimestamp));
     }
+
+    public String getTime() {
+        return new SimpleDateFormat("h:mm a", Locale.US).format(new Date(startTimestamp)); //3:45 PM
+    }
+
+    public String getDuration() {
+        return AppLibrary.getDurationHuman(endTimestamp - startTimestamp);
+    }
+
+//    public String getDate() {
+//        return new SimpleDateFormat("d MMM yyyy - HH:mm:ss", Locale.US).format(new Date(startTimestamp));
+//    }
 
     public void delete(Context context) throws SQLException, SecurityException
     {

@@ -3,6 +3,7 @@ package net.synapticweb.callrecorder;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
@@ -12,18 +13,22 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ContextThemeWrapper;
+import android.support.v7.widget.CardView;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.text.Spanned;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -57,12 +62,12 @@ public class PhoneNumberDetail extends AppCompatActivity implements PopupMenu.On
     PhoneNumber phoneNumber;
     ActionBar actionBar;
     RecyclerView recordingsRecycler;
-    List<Integer> longTouchedItems = new ArrayList<>();
     List<Integer> selectedItems = new ArrayList<>();
     MaterialDialog dialog;
     boolean selectMode = false;
     private static final String TAG = "CallRecorder";
     private static final int EDIT_REQUEST_CODE = 1;
+    private int widthCard, cardViewColumns;
 
     @Override
     public void onResume() {
@@ -70,7 +75,34 @@ public class PhoneNumberDetail extends AppCompatActivity implements PopupMenu.On
         paintViews();
     }
 
+    private void calculateCardViewDimensions() {
+        Configuration configuration = getResources().getConfiguration();
+        int screenWidthDp = configuration.screenWidthDp;
+        final int cardMargin = 3, recyclerMargin = 5, minimumCardWidth = 100, maximumCardWidth = 250;
+
+        int numCols = 3;
+        int usableScreen = screenWidthDp - ((numCols * 2 * cardMargin) + (recyclerMargin * 2)) ;
+        int widthCard = (int) Math.floor(usableScreen / numCols);
+        if(widthCard < minimumCardWidth) {
+            numCols = 2;
+            usableScreen = screenWidthDp - ((numCols * 2 * cardMargin) + (recyclerMargin * 2)) ;
+            widthCard = (int) Math.floor(usableScreen / numCols);
+        }
+        else if(widthCard > maximumCardWidth) {
+           while(widthCard > maximumCardWidth) {
+               numCols++;
+               usableScreen = screenWidthDp - ((numCols * 2 * cardMargin) + (recyclerMargin * 2)) ;
+               widthCard = (int) Math.floor(usableScreen / numCols);
+           }
+        }
+
+        this.widthCard = widthCard;
+        this.cardViewColumns = numCols;
+//        Log.wtf(TAG, "Window width: " + screenWidthDp + " CardWidth: " + widthCard + " Numcols: " + cardViewColumns );
+    }
+
     private void paintViews(){
+        calculateCardViewDimensions();
         typePhoneView.setText(getSpannedText(String.format(getResources().getString(
                 R.string.detail_phonetype_intro), phoneNumber.getPhoneTypeName())));
         phoneNumberView.setText(getSpannedText(String.format(getResources().getString(
@@ -96,7 +128,7 @@ public class PhoneNumberDetail extends AppCompatActivity implements PopupMenu.On
             toolbar.setTitle(phoneNumber.getContactName());
         }
             recordingsRecycler = findViewById(R.id.recordings);
-            recordingsRecycler.setLayoutManager(new LinearLayoutManager(this));
+            recordingsRecycler.setLayoutManager(new GridLayoutManager(this, cardViewColumns));
             recordingsRecycler.setAdapter(new RecordingAdapter(getRecordings()));
 
     }
@@ -164,14 +196,12 @@ public class PhoneNumberDetail extends AppCompatActivity implements PopupMenu.On
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelable("phoneNumber", phoneNumber);
-        outState.putIntegerArrayList("longTouched", (ArrayList<Integer>) longTouchedItems);
         outState.putIntegerArrayList("selectedItems", (ArrayList<Integer>) selectedItems);
         outState.putBoolean("selectMode", selectMode);
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.phonenumber_detail);
         intent = getIntent();
@@ -179,7 +209,6 @@ public class PhoneNumberDetail extends AppCompatActivity implements PopupMenu.On
         if(savedInstanceState != null) {
             phoneNumber = savedInstanceState.getParcelable("phoneNumber");
             selectMode = savedInstanceState.getBoolean("selectMode");
-            longTouchedItems = savedInstanceState.getIntegerArrayList("longTouched");
             selectedItems = savedInstanceState.getIntegerArrayList("selectedItems");
         }
         else
@@ -467,26 +496,6 @@ public class PhoneNumberDetail extends AppCompatActivity implements PopupMenu.On
         return list;
     }
 
-    /*Cînd este apăsat lung un recording activitatea intră în selectMode. În select mode butonul de back din
-    actionbar este înlocuit de un buton close, butonul meniu din dreapta dispare și apar 2 butoane noi: delete
-    și export. Această funcționalitate este asigurată de toggleSelectMode(). Cîmpul selectMode este indicatorul.
-    Deoarece nu am putut să ascund titlul generat automat de actionbar l-am scos cu setDisplayShowTitleEnabled(false)
-    și am adăugat un TextView (@+id/actionbar_select_title) al cărui text afișează numele contactului. La fel am
-    procedat cu butonul back: setDisplayHomeAsUpEnabled(false).
-    În selectMode clickurile simple pe recordinguri au ca efect selectarea acestora.
-    După intrarea în selectMode, recordingul este pregătit pentru selectare cu toggleLongPressed, ceea ce presupune
-    schimbarea backgroundului, afișarea checkboxului (neselectat) și modificarea spațierii. toggleSelectItem ia ca parametru
-    View-ul recordingului (primit în onLongClick()) - pentru că trebuie să schimbe chestii în recording. Apoi este selectat
-    checkboxul și poziția itemului este salvată în listele longTouchedItems și selectedItems.
-       Lista selectedItems mai este accesată de clicklistenerul checkboxului. Cînd checkboxul este selectat poziția
-    recordingului este salvată în listă, cînd este deselectat poziția este ștearsă din listă. Cînd a fost deselectat
-    ultimul recorder, clicklistenerul amintit invocă funcția clearSelectedMode.
-    clearSelectMode este apelată la apăsarea butonului close sau cînd clicklistenerul checkboxului detectează că nu
-    mai este niciun item selectat. Aceasta readuce actionbarul la starea inițială și schimbă înapoi aspectul tuturor
-    itemilor care au fost selectați, prin longclick sau normal click. Ultimul lucru pe care îl face este să devalizeze
-    cele 2 liste selectedItems și longTouchedItems. Distincția este necesară pentru că un item poate să fie modificat
-    dar să nu mai fie în mod curent selectat.
-    */
     private void toggleSelectMode() {
         ImageButton closeBtn = findViewById(R.id.close_select_mode);
         TextView selectTitle = findViewById(R.id.actionbar_select_title);
@@ -505,86 +514,105 @@ public class PhoneNumberDetail extends AppCompatActivity implements PopupMenu.On
         menuRightBtn.setVisibility(selectMode ? View.GONE : View.VISIBLE);
     }
 
-
     private void clearSelectMode() {
         selectMode = false;
         toggleSelectMode();
-        for(int item : longTouchedItems)
+        for(int item : selectedItems)
         {
-            View recordingSlot = recordingsRecycler.getLayoutManager().findViewByPosition(item);
-            toggleLongPressed(recordingSlot);
+            CardView recordingSlot = (CardView) recordingsRecycler.getLayoutManager().findViewByPosition(item);
+            toggleSelected(recordingSlot, null);
         }
         selectedItems.clear();
-        longTouchedItems.clear();
     }
 
-    private void toggleLongPressed(@NonNull View v) {
-        CheckBox checkBox = v.findViewById(R.id.checkbox);
-        TextView date = v.findViewById(R.id.recording_date);
-        ImageView image = v.findViewById(R.id.type_of_recording);
-        RelativeLayout recording = v.findViewById(R.id.recording);
-
-        checkBox.setVisibility(selectMode ? View.VISIBLE : View.GONE);
-        //https://android--code.blogspot.com/2015/05/android-textview-layout-margin.html
-        //https://stackoverflow.com/questions/35354032/how-to-set-layout-params-to-units-dp-android
-        FrameLayout.LayoutParams lpTextView = (FrameLayout.LayoutParams) date.getLayoutParams();
-        int marginLeftTextView = (int) getResources().getDimension(selectMode ?
-                R.dimen.date_recording_left_margin_selected : R.dimen.date_recording_left_margin_unselected);
-        lpTextView.setMarginStart(marginLeftTextView);
-        date.setLayoutParams(lpTextView);
-
-        FrameLayout.LayoutParams lpImage = (FrameLayout.LayoutParams) image.getLayoutParams();
-        int marginStartImageView = (int) getResources().getDimension(selectMode ?
-                R.dimen.type_of_recording_left_margin_selected : R.dimen.type_of_recording_left_margin_unselected);
-        lpImage.setMarginStart(marginStartImageView);
-        image.setLayoutParams(lpImage);
-
-        recording.setBackgroundColor(selectMode ?
-                getResources().getColor(R.color.light_gray) : getResources().getColor(android.R.color.transparent));
+    private void toggleSelected(@NonNull CardView card, final Integer position) {
+        ImageView selectedTick = card.findViewById(R.id.recording_selected);
+        selectedTick.setVisibility((selectedTick.getVisibility() == View.VISIBLE) ? View.GONE : View.VISIBLE);
+        card.setCardBackgroundColor((card.getCardBackgroundColor().getDefaultColor() == getResources().getColor(R.color.white)) ? getResources().getColor(R.color.light_gray) :
+                getResources().getColor(R.color.white));
+        if(position != null) {
+            if (selectedItems.contains(position))
+                selectedItems.remove(position);
+            else
+                selectedItems.add(position);
+        }
     }
 
     class RecordingHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
-        ImageView typeOfRecording;
-        TextView recordingDate, recordingLength;
-        CheckBox checkBox;
+        TextView recordingDate, recordingTime;
+        ImageView recordingType, soundSymbol, recordingSelected;
+        final static double soundSymbolToCardRatio = 0.45;
+        final static double soundSymbolHeightToWidthRatio = 0.672;
+        final static double dateAndTimeMarginsToCardRatio = 0.05;
+        final static double recordingTypeToCardRatio = 0.12;
+        final static double recordingTypeMarginsToCardRatio = 0.04;
+        final static double selectedTickToCardRatio = 0.2;
+        final static double selectedTickMarginsToCardRatio = 0.03;
+
+        private void calculateDimensions() {
+            //dimensiunile cardView-ului, deja calculate:
+            itemView.getLayoutParams().width = AppLibrary.pxFromDp(getApplicationContext(), widthCard);
+            itemView.getLayoutParams().height = AppLibrary.pxFromDp(getApplicationContext(), widthCard);
+
+            //dimensiunile simbolului pentru sunet:
+            int soundSymbolWidth = (int) Math.floor(widthCard * soundSymbolToCardRatio);
+            int soundSymbolHeight = (int) (soundSymbolHeightToWidthRatio * soundSymbolWidth);
+            soundSymbol.getLayoutParams().width = AppLibrary.pxFromDp(getApplicationContext(),soundSymbolWidth);
+            soundSymbol.getLayoutParams().height = AppLibrary.pxFromDp(getApplicationContext(),soundSymbolHeight);
+
+            //marginile TextView-urilor cu data și ora:
+            RelativeLayout.LayoutParams lpRecordingDate = (RelativeLayout.LayoutParams) recordingDate.getLayoutParams();
+            lpRecordingDate.setMargins(0,
+                    AppLibrary.pxFromDp(getApplicationContext(), (int )(widthCard * dateAndTimeMarginsToCardRatio)), 0, 0);
+            recordingDate.setLayoutParams(lpRecordingDate);
+            RelativeLayout.LayoutParams lpRecordingTime = (RelativeLayout.LayoutParams) recordingTime.getLayoutParams();
+            lpRecordingTime.setMargins(0,
+                    0, 0, AppLibrary.pxFromDp(getApplicationContext(), (int )(widthCard * dateAndTimeMarginsToCardRatio)));
+            recordingTime.setLayoutParams(lpRecordingTime);
+
+            //dimensiunile și marginile recordingType:
+            RelativeLayout.LayoutParams lpRecordingType = (RelativeLayout.LayoutParams) recordingType.getLayoutParams();
+            lpRecordingType.width = AppLibrary.pxFromDp(getApplicationContext(), (int) (widthCard * recordingTypeToCardRatio));
+            lpRecordingType.height = AppLibrary.pxFromDp(getApplicationContext(), (int) (widthCard * recordingTypeToCardRatio));
+            lpRecordingType.setMargins(
+                    AppLibrary.pxFromDp(getApplicationContext(), (int)(widthCard * recordingTypeMarginsToCardRatio)), 0, 0,
+                    AppLibrary.pxFromDp(getApplicationContext(), (int)(widthCard * recordingTypeMarginsToCardRatio)) );
+            recordingType.setLayoutParams(lpRecordingType);
+
+            //dimensiunile și marginile tickului selected:
+            RelativeLayout.LayoutParams lpRecordingSelected = (RelativeLayout.LayoutParams) recordingSelected.getLayoutParams();
+            lpRecordingSelected.width = AppLibrary.pxFromDp(getApplicationContext(), (int) (widthCard * selectedTickToCardRatio));
+            lpRecordingSelected.height = AppLibrary.pxFromDp(getApplicationContext(), (int) (widthCard * selectedTickToCardRatio));
+            lpRecordingSelected.setMargins(0,
+                    AppLibrary.pxFromDp(getApplicationContext(), (int )(widthCard * selectedTickMarginsToCardRatio)),
+                    AppLibrary.pxFromDp(getApplicationContext(), (int)(widthCard * selectedTickMarginsToCardRatio)), 0 );
+            recordingSelected.setLayoutParams(lpRecordingSelected);
+        }
 
         RecordingHolder(LayoutInflater inflater, ViewGroup parent) {
             super(inflater.inflate(R.layout.recording, parent, false));
-            typeOfRecording = itemView.findViewById(R.id.type_of_recording);
             recordingDate = itemView.findViewById(R.id.recording_date);
-            recordingLength = itemView.findViewById(R.id.recording_length);
-            checkBox = itemView.findViewById(R.id.checkbox);
-            checkBox.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(((CheckBox) v).isChecked())
-                        selectedItems.add(getAdapterPosition());
-                    else {
-                        selectedItems.remove(Integer.valueOf(getAdapterPosition()));
-                        if(selectedItems.size() == 0)
-                            clearSelectMode();
-                    }
+            recordingTime = itemView.findViewById(R.id.recording_time);
+            recordingType = itemView.findViewById(R.id.recording_type);
+            soundSymbol = itemView.findViewById(R.id.sound_symbol);
+            recordingSelected = itemView.findViewById(R.id.recording_selected);
 
-                }
-            });
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
+
+            calculateDimensions();
         }
 
         @Override
         public boolean onLongClick(View v) {
-           if(!selectMode) {
-               selectMode = true;
-               toggleSelectMode();
-           }
-            int position = this.getAdapterPosition();
-            if(!longTouchedItems.contains(position)) { //necesar pentru că dacă se face de mai multe ori click lung
-                //pe un recording se introduce poziția acestuia de mai multe ori în longTouchedItems, ceea ce creează probleme.
-                toggleLongPressed(v);
-                checkBox.setChecked(true);
-                longTouchedItems.add(position);
-                selectedItems.add(position);
+            if(!selectMode) {
+                selectMode = true;
+                toggleSelectMode();
             }
+            int position = this.getAdapterPosition();
+            toggleSelected((CardView) v, position);
+            if(selectedItems.isEmpty())
+                clearSelectMode();
             return true;
         }
 
@@ -592,12 +620,9 @@ public class PhoneNumberDetail extends AppCompatActivity implements PopupMenu.On
         public void onClick(View v) {
             if(selectMode) {
                 int position = this.getAdapterPosition();
-                if(!longTouchedItems.contains(position)) {
-                    toggleLongPressed(v);
-                    checkBox.setChecked(true);
-                    longTouchedItems.add(position);
-                    selectedItems.add(position);
-                }
+                toggleSelected((CardView) v, position);
+                if(selectedItems.isEmpty())
+                    clearSelectMode();
             }
             else { //usual short click
                 Intent playIntent = new Intent(PhoneNumberDetail.this, PlayerActivity.class);
@@ -629,15 +654,13 @@ public class PhoneNumberDetail extends AppCompatActivity implements PopupMenu.On
         @Override
         public void onBindViewHolder(@NonNull RecordingHolder holder, int position) {
             Recording recording = recordings.get(position);
-            holder.typeOfRecording.setImageResource(recording.isIncoming() ? R.drawable.incoming : R.drawable.outgoing);
             holder.recordingDate.setText(recording.getDate());
-            holder.recordingLength.setText(recording.getDuration());
+            holder.recordingTime.setText(recording.getTime());
+            holder.recordingType.setImageResource(recording.isIncoming() ? R.drawable.incoming : R.drawable.outgoing);
 
-            //pentru situația cînd este întors ecranul
-            if(longTouchedItems.contains(position))
-                toggleLongPressed(holder.itemView);
+            //pentru situația cînd este întors ecranul sau cînd activitatea trece în background:
             if(selectedItems.contains(position))
-                holder.checkBox.setChecked(true);
+                toggleSelected((CardView) holder.itemView, null);
         }
 
         @Override

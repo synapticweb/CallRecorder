@@ -162,10 +162,4 @@ class MediaPlayerHolder implements PlayerAdapter {
             return mediaPlayer.getDuration();
         return 0;
     }
-
-    public int getPLayerId() {
-        if(mediaPlayer != null)
-            return mediaPlayer.getAudioSessionId();
-        return 0;
-    }
 }

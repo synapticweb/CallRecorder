@@ -17,37 +17,17 @@
         app:titleTextAppearance="@style/toolbar_font"
         >
 
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/close"
+            android:id="@+id/close_player"
+            android:layout_gravity="end"
+            android:background="@android:color/transparent"
+            android:layout_marginEnd="10dp"
+            />
+
     </android.support.v7.widget.Toolbar>
-
-    <!--<LinearLayout-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_above="@id/play_controls"-->
-        <!--android:weightSum="10"-->
-        <!--android:gravity="center">-->
-
-        <!--&lt;!&ndash;<com.chibde.visualizer.BarVisualizer&ndash;&gt;-->
-            <!--&lt;!&ndash;android:layout_width="0dp"&ndash;&gt;-->
-            <!--&lt;!&ndash;android:layout_height="100dp"&ndash;&gt;-->
-            <!--&lt;!&ndash;android:layout_weight="8"&ndash;&gt;-->
-            <!--&lt;!&ndash;android:id="@+id/player_visualization"&ndash;&gt;-->
-            <!--&lt;!&ndash;android:background="@drawable/grid_repeat"&ndash;&gt;-->
-            <!--&lt;!&ndash;/>&ndash;&gt;-->
-
-
-        <!--<ak.sh.ay.musicwave.MusicWave-->
-            <!--android:layout_width="0dp"-->
-            <!--android:layout_height="100dp"-->
-            <!--android:layout_weight="8"-->
-            <!--android:id="@+id/player_visualization"-->
-            <!--app:colorGradient="true"-->
-            <!--app:waveThickness="6"-->
-            <!--app:startColor="@color/colorAccent"-->
-            <!--app:endColor="@color/colorPrimary"-->
-            <!--android:background="@drawable/grid_repeat"-->
-            <!--/>-->
-
-    <!--</LinearLayout>-->
 
     <LinearLayout
         android:layout_width="match_parent"

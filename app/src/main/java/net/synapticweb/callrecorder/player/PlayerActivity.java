@@ -5,6 +5,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -19,11 +20,12 @@ import net.synapticweb.callrecorder.Recording;
 
 
 public class PlayerActivity extends AppCompatActivity {
-    ImageButton playPause, stopPlaying;
+    ImageButton playPause, stopPlaying, closeBtn;
     SeekBar playSeekBar;
     MediaPlayerHolder mediaPlayerHolder = null;
     TextView playedTime, totalTime;
     boolean userIsSeeking = false;
+    private static final int WINDOW_HEIGHT_DP = 250;
     private static final String TAG = "CallRecorder";
 
     @Override
@@ -33,15 +35,26 @@ public class PlayerActivity extends AppCompatActivity {
         setContentView(R.layout.play_activity);
 
         DisplayMetrics metrics = getResources().getDisplayMetrics();
-        int screenHeight = (int) (metrics.heightPixels * 0.40);
-        getWindow().setLayout(WindowManager.LayoutParams.WRAP_CONTENT, screenHeight);
+        getWindow().setLayout(WindowManager.LayoutParams.WRAP_CONTENT, (int) (WINDOW_HEIGHT_DP * metrics.density));
 
+        Toolbar toolbar = findViewById(R.id.toolbar_play);
+        Recording recording = getIntent().getParcelableExtra("recording");
+        toolbar.setTitle("Playing " + recording.getDate() + " " + recording.getTime());
+        setSupportActionBar(toolbar);
 
         playPause = findViewById(R.id.player_button_play_pause);
         stopPlaying = findViewById(R.id.player_button_stop);
         playSeekBar = findViewById(R.id.play_seekbar);
         playedTime = findViewById(R.id.play_time_played);
         totalTime = findViewById(R.id.play_total_time);
+        closeBtn = findViewById(R.id.close_player);
+
+        closeBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
         playPause.setOnClickListener(new View.OnClickListener() {
             @Override

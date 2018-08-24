@@ -44,7 +44,7 @@ public class AppLibrary {
     }
 
     //https://stackoverflow.com/questions/625433/how-to-convert-milliseconds-to-x-mins-x-seconds-in-java
-    public static String getDurationHuman(int millis) {
+    public static String getDurationHuman(long millis) {
 //        long hours = TimeUnit.MILLISECONDS.toHours(millis);
 //        millis -= TimeUnit.HOURS.toMillis(hours);
         long minutes = TimeUnit.MILLISECONDS.toMinutes(millis);
@@ -52,4 +52,9 @@ public class AppLibrary {
         long seconds = TimeUnit.MILLISECONDS.toSeconds(millis);
         return String.format(Locale.US, "%02d:%02d", minutes, seconds);
     }
+
+    public static int pxFromDp(final Context context, final int dp) {
+        return (int) (dp * context.getResources().getDisplayMetrics().density);
+    }
+
 }
