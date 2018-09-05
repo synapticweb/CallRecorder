@@ -16,7 +16,7 @@ public class ControlRecordingReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent)
     {
         NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        Intent notificationIntent = new Intent(context, CallRecorderMainActivity.class);
+        Intent notificationIntent = new Intent(context, ListContactsActivityMain.class);
         PendingIntent tapNotificationPi = PendingIntent.getBroadcast(context, 0, notificationIntent, 0);
 
         Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.record);

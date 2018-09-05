@@ -47,14 +47,6 @@ public class Recording implements Parcelable {
         return new SimpleDateFormat("h:mm a", Locale.US).format(new Date(startTimestamp)); //3:45 PM
     }
 
-    public String getDuration() {
-        return AppLibrary.getDurationHuman(endTimestamp - startTimestamp);
-    }
-
-//    public String getDate() {
-//        return new SimpleDateFormat("d MMM yyyy - HH:mm:ss", Locale.US).format(new Date(startTimestamp));
-//    }
-
     public void delete(Context context) throws SQLException, SecurityException
     {
         RecordingsDbHelper mDbHelper = new RecordingsDbHelper(context);
@@ -66,7 +58,7 @@ public class Recording implements Parcelable {
         new File(path).delete();
     }
 
-    public void export(String folderPath, PhoneNumberDetail.ExportAsyncTask asyncTask, long totalSize) throws IOException {
+    public void export(String folderPath, ExportAsyncTask asyncTask, long totalSize) throws IOException {
         String fileName = new SimpleDateFormat("d_MMM_yyyy_HH_mm_ss", Locale.US).format(new Date(startTimestamp)) + ".amr";
         InputStream in = new FileInputStream(path);
         OutputStream out = new FileOutputStream(new File(folderPath, fileName));

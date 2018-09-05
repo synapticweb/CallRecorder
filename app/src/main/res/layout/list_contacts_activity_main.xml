@@ -37,24 +37,14 @@
             android:textColor="@color/textOnDark"
             android:layout_gravity="center"/>
 
-        <!--<Button-->
-            <!--android:id="@+id/settings"-->
-            <!--android:layout_width="30dp"-->
-            <!--android:layout_height="30dp"-->
-            <!--android:background="@drawable/settings"-->
-            <!--android:layout_gravity="end"-->
-            <!--android:layout_marginEnd="10dp"/>-->
-
     </android.support.v7.widget.Toolbar>
 
-
-    <android.support.v7.widget.RecyclerView
-        android:layout_marginTop="?attr/actionBarSize"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/listened_phones"
-        android:scrollbars="vertical">
-    </android.support.v7.widget.RecyclerView>
+        android:id="@+id/contacts_list_fragment_container">
+
+    </FrameLayout>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/add_numbers"

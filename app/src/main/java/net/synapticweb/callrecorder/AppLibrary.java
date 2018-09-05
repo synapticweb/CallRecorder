@@ -53,6 +53,7 @@ public class AppLibrary {
         return String.format(Locale.US, "%02d:%02d", minutes, seconds);
     }
 
+    //https://stackoverflow.com/questions/4605527/converting-pixels-to-dp
     public static int pxFromDp(final Context context, final int dp) {
         return (int) (dp * context.getResources().getDisplayMetrics().density);
     }

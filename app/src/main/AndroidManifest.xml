@@ -21,7 +21,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".CallRecorderMainActivity"
+        <activity android:name=".ListContactsActivityMain"
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -30,23 +30,23 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".PhoneNumberDetail"
-            android:parentActivityName=".CallRecorderMainActivity">
+        <activity android:name=".ContactDetailActivity"
+            android:parentActivityName=".ListContactsActivityMain">
         </activity>
 
         <activity android:name=".SettingsActivity"
-            android:parentActivityName=".CallRecorderMainActivity">
+            android:parentActivityName=".ListContactsActivityMain">
         </activity>
 
         <activity android:name=".EditPhoneNumberActivity"
-            android:parentActivityName=".PhoneNumberDetail">
+            android:parentActivityName=".ContactDetailActivity">
         </activity>
 
         <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat"/>
 
         <activity android:name=".player.PlayerActivity"
-            android:parentActivityName=".PhoneNumberDetail"
+            android:parentActivityName=".ContactDetailActivity"
             android:configChanges="orientation|screenSize"
             android:theme="@style/PlayerStyle"/> <!--Fără screenSize continuă să se restarteze. -->
 

@@ -74,7 +74,7 @@ public class RecorderService extends Service {
     }
 
     private Notification buildNotification(boolean startRecording) {
-        Intent notificationIntent = new Intent(this, CallRecorderMainActivity.class);
+        Intent notificationIntent = new Intent(this, ListContactsActivityMain.class);
         PendingIntent tapNotificationPi = PendingIntent.getBroadcast(this, 0, notificationIntent, 0);
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.record);
 

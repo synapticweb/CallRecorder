@@ -34,6 +34,7 @@ public class PlayerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.play_activity);
 
+        //https://stackoverflow.com/questions/1979369/android-activity-as-a-dialog
         DisplayMetrics metrics = getResources().getDisplayMetrics();
         getWindow().setLayout(WindowManager.LayoutParams.WRAP_CONTENT, (int) (WINDOW_HEIGHT_DP * metrics.density));
 

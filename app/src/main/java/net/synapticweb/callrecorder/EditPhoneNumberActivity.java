@@ -46,6 +46,7 @@ public class EditPhoneNumberActivity extends AppCompatActivity implements Adapte
     private static final String TAG = "CallRecorder";
     private static final int PICK_IMAGE_REQUEST = 1;
     private static final int TAKE_PICTURE = 2;
+    public static final String EDITED_CONTACT = "edited_contact";
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -60,7 +61,7 @@ public class EditPhoneNumberActivity extends AppCompatActivity implements Adapte
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.edit_phone_number);
+        setContentView(R.layout.edit_contact_activity);
 
         if(savedInstanceState != null) {
             phoneNumber = savedInstanceState.getParcelable("phoneNumber");
@@ -117,7 +118,7 @@ public class EditPhoneNumberActivity extends AppCompatActivity implements Adapte
 
                     phoneNumber.updateNumber(EditPhoneNumberActivity.this, false);
                     Intent intent = new Intent();
-                    intent.putExtra("edited_number", phoneNumber);
+                    intent.putExtra(EDITED_CONTACT, phoneNumber);
                     setResult(RESULT_OK, intent);
                 }
                 else
