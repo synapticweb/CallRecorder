@@ -3,10 +3,8 @@ package net.synapticweb.callrecorder;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.util.Log;
-
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
-
 import java.lang.ref.WeakReference;
 
 /*Am decis să folosesc AsyncTask pentru copierea recordingurilor, astfel încît threadul UI să rămînă liber - pentru a putea

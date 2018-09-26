@@ -21,7 +21,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ListContactsActivityMain"
+        <activity android:name=".ContactsListActivityMain"
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -31,11 +31,11 @@
         </activity>
 
         <activity android:name=".ContactDetailActivity"
-            android:parentActivityName=".ListContactsActivityMain">
+            android:parentActivityName=".ContactsListActivityMain">
         </activity>
 
         <activity android:name=".SettingsActivity"
-            android:parentActivityName=".ListContactsActivityMain">
+            android:parentActivityName=".ContactsListActivityMain">
         </activity>
 
         <activity android:name=".EditPhoneNumberActivity"

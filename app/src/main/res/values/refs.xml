@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="activity_masterdetail"
+        type="layout">@layout/contacts_list_activity_onepane</item>
+</resources>

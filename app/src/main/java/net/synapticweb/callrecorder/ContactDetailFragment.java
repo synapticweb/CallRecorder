@@ -54,6 +54,8 @@ public class ContactDetailFragment extends Fragment {
         void onRecordingEdited(PhoneNumber phoneNumber);
         boolean isSelectModeOn();
         boolean selectedItemsContains(int position);
+        int getContainerWidth();
+        void onDeleteContact();
     }
 
     @Override
@@ -194,7 +196,7 @@ public class ContactDetailFragment extends Fragment {
                         catch (Exception exc) {
                             Log.wtf(TAG, exc.getMessage());
                         }
-                        getActivity().finish();
+                        callbacks.onDeleteContact();
                     }
                 })
                 .show();
@@ -219,9 +221,7 @@ public class ContactDetailFragment extends Fragment {
     }
 
     private void calculateCardViewDimensions() {
-        //https://stackoverflow.com/questions/6465680/how-to-determine-the-screen-width-in-terms-of-dp-or-dip-at-runtime-in-android
-        Configuration configuration = getResources().getConfiguration();
-        int screenWidthDp = configuration.screenWidthDp;
+        int screenWidthDp = callbacks.getContainerWidth();
         final int cardMargin = 3, recyclerMargin = 5, minimumCardWidth = 100, maximumCardWidth = 250;
 
         int numCols = 3;
@@ -242,7 +242,7 @@ public class ContactDetailFragment extends Fragment {
 
         this.widthCard = widthCard;
         this.cardViewColumns = numCols;
-//        Log.wtf(TAG, "Window width: " + screenWidthDp + " CardWidth: " + widthCard + " Numcols: " + cardViewColumns );
+        Log.wtf(TAG, "Window width: " + screenWidthDp + " CardWidth: " + widthCard + " Numcols: " + cardViewColumns );
     }
 
     private void displayRecordingStatus(){
@@ -296,6 +296,7 @@ public class ContactDetailFragment extends Fragment {
             Bundle extras = intent.getExtras();
             if(extras != null) {
                 phoneNumber = intent.getParcelableExtra(EditPhoneNumberActivity.EDITED_CONTACT);
+                paintViews();
                 callbacks.onRecordingEdited(phoneNumber);
             }
 //            paintViews(); odată ce refac widgeturile în onResume() nu mai este nevoie de asta.

@@ -34,5 +34,6 @@
     <string name="succes">Succes</string>
     <string name="error_export">An error occurred while exporting the recordings.</string>
     <string name="succes_export">The selected recordings were successfully exported.</string>
+    <string name="number_impossible">This is not a valid phone number.</string>
 
 </resources>

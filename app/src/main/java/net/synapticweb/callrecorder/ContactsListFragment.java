@@ -1,6 +1,6 @@
 package net.synapticweb.callrecorder;
 
-import android.content.Intent;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -21,23 +21,76 @@ import java.util.Collections;
 import java.util.List;
 import static net.synapticweb.callrecorder.AppLibrary.SQLITE_TRUE;
 
-public class ListContactsFragment extends Fragment {
-    RecyclerView listenedPhones;
-    ListenedAdapter adapter;
+public class ContactsListFragment extends Fragment {
+    private ListenedAdapter adapter;
+    private Callbacks callbacks;
+    private int currentPosition;
+    private final static String CURRENT_POS_KEY = "current_pos";
+
+    public interface Callbacks {
+        void onContactSelected(PhoneNumber phoneNumber);
+        void setCurrentDetail(PhoneNumber phoneNumber);
+        void noMoreContacts();
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        callbacks = (Callbacks) context;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        callbacks = null;
+    }
 
     public void updateContactsList() {
         adapter.phoneNumbers = this.getPhoneNumbersList();
         adapter.notifyDataSetChanged();
     }
 
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle savedInstanceState) {
+        savedInstanceState.putInt(CURRENT_POS_KEY, currentPosition);
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if(savedInstanceState != null) {
+            currentPosition = savedInstanceState.getInt(CURRENT_POS_KEY);
+        }
+        else
+            currentPosition = 0;
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        listenedPhones = (RecyclerView) inflater.inflate(R.layout.list_contacts_fragment, container, false);
+        RecyclerView listenedPhones = (RecyclerView) inflater.inflate(R.layout.list_contacts_fragment, container, false);
         listenedPhones.setLayoutManager(new LinearLayoutManager(getActivity()));
-        adapter = new ListenedAdapter(this.getPhoneNumbersList());
+        List<PhoneNumber> listContacts = this.getPhoneNumbersList();
+        adapter = new ListenedAdapter(listContacts);
         listenedPhones.setAdapter(adapter);
+        if(!listContacts.isEmpty())
+            callbacks.setCurrentDetail(listContacts.get(currentPosition));
         return listenedPhones;
+    }
+
+    public void nextOrPrevious() {
+        //în momentul cînd este apelată această funcție phoneNumberul corespunzător a fost deja șters. Dar
+        // adapterul nu știe acest lucru - încă nu a fost notificat, deci lucrăm cu datele vechi.
+        if(currentPosition == (adapter.getItemCount() - 1)) { //suntem la sfîrșit
+            if(currentPosition > 0) //dacă suntem la sfîrșit și mai sunt elemente, va fi șters elementul curent
+                //și locul îi va fi luat de cel precedent. currentPos descrește cu 1
+                callbacks.setCurrentDetail(adapter.getItem(--currentPosition));
+            else
+                callbacks.noMoreContacts();
+        }
+        else //dacă nu suntem la sfîrșit, după ștergerea elem curent, locul îi va fi luat de următorul, care va
+            // avea exact aceeași poziție în listă ca elem șters.
+            callbacks.setCurrentDetail(adapter.getItem(currentPosition + 1));
     }
 
     private List<PhoneNumber> getPhoneNumbersList() {
@@ -115,9 +168,8 @@ public class ListContactsFragment extends Fragment {
 
         @Override
         public void onClick(View view) {
-            Intent detailIntent = new Intent(getActivity(), ContactDetailActivity.class);
-            detailIntent.putExtra("phoneNumber", number);
-            startActivity(detailIntent);
+            currentPosition = getAdapterPosition();
+            callbacks.onContactSelected(number);
         }
     }
 
@@ -155,6 +207,10 @@ public class ListContactsFragment extends Fragment {
             holder.number = phoneNumber;
             if(!phoneNumber.isPrivateNumber())
                 holder.mPhoneNumber.setText(phoneNumber.getPhoneNumber());
+        }
+
+        PhoneNumber getItem(int position) {
+            return phoneNumbers.get(position);
         }
 
         @Override

@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.database.SQLException;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.ContactsContract;
@@ -28,30 +29,129 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.ImageButton;
+import android.widget.TextView;
+
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+
+import net.synapticweb.callrecorder.databases.ListenedContract;
+import net.synapticweb.callrecorder.databases.RecordingsDbHelper;
+
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import static net.synapticweb.callrecorder.AppLibrary.*;
 
 
-public class ListContactsActivityMain extends AppCompatActivity  {
+public class ContactsListActivityMain extends HandleDetailActivity implements ContactsListFragment.Callbacks {
+    private ContactsListFragment contactList;
     private static final String TAG = "CallRecorder";
     private static final int PERMISSION_REQUEST = 2;
     private static final int REQUEST_NUMBER = 1;
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable("phoneNumber", phoneNumber);
+        outState.putIntegerArrayList("selectedItems", (ArrayList<Integer>) selectedItems);
+        outState.putBoolean("selectMode", selectMode);
+    }
+
+    @Override
+    @HandleDetailFragment
+    public void onDeleteContact() {
+        contactList.nextOrPrevious();
+        contactList.updateContactsList();
+    }
+
+    @Override
+    @HandleDetailFragment
+    public void onRecordingEdited(PhoneNumber phoneNumber) {
+        super.onRecordingEdited(phoneNumber);
+        TextView title = findViewById(R.id.actionbar_select_title);
+        title.setText(phoneNumber.getContactName());
+    }
+
+    //super definit în HandleDetailActivity
+    @Override
+    protected void toggleSelectMode() {
+        super.toggleSelectMode();
+        Button hamburger = findViewById(R.id.hamburger);
+        hamburger.setVisibility(selectMode ? View.GONE : View.VISIBLE);
+        TextView selectTitle = findViewById(R.id.actionbar_select_title);
+        selectTitle.setVisibility(View.VISIBLE); //în modul tabletă selectTitle este întotdeauna vizibil!
+
+        actionBar.setDisplayHomeAsUpEnabled(false); //în mod tabletă săgeata stînga nu are ce căuta, iar titlul nu este afișat niciodată.
+        actionBar.setDisplayShowTitleEnabled(false);
+    }
+
+    @Override
+    @HandleListFragment
+    public void setCurrentDetail(PhoneNumber phoneNumber) {
+        if(findViewById(R.id.contact_detail_fragment_container) != null) { //numai pe tabletă
+            this.phoneNumber = phoneNumber;
+            toggleSelectMode(); //ar fi trebuit să fie în onCreate, dar nu e gata fragmentul cînd e apelat și dă NullPointerException.
+            replaceDetailFragment();
+        }
+    }
+
+    @Override
+    @HandleListFragment
+    public void noMoreContacts() {
+        ImageButton detailMenu = findViewById(R.id.phone_number_detail_menu);
+        detailMenu.setVisibility(View.GONE);
+        TextView title = findViewById(R.id.actionbar_select_title);
+        title.setText("");
+        phoneNumber = null;
+        Fragment currentDetailFragment = getSupportFragmentManager().
+                findFragmentById(R.id.contact_detail_fragment_container);
+        getSupportFragmentManager().beginTransaction()
+                .remove(currentDetailFragment)
+                .commit();
+    }
+
+    private void replaceDetailFragment() {
+        TextView title = findViewById(R.id.actionbar_select_title);
+        title.setText(phoneNumber.getContactName());
+        ImageButton detailMenu = findViewById(R.id.phone_number_detail_menu);
+        detailMenu.setVisibility(View.VISIBLE);
+        contactDetail = ContactDetailFragment.newInstance(phoneNumber);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.contact_detail_fragment_container, contactDetail)
+                .commitAllowingStateLoss(); //fără chestia asta îmi dă un Caused by:
+        // java.lang.IllegalStateException: Can not perform this action after onSaveInstanceState cînd înlocuiesc fragmentul detail după adăugarea unui
+        //contact nou. Soluția: https://stackoverflow.com/questions/7575921/illegalstateexception-can-not-perform-this-action-after-onsaveinstancestate-wit
+    }
+
+    @Override
+    @HandleListFragment
+    public void onContactSelected(PhoneNumber phoneNumber) {
+        this.phoneNumber = phoneNumber;
+        if(findViewById(R.id.contact_detail_fragment_container) == null) {
+            Intent detailIntent = new Intent(this, ContactDetailActivity.class);
+            detailIntent.putExtra("phoneNumber", phoneNumber);
+            startActivity(detailIntent);
+        }
+        else  //dacă avem layoutul twopane
+            replaceDetailFragment();
+    }
 
     @Override
     protected void onResume(){
         super.onResume();
         //e necesar să recreem lista în onResume() pentru că prin sincronizarea unui număr necunoscut se modifică obiectele
         //din baza de date.
-        FragmentManager fm = getSupportFragmentManager();
-        ListContactsFragment contactList = (ListContactsFragment) fm.findFragmentById(R.id.contacts_list_fragment_container);
         if(contactList != null)
             contactList.updateContactsList();
     }
@@ -60,13 +160,31 @@ public class ListContactsActivityMain extends AppCompatActivity  {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_masterdetail);
 
-        setContentView(R.layout.list_contacts_activity_main);
+        if(savedInstanceState != null) {
+            phoneNumber = savedInstanceState.getParcelable("phoneNumber");
+            selectMode = savedInstanceState.getBoolean("selectMode");
+            selectedItems = savedInstanceState.getIntegerArrayList("selectedItems");
+        }
+
         Toolbar toolbar = findViewById(R.id.toolbar_main);
         setSupportActionBar(toolbar);
-        ActionBar actionBar = getSupportActionBar();
+        actionBar = getSupportActionBar();
         if(actionBar != null)
             actionBar.setDisplayShowTitleEnabled(false);
+
+        FragmentManager fm = getSupportFragmentManager();
+        contactList = (ContactsListFragment) fm.findFragmentById(R.id.contacts_list_fragment_container);
+        if(contactList == null) {
+            contactList = new ContactsListFragment();
+            fm.beginTransaction().
+                    add(R.id.contacts_list_fragment_container, contactList).
+                    commit();
+        }
+
+        if(findViewById(R.id.contact_detail_fragment_container) != null) //numai cînd suntem pe tabletă
+             setDetailButtonListeners();
 
         if(Build.MANUFACTURER.equalsIgnoreCase("huawei"))
             huaweiAlert();
@@ -100,7 +218,7 @@ public class ListContactsActivityMain extends AppCompatActivity  {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.settings:
-                        Intent intent = new Intent(ListContactsActivityMain.this, SettingsActivity.class);
+                        Intent intent = new Intent(ContactsListActivityMain.this, SettingsActivity.class);
                         startActivity(intent);
                         break;
                 }
@@ -108,19 +226,21 @@ public class ListContactsActivityMain extends AppCompatActivity  {
                 return true;
             }
         });
+    }
 
-        FragmentManager fm = getSupportFragmentManager();
-        Fragment contactList = fm.findFragmentById(R.id.contacts_list_fragment_container);
-        if(contactList == null) {
-            contactList = new ListContactsFragment();
-            fm.beginTransaction().
-                    add(R.id.contacts_list_fragment_container, contactList).
-                    commit();
-        }
+    private void alertAtInsertContact(int message) {
+        new MaterialDialog.Builder(this)
+                .title(R.string.number_exists_title)
+                .content(getResources().getString(message))
+                .positiveText(android.R.string.ok)
+                .icon(getResources().getDrawable(R.drawable.warning))
+                .show();
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data); //necesar pentru că altfel nu apelează onActivityResult din fragmente:
+        // https://stackoverflow.com/questions/6147884/onactivityresult-is-not-being-called-in-fragment
         Uri numberUri;
         String newNumber = null;
         String contactName = null;
@@ -132,50 +252,61 @@ public class ListContactsActivityMain extends AppCompatActivity  {
         }
 
         if (requestCode == REQUEST_NUMBER && (numberUri = data.getData()) != null) {
-                Cursor cursor = getContentResolver().
-                        query(numberUri, new String[]{ContactsContract.CommonDataKinds.Phone.NUMBER,
-                                ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
-                                        ContactsContract.CommonDataKinds.Phone.PHOTO_URI,
-                                        ContactsContract.CommonDataKinds.Phone.TYPE},
-                                null, null, null);
-                if(cursor != null)
-                {
-                    cursor.moveToFirst();
-                    newNumber = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                    contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
-                    photoUri = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_URI));
-                    phoneType = cursor.getInt(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
-                    cursor.close();
+            Cursor cursor = getContentResolver().
+                    query(numberUri, new String[]{ContactsContract.CommonDataKinds.Phone.NUMBER,
+                                    ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
+                                    ContactsContract.CommonDataKinds.Phone.PHOTO_URI,
+                                    ContactsContract.CommonDataKinds.Phone.TYPE},
+                            null, null, null);
+            if (cursor != null) {
+                cursor.moveToFirst();
+                newNumber = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+                photoUri = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_URI));
+                phoneType = cursor.getInt(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
+                cursor.close();
+            }
+
+            PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
+            String countryCode = AppLibrary.getUserCountry(this);
+            if(countryCode == null)
+                countryCode = "US";
+
+            if(!phoneUtil.isPossibleNumber(newNumber, countryCode)) {
+                alertAtInsertContact(R.string.number_impossible);
+                return ;
+            }
+
+            RecordingsDbHelper mDbHelper = new RecordingsDbHelper(getApplicationContext());
+            SQLiteDatabase db = mDbHelper.getReadableDatabase();
+            cursor = db.query(
+                    ListenedContract.Listened.TABLE_NAME, new String[]{ListenedContract.Listened.COLUMN_NAME_NUMBER},
+                    null, null, null, null, null);
+
+            boolean match = false;
+            while (cursor.moveToNext()) {
+                PhoneNumberUtil.MatchType matchType = phoneUtil.isNumberMatch(cursor.getString(
+                        cursor.getColumnIndex(ListenedContract.Listened.COLUMN_NAME_NUMBER)), newNumber);
+                if (matchType != PhoneNumberUtil.MatchType.NO_MATCH && matchType != PhoneNumberUtil.MatchType.NOT_A_NUMBER) {
+                    match = true;
+                    break;
                 }
+            }
 
-
-            PhoneNumber phoneNumber = new PhoneNumber(null, newNumber, contactName, photoUri, phoneType);
-            try {
+            if (match)
+                alertAtInsertContact(R.string.number_exists_message);
+            else
+                {
+                phoneNumber = new PhoneNumber(null, newNumber, contactName, photoUri, phoneType);
                 phoneNumber.insertInDatabase(this);
+                if(findViewById(R.id.contact_detail_fragment_container) != null)
+                    replaceDetailFragment();
+                //după introducerea noului număr trebuie să recreem lista vizibilă de numere din interfața principală:
+                    if(contactList != null)
+                        contactList.updateContactsList();
             }
-            catch (SQLException exc) {
-                if(exc.toString().contains("UNIQUE"))
-                {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setMessage(R.string.number_exists_message)
-                            .setTitle(R.string.number_exists_title)
-                            .setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                }
-                            }
-        );
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
-                }
-            }
-            FragmentManager fm = getSupportFragmentManager();
-            ListContactsFragment contactList = (ListContactsFragment) fm.findFragmentById(R.id.contacts_list_fragment_container);
-            //după introducerea noului număr trebuie să recreem lista vizibilă de numere din interfața principală:
-            if(contactList != null)
-                contactList.updateContactsList();
         }
     }
-
 
     private void askForPermissions() {
         boolean outgoingCalls = ContextCompat.checkSelfPermission(this, Manifest.permission.PROCESS_OUTGOING_CALLS)
