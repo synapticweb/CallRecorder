@@ -1,4 +1,4 @@
-package net.synapticweb.callrecorder;
+package net.synapticweb.callrecorder.data;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -15,12 +15,11 @@ import android.util.Log;
 
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 
-import net.synapticweb.callrecorder.databases.ListenedContract;
-import net.synapticweb.callrecorder.databases.RecordingsContract;
-import net.synapticweb.callrecorder.databases.RecordingsDbHelper;
+import net.synapticweb.callrecorder.AppLibrary;
+import net.synapticweb.callrecorder.PhoneTypeContainer;
 
 
-class PhoneNumber implements Comparable<PhoneNumber>, Parcelable {
+public class Contact implements Comparable<Contact>, Parcelable {
     private Long id;
     private String phoneNumber = null;
     private int phoneType = -1;
@@ -31,10 +30,10 @@ class PhoneNumber implements Comparable<PhoneNumber>, Parcelable {
     private boolean shouldRecord = true;
     private static final String TAG = "CallRecorder";
 
-    PhoneNumber(){
+    public Contact(){
     }
 
-    PhoneNumber(Long id, String phoneNumber, String contactName, String photoUriStr, int phoneTypeCode)
+    public Contact(Long id, String phoneNumber, String contactName, String photoUriStr, int phoneTypeCode)
     {
         setId(id);
         setPhoneNumber(phoneNumber);
@@ -113,8 +112,8 @@ class PhoneNumber implements Comparable<PhoneNumber>, Parcelable {
          throw new SQLException("This Listened row was not deleted");
     }
 
-  @Nullable static public PhoneNumber searchNumberInContacts(final String number, @NonNull final Context context) {
-        PhoneNumber phoneNumber = null;
+  @Nullable static public Contact searchNumberInContacts(final String number, @NonNull final Context context) {
+        Contact contact = null;
       Cursor cursor = context.getContentResolver()
               .query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, new String[]{
                               ContactsContract.CommonDataKinds.Phone.NUMBER,
@@ -130,16 +129,16 @@ class PhoneNumber implements Comparable<PhoneNumber>, Parcelable {
                       cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
               PhoneNumberUtil.MatchType matchType = phoneUtil.isNumberMatch(numberContacts, number);
               if(matchType != PhoneNumberUtil.MatchType.NO_MATCH && matchType != PhoneNumberUtil.MatchType.NOT_A_NUMBER) {
-                  phoneNumber = new PhoneNumber();
-                  phoneNumber.setPhoneType(cursor.getInt(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE)));
-                  phoneNumber.setContactName(cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)));
-                  phoneNumber.setPhotoUri(cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_URI)));
-                  phoneNumber.setPhoneNumber(cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)));
+                  contact = new Contact();
+                  contact.setPhoneType(cursor.getInt(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE)));
+                  contact.setContactName(cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)));
+                  contact.setPhotoUri(cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_URI)));
+                  contact.setPhoneNumber(cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)));
                   break;
               }
           }
           cursor.close();
-          return  phoneNumber;
+          return contact;
       }
         return null;
     }
@@ -170,7 +169,7 @@ class PhoneNumber implements Comparable<PhoneNumber>, Parcelable {
     }
 
 
-    public int compareTo(@NonNull  PhoneNumber numberToCompare)
+    public int compareTo(@NonNull Contact numberToCompare)
     {
         if(this.isUnkownNumber() && !numberToCompare.isUnkownNumber() )
             return -1;
@@ -275,7 +274,7 @@ class PhoneNumber implements Comparable<PhoneNumber>, Parcelable {
         dest.writeByte(this.shouldRecord ? (byte) 1 : (byte) 0);
     }
 
-    private PhoneNumber(Parcel in) {
+    private Contact(Parcel in) {
         this.id = (Long) in.readValue(Long.class.getClassLoader());
         this.phoneNumber = in.readString();
         this.phoneType = in.readInt();
@@ -286,15 +285,15 @@ class PhoneNumber implements Comparable<PhoneNumber>, Parcelable {
         this.shouldRecord = in.readByte() != 0;
     }
 
-    public static final Parcelable.Creator<PhoneNumber> CREATOR = new Parcelable.Creator<PhoneNumber>() {
+    public static final Parcelable.Creator<Contact> CREATOR = new Parcelable.Creator<Contact>() {
         @Override
-        public PhoneNumber createFromParcel(Parcel source) {
-            return new PhoneNumber(source);
+        public Contact createFromParcel(Parcel source) {
+            return new Contact(source);
         }
 
         @Override
-        public PhoneNumber[] newArray(int size) {
-            return new PhoneNumber[size];
+        public Contact[] newArray(int size) {
+            return new Contact[size];
         }
     };
 }

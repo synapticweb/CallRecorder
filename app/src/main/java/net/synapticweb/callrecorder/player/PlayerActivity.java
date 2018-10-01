@@ -16,7 +16,8 @@ import android.widget.TextView;
 
 import net.synapticweb.callrecorder.AppLibrary;
 import net.synapticweb.callrecorder.R;
-import net.synapticweb.callrecorder.Recording;
+import net.synapticweb.callrecorder.contactdetail.ContactDetailPresenter;
+import net.synapticweb.callrecorder.data.Recording;
 
 
 public class PlayerActivity extends AppCompatActivity {
@@ -25,6 +26,7 @@ public class PlayerActivity extends AppCompatActivity {
     MediaPlayerHolder mediaPlayerHolder = null;
     TextView playedTime, totalTime;
     boolean userIsSeeking = false;
+    private Recording recording;
     private static final int WINDOW_HEIGHT_DP = 250;
     private static final String TAG = "CallRecorder";
 
@@ -39,7 +41,7 @@ public class PlayerActivity extends AppCompatActivity {
         getWindow().setLayout(WindowManager.LayoutParams.WRAP_CONTENT, (int) (WINDOW_HEIGHT_DP * metrics.density));
 
         Toolbar toolbar = findViewById(R.id.toolbar_play);
-        Recording recording = getIntent().getParcelableExtra("recording");
+        recording = getIntent().getParcelableExtra(ContactDetailPresenter.RECORDING_EXTRA);
         toolbar.setTitle("Playing " + recording.getDate() + " " + recording.getTime());
         setSupportActionBar(toolbar);
 
@@ -110,7 +112,6 @@ public class PlayerActivity extends AppCompatActivity {
     public void onStart() {
         Log.wtf(TAG, "onStart");
         super.onStart();
-        Recording recording = getIntent().getParcelableExtra("recording");
         mediaPlayerHolder.loadMedia(recording.getPath());
 
         playedTime.setText("00:00");

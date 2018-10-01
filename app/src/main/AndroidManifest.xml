@@ -20,8 +20,10 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-        <activity android:name=".ContactsListActivityMain"
+        android:theme="@style/AppTheme"
+        android:name=".CallRecorderApplication">
+
+        <activity android:name=".contactslist.ContactsListActivityMain"
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -30,23 +32,23 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ContactDetailActivity"
-            android:parentActivityName=".ContactsListActivityMain">
+        <activity android:name=".contactdetail.ContactDetailActivity"
+            android:parentActivityName=".contactslist.ContactsListActivityMain">
         </activity>
 
         <activity android:name=".SettingsActivity"
-            android:parentActivityName=".ContactsListActivityMain">
+            android:parentActivityName=".contactslist.ContactsListActivityMain">
         </activity>
 
-        <activity android:name=".EditPhoneNumberActivity"
-            android:parentActivityName=".ContactDetailActivity">
+        <activity android:name=".contactdetail.EditPhoneNumberActivity"
+            android:parentActivityName=".contactdetail.ContactDetailActivity">
         </activity>
 
         <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat"/>
 
         <activity android:name=".player.PlayerActivity"
-            android:parentActivityName=".ContactDetailActivity"
+            android:parentActivityName=".contactdetail.ContactDetailActivity"
             android:configChanges="orientation|screenSize"
             android:theme="@style/PlayerStyle"/> <!--Fără screenSize continuă să se restarteze. -->
 
@@ -61,7 +63,7 @@
         </provider>
 
 
-        <receiver android:name=".CallReceiver">
+        <receiver android:name=".recorder.CallReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.PHONE_STATE"/>
                 <action android:name="android.intent.action.NEW_OUTGOING_CALL"/>
@@ -69,7 +71,7 @@
 
         </receiver>
 
-        <receiver android:name=".ControlRecordingReceiver">
+        <receiver android:name=".recorder.ControlRecordingReceiver">
             <intent-filter>
                 <action android:name="net.synapticweb.callrecorder.STOP_RECORDING"/>
                 <action android:name="net.synapticweb.callrecorder.START_RECORDING" />
@@ -78,7 +80,7 @@
             </intent-filter>
         </receiver>
 
-        <service android:name=".RecorderService"/>
+        <service android:name=".recorder.RecorderService"/>
     </application>
 
 </manifest>

@@ -1,10 +1,15 @@
 package net.synapticweb.callrecorder;
 
+import android.app.Activity;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+
+import net.synapticweb.callrecorder.contactdetail.ContactDetailActivity;
+import net.synapticweb.callrecorder.data.Recording;
+
 import java.lang.ref.WeakReference;
 
 /*Am decis să folosesc AsyncTask pentru copierea recordingurilor, astfel încît threadul UI să rămînă liber - pentru a putea
@@ -28,21 +33,21 @@ import java.lang.ref.WeakReference;
    unui fișier, și pot fi mari; dacă aș verifica numai în export() aș întrerupe exportul fișierului curent, dar doInBackground
    ar apela din nou export() și s-ar mai copia cîte 1MB din fiecare fișier rămas.
    */
-class ExportAsyncTask extends AsyncTask<Recording, Integer, Boolean> {
-    long alreadyCopied = 0;
+public class ExportAsyncTask extends AsyncTask<Recording, Integer, Boolean> {
+    public long alreadyCopied = 0;
     private String path;
     private long totalSize;
     private MaterialDialog dialog;
-    private WeakReference<ContactDetailActivity> activityRef; //http://sohailaziz05.blogspot.com/2014/10/asynctask-and-context-leaking.html
+    private WeakReference<Activity> activityRef; //http://sohailaziz05.blogspot.com/2014/10/asynctask-and-context-leaking.html
     private static final String TAG = "CallRecorder";
 
-    ExportAsyncTask(String foderPath, long totalSize, ContactDetailActivity activity) {
+    public ExportAsyncTask(String foderPath, long totalSize, Activity activity) {
         this.path = foderPath;
         this.totalSize = totalSize;
         activityRef = new WeakReference<>(activity);
     }
 
-    void callPublishProgress(int progress) {
+    public void callPublishProgress(int progress) {
         publishProgress(progress);
     }
 
@@ -77,7 +82,6 @@ class ExportAsyncTask extends AsyncTask<Recording, Integer, Boolean> {
                 .positiveText("OK")
                 .icon(activityRef.get().getResources().getDrawable(R.drawable.warning))
                 .show();
-        activityRef.get().clearSelectMode();
     }
 
     @Override
@@ -99,7 +103,6 @@ class ExportAsyncTask extends AsyncTask<Recording, Integer, Boolean> {
                     .icon(activityRef.get().getResources().getDrawable(R.drawable.error))
                     .show();
         }
-        activityRef.get().clearSelectMode();
     }
 
     @Override

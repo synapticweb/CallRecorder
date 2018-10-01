@@ -1,4 +1,4 @@
-package net.synapticweb.callrecorder;
+package net.synapticweb.callrecorder.recorder;
 
 
 import android.annotation.TargetApi;

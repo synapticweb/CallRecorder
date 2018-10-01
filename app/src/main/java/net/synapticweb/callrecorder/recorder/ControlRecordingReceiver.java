@@ -1,4 +1,4 @@
-package net.synapticweb.callrecorder;
+package net.synapticweb.callrecorder.recorder;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -9,6 +9,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
+
+import net.synapticweb.callrecorder.R;
+import net.synapticweb.callrecorder.contactslist.ContactsListActivityMain;
 
 
 public class ControlRecordingReceiver extends BroadcastReceiver {

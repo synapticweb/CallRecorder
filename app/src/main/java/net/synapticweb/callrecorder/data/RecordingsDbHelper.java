@@ -1,10 +1,10 @@
-package net.synapticweb.callrecorder.databases;
+package net.synapticweb.callrecorder.data;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import net.synapticweb.callrecorder.databases.RecordingsContract.*;
-import net.synapticweb.callrecorder.databases.ListenedContract.*;
+import net.synapticweb.callrecorder.data.RecordingsContract.*;
+import net.synapticweb.callrecorder.data.ListenedContract.*;
 
 
 public class RecordingsDbHelper extends SQLiteOpenHelper {

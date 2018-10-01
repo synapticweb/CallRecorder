@@ -1,17 +1,16 @@
-package net.synapticweb.callrecorder;
+package net.synapticweb.callrecorder.recorder;
 
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 
-import java.util.Locale;
+import net.synapticweb.callrecorder.AppLibrary;
 
 
 public class CallReceiver extends BroadcastReceiver {
@@ -73,7 +72,7 @@ public class CallReceiver extends BroadcastReceiver {
                     {
                         Intent intentService = new Intent(context, RecorderService.class);
                         serviceName = intentService.getComponent();
-                        intentService.putExtra("phoneNumber", inCall);
+                        intentService.putExtra("contact", inCall);
                         intentService.putExtra("incoming", true);
 
                         context.startService(intentService);
@@ -108,7 +107,7 @@ public class CallReceiver extends BroadcastReceiver {
             {
                 Intent intentService = new Intent(context, RecorderService.class);
                 serviceName = intentService.getComponent();
-                intentService.putExtra("phoneNumber", outCall);
+                intentService.putExtra("contact", outCall);
                 intentService.putExtra("incoming", false);
 
                 context.startService(intentService);

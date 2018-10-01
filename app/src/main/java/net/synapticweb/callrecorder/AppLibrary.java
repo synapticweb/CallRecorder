@@ -11,9 +11,9 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public class AppLibrary {
-    static final int SQLITE_TRUE = 1;
-    static final int SQLITE_FALSE = 0;
-    static final int UNKNOWN_TYPE_PHONE_CODE = -1;
+    public static final int SQLITE_TRUE = 1;
+    public static final int SQLITE_FALSE = 0;
+    public static final int UNKNOWN_TYPE_PHONE_CODE = -1;
 
     //https://stackoverflow.com/questions/2760995/arraylist-initialization-equivalent-to-array-initialization
     public static final List<PhoneTypeContainer> PHONE_TYPES = new ArrayList<>(Arrays.asList(
@@ -60,8 +60,8 @@ public class AppLibrary {
 
     //semnalizează metodele folosite în ContactsListActivityMain și ContactDetailActivity pentru a gestiona fragmentul
     // care listează recordingurile unui contact
-    @interface HandleDetailFragment{}
+    public @interface HandleDetailFragment{}
     //semnalizează metodele folosite în ContactsListActivityMain pentru a gestiona fragmentul care listează contactele
-    @interface HandleListFragment {}
+   public  @interface HandleListFragment {}
 
 }

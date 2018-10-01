@@ -1,4 +1,4 @@
-package net.synapticweb.callrecorder;
+package net.synapticweb.callrecorder.data;
 
 import android.content.Context;
 import android.database.SQLException;
@@ -6,8 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import net.synapticweb.callrecorder.databases.RecordingsContract;
-import net.synapticweb.callrecorder.databases.RecordingsDbHelper;
+import net.synapticweb.callrecorder.ExportAsyncTask;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -26,7 +25,7 @@ public class Recording implements Parcelable {
     private Boolean incoming;
     private Long startTimestamp, endTimestamp;
 
-    Recording(long id, String path, Boolean incoming, Long startTimestamp, Long endTimestamp) {
+    public Recording(long id, String path, Boolean incoming, Long startTimestamp, Long endTimestamp) {
         this.id = id;
         this.path = path;
         this.incoming = incoming;

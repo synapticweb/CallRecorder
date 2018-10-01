@@ -1,4 +1,4 @@
-package net.synapticweb.callrecorder.databases;
+package net.synapticweb.callrecorder.data;
 
 import android.provider.BaseColumns;
 

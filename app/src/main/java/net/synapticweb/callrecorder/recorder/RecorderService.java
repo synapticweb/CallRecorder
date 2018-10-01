@@ -1,4 +1,4 @@
-package net.synapticweb.callrecorder;
+package net.synapticweb.callrecorder.recorder;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -25,9 +25,15 @@ import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.synapticweb.callrecorder.databases.ListenedContract.*;
-import net.synapticweb.callrecorder.databases.RecordingsContract.*;
-import net.synapticweb.callrecorder.databases.RecordingsDbHelper;
+import net.synapticweb.callrecorder.R;
+import net.synapticweb.callrecorder.contactslist.ContactsListActivityMain;
+import net.synapticweb.callrecorder.data.Contact;
+import net.synapticweb.callrecorder.data.ListenedContract.*;
+import net.synapticweb.callrecorder.data.RecordingsContract.*;
+import net.synapticweb.callrecorder.data.RecordingsDbHelper;
+import net.synapticweb.callrecorder.recorder.ControlRecordingReceiver;
+import net.synapticweb.callrecorder.recorder.RecorderBox;
+
 import static net.synapticweb.callrecorder.AppLibrary.*;
 
 
@@ -41,7 +47,7 @@ public class RecorderService extends Service {
     private static final String CHANNEL_ID = "call_recorder_channel";
     private boolean unknownPhone = false;
     private boolean privateCall = false;
-    private PhoneNumber phoneNumber = null;
+    private Contact contact = null;
 
 
     @Override
@@ -147,7 +153,7 @@ public class RecorderService extends Service {
         }
         cursor.close();
 
-        receivedNumPhone = intent.getStringExtra("phoneNumber");
+        receivedNumPhone = intent.getStringExtra("contact");
         incoming = intent.getBooleanExtra("incoming", false);
         RecorderBox.setAudioFile(this, receivedNumPhone);
         boolean match = false;
@@ -167,8 +173,8 @@ public class RecorderService extends Service {
                 }
             }
             if(!match) { //chiar dacă nu se găsește în db,  s-ar putea să fie contacte. Verificăm chestia asta
-                // și dacă îl găsim în contacte populăm RecorderService.phoneNumber.
-                if ((phoneNumber = PhoneNumber.searchNumberInContacts(receivedNumPhone, getApplicationContext())) == null)
+                // și dacă îl găsim în contacte populăm RecorderService.contact.
+                if ((contact = Contact.searchNumberInContacts(receivedNumPhone, getApplicationContext())) == null)
                     unknownPhone = true; //dacă nu e nici în contacte îl declarăm nr. necunoscut.
             }
         }
@@ -203,15 +209,15 @@ public class RecorderService extends Service {
 
         if(unknownPhone)
         {
-           PhoneNumber phoneNumber =  new PhoneNumber(null, receivedNumPhone, null, null, -1);
-           phoneNumber.setUnkownNumber(true);
+           Contact contact =  new Contact(null, receivedNumPhone, null, null, -1);
+           contact.setUnkownNumber(true);
            try {
-               phoneNumber.insertInDatabase(this); //introducerea în db setează id-ul în obiect
+               contact.insertInDatabase(this); //introducerea în db setează id-ul în obiect
            }
            catch (SQLException exc) {
                Log.wtf(TAG, exc.getMessage());
            }
-           idToInsert = phoneNumber.getId();
+           idToInsert = contact.getId();
         }
         else if(privateCall)
         {
@@ -219,16 +225,16 @@ public class RecorderService extends Service {
                     Listened.COLUMN_NAME_PRIVATE_NUMBER + "=" + SQLITE_TRUE, null, null, null, null);
 
             if(cursor.getCount() == 0) {
-                PhoneNumber phoneNumber =  new PhoneNumber();
-                phoneNumber.setPrivateNumber(true);
-                phoneNumber.setContactName(null);
+                Contact contact =  new Contact();
+                contact.setPrivateNumber(true);
+                contact.setContactName(null);
                 try {
-                    phoneNumber.insertInDatabase(this);
+                    contact.insertInDatabase(this);
                 }
                 catch (SQLException exc) {
                     Log.wtf(TAG, exc.getMessage());
                 }
-                idToInsert = phoneNumber.getId();
+                idToInsert = contact.getId();
             }
             else {
                 cursor.moveToFirst();
@@ -240,16 +246,16 @@ public class RecorderService extends Service {
         else //dacă nu e nici unknown nici privat: se poate ca nr să existe în db, sau să nu existe dar să fi fost
         // găsit în contacte.
         {
-            if(phoneNumber != null) //în cazul în care nr nu exista în db dar a fost găsit în contacte și deci
-                //RecorderService::phoneNumber e nonnul, inserăm în db numărul găsit
+            if(contact != null) //în cazul în care nr nu exista în db dar a fost găsit în contacte și deci
+                //RecorderService::contact e nonnul, inserăm în db numărul găsit
             {
                 try {
-                    phoneNumber.insertInDatabase(this);
+                    contact.insertInDatabase(this);
                 }
                 catch (SQLException exception) {
                     Log.wtf(TAG, exception.getMessage());
                 }
-                idToInsert = phoneNumber.getId();
+                idToInsert = contact.getId();
             }
             else { //dacă nr există în baza de date
 
