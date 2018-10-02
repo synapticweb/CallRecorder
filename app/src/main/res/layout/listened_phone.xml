@@ -4,8 +4,6 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-   android:layout_marginStart="15dp"
-    android:layout_marginEnd="15dp"
     >
 
     <de.hdodenhof.circleimageview.CircleImageView
@@ -15,6 +13,7 @@
         android:layout_alignParentStart="true"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
+        android:layout_marginStart="10dp"
         />
 
     <TextView

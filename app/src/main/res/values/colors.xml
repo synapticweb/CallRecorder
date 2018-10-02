@@ -11,4 +11,5 @@
     <color name="gray">#999</color>
     <color name="light_gray">#ddd</color>
     <color name="textOnLight">#a0000000</color>
+    <color name="selected_contact">#f0e2e7</color>
 </resources>

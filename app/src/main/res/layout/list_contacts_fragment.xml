@@ -4,5 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/listened_phones"
-    android:scrollbars="vertical">
+    android:scrollbars="vertical"
+    android:layout_marginEnd="0.001dp"
+    > <!-- MarginEnd-ul este necesar pentru că pe tabletă la contactele selectate background-ul se suprapunea
+    peste linia de demarcație între fragmente.-->
 </android.support.v7.widget.RecyclerView>

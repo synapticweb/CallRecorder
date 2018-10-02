@@ -3,10 +3,13 @@ package net.synapticweb.callrecorder.contactslist;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -27,9 +30,17 @@ import java.util.List;
 public class ContactsListFragment extends Fragment implements ContactsListContract.View {
     private ContactsListPresenter presenter;
     private ListenedAdapter adapter;
+    private RecyclerView listenedPhones;
+    private int previousPos;
     private int currentPos = 0;
+    private Long newAddedContactId = null;
     private boolean hasRestarted = false;
     private final static String CURRENT_POS_KEY = "current_pos";
+
+    @Override
+    public void setNewAddedContactId(long id) {
+        newAddedContactId = id;
+    }
 
     public void resetDetailFragment() {
         currentPos = 0;
@@ -39,12 +50,6 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
     public void onResume(){
         super.onResume();
         presenter.loadContacts();
-        if(!isSinglePaneLayout() && !hasRestarted) {
-            if(adapter.getItemCount() > 0)
-                presenter.setCurrentDetail(adapter.getItem(currentPos));
-            else
-                presenter.setCurrentDetail(null);
-        }
     }
 
     @Override
@@ -65,38 +70,41 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
                 parentActivity.findViewById(R.id.contact_detail_fragment_container) == null);
     }
 
-    public void replaceDetailFragment(Contact contact) {
-        AppCompatActivity parentActivity = (AppCompatActivity) getActivity();
-        if(parentActivity == null)
-            return ;
-        TextView title = parentActivity.findViewById(R.id.actionbar_select_title);
-        ImageButton detailMenu = parentActivity.findViewById(R.id.phone_number_detail_menu);
-        if(contact != null) {
-            title.setText(contact.getContactName());
-            detailMenu.setVisibility(View.VISIBLE);
-
-            ContactDetailFragment contactDetail = ContactDetailFragment.newInstance(contact);
-            parentActivity.getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.contact_detail_fragment_container, contactDetail)
-                    .commitAllowingStateLoss(); //fără chestia asta îmi dă un Caused by:
-            // java.lang.IllegalStateException: Can not perform this action after onSaveInstanceState cînd înlocuiesc fragmentul detail după adăugarea unui
-            //contact nou. Soluția: https://stackoverflow.com/questions/7575921/illegalstateexception-can-not-perform-this-action-after-onsaveinstancestate-wit
+    @Override
+    public void showContacts(List<Contact> contacts) {
+        adapter = new ListenedAdapter(contacts);
+        if(newAddedContactId != null) {
+            for(Contact contact : adapter.getData())
+                if(contact.getId() == newAddedContactId) {
+                    currentPos = adapter.getData().indexOf(contact);
+                    break;
+                }
+            newAddedContactId = null;
         }
-        else {
-            title.setText(parentActivity.getResources().getString(R.string.app_name));
-            detailMenu.setVisibility(View.GONE);
-
-            Fragment detailFragment = parentActivity.getSupportFragmentManager().findFragmentById(R.id.contact_detail_fragment_container);
-            if(detailFragment != null) //dacă aplicația începe fără niciun contact detailFragment va fi null
-                parentActivity.getSupportFragmentManager().beginTransaction().remove(detailFragment).commit();
+        //înainte de asta aveam un adapter.replaceData() care înlocuia lista din adapter și apela notifyData
+        //setChanged(). Performanța era mai bună dar problema era că la adăugarea unui contact nou rămînea
+        //marcat și cel anterior.
+        listenedPhones.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+        if(!isSinglePaneLayout() && !hasRestarted) { //dacă ne găsim după un restart al activității
+            // datorat rotirii nu trebuie să mai înlocuim fragmentul detaliu, el este deja acolo. Dacă
+            // îl înlocuim onResume() al fragmnetului detaliu va fi apelat de 2 ori: prima dată din cauza
+            // restartului fragmentului detaliu - cu datele de stare, a doua oară datorită înlocuirii - fără
+            //datele de stare.
+            if(adapter.getItemCount() > 0)
+                presenter.setCurrentDetail(adapter.getItem(currentPos));
+            else
+                presenter.setCurrentDetail(null);
         }
     }
 
     @Override
-    public void showContacts(List<Contact> contacts) {
-        adapter.replaceData(contacts);
+    public void markSelectedContact(@Nullable  View previousSelected, @Nullable View currentSelected) {
+        if(previousSelected != null)
+            previousSelected.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+        if(currentSelected != null)
+            currentSelected.setBackgroundColor(getResources().getColor(R.color.selected_contact));
     }
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -112,10 +120,25 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        RecyclerView listenedPhones = (RecyclerView) inflater.inflate(R.layout.list_contacts_fragment, container, false);
+        listenedPhones = (RecyclerView) inflater.inflate(R.layout.list_contacts_fragment, container, false);
         listenedPhones.setLayoutManager(new LinearLayoutManager(getActivity()));
-        listenedPhones.setAdapter(adapter);
+        Activity parentActivity = getActivity();
+        if(parentActivity != null) {
+            FloatingActionButton fab = parentActivity.findViewById(R.id.add_numbers);
+            fab.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v) {
+                    presenter.addNewContact();
+                }
+            });
+        }
         return listenedPhones;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        if(resultCode == Activity.RESULT_OK && requestCode == ContactsListPresenter.REQUEST_ADD_CONTACT)
+            presenter.onAddContactResult(intent);
     }
 
     public class PhoneHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -135,8 +158,11 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
 
         @Override
         public void onClick(View view) {
+            previousPos = currentPos;
             currentPos = getAdapterPosition();
-            presenter.openContactDetails(contact);
+            View previousSelected = listenedPhones.getLayoutManager().findViewByPosition(previousPos);
+            View currentSelected = listenedPhones.getLayoutManager().findViewByPosition(currentPos);
+            presenter.manageContactDetails(contact, previousSelected, currentSelected);
         }
     }
 
@@ -146,9 +172,8 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
             contacts = list;
         }
 
-        void replaceData(List<Contact> contacts) {
-            this.contacts = contacts;
-            notifyDataSetChanged();
+        List<Contact> getData() {
+            return contacts;
         }
 
         @Override
@@ -179,6 +204,9 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
             holder.contact = contact;
             if(!contact.isPrivateNumber())
                 holder.mPhoneNumber.setText(contact.getPhoneNumber());
+
+            if(position == currentPos && !isSinglePaneLayout())
+                markSelectedContact(null, holder.itemView);
         }
 
         Contact getItem(int position) {
@@ -189,7 +217,6 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
         public int getItemCount() {
             return contacts.size();
         }
-
 
     }
 }

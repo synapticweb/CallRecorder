@@ -117,79 +117,10 @@ public class ContactsListActivityMain extends AppCompatActivity  {
         });
     }
 
-    private void alertAtInsertContact(int message) {
-        new MaterialDialog.Builder(this)
-                .title(R.string.number_exists_title)
-                .content(getResources().getString(message))
-                .positiveText(android.R.string.ok)
-                .icon(getResources().getDrawable(R.drawable.warning))
-                .show();
-    }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data); //necesar pentru că altfel nu apelează onActivityResult din fragmente:
         // https://stackoverflow.com/questions/6147884/onactivityresult-is-not-being-called-in-fragment
-        Uri numberUri;
-        String newNumber = null;
-        String contactName = null;
-        String photoUri = null;
-        int phoneType = UNKNOWN_TYPE_PHONE_CODE;
-
-        if (resultCode != Activity.RESULT_OK) {
-            return;
-        }
-
-        if (requestCode == REQUEST_NUMBER && (numberUri = data.getData()) != null) {
-            Cursor cursor = getContentResolver().
-                    query(numberUri, new String[]{ContactsContract.CommonDataKinds.Phone.NUMBER,
-                                    ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
-                                    ContactsContract.CommonDataKinds.Phone.PHOTO_URI,
-                                    ContactsContract.CommonDataKinds.Phone.TYPE},
-                            null, null, null);
-            if (cursor != null) {
-                cursor.moveToFirst();
-                newNumber = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
-                photoUri = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_URI));
-                phoneType = cursor.getInt(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
-                cursor.close();
-            }
-
-            PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
-            String countryCode = AppLibrary.getUserCountry(this);
-            if(countryCode == null)
-                countryCode = "US";
-
-            if(!phoneUtil.isPossibleNumber(newNumber, countryCode)) {
-                alertAtInsertContact(R.string.number_impossible);
-                return ;
-            }
-
-            RecordingsDbHelper mDbHelper = new RecordingsDbHelper(getApplicationContext());
-            SQLiteDatabase db = mDbHelper.getReadableDatabase();
-            cursor = db.query(
-                    ListenedContract.Listened.TABLE_NAME, new String[]{ListenedContract.Listened.COLUMN_NAME_NUMBER},
-                    null, null, null, null, null);
-
-            boolean match = false;
-            while (cursor.moveToNext()) {
-                PhoneNumberUtil.MatchType matchType = phoneUtil.isNumberMatch(cursor.getString(
-                        cursor.getColumnIndex(ListenedContract.Listened.COLUMN_NAME_NUMBER)), newNumber);
-                if (matchType != PhoneNumberUtil.MatchType.NO_MATCH && matchType != PhoneNumberUtil.MatchType.NOT_A_NUMBER) {
-                    match = true;
-                    break;
-                }
-            }
-
-            if (match)
-                alertAtInsertContact(R.string.number_exists_message);
-            else
-                {
-                Contact contact = new Contact(null, newNumber, contactName, photoUri, phoneType);
-                contact.insertInDatabase(this);
-            }
-        }
     }
 
     private void askForPermissions() {
