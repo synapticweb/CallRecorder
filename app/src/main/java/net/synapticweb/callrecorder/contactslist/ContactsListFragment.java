@@ -1,6 +1,7 @@
 package net.synapticweb.callrecorder.contactslist;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -31,11 +32,24 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
     private ContactsListPresenter presenter;
     private ListenedAdapter adapter;
     private RecyclerView listenedPhones;
-    private int previousPos;
     private int currentPos = 0;
     private Long newAddedContactId = null;
     private boolean hasRestarted = false;
+    private AppCompatActivity parentActivity;
     private final static String CURRENT_POS_KEY = "current_pos";
+    public final static String ARG_CONTACT = "arg_contact";
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        parentActivity = (AppCompatActivity) context;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        parentActivity = null;
+    }
 
     @Override
     public void setNewAddedContactId(long id) {
@@ -60,12 +74,11 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
     @Override
     public void startContactDetailActivity(Contact contact) {
         Intent detailIntent = new Intent(getContext(), ContactDetailActivity.class);
-        detailIntent.putExtra("contact", contact);
+        detailIntent.putExtra(ARG_CONTACT, contact);
         startActivity(detailIntent);
     }
 
     public boolean isSinglePaneLayout() {
-        Activity parentActivity = getActivity();
         return (parentActivity != null &&
                 parentActivity.findViewById(R.id.contact_detail_fragment_container) == null);
     }
@@ -96,6 +109,11 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
             else
                 presenter.setCurrentDetail(null);
         }
+        TextView noContent = parentActivity.findViewById(R.id.no_content);
+        if(adapter.getItemCount() > 0)
+            noContent.setVisibility(View.GONE);
+        else
+            noContent.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -121,8 +139,8 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         listenedPhones = (RecyclerView) inflater.inflate(R.layout.list_contacts_fragment, container, false);
-        listenedPhones.setLayoutManager(new LinearLayoutManager(getActivity()));
-        Activity parentActivity = getActivity();
+        listenedPhones.setLayoutManager(new LinearLayoutManager(parentActivity));
+
         if(parentActivity != null) {
             FloatingActionButton fab = parentActivity.findViewById(R.id.add_numbers);
             fab.setOnClickListener(new View.OnClickListener(){
@@ -158,7 +176,7 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
 
         @Override
         public void onClick(View view) {
-            previousPos = currentPos;
+            int previousPos = currentPos;
             currentPos = getAdapterPosition();
             View previousSelected = listenedPhones.getLayoutManager().findViewByPosition(previousPos);
             View currentSelected = listenedPhones.getLayoutManager().findViewByPosition(currentPos);
@@ -179,7 +197,7 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
         @Override
         @NonNull
         public PhoneHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
+            LayoutInflater layoutInflater = LayoutInflater.from(parentActivity);
             return new PhoneHolder(layoutInflater, parent);
         }
 
@@ -204,6 +222,8 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
             holder.contact = contact;
             if(!contact.isPrivateNumber())
                 holder.mPhoneNumber.setText(contact.getPhoneNumber());
+            if(!isSinglePaneLayout())
+                holder.mPhoneNumber.setVisibility(View.GONE);
 
             if(position == currentPos && !isSinglePaneLayout())
                 markSelectedContact(null, holder.itemView);

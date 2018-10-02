@@ -39,4 +39,14 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <!-- Pentru butoanele din activitatea edit
+    https://www.androiddesignpatterns.com/2016/08/coloring-buttons-with-themeoverlays-background-tints.html-->
+    <style name="ButtonCancel" parent="ThemeOverlay.AppCompat.Light">
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="ButtonOk" parent="ThemeOverlay.AppCompat.Light">
+        <item name="colorAccent">@color/colorPrimaryDark</item>
+    </style>
+
 </resources>

@@ -8,6 +8,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import net.synapticweb.callrecorder.R;
+import net.synapticweb.callrecorder.contactslist.ContactsListFragment;
 import net.synapticweb.callrecorder.data.Contact;
 
 public class ContactDetailActivity extends AppCompatActivity {
@@ -17,7 +18,7 @@ public class ContactDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.contact_detail_activity);
         Intent intent = getIntent();
-        Contact contact = intent.getParcelableExtra("contact");
+        Contact contact = intent.getParcelableExtra(ContactsListFragment.ARG_CONTACT);
 
         FragmentManager fm = getSupportFragmentManager();
         Fragment contactDetail = fm.findFragmentById(R.id.contact_detail_fragment_container);

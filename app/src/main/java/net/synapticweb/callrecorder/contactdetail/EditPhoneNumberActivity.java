@@ -77,7 +77,7 @@ public class EditPhoneNumberActivity extends AppCompatActivity implements Adapte
             oldPhotoUri = savedInstanceState.getParcelable("oldPhotoUri");
         }
         else
-            contact = getIntent().getExtras().getParcelable("contact");
+            contact = getIntent().getExtras().getParcelable(ContactDetailPresenter.EDIT_EXTRA_CONTACT);
 
         Button cancelButton = findViewById(R.id.edit_phone_number_cancel);
 

@@ -175,9 +175,8 @@ Soluția a fost să adaug o margine ultimului linealayout orizontal.
             android:text="Cancel"
             android:drawableStart="@drawable/baseline_cancel_white_24"
             android:padding="16dp"
-            android:background="@color/colorAccent"
-            android:textColor="@color/textOnDark"
-            style="?android:attr/buttonBarButtonStyle"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:theme="@style/ButtonCancel"
             android:id="@+id/edit_phone_number_cancel"
             />
 
@@ -188,9 +187,8 @@ Soluția a fost să adaug o margine ultimului linealayout orizontal.
             android:text="Ok"
             android:drawableStart="@drawable/baseline_check_circle_white_24"
             android:padding="16dp"
-            android:background="@color/colorPrimary"
-            android:textColor="@color/textOnDark"
-            style="?android:attr/buttonBarButtonStyle"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:theme="@style/ButtonOk"
             android:id="@+id/edit_phone_number_ok"
             />
     </LinearLayout>

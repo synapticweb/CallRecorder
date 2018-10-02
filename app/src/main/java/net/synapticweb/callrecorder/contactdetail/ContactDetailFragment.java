@@ -49,20 +49,31 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
     private TextView typePhoneView, phoneNumberView, recordingStatusView;
     private ImageView contactPhotoView;
     private RecyclerView recordingsRecycler;
+    private RelativeLayout detailView;
     private int widthCard, cardViewColumns;
     private Contact contact;
     private boolean selectMode = false;
     private List<Integer> selectedItems = new ArrayList<>();
+    private AppCompatActivity parentActivity;
     private static final String ARG_CONTACT = "arg_contact";
     private static final String SELECT_MODE_KEY = "select_mode_key";
     private static final String SELECTED_ITEMS_KEY = "selected_items_key";
     private static final String TAG = "CallRecorder";
 
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        parentActivity = (AppCompatActivity) context;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        parentActivity = null;
+    }
+
+    @Override
     public void setActionBarTitleIfActivityDetail() {
-        final AppCompatActivity parentActivity = (AppCompatActivity) getActivity();
-        if(parentActivity == null)
-            return ;
         ActionBar actionBar = parentActivity.getSupportActionBar();
         if(actionBar != null) {
             actionBar.setTitle(contact.getContactName());
@@ -71,7 +82,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
 
     @Override
     public Activity getParentActivity() {
-        return getActivity();
+        return parentActivity;
     }
 
     @Override
@@ -115,7 +126,6 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
 
     @Override
     public boolean isSinglePaneLayout() {
-        Activity parentActivity = getActivity();
         return (parentActivity != null &&
                 parentActivity.findViewById(R.id.contacts_list_fragment_container) == null);
     }
@@ -133,9 +143,6 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
 
     @Override
     public void toggleSelectModeActionBar() {
-        final AppCompatActivity parentActivity = (AppCompatActivity) getActivity();
-        if(parentActivity == null)
-            return ;
         ImageButton closeBtn = parentActivity.findViewById(R.id.close_select_mode);
         TextView selectTitle = parentActivity.findViewById(R.id.actionbar_select_title);
         ImageButton exportBtn = parentActivity.findViewById(R.id.actionbar_select_export);
@@ -209,9 +216,6 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
     }
 
     private void setDetailsButtonsListeners() {
-        final Activity parentActivity = getActivity();
-        if(parentActivity == null)
-            return ;
         final ImageButton menuButton = parentActivity.findViewById(R.id.phone_number_detail_menu);
         menuButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -328,7 +332,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        RelativeLayout detailView = (RelativeLayout) inflater.inflate(R.layout.contact_detail_fragment, container, false);
+        detailView = (RelativeLayout) inflater.inflate(R.layout.contact_detail_fragment, container, false);
         typePhoneView = detailView.findViewById(R.id.phone_type_detail);
         phoneNumberView = detailView.findViewById(R.id.phone_number_detail);
         contactPhotoView = detailView.findViewById(R.id.contact_photo_detail);
@@ -339,7 +343,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && Build.VERSION.SDK_INT < Build.VERSION_CODES.N)
             contactPhotoView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         calculateCardViewDimensions();
-        recordingsRecycler.setLayoutManager(new GridLayoutManager(getActivity(), cardViewColumns));
+        recordingsRecycler.setLayoutManager(new GridLayoutManager(parentActivity, cardViewColumns));
         recordingsRecycler.setAdapter(adapter);
 
         return detailView;
@@ -373,14 +377,18 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
                 contactPhotoView.setImageResource(R.drawable.user_contact_blue);
         }
         displayRecordingStatus();
+
+        TextView noContent = detailView.findViewById(R.id.no_content);
         adapter.replaceData(recordings);
+
+        if(recordings.size() > 0)
+            noContent.setVisibility(View.GONE);
+        else
+            noContent.setVisibility(View.VISIBLE);
     }
 
     //întoarce lățimea în dp a containerului care conține fragmentul cu detalii.
     private int getContainerWidth() {
-        Activity parentActivity = getActivity();
-        if(parentActivity == null)
-            return 0;
         Configuration configuration = getResources().getConfiguration();
         if(parentActivity.findViewById(R.id.contacts_list_fragment_container) != null &&
                 parentActivity.findViewById(R.id.contact_detail_fragment_container) != null) { //suntem pe tabletă
@@ -394,7 +402,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
 
     private void calculateCardViewDimensions() {
         int screenWidthDp = getContainerWidth();
-        final int cardMargin = 3, recyclerMargin = 5, minimumCardWidth = 100, maximumCardWidth = 250;
+        final int cardMargin = 3, recyclerMargin = 10, minimumCardWidth = 100, maximumCardWidth = 250;
 
         int numCols = 3;
         int usableScreen = screenWidthDp - ((numCols * 2 * cardMargin) + (recyclerMargin * 2)) ;
@@ -448,41 +456,41 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
 
         private void setDimensions() {
             //dimensiunile cardView-ului, deja calculate:
-            itemView.getLayoutParams().width = AppLibrary.pxFromDp(getActivity(), widthCard);
-            itemView.getLayoutParams().height = AppLibrary.pxFromDp(getActivity(), widthCard);
+            itemView.getLayoutParams().width = AppLibrary.pxFromDp(parentActivity, widthCard);
+            itemView.getLayoutParams().height = AppLibrary.pxFromDp(parentActivity, widthCard);
 
             //dimensiunile simbolului pentru sunet:
             int soundSymbolWidth = (int) Math.floor(widthCard * soundSymbolToCardRatio);
             int soundSymbolHeight = (int) (soundSymbolHeightToWidthRatio * soundSymbolWidth);
-            soundSymbol.getLayoutParams().width = AppLibrary.pxFromDp(getActivity(),soundSymbolWidth);
-            soundSymbol.getLayoutParams().height = AppLibrary.pxFromDp(getActivity(),soundSymbolHeight);
+            soundSymbol.getLayoutParams().width = AppLibrary.pxFromDp(parentActivity,soundSymbolWidth);
+            soundSymbol.getLayoutParams().height = AppLibrary.pxFromDp(parentActivity,soundSymbolHeight);
 
             //marginile TextView-urilor cu data și ora:
             RelativeLayout.LayoutParams lpRecordingDate = (RelativeLayout.LayoutParams) recordingDate.getLayoutParams();
             lpRecordingDate.setMargins(0,
-                    AppLibrary.pxFromDp(getActivity(), (int )(widthCard * dateAndTimeMarginsToCardRatio)), 0, 0);
+                    AppLibrary.pxFromDp(parentActivity, (int )(widthCard * dateAndTimeMarginsToCardRatio)), 0, 0);
             recordingDate.setLayoutParams(lpRecordingDate);
             RelativeLayout.LayoutParams lpRecordingTime = (RelativeLayout.LayoutParams) recordingTime.getLayoutParams();
             lpRecordingTime.setMargins(0,
-                    0, 0, AppLibrary.pxFromDp(getActivity(), (int )(widthCard * dateAndTimeMarginsToCardRatio)));
+                    0, 0, AppLibrary.pxFromDp(parentActivity, (int )(widthCard * dateAndTimeMarginsToCardRatio)));
             recordingTime.setLayoutParams(lpRecordingTime);
 
             //dimensiunile și marginile recordingType:
             RelativeLayout.LayoutParams lpRecordingType = (RelativeLayout.LayoutParams) recordingType.getLayoutParams();
-            lpRecordingType.width = AppLibrary.pxFromDp(getActivity(), (int) (widthCard * recordingTypeToCardRatio));
-            lpRecordingType.height = AppLibrary.pxFromDp(getActivity(), (int) (widthCard * recordingTypeToCardRatio));
+            lpRecordingType.width = AppLibrary.pxFromDp(parentActivity, (int) (widthCard * recordingTypeToCardRatio));
+            lpRecordingType.height = AppLibrary.pxFromDp(parentActivity, (int) (widthCard * recordingTypeToCardRatio));
             lpRecordingType.setMargins(
-                    AppLibrary.pxFromDp(getActivity(), (int)(widthCard * recordingTypeMarginsToCardRatio)), 0, 0,
-                    AppLibrary.pxFromDp(getActivity(), (int)(widthCard * recordingTypeMarginsToCardRatio)) );
+                    AppLibrary.pxFromDp(parentActivity, (int)(widthCard * recordingTypeMarginsToCardRatio)), 0, 0,
+                    AppLibrary.pxFromDp(parentActivity, (int)(widthCard * recordingTypeMarginsToCardRatio)) );
             recordingType.setLayoutParams(lpRecordingType);
 
             //dimensiunile și marginile tickului selected:
             RelativeLayout.LayoutParams lpRecordingSelected = (RelativeLayout.LayoutParams) recordingSelected.getLayoutParams();
-            lpRecordingSelected.width = AppLibrary.pxFromDp(getActivity(), (int) (widthCard * selectedTickToCardRatio));
-            lpRecordingSelected.height = AppLibrary.pxFromDp(getActivity(), (int) (widthCard * selectedTickToCardRatio));
+            lpRecordingSelected.width = AppLibrary.pxFromDp(parentActivity, (int) (widthCard * selectedTickToCardRatio));
+            lpRecordingSelected.height = AppLibrary.pxFromDp(parentActivity, (int) (widthCard * selectedTickToCardRatio));
             lpRecordingSelected.setMargins(0,
-                    AppLibrary.pxFromDp(getActivity(), (int )(widthCard * selectedTickMarginsToCardRatio)),
-                    AppLibrary.pxFromDp(getActivity(), (int)(widthCard * selectedTickMarginsToCardRatio)), 0 );
+                    AppLibrary.pxFromDp(parentActivity, (int )(widthCard * selectedTickMarginsToCardRatio)),
+                    AppLibrary.pxFromDp(parentActivity, (int)(widthCard * selectedTickMarginsToCardRatio)), 0 );
             recordingSelected.setLayoutParams(lpRecordingSelected);
         }
 
@@ -534,7 +542,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         @Override
         @NonNull
         public RecordingHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
+            LayoutInflater layoutInflater = LayoutInflater.from(parentActivity);
             return new RecordingHolder(layoutInflater, parent);
         }
 

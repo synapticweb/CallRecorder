@@ -18,8 +18,8 @@
     <string name="main_activity_title">Phone numbers</string>
     <string name="edit_phone_number">Edit</string>
     <string name="delete_phone_number">Delete</string>
-    <string name="delete_number_confirm_title">Delete number</string>
-    <string name="delete_number_confirm_message">Delete this number?
+    <string name="delete_number_confirm_title">Delete contact</string>
+    <string name="delete_number_confirm_message">Delete the contact \"%s\"?
         All associated records will be deleted too and this action cannot be undone.</string>
     <string name="stop_recording">Stop recording calls</string>
     <string name="start_recording">Start recording calls</string>

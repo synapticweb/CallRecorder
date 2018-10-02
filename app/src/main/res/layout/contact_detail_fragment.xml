@@ -47,6 +47,18 @@
         android:layout_below="@id/phone_type_detail"
         android:layout_toEndOf="@+id/contact_photo_detail"/>
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/no_content"
+        android:visibility="gone"
+        android:text="No recordings are currently associated with this contact."
+        android:textAlignment="center"
+        android:layout_marginTop="25dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_below="@id/contact_photo_detail"/>
+
     <!-- Marginile setate aici trebuie să fie identice cu cele din phoneNumberDetail::calculateCardViewDimensions().-->
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
@@ -55,8 +67,8 @@
         android:id="@+id/recordings"
         android:layout_marginTop="30dp"
         android:layout_below="@id/recording_status"
-        android:layout_marginStart="5dp"
-        android:layout_marginEnd="5dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
         />
 
 </RelativeLayout>

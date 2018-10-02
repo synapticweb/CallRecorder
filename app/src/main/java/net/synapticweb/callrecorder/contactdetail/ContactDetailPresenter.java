@@ -31,6 +31,7 @@ import java.util.List;
 public class ContactDetailPresenter implements ContactDetailContract.ContactDetailPresenter {
     private ContactDetailContract.View view;
     public static final int EDIT_REQUEST_CODE = 1;
+    public static final String EDIT_EXTRA_CONTACT = "edit_extra_contact";
     public static final String RECORDING_EXTRA = "recording_extra";
     private static final String TAG = "CallRecorder";
 
@@ -46,7 +47,8 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
             return ;
         new MaterialDialog.Builder(parentActivity)
                 .title(R.string.delete_number_confirm_title)
-                .content(R.string.delete_number_confirm_message)
+                .content(String.format(parentActivity.getResources().
+                        getString(R.string.delete_number_confirm_message), contact.getContactName()))
                 .positiveText(android.R.string.ok)
                 .negativeText(android.R.string.cancel)
                 .icon(parentActivity.getResources().getDrawable(R.drawable.warning))
@@ -76,7 +78,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
     public void editContact(final Contact contact) {
         Fragment fragment = (Fragment) view;
         Intent intent = new Intent(CallRecorderApplication.getInstance(), EditPhoneNumberActivity.class);
-        intent.putExtra("contact", contact);
+        intent.putExtra(EDIT_EXTRA_CONTACT, contact);
         fragment.startActivityForResult(intent, EDIT_REQUEST_CODE);
     }
 
