@@ -1,10 +1,12 @@
 package net.synapticweb.callrecorder.contactdetail;
 
 import android.app.Activity;
+import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
@@ -260,6 +262,13 @@ public class EditPhoneNumberActivity extends AppCompatActivity implements Adapte
 
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(this, "net.synapticweb.callrecorder.fileprovider", savedPhotoPath));
+        //fără chestia de mai jos aplicația foto crapă în kitkat cu java.lang.SecurityException:
+        // Permission Denial: opening provider android.support.v4.content.FileProvider
+        //https://stackoverflow.com/questions/24467696/android-file-provider-permission-denial
+        if ( Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP ) {
+            intent.setClipData(ClipData.newRawUri("", FileProvider.getUriForFile(this, "net.synapticweb.callrecorder.fileprovider", savedPhotoPath)));
+            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION|Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        }
         if (intent.resolveActivity(getPackageManager()) != null)
             startActivityForResult(intent, TAKE_PICTURE);
     }
