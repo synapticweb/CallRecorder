@@ -53,10 +53,9 @@ public class ContactsListPresenter implements ContactsListContract.ContactsListP
         AppCompatActivity parentActivity = (AppCompatActivity) fragment.getActivity();
         if(parentActivity == null)
             return ;
-        TextView title = parentActivity.findViewById(R.id.actionbar_select_title);
+
         ImageButton detailMenu = parentActivity.findViewById(R.id.phone_number_detail_menu);
         if(contact != null) {
-            title.setText(contact.getContactName());
             detailMenu.setVisibility(View.VISIBLE);
 
             ContactDetailFragment contactDetail = ContactDetailFragment.newInstance(contact);
@@ -67,7 +66,6 @@ public class ContactsListPresenter implements ContactsListContract.ContactsListP
             //contact nou. Soluția: https://stackoverflow.com/questions/7575921/illegalstateexception-can-not-perform-this-action-after-onsaveinstancestate-wit
         }
         else {
-            title.setText(parentActivity.getResources().getString(R.string.app_name));
             detailMenu.setVisibility(View.GONE);
 
             Fragment detailFragment = parentActivity.getSupportFragmentManager().findFragmentById(R.id.contact_detail_fragment_container);

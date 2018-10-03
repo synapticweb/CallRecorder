@@ -15,6 +15,12 @@
     android:id="@+id/edit_phone_number"
     >
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_centerInParent="true">
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -22,15 +28,9 @@
         android:gravity="center"
         android:id="@+id/edit_phone_number_title"
         android:textSize="24sp"
-        android:layout_marginTop="25dp"/>
+        android:layout_marginTop="20dp"
+        />
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/edit_phone_number_title"
-        android:layout_marginTop="40dp"
-        android:id="@+id/edit_phone_number_photo_parent"
-        >
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/edit_phone_number_photo"
             android:layout_width="120dp"
@@ -39,19 +39,19 @@
             android:paddingBottom="7dp"
             app:civ_border_width="2dp"
             app:civ_border_color="#FFFFFFFF"
-            android:layout_centerInParent="true"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="40dp"
             />
-    </RelativeLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:weightSum="6"
-        android:layout_below="@id/edit_phone_number_photo_parent"
         android:orientation="horizontal"
         android:gravity="center_horizontal"
-        android:layout_marginTop="40dp"
-        android:id="@+id/edit_name_parent">
+        android:layout_marginTop="60dp"
+        android:id="@+id/edit_name_parent"
+        android:baselineAligned="false">
 
         <LinearLayout
             android:layout_width="0dp"
@@ -85,12 +85,12 @@
    <LinearLayout
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
-       android:layout_below="@id/edit_name_parent"
        android:orientation="horizontal"
        android:gravity="center_horizontal"
        android:layout_marginTop="20dp"
        android:id="@+id/edit_number_parent"
-       android:weightSum="6">
+       android:weightSum="6"
+       android:baselineAligned="false">
 
        <LinearLayout
            android:layout_width="0dp"
@@ -126,13 +126,13 @@ Soluția a fost să adaug o margine ultimului linealayout orizontal.
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/edit_number_parent"
         android:orientation="horizontal"
         android:gravity="center_horizontal"
         android:layout_marginTop="20dp"
         android:id="@+id/edit_type_parent"
         android:weightSum="6"
-        android:layout_marginBottom="100dp">
+        android:layout_marginBottom="100dp"
+        android:baselineAligned="false">
 
         <LinearLayout
             android:layout_width="0dp"
@@ -157,6 +157,8 @@ Soluția a fost să adaug o margine ultimului linealayout orizontal.
                 android:layout_height="wrap_content"
                 android:id="@+id/edit_types"/>
         </LinearLayout>
+
+    </LinearLayout>
 
     </LinearLayout>
 

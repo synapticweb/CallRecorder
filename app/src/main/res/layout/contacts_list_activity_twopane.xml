@@ -41,13 +41,6 @@
                 android:background="@drawable/baseline_menu_white_24"
                 android:id="@+id/hamburger"/>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/actionbar_select_title"
-                android:layout_gravity="center"
-                style="@style/toolbar_font"
-                android:textColor="@color/textOnDark"/>
 
             <ImageButton
                 android:layout_width="wrap_content"
@@ -89,12 +82,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:baselineAligned="false"
+            android:weightSum="10"
             >
 
             <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
+                android:layout_weight="4"
                 android:id="@+id/contacts_list_fragment_container">
 
                 <TextView
@@ -122,7 +116,7 @@
             <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
+                android:layout_weight="6"
                 android:id="@+id/contact_detail_fragment_container"
                 android:layout_marginTop="?attr/actionBarSize">
             </FrameLayout>

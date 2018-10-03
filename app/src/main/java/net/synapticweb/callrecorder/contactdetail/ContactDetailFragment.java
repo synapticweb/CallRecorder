@@ -156,9 +156,10 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         }
 
         closeBtn.setVisibility(selectMode ? View.VISIBLE : View.GONE);
-        selectTitle.setText(contact.getContactName());
-        if(isSinglePaneLayout())
+        if(isSinglePaneLayout()) {
+            selectTitle.setText(contact.getContactName());
             selectTitle.setVisibility(selectMode ? View.VISIBLE : View.GONE);
+        }
 
         exportBtn.setVisibility(selectMode ? View.VISIBLE : View.GONE);
         deleteBtn.setVisibility(selectMode ? View.VISIBLE : View.GONE);
