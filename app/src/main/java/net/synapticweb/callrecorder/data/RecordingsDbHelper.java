@@ -10,20 +10,20 @@ import net.synapticweb.callrecorder.data.ListenedContract.*;
 public class RecordingsDbHelper extends SQLiteOpenHelper {
     private static final String SQL_CREATE_RECORDINGS = "CREATE TABLE " +
             Recordings.TABLE_NAME + " (" + Recordings._ID +
-            " INTEGER PRIMARY KEY, " + Recordings.COLUMN_NAME_PHONE_NUM_ID + " INTEGER, "
-            + Recordings.COLUMN_NAME_INCOMING + " INTEGER, " +
-            Recordings.COLUMN_NAME_PATH + " TEXT, " +
-            Recordings.COLUMN_NAME_START_TIMESTAMP + " INTEGER, " +
-            Recordings.COLUMN_NAME_END_TIMESTAMP + " INTEGER )";
+            " INTEGER NOT NULL PRIMARY KEY, " + Recordings.COLUMN_NAME_PHONE_NUM_ID + " INTEGER NOT NULL, "
+            + Recordings.COLUMN_NAME_INCOMING + " INTEGER NOT NULL, " +
+            Recordings.COLUMN_NAME_PATH + " TEXT NOT NULL, " +
+            Recordings.COLUMN_NAME_START_TIMESTAMP + " INTEGER NOT NULL, " +
+            Recordings.COLUMN_NAME_END_TIMESTAMP + " INTEGER NOT NULL)";
 
-    private static final String SQL_CREATE_LISTENED = "CREATE TABLE " + Listened.TABLE_NAME + " (" + Listened._ID + " INTEGER PRIMARY KEY, " +
-            Listened.COLUMN_NAME_NUMBER + " TEXT, " +
-            Listened.COLUMN_NAME_CONTACT_NAME + " TEXT, " +
+    private static final String SQL_CREATE_LISTENED = "CREATE TABLE " + Listened.TABLE_NAME + " (" + Listened._ID + " INTEGER NOT NULL PRIMARY KEY, " +
+            Listened.COLUMN_NAME_NUMBER + " TEXT NOT NULL, " +
+            Listened.COLUMN_NAME_CONTACT_NAME + " TEXT NOT NULL, " +
             Listened.COLUMN_NAME_PHOTO_URI + " TEXT, " +
-            Listened.COLUMN_NAME_PHONE_TYPE + " INTEGER, " +
-            Listened.COLUMN_NAME_SHOULD_RECORD + " INTEGER DEFAULT  1, " +
-            Listened.COLUMN_NAME_PRIVATE_NUMBER + " INTEGER DEFAULT 0, " +
-            Listened.COLUMN_NAME_UNKNOWN_NUMBER + " INTEGER DEFAULT 0, " +
+            Listened.COLUMN_NAME_PHONE_TYPE + " INTEGER NOT NULL, " +
+            Listened.COLUMN_NAME_SHOULD_RECORD + " INTEGER NOT NULL DEFAULT  1, " +
+            Listened.COLUMN_NAME_PRIVATE_NUMBER + " INTEGER NOT NULL DEFAULT 0, " +
+            Listened.COLUMN_NAME_UNKNOWN_NUMBER + " INTEGER NOT NULL DEFAULT 0, " +
             "CONSTRAINT no_duplicates UNIQUE(" + Listened.COLUMN_NAME_NUMBER + ") )";
 
 

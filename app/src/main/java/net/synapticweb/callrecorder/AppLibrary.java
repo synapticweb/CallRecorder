@@ -58,10 +58,4 @@ public class AppLibrary {
         return (int) (dp * context.getResources().getDisplayMetrics().density);
     }
 
-    //semnalizează metodele folosite în ContactsListActivityMain și ContactDetailActivity pentru a gestiona fragmentul
-    // care listează recordingurile unui contact
-    public @interface HandleDetailFragment{}
-    //semnalizează metodele folosite în ContactsListActivityMain pentru a gestiona fragmentul care listează contactele
-   public  @interface HandleListFragment {}
-
 }

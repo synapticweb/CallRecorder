@@ -2,6 +2,7 @@ package net.synapticweb.callrecorder.contactdetail;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 
 import net.synapticweb.callrecorder.data.Contact;
@@ -22,7 +23,7 @@ public interface ContactDetailContract {
         boolean isEmptySelectedItems();
         void clearSelectedMode();
         List<Recording> getSelectedRecordings();
-        Activity getParentActivity();
+        AppCompatActivity getParentActivity();
         void displayRecordingStatus();
         boolean isSinglePaneLayout();
         void setActionBarTitleIfActivityDetail();

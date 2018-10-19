@@ -22,9 +22,11 @@ import android.util.Log;
 
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.synapticweb.callrecorder.AppLibrary;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.contactslist.ContactsListActivityMain;
 import net.synapticweb.callrecorder.data.Contact;
@@ -209,7 +211,7 @@ public class RecorderService extends Service {
 
         if(unknownPhone)
         {
-           Contact contact =  new Contact(null, receivedNumPhone, null, null, -1);
+           Contact contact =  new Contact(null, receivedNumPhone, null, null, AppLibrary.UNKNOWN_TYPE_PHONE_CODE);
            contact.setUnkownNumber(true);
            try {
                contact.insertInDatabase(this); //introducerea în db setează id-ul în obiect
@@ -231,33 +233,33 @@ public class RecorderService extends Service {
                 try {
                     contact.insertInDatabase(this);
                 }
-                catch (SQLException exc) {
+                catch (SQLException  exc) {
                     Log.wtf(TAG, exc.getMessage());
                 }
                 idToInsert = contact.getId();
             }
-            else {
+            else { //pentru teste: aici e de așteptat ca întotdeauna cursorul să conțină numai 1 element
                 cursor.moveToFirst();
                 idToInsert = cursor.getInt(cursor.getColumnIndex(Listened._ID));
             }
 
             cursor.close();
         }
-        else //dacă nu e nici unknown nici privat: se poate ca nr să existe în db, sau să nu existe dar să fi fost
-        // găsit în contacte.
+        else //dacă nu e nici unknown nici privat: se poate ca nr să existe în db - caz în care contact este null,
+        // sau să nu existe dar să fi fost găsit în contacte, caz în care contact != null.
         {
-            if(contact != null) //în cazul în care nr nu exista în db dar a fost găsit în contacte și deci
-                //RecorderService::contact e nonnul, inserăm în db numărul găsit
+            if(contact != null) //nr nu există în db dar a fost găsit în contacte
             {
                 try {
+                    contact.copyPhotoIfExternal(this);
                     contact.insertInDatabase(this);
                 }
-                catch (SQLException exception) {
+                catch (SQLException | IOException exception) {
                     Log.wtf(TAG, exception.getMessage());
                 }
                 idToInsert = contact.getId();
             }
-            else { //dacă nr există în baza de date
+            else { //nr există în baza de date
 
                 Cursor cursor = db.query(Listened.TABLE_NAME, new String[]{Listened._ID},
                         Listened.COLUMN_NAME_NUMBER + "='" + dbNumPhone + "'", null, null, null, null);

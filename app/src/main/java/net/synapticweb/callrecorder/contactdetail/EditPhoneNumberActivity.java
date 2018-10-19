@@ -5,6 +5,7 @@ import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -117,10 +118,9 @@ public class EditPhoneNumberActivity extends AppCompatActivity implements Adapte
                 if(dataChanged) {
 //                    Cursor cursor = (Cursor) phoneType.getSelectedItem(); //https://stackoverflow.com/questions/5787809/get-spinner-selected-items-text
                     contact.setUnkownNumber(false);
-                    if(oldPhotoUri != null) { //a fost selectată altă poză din galerie sau a fost luată altă poză cu camera. Dacă
-                        //se scoate poza oldPhotoUri va fi null.
-                        String oldPhotoPath = oldPhotoUri.getPath();
-                        if(oldPhotoPath.matches("^/callrecorder_photos/.*")) //ștergem doar dacă este poza noastră
+                    if(oldPhotoUri != null) { //a fost selectată altă poză din galerie sau a fost luată altă poză
+                        // cu camera sau a fost scoasă poza existentă.
+                        //întotdeauna este poza noastră!
                             getContentResolver().delete(oldPhotoUri, null, null);
                     }
 
@@ -233,7 +233,7 @@ public class EditPhoneNumberActivity extends AppCompatActivity implements Adapte
     }
 
     private void setPhotoPath() {
-        savedPhotoPath = new File(getFilesDir(), contact.getPhoneNumber() + System.currentTimeMillis() + ".jpg");
+        savedPhotoPath = new File(getFilesDir(), contact.getPhoneNumber() + ".jpg");
     }
 
     //http://codetheory.in/android-pick-select-image-from-gallery-with-intents/
@@ -246,6 +246,7 @@ public class EditPhoneNumberActivity extends AppCompatActivity implements Adapte
     }
 
     private void removePhoto() {
+        oldPhotoUri = contact.getPhotoUri();
         contact.setPhotoUri((Uri) null); //ambigous method call
         contactPhoto.setImageResource(R.drawable.user_contact_blue);
         dataChanged = true;
@@ -275,7 +276,7 @@ public class EditPhoneNumberActivity extends AppCompatActivity implements Adapte
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Uri photoUri;
+        Uri chosenPhotoUri;
         if (resultCode != Activity.RESULT_OK ) {
             Log.wtf(TAG, "The result code is error");
             if(resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
@@ -286,20 +287,22 @@ public class EditPhoneNumberActivity extends AppCompatActivity implements Adapte
             return;
         }
 
-        if (requestCode == PICK_IMAGE_REQUEST && (photoUri = data.getData()) != null) {
-            CropImage.activity(photoUri).setCropShape(CropImageView.CropShape.OVAL)
+        if (requestCode == PICK_IMAGE_REQUEST && (chosenPhotoUri = data.getData()) != null) {
+            CropImage.activity(chosenPhotoUri).setCropShape(CropImageView.CropShape.OVAL)
                     .setOutputUri(FileProvider.getUriForFile(this, "net.synapticweb.callrecorder.fileprovider", savedPhotoPath))
                     .setAspectRatio(1,1)
                     .setMaxCropResultSize(2000, 2000) //vezi mai jos comentariul
+                    .setOutputCompressFormat(Bitmap.CompressFormat.JPEG)
+                    .setOutputCompressQuality(70)
                     .start(this);
         }
         else if(requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
-            photoUri = result.getUri();
+            chosenPhotoUri = result.getUri();
             contactPhoto.setImageURI(null); //cînd se schimbă succesiv 2 poze făcute de cameră se folosește același fișier și optimizările android fac necesar acest hack pentru a obține refresh-ul pozei
-            contactPhoto.setImageURI(photoUri);
+            contactPhoto.setImageURI(chosenPhotoUri);
             this.oldPhotoUri = contact.getPhotoUri();
-            contact.setPhotoUri(photoUri);
+            contact.setPhotoUri(chosenPhotoUri);
             dataChanged = true;
         }
         else if(requestCode == TAKE_PICTURE) {
@@ -307,6 +310,9 @@ public class EditPhoneNumberActivity extends AppCompatActivity implements Adapte
                     .setCropShape(CropImageView.CropShape.OVAL)
                     .setOutputUri(FileProvider.getUriForFile(this, "net.synapticweb.callrecorder.fileprovider", savedPhotoPath))
                     .setMaxCropResultSize(2000, 2000) //necesar, pentru că dacă poza e prea mare apare un rotund negru
+                    .setOutputCompressFormat(Bitmap.CompressFormat.JPEG) //necesar, pentru că fișierul output are
+                    //totdeauna extensia .jpg
+                    .setOutputCompressQuality(70)
                     .start(this);
         }
     }

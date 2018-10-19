@@ -3,11 +3,14 @@ package net.synapticweb.callrecorder.contactslist;
 import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.provider.ContactsContract;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -24,16 +27,17 @@ import net.synapticweb.callrecorder.data.ContactsRepository;
 import net.synapticweb.callrecorder.data.ListenedContract;
 import net.synapticweb.callrecorder.data.RecordingsDbHelper;
 
+import java.io.IOException;
 import java.util.List;
 
 import static net.synapticweb.callrecorder.AppLibrary.UNKNOWN_TYPE_PHONE_CODE;
 
 public class ContactsListPresenter implements ContactsListContract.ContactsListPresenter {
-
-    private ContactsListContract.View view;
+    @NonNull private ContactsListContract.View view;
     static final int REQUEST_ADD_CONTACT = 1;
+    private static final String TAG = "CallRecorder";
 
-    ContactsListPresenter(ContactsListContract.View view) {
+    ContactsListPresenter(@NonNull ContactsListContract.View view) {
         this.view = view;
     }
 
@@ -107,8 +111,7 @@ public class ContactsListPresenter implements ContactsListContract.ContactsListP
         int phoneType = UNKNOWN_TYPE_PHONE_CODE;
 
         if(intent != null && (numberUri = intent.getData()) != null) {
-            Fragment fragment = (Fragment) view;
-            Cursor cursor = fragment.getActivity().getContentResolver().
+            Cursor cursor = view.getParentActivity().getContentResolver().
                     query(numberUri, new String[]{ContactsContract.CommonDataKinds.Phone.NUMBER,
                                     ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
                                     ContactsContract.CommonDataKinds.Phone.PHOTO_URI,
@@ -129,7 +132,7 @@ public class ContactsListPresenter implements ContactsListContract.ContactsListP
                 countryCode = "US";
 
             if(!phoneUtil.isPossibleNumber(newNumber, countryCode)) {
-                alertAtInsertContact(R.string.number_impossible, fragment.getActivity());
+                alertAtInsertContact(R.string.number_impossible, view.getParentActivity());
                 return ;
             }
 
@@ -150,11 +153,17 @@ public class ContactsListPresenter implements ContactsListContract.ContactsListP
             }
 
             if (match)
-                alertAtInsertContact(R.string.number_exists_message, fragment.getActivity());
+                alertAtInsertContact(R.string.number_exists_message, view.getParentActivity());
             else
             {
                 Contact contact = new Contact(null, newNumber, contactName, photoUri, phoneType);
-                contact.insertInDatabase(CallRecorderApplication.getInstance());
+                try {
+                    contact.copyPhotoIfExternal(view.getParentActivity());
+                    contact.insertInDatabase(CallRecorderApplication.getInstance());
+                }
+                catch (SQLException | IOException exc) {
+                    Log.wtf(TAG, exc.getMessage());
+                }
                 view.setNewAddedContactId(contact.getId());
             }
         }

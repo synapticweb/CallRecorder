@@ -81,7 +81,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
     }
 
     @Override
-    public Activity getParentActivity() {
+    public AppCompatActivity getParentActivity() {
         return parentActivity;
     }
 
@@ -116,7 +116,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
     @Override
     public boolean removeIfPresentInSelectedItems(int adapterPosition) {
         if (selectedItems.contains(adapterPosition)) {
-            selectedItems.remove((Integer )adapterPosition); //fără casting îl interpretează ca poziție
+            selectedItems.remove((Integer) adapterPosition); //fără casting îl interpretează ca poziție
             //în selectedItems
             return true;
         }

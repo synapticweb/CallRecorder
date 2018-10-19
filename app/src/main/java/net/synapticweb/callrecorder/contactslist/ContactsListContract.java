@@ -1,5 +1,6 @@
 package net.synapticweb.callrecorder.contactslist;
 
+import android.app.Activity;
 import android.content.Intent;
 
 import net.synapticweb.callrecorder.data.Contact;
@@ -7,6 +8,7 @@ import java.util.List;
 
 public interface ContactsListContract {
     interface View {
+        Activity getParentActivity();
         void showContacts(List<Contact> contactList);
         void startContactDetailActivity(Contact contact);
         boolean isSinglePaneLayout();

@@ -5,18 +5,27 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.provider.ContactsContract;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
 
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 
 import net.synapticweb.callrecorder.AppLibrary;
 import net.synapticweb.callrecorder.PhoneTypeContainer;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 
 
 public class Contact implements Comparable<Contact>, Parcelable {
@@ -33,8 +42,7 @@ public class Contact implements Comparable<Contact>, Parcelable {
     public Contact(){
     }
 
-    public Contact(Long id, String phoneNumber, String contactName, String photoUriStr, int phoneTypeCode)
-    {
+    public Contact(Long id, String phoneNumber, String contactName, String photoUriStr, int phoneTypeCode) {
         setId(id);
         setPhoneNumber(phoneNumber);
         setContactName(contactName);
@@ -68,6 +76,16 @@ public class Contact implements Comparable<Contact>, Parcelable {
         catch (SQLException exception) {
             Log.wtf(TAG, exception.getMessage());
         }
+    }
+
+    public void copyPhotoIfExternal(Context context) throws IOException {
+      if(photoUri != null && !photoUri.getAuthority().equals("net.synapticweb.callrecorder.fileprovider")) {
+          Bitmap originalPhotoBitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), photoUri);
+          File copiedPhotoFile = new File(context.getFilesDir(), getPhoneNumber() + ".jpg");
+          OutputStream os = new FileOutputStream(copiedPhotoFile);
+          originalPhotoBitmap.compress(Bitmap.CompressFormat.JPEG, 70, os);
+          setPhotoUri(FileProvider.getUriForFile(context, "net.synapticweb.callrecorder.fileprovider", copiedPhotoFile));
+      }
     }
 
     public void insertInDatabase(Context context) throws SQLException
@@ -106,7 +124,8 @@ public class Contact implements Comparable<Contact>, Parcelable {
         }
 
         cursor.close();
-
+        if(getPhotoUri() != null ) //întotdeauna este poza noastră.
+            context.getContentResolver().delete(getPhotoUri(), null, null);
      if((db.delete(ListenedContract.Listened.TABLE_NAME, ListenedContract.Listened.COLUMN_NAME_NUMBER
                 + "='" + getPhoneNumber() + "'", null)) == 0)
          throw new SQLException("This Listened row was not deleted");

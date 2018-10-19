@@ -1,6 +1,7 @@
 package net.synapticweb.callrecorder.contactdetail;
 
 
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
@@ -41,10 +42,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
 
     @Override
     public void deleteContact(final Contact contact) {
-        Fragment fragment = (Fragment) view;
-        final AppCompatActivity parentActivity = (AppCompatActivity) fragment.getActivity();
-        if(parentActivity == null)
-            return ;
+        final AppCompatActivity parentActivity = view.getParentActivity();
         new MaterialDialog.Builder(parentActivity)
                 .title(R.string.delete_number_confirm_title)
                 .content(String.format(parentActivity.getResources().

@@ -40,6 +40,11 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
     public final static String ARG_CONTACT = "arg_contact";
 
     @Override
+    public Activity getParentActivity() {
+        return parentActivity;
+    }
+
+    @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         parentActivity = (AppCompatActivity) context;
@@ -83,6 +88,8 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
                 parentActivity.findViewById(R.id.contact_detail_fragment_container) == null);
     }
 
+    //e apelată de callback-ul pasat funcției ContactRepository::getContacts(), la rîndul ei apelată de
+    // ContactsListPresenter::loadContacts()
     @Override
     public void showContacts(List<Contact> contacts) {
         adapter = new ListenedAdapter(contacts);

@@ -4,6 +4,7 @@ broadcastreceiver 2 calls : http://blog.mmarvick.com/blog/lollipop-multiple-broa
 android app forced stoped: https://android.stackexchange.com/questions/33801/what-does-the-force-stop-button-mean
 huawei protected apps: https://stackoverflow.com/questions/31638986/protected-apps-setting-on-huawei-phones-and-how-to-handle-it
 android emulator simulate outgoing phone call: https://stackoverflow.com/questions/20035650/make-calls-using-telnet-from-one-android-emulator-to-another
+mock private number: https://stackoverflow.com/questions/10004162/simulate-an-incoming-call-from-a-private-number
 
 
 https://www.newventuresoftware.com/blog/record-play-and-visualize-raw-audio-data-in-android
