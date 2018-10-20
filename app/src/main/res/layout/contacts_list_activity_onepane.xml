@@ -30,12 +30,6 @@
             android:background="@drawable/baseline_menu_white_24"
             android:id="@+id/hamburger"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/main_activity_title"
-            android:textColor="@color/textOnDark"
-            android:layout_gravity="center"/>
 
     </android.support.v7.widget.Toolbar>
 

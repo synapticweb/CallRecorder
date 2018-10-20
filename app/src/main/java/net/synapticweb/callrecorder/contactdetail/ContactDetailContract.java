@@ -13,6 +13,7 @@ import java.util.List;
 public interface ContactDetailContract {
     interface View {
         void setContact(Contact contact);
+        Contact getContact();
         void paintViews(List<Recording> recordings);
         void setSelectMode(boolean isSelectModeOn);
         boolean getSelectMode();

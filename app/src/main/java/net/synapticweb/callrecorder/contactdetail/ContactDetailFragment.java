@@ -136,6 +136,11 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
     }
 
     @Override
+    public Contact getContact() {
+        return contact;
+    }
+
+    @Override
     public void onResume(){
         super.onResume();
         presenter.loadRecordings(contact);
@@ -248,6 +253,11 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
                     shouldRecordMenuItem.setTitle(R.string.stop_recording);
                 else
                     shouldRecordMenuItem.setTitle(R.string.start_recording);
+                MenuItem editMenuItem = popupMenu.getMenu().findItem(R.id.edit_phone_number);
+                if(contact.isPrivateNumber()) {
+                    editMenuItem.setEnabled(false);
+                    shouldRecordMenuItem.setEnabled(false);
+                }
                 popupMenu.show();
             }
         });
@@ -427,6 +437,10 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
     }
 
     public void displayRecordingStatus(){
+        if(contact.isPrivateNumber()) {
+            recordingStatusView.setVisibility(View.INVISIBLE);
+            return;
+        }
         if(contact.shouldRecord()) {
             recordingStatusView.setText(R.string.rec_status_recording);
             recordingStatusView.setTextColor(getResources().getColor(R.color.green));
@@ -508,7 +522,6 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
 
             setDimensions();
         }
-
 
         @Override
         public boolean onLongClick(View v) {

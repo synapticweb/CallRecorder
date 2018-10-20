@@ -37,13 +37,15 @@ public class ExportAsyncTask extends AsyncTask<Recording, Integer, Boolean> {
     public long alreadyCopied = 0;
     private String path;
     private long totalSize;
+    private String phoneNumber;
     private MaterialDialog dialog;
     private WeakReference<Activity> activityRef; //http://sohailaziz05.blogspot.com/2014/10/asynctask-and-context-leaking.html
     private static final String TAG = "CallRecorder";
 
-    public ExportAsyncTask(String foderPath, long totalSize, Activity activity) {
+    public ExportAsyncTask(String foderPath, long totalSize, String phoneNumber, Activity activity) {
         this.path = foderPath;
         this.totalSize = totalSize;
+        this.phoneNumber = phoneNumber;
         activityRef = new WeakReference<>(activity);
     }
 
@@ -109,7 +111,7 @@ public class ExportAsyncTask extends AsyncTask<Recording, Integer, Boolean> {
     protected Boolean doInBackground(Recording...recordings) {
         for(Recording recording : recordings) {
             try {
-                recording.export(path, this, totalSize);
+                recording.export(path, this, totalSize, phoneNumber);
                 if(isCancelled())
                     break;
             }

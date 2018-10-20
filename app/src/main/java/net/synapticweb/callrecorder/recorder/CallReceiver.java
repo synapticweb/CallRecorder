@@ -88,7 +88,7 @@ public class CallReceiver extends BroadcastReceiver {
                         stopIntent.setComponent(serviceName);
                         context.stopService(stopIntent);
                         serviceStarted = false;
-                        Log.wtf(TAG, "Service stopped");
+                        Log.wtf(TAG, "Service stopped by CallReceiver");
                     }
                 }
             }

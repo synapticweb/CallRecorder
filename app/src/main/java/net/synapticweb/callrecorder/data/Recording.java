@@ -57,8 +57,9 @@ public class Recording implements Parcelable {
         new File(path).delete();
     }
 
-    public void export(String folderPath, ExportAsyncTask asyncTask, long totalSize) throws IOException {
-        String fileName = new SimpleDateFormat("d_MMM_yyyy_HH_mm_ss", Locale.US).format(new Date(startTimestamp)) + ".amr";
+    public void export(String folderPath, ExportAsyncTask asyncTask, long totalSize, String phoneNumber) throws IOException {
+        String fileName = phoneNumber + " - " + new SimpleDateFormat("d_MMM_yyyy_HH:mm:ss", Locale.US).
+                format(new Date(startTimestamp)) + ".amr";
         InputStream in = new FileInputStream(path);
         OutputStream out = new FileOutputStream(new File(folderPath, fileName));
 

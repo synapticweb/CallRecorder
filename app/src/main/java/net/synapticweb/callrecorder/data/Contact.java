@@ -31,7 +31,7 @@ import java.io.OutputStream;
 public class Contact implements Comparable<Contact>, Parcelable {
     private Long id;
     private String phoneNumber = null;
-    private int phoneType = -1;
+    private int phoneType = AppLibrary.UNKNOWN_TYPE_PHONE_CODE;
     private String contactName = null;
     private Uri photoUri = null;
     private boolean unkownNumber = false;
@@ -206,7 +206,7 @@ public class Contact implements Comparable<Contact>, Parcelable {
 
     public void setPhoneNumber(String phoneNumber) {
         if(phoneNumber == null)
-            this.phoneNumber = "Unknown number";
+            this.phoneNumber = "Private number";
         else
             this.phoneNumber = phoneNumber;
     }

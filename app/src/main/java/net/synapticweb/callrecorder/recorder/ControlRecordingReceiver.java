@@ -9,12 +9,14 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.contactslist.ContactsListActivityMain;
 
 
 public class ControlRecordingReceiver extends BroadcastReceiver {
+    private static final String TAG = "CallRecorder";
     @Override
     public void onReceive(Context context, Intent intent)
     {
@@ -28,8 +30,10 @@ public class ControlRecordingReceiver extends BroadcastReceiver {
         notificationIntent.setAction(RecorderBox.ACTION_STOP_RECORDING);
         PendingIntent stopRecordingPi = PendingIntent.getBroadcast(context, 0, notificationIntent, 0);
 
-        if(intent.getAction().equals(RecorderBox.ACTION_STOP_RECORDING))
+        if(intent.getAction().equals(RecorderBox.ACTION_STOP_RECORDING)) {
             context.stopService(new Intent(context, RecorderService.class)); //de văzut: oare oprește corect serviciul?
+            Log.wtf(TAG, "Service stopped by ControlRecordingReceiver");
+        }
 
         else if(intent.getAction().equals(RecorderBox.ACTION_START_RECORDING))
         {

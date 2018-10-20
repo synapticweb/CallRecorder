@@ -145,7 +145,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
          for(Recording recording : recordings)
              totalSize += new File(recording.getPath()).length();
 
-        new ExportAsyncTask(path, totalSize, view.getParentActivity()).
+        new ExportAsyncTask(path, totalSize, view.getContact().getPhoneNumber(), view.getParentActivity()).
                 execute(recordings.toArray(recordingsArray));
         view.clearSelectedMode();
     }

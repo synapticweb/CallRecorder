@@ -72,6 +72,7 @@ class RecorderBox {
                 } catch (Exception e3)
                 {
                     Log.wtf(TAG, "MIC exception: " + e3.getClass() + ": " + e3.getMessage());
+                    return ;
                 }
             }
         }

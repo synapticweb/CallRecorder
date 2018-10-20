@@ -17,8 +17,8 @@ public class RecordingsDbHelper extends SQLiteOpenHelper {
             Recordings.COLUMN_NAME_END_TIMESTAMP + " INTEGER NOT NULL)";
 
     private static final String SQL_CREATE_LISTENED = "CREATE TABLE " + Listened.TABLE_NAME + " (" + Listened._ID + " INTEGER NOT NULL PRIMARY KEY, " +
-            Listened.COLUMN_NAME_NUMBER + " TEXT NOT NULL, " +
-            Listened.COLUMN_NAME_CONTACT_NAME + " TEXT NOT NULL, " +
+            Listened.COLUMN_NAME_NUMBER + " TEXT, " +
+            Listened.COLUMN_NAME_CONTACT_NAME + " TEXT, " +
             Listened.COLUMN_NAME_PHOTO_URI + " TEXT, " +
             Listened.COLUMN_NAME_PHONE_TYPE + " INTEGER NOT NULL, " +
             Listened.COLUMN_NAME_SHOULD_RECORD + " INTEGER NOT NULL DEFAULT  1, " +

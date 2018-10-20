@@ -1,17 +1,12 @@
 package net.synapticweb.callrecorder.contactslist;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.ActionBar;
-import android.net.Uri;
 import android.os.Build;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
@@ -22,32 +17,23 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 
+import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.google.i18n.phonenumbers.PhoneNumberUtil;
-
-import net.synapticweb.callrecorder.AppLibrary;
-import net.synapticweb.callrecorder.data.Contact;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.SettingsActivity;
-import net.synapticweb.callrecorder.data.ListenedContract;
-import net.synapticweb.callrecorder.data.RecordingsDbHelper;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
-
-import static net.synapticweb.callrecorder.AppLibrary.*;
 
 
 public class ContactsListActivityMain extends AppCompatActivity  {
@@ -123,6 +109,23 @@ public class ContactsListActivityMain extends AppCompatActivity  {
         // https://stackoverflow.com/questions/6147884/onactivityresult-is-not-being-called-in-fragment
     }
 
+    @Override
+    public void onBackPressed() {
+        new MaterialDialog.Builder(this)
+                .title("Confirm")
+                .icon(getResources().getDrawable(R.drawable.question_mark))
+                .content("Exit the application?")
+                .positiveText(android.R.string.ok)
+                .negativeText(android.R.string.cancel)
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        ContactsListActivityMain.super.onBackPressed();
+                    }
+                })
+                .show();
+    }
+
     private void askForPermissions() {
         boolean outgoingCalls = ContextCompat.checkSelfPermission(this, Manifest.permission.PROCESS_OUTGOING_CALLS)
                 == PackageManager.PERMISSION_GRANTED;
@@ -165,17 +168,19 @@ public class ContactsListActivityMain extends AppCompatActivity  {
             }
 
             if(notGranted) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setMessage("The app was not granted the necessary permissions for proper functioning. " +
-                        "As a result, some or all of the app functionality will be lost.")
-                        .setTitle("Warning")
-                        .setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                    }
-                                }
-                        );
-                AlertDialog dialog = builder.create();
-                dialog.show();
+                new MaterialDialog.Builder(this)
+                        .title("Warning")
+                        .content("The app was not granted the necessary permissions for proper functioning. " +
+                                "As a result, some or all of the app functionality will be lost.")
+                        .neutralText(android.R.string.ok)
+                        .icon(getResources().getDrawable(R.drawable.warning))
+                        .onNeutral(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+
+                            }
+                        })
+                        .show();
             }
 
         }
@@ -190,28 +195,28 @@ public class ContactsListActivityMain extends AppCompatActivity  {
             Intent intent = new Intent();
         intent.setClassName("com.huawei.systemmanager", "com.huawei.systemmanager.optimize.process.ProtectActivity");
             if (isCallable(intent)) {
-                final AppCompatCheckBox dontShowAgain = new AppCompatCheckBox(this);
-                dontShowAgain.setText("Do not show again");
-                dontShowAgain.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        editor.putBoolean(saveIfSkip, isChecked);
-                        editor.apply();
-                    }
-                });
-
-                new AlertDialog.Builder(this)
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .setTitle("Huawei Protected Apps")
-                        .setMessage(String.format("%s requires to be enabled in 'Protected Apps' to function properly.%n", getString(R.string.app_name)))
-                        .setView(dontShowAgain)
-                        .setPositiveButton("Protected Apps", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
+                new MaterialDialog.Builder(this)
+                        .title("Huawei Protected Apps")
+                        .icon(getResources().getDrawable(R.drawable.warning))
+                        .content(String.format("%s requires to be enabled in 'Protected Apps' to function properly.%n",
+                                getString(R.string.app_name)))
+                        .checkBoxPrompt("Do not show again", false, new CompoundButton.OnCheckedChangeListener() {
+                            @Override
+                            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                                editor.putBoolean(saveIfSkip, isChecked);
+                                editor.apply();
+                            }
+                        })
+                        .positiveText(android.R.string.ok)
+                        .negativeText(android.R.string.cancel)
+                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                 huaweiProtectedApps();
                             }
                         })
-                        .setNegativeButton(android.R.string.cancel, null)
                         .show();
+
             } else {
                 editor.putBoolean(saveIfSkip, true);
                 editor.apply();

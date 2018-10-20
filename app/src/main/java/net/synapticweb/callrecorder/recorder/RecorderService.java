@@ -184,7 +184,7 @@ public class RecorderService extends Service {
         //dacă nr nu există în db sau dacă setările interzic înregistrarea convorbirilor nr punem doar o notificare
         //cu posibilitatea de a porni înregistrarea. Dacă s-a găsit un match, atunci dbNumPhone este setat la nr din baza de date care
         //se potrivește
-        if(!match || !numbers.get(dbNumPhone))
+        if(!match || !numbers.get(dbNumPhone)) //de pus verificarea opțiunii pentru nr private
             startForeground(NOTIFICATION_ID, buildNotification(false));
         else {
             startForeground(NOTIFICATION_ID, buildNotification(true)); //altfel, pornim înregistrarea și notificarea conține
@@ -229,7 +229,6 @@ public class RecorderService extends Service {
             if(cursor.getCount() == 0) {
                 Contact contact =  new Contact();
                 contact.setPrivateNumber(true);
-                contact.setContactName(null);
                 try {
                     contact.insertInDatabase(this);
                 }

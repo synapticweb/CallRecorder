@@ -219,8 +219,10 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
                     holder.contactPhoto.setImageURI(null); //cînd se schimbă succesiv 2 poze făcute de cameră se folosește același fișier și optimizările android fac necesar acest hack pentru a obține refresh-ul pozei
                     holder.contactPhoto.setImageURI(contact.getPhotoUri());
                 } else {
-                    if (contact.isPrivateNumber())
+                    if (contact.isPrivateNumber()) {
                         holder.contactPhoto.setImageResource(R.drawable.user_contact_yellow);
+                        holder.mPhoneNumber.setVisibility(View.GONE);
+                    }
                     else if (contact.isUnkownNumber())
                         holder.contactPhoto.setImageResource(R.drawable.user_contact_red);
                     else

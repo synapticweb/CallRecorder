@@ -2,7 +2,6 @@ package net.synapticweb.callrecorder.contactdetail;
 
 import android.app.Activity;
 import android.content.ClipData;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -10,8 +9,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v4.content.FileProvider;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.Spannable;
@@ -30,6 +29,9 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
@@ -67,6 +69,32 @@ public class EditPhoneNumberActivity extends AppCompatActivity implements Adapte
         outState.putParcelable("oldPhotoUri", oldPhotoUri);
     }
 
+    private void onCancelOrBackPressed() {
+        if (dataChanged) {
+            new MaterialDialog.Builder(EditPhoneNumberActivity.this)
+                    .title(R.string.discard_edit_title)
+                    .icon(getResources().getDrawable(R.drawable.warning))
+                    .content(R.string.discard_edit_message)
+                    .positiveText(android.R.string.ok)
+                    .negativeText(android.R.string.cancel)
+                    .onPositive(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                            if(savedPhotoPath != null) {
+                                getContentResolver().delete(contact.getPhotoUri(), null, null);
+                            }
+                            setResult(RESULT_CANCELED);
+                            finish();
+                        }
+                    })
+                    .show();
+        }
+        else {
+            setResult(RESULT_CANCELED);
+            finish();
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,27 +115,7 @@ public class EditPhoneNumberActivity extends AppCompatActivity implements Adapte
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (dataChanged) {
-                    new AlertDialog.Builder(EditPhoneNumberActivity.this)
-                            .setIcon(android.R.drawable.ic_dialog_alert)
-                            .setTitle(R.string.discard_edit_title)
-                            .setMessage(R.string.discard_edit_message)
-                            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    if(savedPhotoPath != null) {
-                                        getContentResolver().delete(contact.getPhotoUri(), null, null);
-                                    }
-                                    setResult(RESULT_CANCELED);
-                                    finish();
-                                }
-                            })
-                            .setNegativeButton(android.R.string.cancel, null)
-                            .show();
-                }
-                else {
-                    setResult(RESULT_CANCELED);
-                    finish();
-                }
+                onCancelOrBackPressed();
             }
         });
 
@@ -333,6 +341,10 @@ public class EditPhoneNumberActivity extends AppCompatActivity implements Adapte
     @Override
     public void onNothingSelected(AdapterView<?> parent) {}
 
+    @Override
+    public void onBackPressed() {
+        onCancelOrBackPressed();
+    }
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
