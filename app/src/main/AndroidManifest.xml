@@ -40,7 +40,7 @@
             android:parentActivityName=".contactslist.ContactsListActivityMain">
         </activity>
 
-        <activity android:name=".contactdetail.EditPhoneNumberActivity"
+        <activity android:name=".contactdetail.EditContactActivity"
             android:parentActivityName=".contactdetail.ContactDetailActivity">
         </activity>
 

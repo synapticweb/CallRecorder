@@ -4,10 +4,10 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import net.synapticweb.callrecorder.data.RecordingsContract.*;
-import net.synapticweb.callrecorder.data.ListenedContract.*;
+import net.synapticweb.callrecorder.data.ContactsContract.*;
 
 
-public class RecordingsDbHelper extends SQLiteOpenHelper {
+public class CallRecorderDbHelper extends SQLiteOpenHelper {
     private static final String SQL_CREATE_RECORDINGS = "CREATE TABLE " +
             Recordings.TABLE_NAME + " (" + Recordings._ID +
             " INTEGER NOT NULL PRIMARY KEY, " + Recordings.COLUMN_NAME_PHONE_NUM_ID + " INTEGER NOT NULL, "
@@ -28,9 +28,9 @@ public class RecordingsDbHelper extends SQLiteOpenHelper {
 
 
     private static final int DATABASE_VERSION = 1;
-    private static final String DATABASE_NAME = "recordings.db";
+    private static final String DATABASE_NAME = "callrecorder.db";
 
-    public RecordingsDbHelper(Context context)
+    public CallRecorderDbHelper(Context context)
     {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }

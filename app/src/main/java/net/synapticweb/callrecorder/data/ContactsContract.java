@@ -2,11 +2,11 @@ package net.synapticweb.callrecorder.data;
 
 import android.provider.BaseColumns;
 
-public class ListenedContract {
-    private ListenedContract(){}
+public class ContactsContract {
+    private ContactsContract(){}
 
     public static class Listened implements BaseColumns {
-        public static final String TABLE_NAME = "listened";
+        public static final String TABLE_NAME = "contacts";
 
         public static final String COLUMN_NAME_NUMBER = "phone_number";
         public static final String COLUMN_NAME_CONTACT_NAME = "contact_name";

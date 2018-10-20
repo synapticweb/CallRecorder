@@ -1,7 +1,6 @@
 package net.synapticweb.callrecorder.contactdetail;
 
 
-import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
@@ -20,9 +19,9 @@ import net.synapticweb.callrecorder.ExportAsyncTask;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.contactslist.ContactsListFragment;
 import net.synapticweb.callrecorder.data.Contact;
-import net.synapticweb.callrecorder.data.ListenedContract;
+import net.synapticweb.callrecorder.data.ContactsContract;
 import net.synapticweb.callrecorder.data.Recording;
-import net.synapticweb.callrecorder.data.RecordingsDbHelper;
+import net.synapticweb.callrecorder.data.CallRecorderDbHelper;
 import net.synapticweb.callrecorder.data.RecordingsRepository;
 import net.synapticweb.callrecorder.player.PlayerActivity;
 
@@ -75,7 +74,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
     @Override
     public void editContact(final Contact contact) {
         Fragment fragment = (Fragment) view;
-        Intent intent = new Intent(CallRecorderApplication.getInstance(), EditPhoneNumberActivity.class);
+        Intent intent = new Intent(CallRecorderApplication.getInstance(), EditContactActivity.class);
         intent.putExtra(EDIT_EXTRA_CONTACT, contact);
         fragment.startActivityForResult(intent, EDIT_REQUEST_CODE);
     }
@@ -83,7 +82,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
     @Override
     public void onEditActivityResult(Bundle result) {
         if (result != null) {
-            view.setContact((Contact) result.getParcelable(EditPhoneNumberActivity.EDITED_CONTACT));
+            view.setContact((Contact) result.getParcelable(EditContactActivity.EDITED_CONTACT));
             if(view.isSinglePaneLayout())
                 view.setActionBarTitleIfActivityDetail();
         }
@@ -152,13 +151,13 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
 
     @Override
     public void toggleShouldRecord(Contact contact) {
-        RecordingsDbHelper mDbHelper = new RecordingsDbHelper(CallRecorderApplication.getInstance());
+        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(CallRecorderApplication.getInstance());
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
         ContentValues values = new ContentValues();
 
-        values.put(ListenedContract.Listened.COLUMN_NAME_SHOULD_RECORD, !contact.shouldRecord());
-        db.update(ListenedContract.Listened.TABLE_NAME, values,
-                ListenedContract.Listened._ID + '=' + contact.getId(), null);
+        values.put(ContactsContract.Listened.COLUMN_NAME_SHOULD_RECORD, !contact.shouldRecord());
+        db.update(ContactsContract.Listened.TABLE_NAME, values,
+                ContactsContract.Listened._ID + '=' + contact.getId(), null);
         contact.setShouldRecord(!contact.shouldRecord());
         view.setContact(contact);
         view.displayRecordingStatus();

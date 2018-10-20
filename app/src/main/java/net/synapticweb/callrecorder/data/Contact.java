@@ -6,11 +6,9 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -51,27 +49,27 @@ public class Contact implements Comparable<Contact>, Parcelable {
         setPhoneType(phoneTypeCode);
     }
 
-    public void updateNumber(Context context, boolean byNumber) {
-        RecordingsDbHelper mDbHelper = new RecordingsDbHelper(context);
+    public void updateContact(Context context, boolean byNumber) {
+        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(context);
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(ListenedContract.Listened.COLUMN_NAME_NUMBER, getPhoneNumber());
-        values.put(ListenedContract.Listened.COLUMN_NAME_CONTACT_NAME, getContactName());
-        values.put(ListenedContract.Listened.COLUMN_NAME_PHONE_TYPE, getPhoneTypeCode());
-        values.put(ListenedContract.Listened.COLUMN_NAME_PHOTO_URI,
+        values.put(ContactsContract.Listened.COLUMN_NAME_NUMBER, getPhoneNumber());
+        values.put(ContactsContract.Listened.COLUMN_NAME_CONTACT_NAME, getContactName());
+        values.put(ContactsContract.Listened.COLUMN_NAME_PHONE_TYPE, getPhoneTypeCode());
+        values.put(ContactsContract.Listened.COLUMN_NAME_PHOTO_URI,
                 (getPhotoUri() == null) ? null : getPhotoUri().toString());
-        values.put(ListenedContract.Listened.COLUMN_NAME_UNKNOWN_NUMBER, isUnkownNumber());
-        values.put(ListenedContract.Listened.COLUMN_NAME_SHOULD_RECORD, shouldRecord());
-        values.put(ListenedContract.Listened.COLUMN_NAME_PRIVATE_NUMBER, isPrivateNumber());
+        values.put(ContactsContract.Listened.COLUMN_NAME_UNKNOWN_NUMBER, isUnkownNumber());
+        values.put(ContactsContract.Listened.COLUMN_NAME_SHOULD_RECORD, shouldRecord());
+        values.put(ContactsContract.Listened.COLUMN_NAME_PRIVATE_NUMBER, isPrivateNumber());
 
         try {
             if(byNumber)
-                db.update(ListenedContract.Listened.TABLE_NAME, values,
-                    ListenedContract.Listened.COLUMN_NAME_NUMBER + "='" + getPhoneNumber() + "'", null);
+                db.update(ContactsContract.Listened.TABLE_NAME, values,
+                    ContactsContract.Listened.COLUMN_NAME_NUMBER + "='" + getPhoneNumber() + "'", null);
             else
-                db.update(ListenedContract.Listened.TABLE_NAME, values,
-                        ListenedContract.Listened._ID + "=" + getId(), null);
+                db.update(ContactsContract.Listened.TABLE_NAME, values,
+                        ContactsContract.Listened._ID + "=" + getId(), null);
         }
         catch (SQLException exception) {
             Log.wtf(TAG, exception.getMessage());
@@ -90,25 +88,25 @@ public class Contact implements Comparable<Contact>, Parcelable {
 
     public void insertInDatabase(Context context) throws SQLException
     {
-        RecordingsDbHelper mDbHelper = new RecordingsDbHelper(context);
+        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(context);
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
         ContentValues values = new ContentValues();
 
-        values.put(ListenedContract.Listened.COLUMN_NAME_NUMBER, phoneNumber);
-        values.put(ListenedContract.Listened.COLUMN_NAME_CONTACT_NAME, contactName);
-        values.put(ListenedContract.Listened.COLUMN_NAME_PHOTO_URI, photoUri == null ? null : photoUri.toString());
-        values.put(ListenedContract.Listened.COLUMN_NAME_PHONE_TYPE, phoneType);
-        values.put(ListenedContract.Listened.COLUMN_NAME_SHOULD_RECORD, shouldRecord);
-        values.put(ListenedContract.Listened.COLUMN_NAME_UNKNOWN_NUMBER, unkownNumber);
-        values.put(ListenedContract.Listened.COLUMN_NAME_PRIVATE_NUMBER, privateNumber);
+        values.put(ContactsContract.Listened.COLUMN_NAME_NUMBER, phoneNumber);
+        values.put(ContactsContract.Listened.COLUMN_NAME_CONTACT_NAME, contactName);
+        values.put(ContactsContract.Listened.COLUMN_NAME_PHOTO_URI, photoUri == null ? null : photoUri.toString());
+        values.put(ContactsContract.Listened.COLUMN_NAME_PHONE_TYPE, phoneType);
+        values.put(ContactsContract.Listened.COLUMN_NAME_SHOULD_RECORD, shouldRecord);
+        values.put(ContactsContract.Listened.COLUMN_NAME_UNKNOWN_NUMBER, unkownNumber);
+        values.put(ContactsContract.Listened.COLUMN_NAME_PRIVATE_NUMBER, privateNumber);
 
-        setId(db.insertOrThrow(ListenedContract.Listened.TABLE_NAME, null, values));
+        setId(db.insertOrThrow(ContactsContract.Listened.TABLE_NAME, null, values));
     }
 
     public void delete(Context context) throws SQLException
     {
-        RecordingsDbHelper mDbHelper = new RecordingsDbHelper(context);
+        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(context);
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
         Cursor cursor = db.query(RecordingsContract.Recordings.TABLE_NAME,
@@ -126,7 +124,7 @@ public class Contact implements Comparable<Contact>, Parcelable {
         cursor.close();
         if(getPhotoUri() != null ) //întotdeauna este poza noastră.
             context.getContentResolver().delete(getPhotoUri(), null, null);
-     if((db.delete(ListenedContract.Listened.TABLE_NAME, ListenedContract.Listened.COLUMN_NAME_NUMBER
+     if((db.delete(ContactsContract.Listened.TABLE_NAME, ContactsContract.Listened.COLUMN_NAME_NUMBER
                 + "='" + getPhoneNumber() + "'", null)) == 0)
          throw new SQLException("This Listened row was not deleted");
     }
@@ -134,25 +132,25 @@ public class Contact implements Comparable<Contact>, Parcelable {
   @Nullable static public Contact searchNumberInContacts(final String number, @NonNull final Context context) {
         Contact contact = null;
       Cursor cursor = context.getContentResolver()
-              .query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, new String[]{
-                              ContactsContract.CommonDataKinds.Phone.NUMBER,
-                              ContactsContract.CommonDataKinds.Phone.TYPE,
-                              ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
-                              ContactsContract.CommonDataKinds.Phone.PHOTO_URI},
+              .query(android.provider.ContactsContract.CommonDataKinds.Phone.CONTENT_URI, new String[]{
+                              android.provider.ContactsContract.CommonDataKinds.Phone.NUMBER,
+                              android.provider.ContactsContract.CommonDataKinds.Phone.TYPE,
+                              android.provider.ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
+                              android.provider.ContactsContract.CommonDataKinds.Phone.PHOTO_URI},
                       null, null, null);
 
       if(cursor != null) {
           PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
           while (cursor.moveToNext()) {
               String numberContacts = cursor.getString(
-                      cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                      cursor.getColumnIndex(android.provider.ContactsContract.CommonDataKinds.Phone.NUMBER));
               PhoneNumberUtil.MatchType matchType = phoneUtil.isNumberMatch(numberContacts, number);
               if(matchType != PhoneNumberUtil.MatchType.NO_MATCH && matchType != PhoneNumberUtil.MatchType.NOT_A_NUMBER) {
                   contact = new Contact();
-                  contact.setPhoneType(cursor.getInt(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE)));
-                  contact.setContactName(cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)));
-                  contact.setPhotoUri(cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_URI)));
-                  contact.setPhoneNumber(cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)));
+                  contact.setPhoneType(cursor.getInt(cursor.getColumnIndex(android.provider.ContactsContract.CommonDataKinds.Phone.TYPE)));
+                  contact.setContactName(cursor.getString(cursor.getColumnIndex(android.provider.ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)));
+                  contact.setPhotoUri(cursor.getString(cursor.getColumnIndex(android.provider.ContactsContract.CommonDataKinds.Phone.PHOTO_URI)));
+                  contact.setPhoneNumber(cursor.getString(cursor.getColumnIndex(android.provider.ContactsContract.CommonDataKinds.Phone.NUMBER)));
                   break;
               }
           }

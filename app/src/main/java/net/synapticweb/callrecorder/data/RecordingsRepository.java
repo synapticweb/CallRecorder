@@ -14,7 +14,7 @@ public class RecordingsRepository {
     }
 
     public static void getRecordings(Contact contact, loadRecordingsCallback callback) {
-        RecordingsDbHelper mDbHelper = new RecordingsDbHelper(CallRecorderApplication.getInstance());
+        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(CallRecorderApplication.getInstance());
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
         List<Recording> list =  new ArrayList<>();
 

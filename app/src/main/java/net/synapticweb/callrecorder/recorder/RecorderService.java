@@ -30,11 +30,9 @@ import net.synapticweb.callrecorder.AppLibrary;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.contactslist.ContactsListActivityMain;
 import net.synapticweb.callrecorder.data.Contact;
-import net.synapticweb.callrecorder.data.ListenedContract.*;
+import net.synapticweb.callrecorder.data.ContactsContract.*;
 import net.synapticweb.callrecorder.data.RecordingsContract.*;
-import net.synapticweb.callrecorder.data.RecordingsDbHelper;
-import net.synapticweb.callrecorder.recorder.ControlRecordingReceiver;
-import net.synapticweb.callrecorder.recorder.RecorderBox;
+import net.synapticweb.callrecorder.data.CallRecorderDbHelper;
 
 import static net.synapticweb.callrecorder.AppLibrary.*;
 
@@ -140,7 +138,7 @@ public class RecorderService extends Service {
 
         super.onStartCommand(intent, flags, startId);
 
-        RecordingsDbHelper mDbHelper = new RecordingsDbHelper(getApplicationContext());
+        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(getApplicationContext());
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
         String[] projection = {Listened.COLUMN_NAME_NUMBER, Listened.COLUMN_NAME_SHOULD_RECORD};
@@ -204,7 +202,7 @@ public class RecorderService extends Service {
         if(!RecorderBox.getRecordingDone()) //dacă nu s-a pornit înregistrarea nu avem nimic de făcut
             return ;
 
-        RecordingsDbHelper mDbHelper = new RecordingsDbHelper(getApplicationContext());
+        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(getApplicationContext());
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
         long idToInsert;

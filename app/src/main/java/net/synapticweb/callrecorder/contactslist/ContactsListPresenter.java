@@ -6,14 +6,12 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
@@ -24,8 +22,8 @@ import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.contactdetail.ContactDetailFragment;
 import net.synapticweb.callrecorder.data.Contact;
 import net.synapticweb.callrecorder.data.ContactsRepository;
-import net.synapticweb.callrecorder.data.ListenedContract;
-import net.synapticweb.callrecorder.data.RecordingsDbHelper;
+import net.synapticweb.callrecorder.data.ContactsContract;
+import net.synapticweb.callrecorder.data.CallRecorderDbHelper;
 
 import java.io.IOException;
 import java.util.List;
@@ -100,7 +98,7 @@ public class ContactsListPresenter implements ContactsListContract.ContactsListP
     @Override
     public void addNewContact() {
         Fragment fragment = (Fragment) view;
-        Intent pickNumber = new Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
+        Intent pickNumber = new Intent(Intent.ACTION_PICK, android.provider.ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
         fragment.startActivityForResult(pickNumber, REQUEST_ADD_CONTACT);
     }
 
@@ -112,17 +110,17 @@ public class ContactsListPresenter implements ContactsListContract.ContactsListP
 
         if(intent != null && (numberUri = intent.getData()) != null) {
             Cursor cursor = view.getParentActivity().getContentResolver().
-                    query(numberUri, new String[]{ContactsContract.CommonDataKinds.Phone.NUMBER,
-                                    ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
-                                    ContactsContract.CommonDataKinds.Phone.PHOTO_URI,
-                                    ContactsContract.CommonDataKinds.Phone.TYPE},
+                    query(numberUri, new String[]{android.provider.ContactsContract.CommonDataKinds.Phone.NUMBER,
+                                    android.provider.ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
+                                    android.provider.ContactsContract.CommonDataKinds.Phone.PHOTO_URI,
+                                    android.provider.ContactsContract.CommonDataKinds.Phone.TYPE},
                             null, null, null);
             if (cursor != null) {
                 cursor.moveToFirst();
-                newNumber = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
-                photoUri = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_URI));
-                phoneType = cursor.getInt(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
+                newNumber = cursor.getString(cursor.getColumnIndex(android.provider.ContactsContract.CommonDataKinds.Phone.NUMBER));
+                contactName = cursor.getString(cursor.getColumnIndex(android.provider.ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+                photoUri = cursor.getString(cursor.getColumnIndex(android.provider.ContactsContract.CommonDataKinds.Phone.PHOTO_URI));
+                phoneType = cursor.getInt(cursor.getColumnIndex(android.provider.ContactsContract.CommonDataKinds.Phone.TYPE));
                 cursor.close();
             }
 
@@ -136,16 +134,16 @@ public class ContactsListPresenter implements ContactsListContract.ContactsListP
                 return ;
             }
 
-            RecordingsDbHelper mDbHelper = new RecordingsDbHelper(CallRecorderApplication.getInstance());
+            CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(CallRecorderApplication.getInstance());
             SQLiteDatabase db = mDbHelper.getReadableDatabase();
             cursor = db.query(
-                    ListenedContract.Listened.TABLE_NAME, new String[]{ListenedContract.Listened.COLUMN_NAME_NUMBER},
+                    ContactsContract.Listened.TABLE_NAME, new String[]{ContactsContract.Listened.COLUMN_NAME_NUMBER},
                     null, null, null, null, null);
 
             boolean match = false;
             while (cursor.moveToNext()) {
                 PhoneNumberUtil.MatchType matchType = phoneUtil.isNumberMatch(cursor.getString(
-                        cursor.getColumnIndex(ListenedContract.Listened.COLUMN_NAME_NUMBER)), newNumber);
+                        cursor.getColumnIndex(ContactsContract.Listened.COLUMN_NAME_NUMBER)), newNumber);
                 if (matchType != PhoneNumberUtil.MatchType.NO_MATCH && matchType != PhoneNumberUtil.MatchType.NOT_A_NUMBER) {
                     match = true;
                     break;

@@ -44,7 +44,7 @@ import java.io.File;
 import java.io.IOException;
 
 
-public class EditPhoneNumberActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+public class EditContactActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     private Contact contact;
     private ImageView contactPhoto;
     private EditText contactName;
@@ -71,7 +71,7 @@ public class EditPhoneNumberActivity extends AppCompatActivity implements Adapte
 
     private void onCancelOrBackPressed() {
         if (dataChanged) {
-            new MaterialDialog.Builder(EditPhoneNumberActivity.this)
+            new MaterialDialog.Builder(EditContactActivity.this)
                     .title(R.string.discard_edit_title)
                     .icon(getResources().getDrawable(R.drawable.warning))
                     .content(R.string.discard_edit_message)
@@ -132,7 +132,7 @@ public class EditPhoneNumberActivity extends AppCompatActivity implements Adapte
                             getContentResolver().delete(oldPhotoUri, null, null);
                     }
 
-                    contact.updateNumber(EditPhoneNumberActivity.this, false);
+                    contact.updateContact(EditContactActivity.this, false);
                     Intent intent = new Intent();
                     intent.putExtra(EDITED_CONTACT, contact);
                     setResult(RESULT_OK, intent);

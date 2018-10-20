@@ -48,7 +48,7 @@ public class Recording implements Parcelable {
 
     public void delete(Context context) throws SQLException, SecurityException
     {
-        RecordingsDbHelper mDbHelper = new RecordingsDbHelper(context);
+        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(context);
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
         if((db.delete(RecordingsContract.Recordings.TABLE_NAME,
                 RecordingsContract.Recordings._ID + "=" + getId(), null)) == 0)
