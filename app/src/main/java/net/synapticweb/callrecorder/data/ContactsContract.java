@@ -5,7 +5,7 @@ import android.provider.BaseColumns;
 public class ContactsContract {
     private ContactsContract(){}
 
-    public static class Listened implements BaseColumns {
+    public static class Contacts implements BaseColumns {
         public static final String TABLE_NAME = "contacts";
 
         public static final String COLUMN_NAME_NUMBER = "phone_number";

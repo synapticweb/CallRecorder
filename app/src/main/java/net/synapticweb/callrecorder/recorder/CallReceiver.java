@@ -19,7 +19,7 @@ public class CallReceiver extends BroadcastReceiver {
     private static final String ACTION_OUTGOING = "android.intent.action.NEW_OUTGOING_CALL";
     private Bundle bundle;
     private String state;
-    private static String inCall = "no-incall";
+    private static String inCall;
     private static String outCall = null;
     private static boolean serviceStarted = false;
     private static ComponentName serviceName;
@@ -58,18 +58,14 @@ public class CallReceiver extends BroadcastReceiver {
                 state = bundle.getString(TelephonyManager.EXTRA_STATE);
                 Log.wtf(TAG, intent.getAction() + " " + state);
 
+                //acum serviciul este pornit totdeauna în extra_state_ringing (pentru ca userul să aibă posibilitatea
+                // în cazul nr necunoscute să pornească înregistrarea înainte de începerea convorbirii),
+                // extra_state_offhook nu mai e folosit. (Ceea ce simplifică și logica)
                 if(state.equals(TelephonyManager.EXTRA_STATE_RINGING))
                 {
                     inCall = bundle.getString(TelephonyManager.EXTRA_INCOMING_NUMBER);
-
                     Log.wtf(TAG, "Incoming number: " + inCall);
-                }
-                else if(state.equals(TelephonyManager.EXTRA_STATE_OFFHOOK))
-                {
-                    //Citește: dacă serviciul nu a fost deja pornit ȘI: ORI nr este null (privat), ORI este diferit
-                    // de no-incall (a fost modificat într-un nr. obișnuit)
-                    if(!serviceStarted && (inCall == null || !inCall.equals("no-incall")) )
-                    {
+                    if(!serviceStarted) {
                         Intent intentService = new Intent(context, RecorderService.class);
                         serviceName = intentService.getComponent();
                         intentService.putExtra("contact", inCall);

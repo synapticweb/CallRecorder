@@ -155,9 +155,9 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
         ContentValues values = new ContentValues();
 
-        values.put(ContactsContract.Listened.COLUMN_NAME_SHOULD_RECORD, !contact.shouldRecord());
-        db.update(ContactsContract.Listened.TABLE_NAME, values,
-                ContactsContract.Listened._ID + '=' + contact.getId(), null);
+        values.put(ContactsContract.Contacts.COLUMN_NAME_SHOULD_RECORD, !contact.shouldRecord());
+        db.update(ContactsContract.Contacts.TABLE_NAME, values,
+                ContactsContract.Contacts._ID + '=' + contact.getId(), null);
         contact.setShouldRecord(!contact.shouldRecord());
         view.setContact(contact);
         view.displayRecordingStatus();

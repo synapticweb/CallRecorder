@@ -240,8 +240,9 @@ public class EditContactActivity extends AppCompatActivity implements AdapterVie
             menuItem.setEnabled(false);
     }
 
+    //timestampul este necesar pentru situația cînd se schimbă pozele și trebuie ștearsă cea veche.
     private void setPhotoPath() {
-        savedPhotoPath = new File(getFilesDir(), contact.getPhoneNumber() + ".jpg");
+        savedPhotoPath = new File(getFilesDir(), contact.getPhoneNumber() + System.currentTimeMillis() + ".jpg");
     }
 
     //http://codetheory.in/android-pick-select-image-from-gallery-with-intents/

@@ -17,6 +17,7 @@ import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.util.Pair;
 import android.util.Log;
 //import android.support.v4.media.app.NotificationCompat.MediaStyle;device
 
@@ -27,6 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.synapticweb.callrecorder.AppLibrary;
+import net.synapticweb.callrecorder.CallRecorderApplication;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.contactslist.ContactsListActivityMain;
 import net.synapticweb.callrecorder.data.Contact;
@@ -134,44 +136,22 @@ public class RecorderService extends Service {
 
     public int onStartCommand(Intent intent, int flags, int startId)
     {
-        Map<String, Boolean> numbers = new HashMap<>();
-
         super.onStartCommand(intent, flags, startId);
-
-        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(getApplicationContext());
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
-
-        String[] projection = {Listened.COLUMN_NAME_NUMBER, Listened.COLUMN_NAME_SHOULD_RECORD};
-        Cursor cursor = db.query(
-                Listened.TABLE_NAME, projection, null, null, null, null, null);
-
-        while(cursor.moveToNext())
-        {
-            String number = cursor.getString(cursor.getColumnIndex(Listened.COLUMN_NAME_NUMBER));
-            Boolean shouldRecord = cursor.getInt(cursor.getColumnIndex(Listened.COLUMN_NAME_SHOULD_RECORD)) == 1;
-            numbers.put(number, shouldRecord);
-        }
-        cursor.close();
 
         receivedNumPhone = intent.getStringExtra("contact");
         incoming = intent.getBooleanExtra("incoming", false);
         RecorderBox.setAudioFile(this, receivedNumPhone);
         boolean match = false;
+        Pair<String, Boolean> numberInfo = null;
 
         if(receivedNumPhone == null) //în cazul în care nr primit e null înseamnă că se sună de pe nr privat
             privateCall = true;
 
         if(!privateCall) { //și nu trebuie să mai verificăm dacă nr este în baza de date sau dacă nu
             // este în baza de date dacă este în contacte.
-            PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
-            for (Map.Entry<String, Boolean> entry : numbers.entrySet()) {
-                dbNumPhone = entry.getKey();
-                PhoneNumberUtil.MatchType matchType = phoneUtil.isNumberMatch(receivedNumPhone, dbNumPhone);
-                if (matchType != PhoneNumberUtil.MatchType.NO_MATCH && matchType != PhoneNumberUtil.MatchType.NOT_A_NUMBER) {
-                    match = true;
-                    break;
-                }
-            }
+            if((numberInfo = Contact.getNumberDbInfo(receivedNumPhone, CallRecorderApplication.getInstance())) != null)
+                match = true;
+
             if(!match) { //chiar dacă nu se găsește în db,  s-ar putea să fie contacte. Verificăm chestia asta
                 // și dacă îl găsim în contacte populăm RecorderService.contact.
                 if ((contact = Contact.searchNumberInContacts(receivedNumPhone, getApplicationContext())) == null)
@@ -180,9 +160,8 @@ public class RecorderService extends Service {
         }
 
         //dacă nr nu există în db sau dacă setările interzic înregistrarea convorbirilor nr punem doar o notificare
-        //cu posibilitatea de a porni înregistrarea. Dacă s-a găsit un match, atunci dbNumPhone este setat la nr din baza de date care
-        //se potrivește
-        if(!match || !numbers.get(dbNumPhone)) //de pus verificarea opțiunii pentru nr private
+        //cu posibilitatea de a porni înregistrarea. Mai întîi verificăm ca nu cumva numberInfo.second să fie null.
+        if(!match || (numberInfo.second != null && !numberInfo.second)) //de pus verificarea opțiunii pentru nr private
             startForeground(NOTIFICATION_ID, buildNotification(false));
         else {
             startForeground(NOTIFICATION_ID, buildNotification(true)); //altfel, pornim înregistrarea și notificarea conține
@@ -221,8 +200,8 @@ public class RecorderService extends Service {
         }
         else if(privateCall)
         {
-            Cursor cursor = db.query(Listened.TABLE_NAME, new String[]{Listened._ID},
-                    Listened.COLUMN_NAME_PRIVATE_NUMBER + "=" + SQLITE_TRUE, null, null, null, null);
+            Cursor cursor = db.query(Contacts.TABLE_NAME, new String[]{Contacts._ID},
+                    Contacts.COLUMN_NAME_PRIVATE_NUMBER + "=" + SQLITE_TRUE, null, null, null, null);
 
             if(cursor.getCount() == 0) {
                 Contact contact =  new Contact();
@@ -237,7 +216,7 @@ public class RecorderService extends Service {
             }
             else { //pentru teste: aici e de așteptat ca întotdeauna cursorul să conțină numai 1 element
                 cursor.moveToFirst();
-                idToInsert = cursor.getInt(cursor.getColumnIndex(Listened._ID));
+                idToInsert = cursor.getInt(cursor.getColumnIndex(Contacts._ID));
             }
 
             cursor.close();
@@ -258,10 +237,10 @@ public class RecorderService extends Service {
             }
             else { //nr există în baza de date
 
-                Cursor cursor = db.query(Listened.TABLE_NAME, new String[]{Listened._ID},
-                        Listened.COLUMN_NAME_NUMBER + "='" + dbNumPhone + "'", null, null, null, null);
+                Cursor cursor = db.query(Contacts.TABLE_NAME, new String[]{Contacts._ID},
+                        Contacts.COLUMN_NAME_NUMBER + "='" + dbNumPhone + "'", null, null, null, null);
                 cursor.moveToFirst();
-                idToInsert = cursor.getLong(cursor.getColumnIndex(Listened._ID));
+                idToInsert = cursor.getLong(cursor.getColumnIndex(Contacts._ID));
                 cursor.close();
             }
         }

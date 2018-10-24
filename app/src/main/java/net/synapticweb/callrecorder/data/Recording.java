@@ -3,6 +3,7 @@ package net.synapticweb.callrecorder.data;
 import android.content.Context;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -58,7 +59,9 @@ public class Recording implements Parcelable {
     }
 
     public void export(String folderPath, ExportAsyncTask asyncTask, long totalSize, String phoneNumber) throws IOException {
-        String fileName = phoneNumber + " - " + new SimpleDateFormat("d_MMM_yyyy_HH:mm:ss", Locale.US).
+        String timeSeparator = (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) ? "_" : ":";
+        String fileName = phoneNumber + " - " + new SimpleDateFormat("d_MMM_yyyy_HH" + timeSeparator
+                + "mm" + timeSeparator + "ss", Locale.US).
                 format(new Date(startTimestamp)) + ".amr";
         InputStream in = new FileInputStream(path);
         OutputStream out = new FileOutputStream(new File(folderPath, fileName));

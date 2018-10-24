@@ -21,7 +21,7 @@ public class ContactsRepository {
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
         Cursor cursor = db.
-                query(ContactsContract.Listened.TABLE_NAME, null, null, null, null, null, ContactsContract.Listened._ID + " ASC", "1");
+                query(ContactsContract.Contacts.TABLE_NAME, null, null, null, null, null, ContactsContract.Contacts._ID + " ASC", "1");
 
         if(cursor.getCount() > 0) {
             cursor.moveToFirst();
@@ -36,7 +36,7 @@ public class ContactsRepository {
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
         Cursor cursor = db.
-                query(ContactsContract.Listened.TABLE_NAME, null, ContactsContract.Listened._ID + "=" + id,
+                query(ContactsContract.Contacts.TABLE_NAME, null, ContactsContract.Contacts._ID + "=" + id,
                         null, null, null, null);
         if(cursor.getCount() > 0) {
             cursor.moveToFirst();
@@ -51,7 +51,7 @@ public class ContactsRepository {
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
         Cursor cursor = db.
-                query(ContactsContract.Listened.TABLE_NAME, null, ContactsContract.Listened._ID + "=" + id,
+                query(ContactsContract.Contacts.TABLE_NAME, null, ContactsContract.Contacts._ID + "=" + id,
                         null, null, null, null);
         if(cursor.getCount() > 0) {
             cursor.moveToFirst();
@@ -62,19 +62,19 @@ public class ContactsRepository {
 
     private static Contact populateContact(Cursor cursor) {
         Contact contact = new Contact();
-        contact.setPhoneNumber(cursor.getString(cursor.getColumnIndex(ContactsContract.Listened.COLUMN_NAME_NUMBER)));
+        contact.setPhoneNumber(cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.COLUMN_NAME_NUMBER)));
         contact.setPrivateNumber(cursor.getInt(
-                cursor.getColumnIndex(ContactsContract.Listened.COLUMN_NAME_PRIVATE_NUMBER)) == SQLITE_TRUE);
+                cursor.getColumnIndex(ContactsContract.Contacts.COLUMN_NAME_PRIVATE_NUMBER)) == SQLITE_TRUE);
         contact.setContactName(
-                cursor.getString(cursor.getColumnIndex(ContactsContract.Listened.COLUMN_NAME_CONTACT_NAME)));
+                cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.COLUMN_NAME_CONTACT_NAME)));
         contact.setPhotoUri(
-                cursor.getString(cursor.getColumnIndex(ContactsContract.Listened.COLUMN_NAME_PHOTO_URI)));
+                cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.COLUMN_NAME_PHOTO_URI)));
         contact.setPhoneType(
-                cursor.getInt(cursor.getColumnIndex(ContactsContract.Listened.COLUMN_NAME_PHONE_TYPE)));
-        contact.setId(cursor.getLong(cursor.getColumnIndex(ContactsContract.Listened._ID)));
+                cursor.getInt(cursor.getColumnIndex(ContactsContract.Contacts.COLUMN_NAME_PHONE_TYPE)));
+        contact.setId(cursor.getLong(cursor.getColumnIndex(ContactsContract.Contacts._ID)));
         contact.setShouldRecord(
-                cursor.getInt(cursor.getColumnIndex(ContactsContract.Listened.COLUMN_NAME_SHOULD_RECORD)) == 1);
-        contact.setUnkownNumber(cursor.getInt(cursor.getColumnIndex(ContactsContract.Listened.COLUMN_NAME_UNKNOWN_NUMBER)) == 1);
+                cursor.getInt(cursor.getColumnIndex(ContactsContract.Contacts.COLUMN_NAME_SHOULD_RECORD)) == 1);
+        contact.setUnkownNumber(cursor.getInt(cursor.getColumnIndex(ContactsContract.Contacts.COLUMN_NAME_UNKNOWN_NUMBER)) == 1);
         return contact;
     }
 
@@ -84,7 +84,7 @@ public class ContactsRepository {
         List<Contact> contacts = new ArrayList<>();
 
         Cursor cursor = db.
-                query(ContactsContract.Listened.TABLE_NAME, null, null, null, null, null, null);
+                query(ContactsContract.Contacts.TABLE_NAME, null, null, null, null, null, null);
 
         while(cursor.moveToNext()) {
             contacts.add(populateContact(cursor));

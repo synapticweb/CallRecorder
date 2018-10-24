@@ -137,13 +137,13 @@ public class ContactsListPresenter implements ContactsListContract.ContactsListP
             CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(CallRecorderApplication.getInstance());
             SQLiteDatabase db = mDbHelper.getReadableDatabase();
             cursor = db.query(
-                    ContactsContract.Listened.TABLE_NAME, new String[]{ContactsContract.Listened.COLUMN_NAME_NUMBER},
+                    ContactsContract.Contacts.TABLE_NAME, new String[]{ContactsContract.Contacts.COLUMN_NAME_NUMBER},
                     null, null, null, null, null);
 
             boolean match = false;
             while (cursor.moveToNext()) {
                 PhoneNumberUtil.MatchType matchType = phoneUtil.isNumberMatch(cursor.getString(
-                        cursor.getColumnIndex(ContactsContract.Listened.COLUMN_NAME_NUMBER)), newNumber);
+                        cursor.getColumnIndex(ContactsContract.Contacts.COLUMN_NAME_NUMBER)), newNumber);
                 if (matchType != PhoneNumberUtil.MatchType.NO_MATCH && matchType != PhoneNumberUtil.MatchType.NOT_A_NUMBER) {
                     match = true;
                     break;
