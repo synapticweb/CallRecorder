@@ -90,33 +90,15 @@ public class RecorderService extends Service {
             createChannel();
         NotificationCompat.Builder builder;
 
-        if(startRecording)
-        {
-            notificationIntent = new Intent(this, ControlRecordingReceiver.class);
-            notificationIntent.setAction(RecorderBox.ACTION_PAUSE_RECORDING);
-            PendingIntent pauseRecordingPi = PendingIntent.getBroadcast(this, 0, notificationIntent, 0);
-
-            notificationIntent = new Intent(this, ControlRecordingReceiver.class);
-            notificationIntent.setAction(RecorderBox.ACTION_STOP_RECORDING);
-            PendingIntent stopRecordingPi = PendingIntent.getBroadcast(this, 0, notificationIntent, 0);
-
+        if(startRecording) {
             builder = new NotificationCompat.Builder(this, CHANNEL_ID)
                     .setSmallIcon(R.drawable.ic_album_white_24dp)
                     .setContentTitle("CallRecorder")
                     .setContentIntent(tapNotificationPi)
-                    .setLargeIcon(bitmap);
-
-            if (Build.VERSION.SDK_INT >= 24)
-                builder.addAction(new NotificationCompat.Action.Builder(
-                        R.drawable.ic_pause_grey600_24dp, "Pause recording", pauseRecordingPi).build());
-
-            builder.addAction(new NotificationCompat.Action.Builder(
-                    R.drawable.ic_stop_grey600_24dp, "Stop recording", stopRecordingPi).build())
+                    .setLargeIcon(bitmap)
                     .setStyle(new NotificationCompat.BigTextStyle().bigText("Recording..."));
-
         }
-        else
-        {
+        else {
             notificationIntent = new Intent(this, ControlRecordingReceiver.class);
             notificationIntent.setAction(RecorderBox.ACTION_START_RECORDING);
             notificationIntent.putExtra("channel_id", CHANNEL_ID);
@@ -134,8 +116,7 @@ public class RecorderService extends Service {
         return builder.build();
     }
 
-    public int onStartCommand(Intent intent, int flags, int startId)
-    {
+    public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
 
         receivedNumPhone = intent.getStringExtra("contact");
@@ -149,8 +130,10 @@ public class RecorderService extends Service {
 
         if(!privateCall) { //și nu trebuie să mai verificăm dacă nr este în baza de date sau dacă nu
             // este în baza de date dacă este în contacte.
-            if((numberInfo = Contact.getNumberDbInfo(receivedNumPhone, CallRecorderApplication.getInstance())) != null)
+            if((numberInfo = Contact.getNumberDbInfo(receivedNumPhone, CallRecorderApplication.getInstance())) != null) {
                 match = true;
+                dbNumPhone = numberInfo.first;
+            }
 
             if(!match) { //chiar dacă nu se găsește în db,  s-ar putea să fie contacte. Verificăm chestia asta
                 // și dacă îl găsim în contacte populăm RecorderService.contact.
@@ -236,7 +219,6 @@ public class RecorderService extends Service {
                 idToInsert = contact.getId();
             }
             else { //nr există în baza de date
-
                 Cursor cursor = db.query(Contacts.TABLE_NAME, new String[]{Contacts._ID},
                         Contacts.COLUMN_NAME_NUMBER + "='" + dbNumPhone + "'", null, null, null, null);
                 cursor.moveToFirst();
