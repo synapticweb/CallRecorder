@@ -11,6 +11,7 @@ import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import net.synapticweb.callrecorder.CallRecorderApplication;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.contactslist.ContactsListActivityMain;
 
@@ -26,8 +27,9 @@ public class ControlRecordingReceiver extends BroadcastReceiver {
         Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.record);
 
         if(intent.getAction().equals(RecorderBox.ACTION_START_RECORDING)) {
-            RecorderBox.doRecording();
-            String channelId = intent.getExtras().getString("channel_id");
+            String channelId = intent.getExtras().getString(RecorderService.CHANNEL_ID_KEY);
+            String phoneNumber =  intent.getExtras().getString(RecorderService.PHONE_NUM_KEY);
+            RecorderBox.doRecording(CallRecorderApplication.getInstance(), phoneNumber);
 
             NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelId)
                     .setSmallIcon(R.drawable.ic_album_white_24dp)

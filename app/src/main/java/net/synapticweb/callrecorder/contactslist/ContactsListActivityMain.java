@@ -27,6 +27,8 @@ import android.widget.CompoundButton;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+
+import net.synapticweb.callrecorder.AppLibrary;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.SettingsActivity;
 
@@ -66,6 +68,8 @@ public class ContactsListActivityMain extends AppCompatActivity  {
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
             askForPermissions();
+
+        setMockPreferences();
 
         FloatingActionButton fab = findViewById(R.id.add_numbers);
         fab.setOnClickListener(new View.OnClickListener(){
@@ -186,8 +190,15 @@ public class ContactsListActivityMain extends AppCompatActivity  {
         }
     }
 
+    private void setMockPreferences() {
+        final SharedPreferences settings = getSharedPreferences(AppLibrary.PREFERENCES, MODE_PRIVATE);
+        final SharedPreferences.Editor editor = settings.edit();
+        editor.putBoolean(AppLibrary.Settings.AUTOMMATICALLY_RECORD_PRIVATE_CALLS, false);
+        editor.apply();
+    }
+
     private void huaweiAlert() {
-        final SharedPreferences settings = getSharedPreferences("ProtectedApps", MODE_PRIVATE);
+        final SharedPreferences settings = getSharedPreferences(AppLibrary.PREFERENCES, MODE_PRIVATE);
         final String saveIfSkip = "skipProtectedAppsMessage";
         boolean skipMessage = settings.getBoolean(saveIfSkip, false);
         if (!skipMessage) {

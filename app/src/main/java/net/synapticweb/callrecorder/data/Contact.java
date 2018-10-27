@@ -15,6 +15,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.FileProvider;
 import android.support.v4.util.Pair;
 import android.util.Log;
+import android.util.LongSparseArray;
 
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 
@@ -52,28 +53,30 @@ public class Contact implements Comparable<Contact>, Parcelable {
         setPhoneType(phoneTypeCode);
     }
 
-    public static Pair<String, Boolean> getNumberDbInfo(String receivedPhoneNumber, Context context) {
+    public static Pair<Long, Boolean> infoIfNumberInDb(String receivedPhoneNumber, Context context) {
         CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(context);
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
-        Map<String, Boolean> numbers = new HashMap<>();
-        String[] projection = {ContactsContract.Contacts.COLUMN_NAME_NUMBER, ContactsContract.Contacts.COLUMN_NAME_SHOULD_RECORD};
+        LongSparseArray<Pair<String, Boolean>> numbers = new LongSparseArray<>();
+        String[] projection = {ContactsContract.Contacts._ID, ContactsContract.Contacts.COLUMN_NAME_NUMBER, ContactsContract.Contacts.COLUMN_NAME_SHOULD_RECORD};
         Cursor cursor = db.query(
                 ContactsContract.Contacts.TABLE_NAME, projection, null, null, null, null, null);
 
         while(cursor.moveToNext())
         {
             String number = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.COLUMN_NAME_NUMBER));
+            Long id = cursor.getLong(cursor.getColumnIndex(ContactsContract.Contacts._ID));
             Boolean shouldRecord = cursor.getInt(cursor.getColumnIndex(ContactsContract.Contacts.COLUMN_NAME_SHOULD_RECORD)) == 1;
-            numbers.put(number, shouldRecord);
+            numbers.put(id, new Pair<>(number, shouldRecord));
         }
         cursor.close();
+
         PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
-        for (Map.Entry<String, Boolean> entry : numbers.entrySet()) {
-            String dbNumPhone = entry.getKey();
+        for (int i = 0; i < numbers.size(); ++i) {
+            String dbNumPhone = numbers.valueAt(i).first;
             PhoneNumberUtil.MatchType matchType = phoneUtil.isNumberMatch(receivedPhoneNumber, dbNumPhone);
             if (matchType != PhoneNumberUtil.MatchType.NO_MATCH && matchType != PhoneNumberUtil.MatchType.NOT_A_NUMBER)
-                return new Pair<>(entry.getKey(), entry.getValue());
+                return new Pair<>(numbers.keyAt(i), numbers.valueAt(i).second);
         }
         return null;
     }
@@ -156,7 +159,7 @@ public class Contact implements Comparable<Contact>, Parcelable {
          throw new SQLException("This Contacts row was not deleted");
     }
 
-  @Nullable static public Contact searchNumberInContacts(final String number, @NonNull final Context context) {
+  @Nullable static public Contact searchNumberInPhoneContacts(final String number, @NonNull final Context context) {
         Contact contact = null;
       Cursor cursor = context.getContentResolver()
               .query(android.provider.ContactsContract.CommonDataKinds.Phone.CONTENT_URI, new String[]{

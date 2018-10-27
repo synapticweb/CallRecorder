@@ -23,8 +23,8 @@
         All associated records will be deleted too and this action cannot be undone.</string>
     <string name="stop_recording">Stop recording calls</string>
     <string name="start_recording">Start recording calls</string>
-    <string name="rec_status_recording">Recording new calls</string>
-    <string name="rec_status_not_recording">Not recording new calls</string>
+    <string name="rec_status_recording">Will record new calls autommatically</string>
+    <string name="rec_status_not_recording">Manual action required to start recording new calls.</string>
     <string name="discard_edit_title">Warning</string>
     <string name="discard_edit_message">Discard your changes?</string>
     <string name="delete_recording_confirm_title">Delete recordings</string>

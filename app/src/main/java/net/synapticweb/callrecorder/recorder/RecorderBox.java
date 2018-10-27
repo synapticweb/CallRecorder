@@ -12,7 +12,7 @@ import java.io.IOException;
 
 class RecorderBox {
     private static final String TAG = "CallRecorder";
-    private static MediaRecorder recorder;
+    private static MediaRecorder recorder = null;
     private static File audioFile;
     private static long startTimestamp;
     private static boolean recordingDone = false;
@@ -24,12 +24,11 @@ class RecorderBox {
 
     private RecorderBox(){}
 
-    static void setAudioFile(Context context, String numPhone) {
-        audioFile = new File(context.getFilesDir(), numPhone + System.currentTimeMillis() + ".amr");
-    }
-
-    static void doRecording()
+    static void doRecording(Context context, String phoneNumber)
     {
+        if(recorder != null)
+            return ;
+        audioFile = new File(context.getFilesDir(), phoneNumber + System.currentTimeMillis() + ".amr");
         try {
             audioFile.createNewFile();
         } catch (IOException ioe) {
@@ -85,6 +84,7 @@ class RecorderBox {
         if(recorder != null) {
             recorder.stop();
             recorder.release();
+            recorder = null;
         }
     }
 

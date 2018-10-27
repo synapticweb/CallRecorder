@@ -14,13 +14,12 @@ import net.synapticweb.callrecorder.AppLibrary;
 
 
 public class CallReceiver extends BroadcastReceiver {
-    private final String TAG = "CallRecorder";
+    private static final String TAG = "CallRecorder";
     private static final String ACTION_PHONE_STATE = "android.intent.action.PHONE_STATE";
     private static final String ACTION_OUTGOING = "android.intent.action.NEW_OUTGOING_CALL";
-    private Bundle bundle;
-    private String state;
-    private static String inCall;
-    private static String outCall = null;
+    public static final String ARG_NUM_PHONE = "arg_num_phone";
+    public static final String ARG_INCOMING = "arg_incoming";
+    private static String inCall = "no-incall";
     private static boolean serviceStarted = false;
     private static ComponentName serviceName;
 
@@ -50,6 +49,8 @@ public class CallReceiver extends BroadcastReceiver {
     // La oprire, intentul preia numele de conmponent salvat anterior.
     @Override
     public void onReceive(Context context, Intent intent) {
+        Bundle bundle;
+        String state;
 
         if(intent.getAction().equals(ACTION_PHONE_STATE) )
         {
@@ -60,7 +61,6 @@ public class CallReceiver extends BroadcastReceiver {
 
                 //acum serviciul este pornit totdeauna în extra_state_ringing (pentru ca userul să aibă posibilitatea
                 // în cazul nr necunoscute să pornească înregistrarea înainte de începerea convorbirii),
-                // extra_state_offhook nu mai e folosit. (Ceea ce simplifică și logica)
                 if(state.equals(TelephonyManager.EXTRA_STATE_RINGING))
                 {
                     inCall = bundle.getString(TelephonyManager.EXTRA_INCOMING_NUMBER);
@@ -68,12 +68,20 @@ public class CallReceiver extends BroadcastReceiver {
                     if(!serviceStarted) {
                         Intent intentService = new Intent(context, RecorderService.class);
                         serviceName = intentService.getComponent();
-                        intentService.putExtra("contact", inCall);
-                        intentService.putExtra("incoming", true);
+                        intentService.putExtra(ARG_NUM_PHONE, inCall);
+                        intentService.putExtra(ARG_INCOMING, true);
 
                         context.startService(intentService);
                         serviceStarted = true;
                         Log.wtf(TAG, "Service started at incoming call");
+                    }
+                }
+
+                else if(state.equals(TelephonyManager.EXTRA_STATE_OFFHOOK)) {
+                    //Citește: dacă serviciul este pornit ȘI: ORI nr este null (privat), ORI este diferit
+                    // de no-incall (a fost modificat într-un nr. obișnuit), deci este incoming, nu outgoing.
+                    if(serviceStarted && (inCall == null || !inCall.equals("no-incall")) ) {
+                        RecorderService.onIncomingOfhook();
                     }
                 }
 
@@ -91,6 +99,8 @@ public class CallReceiver extends BroadcastReceiver {
         }
         else if(intent.getAction().equals(ACTION_OUTGOING))
         {
+            String outCall;
+
             Log.wtf(TAG, intent.getAction());
             outCall = intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER);
             Log.wtf(TAG, "Outgoing number: " + outCall);
@@ -103,8 +113,8 @@ public class CallReceiver extends BroadcastReceiver {
             {
                 Intent intentService = new Intent(context, RecorderService.class);
                 serviceName = intentService.getComponent();
-                intentService.putExtra("contact", outCall);
-                intentService.putExtra("incoming", false);
+                intentService.putExtra(ARG_NUM_PHONE, outCall);
+                intentService.putExtra(ARG_INCOMING, false);
 
                 context.startService(intentService);
                 serviceStarted = true;
