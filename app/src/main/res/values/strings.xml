@@ -35,5 +35,9 @@
     <string name="error_export">An error occurred while exporting the recordings.</string>
     <string name="succes_export">The selected recordings were successfully exported.</string>
     <string name="number_impossible">This is not a valid phone number.</string>
+    <string name="make_system">On rooted devices, CallRecorder can become a system app. Becoming a system app
+        lets CallRecorder use the device\'s internal source of sound for recording instead of using the microphone.
+    This leads to slightly better audio quality.</string>
+    <string name="make_system_title">Make %1$s app</string>
 
 </resources>

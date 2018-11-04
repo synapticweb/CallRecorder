@@ -4,9 +4,8 @@
         android:title="Settings"
         android:icon="@drawable/baseline_settings_black_36"/>
 
-    <item android:id="@+id/make_system"
-        android:title="Make system app"
-        android:icon="@drawable/baseline_android_black_36"/>
+    <!--<item android:id="@+id/make_system"-->
+        <!--android:icon="@drawable/baseline_android_black_36"/>-->
 
     <item android:id="@+id/about"
         android:title="About"
