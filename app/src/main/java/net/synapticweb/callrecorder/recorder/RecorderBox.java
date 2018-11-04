@@ -17,10 +17,7 @@ class RecorderBox {
     private static long startTimestamp;
     private static boolean recordingDone = false;
 
-    static final String ACTION_STOP_RECORDING = "net.synapticweb.callrecorder.STOP_RECORDING";
     static final String ACTION_START_RECORDING = "net.synapticweb.callrecorder.START_RECORDING";
-    static final String ACTION_PAUSE_RECORDING = "net.synapticweb.callrecorder.PAUSE_RECORDING";
-    static final String ACTION_RESUME_RECORDING = "net.synapticweb.callrecorder.RESUME_RECORDING";
 
     private RecorderBox(){}
 

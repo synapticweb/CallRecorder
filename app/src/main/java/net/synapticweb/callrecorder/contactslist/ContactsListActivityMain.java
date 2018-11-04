@@ -222,7 +222,7 @@ public class ContactsListActivityMain extends AppCompatActivity  {
     private void setMockPreferences() {
         final SharedPreferences settings = getSharedPreferences(AppLibrary.PREFERENCES, MODE_PRIVATE);
         final SharedPreferences.Editor editor = settings.edit();
-        editor.putBoolean(AppLibrary.Settings.AUTOMMATICALLY_RECORD_PRIVATE_CALLS, false);
+        editor.putBoolean(AppLibrary.Settings.AUTOMMATICALLY_RECORD_PRIVATE_CALLS, true);
         editor.apply();
     }
 

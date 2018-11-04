@@ -26,7 +26,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -51,30 +53,36 @@ public class Contact implements Comparable<Contact>, Parcelable {
         setPhoneType(phoneTypeCode);
     }
 
-    public static Pair<Long, Boolean> infoIfNumberInDb(String receivedPhoneNumber, Context context) {
+    public static Contact getContactIfNumberInDb(String receivedPhoneNumber, Context context) {
         CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(context);
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
-        LongSparseArray<Pair<String, Boolean>> numbers = new LongSparseArray<>();
-        String[] projection = {ContactsContract.Contacts._ID, ContactsContract.Contacts.COLUMN_NAME_NUMBER, ContactsContract.Contacts.COLUMN_NAME_SHOULD_RECORD};
+        List<Contact> contacts = new ArrayList<>();
+        String[] projection = {ContactsContract.Contacts._ID,
+                ContactsContract.Contacts.COLUMN_NAME_NUMBER,
+                ContactsContract.Contacts.COLUMN_NAME_CONTACT_NAME,
+                ContactsContract.Contacts.COLUMN_NAME_SHOULD_RECORD};
         Cursor cursor = db.query(
                 ContactsContract.Contacts.TABLE_NAME, projection, null, null, null, null, null);
 
         while(cursor.moveToNext())
         {
-            String number = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.COLUMN_NAME_NUMBER));
             Long id = cursor.getLong(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+            String number = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.COLUMN_NAME_NUMBER));
+            String contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.COLUMN_NAME_CONTACT_NAME));
             Boolean shouldRecord = cursor.getInt(cursor.getColumnIndex(ContactsContract.Contacts.COLUMN_NAME_SHOULD_RECORD)) == 1;
-            numbers.put(id, new Pair<>(number, shouldRecord));
+            Contact contact = new Contact(id, number, contactName, null, AppLibrary.UNKNOWN_TYPE_PHONE_CODE);
+            contact.setShouldRecord(shouldRecord);
+            contacts.add(contact);
         }
         cursor.close();
 
         PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
-        for (int i = 0; i < numbers.size(); ++i) {
-            String dbNumPhone = numbers.valueAt(i).first;
+        for (Contact contact : contacts) {
+            String dbNumPhone = contact.getPhoneNumber();
             PhoneNumberUtil.MatchType matchType = phoneUtil.isNumberMatch(receivedPhoneNumber, dbNumPhone);
             if (matchType != PhoneNumberUtil.MatchType.NO_MATCH && matchType != PhoneNumberUtil.MatchType.NOT_A_NUMBER)
-                return new Pair<>(numbers.keyAt(i), numbers.valueAt(i).second);
+                return contact;
         }
         return null;
     }
@@ -150,8 +158,9 @@ public class Contact implements Comparable<Contact>, Parcelable {
         cursor.close();
         if(getPhotoUri() != null ) //întotdeauna este poza noastră.
             context.getContentResolver().delete(getPhotoUri(), null, null);
-     if((db.delete(ContactsContract.Contacts.TABLE_NAME, ContactsContract.Contacts.COLUMN_NAME_NUMBER
-                + "='" + getPhoneNumber() + "'", null)) == 0)
+        //dacă foloseam nr pentru a identifica contactul crăpa la numerele private
+     if((db.delete(ContactsContract.Contacts.TABLE_NAME, ContactsContract.Contacts._ID
+                + "=" + getId(), null)) == 0)
          throw new SQLException("This Contacts row was not deleted");
     }
 
