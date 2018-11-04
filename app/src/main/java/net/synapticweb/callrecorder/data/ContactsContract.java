@@ -14,6 +14,5 @@ public class ContactsContract {
         public static final String COLUMN_NAME_PHONE_TYPE = "phone_type";
         public static final String COLUMN_NAME_SHOULD_RECORD = "should_record";
         public static final String COLUMN_NAME_PRIVATE_NUMBER = "private_number";
-        public static final String COLUMN_NAME_UNKNOWN_NUMBER = "unknown_number";
     }
 }

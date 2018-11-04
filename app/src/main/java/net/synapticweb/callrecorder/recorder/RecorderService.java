@@ -247,8 +247,7 @@ public class RecorderService extends Service {
                 idToInsert = contact.getId();
             }
             else { //numărul nu există nici contactele telefonului. Deci este unknown.
-                contact =  new Contact(null, receivedNumPhone, null, null, AppLibrary.UNKNOWN_TYPE_PHONE_CODE);
-                contact.setUnkownNumber(true);
+                contact =  new Contact(null, receivedNumPhone, getResources().getString(R.string.unkown_contact), null, AppLibrary.UNKNOWN_TYPE_PHONE_CODE);
                 try {
                     contact.insertInDatabase(this); //introducerea în db setează id-ul în obiect
                 }

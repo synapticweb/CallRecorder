@@ -381,8 +381,6 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         }
         else {
             if(contact.isPrivateNumber())
-                contactPhotoView.setImageResource(R.drawable.user_contact_yellow);
-            else if(contact.isUnkownNumber())
                 contactPhotoView.setImageResource(R.drawable.user_contact_red);
             else
                 contactPhotoView.setImageResource(R.drawable.user_contact_blue);

@@ -36,7 +36,6 @@ public class Contact implements Comparable<Contact>, Parcelable {
     private int phoneType = AppLibrary.UNKNOWN_TYPE_PHONE_CODE;
     private String contactName = null;
     private Uri photoUri = null;
-    private boolean unkownNumber = false;
     private boolean privateNumber = false;
     private boolean shouldRecord = true;
     private static final String TAG = "CallRecorder";
@@ -49,7 +48,6 @@ public class Contact implements Comparable<Contact>, Parcelable {
         setPhoneNumber(phoneNumber);
         setContactName(contactName);
         setPhotoUri(photoUriStr);
-        setPhoneType(phoneTypeCode);
         setPhoneType(phoneTypeCode);
     }
 
@@ -91,7 +89,6 @@ public class Contact implements Comparable<Contact>, Parcelable {
         values.put(ContactsContract.Contacts.COLUMN_NAME_PHONE_TYPE, getPhoneTypeCode());
         values.put(ContactsContract.Contacts.COLUMN_NAME_PHOTO_URI,
                 (getPhotoUri() == null) ? null : getPhotoUri().toString());
-        values.put(ContactsContract.Contacts.COLUMN_NAME_UNKNOWN_NUMBER, isUnkownNumber());
         values.put(ContactsContract.Contacts.COLUMN_NAME_SHOULD_RECORD, shouldRecord());
         values.put(ContactsContract.Contacts.COLUMN_NAME_PRIVATE_NUMBER, isPrivateNumber());
 
@@ -129,7 +126,6 @@ public class Contact implements Comparable<Contact>, Parcelable {
         values.put(ContactsContract.Contacts.COLUMN_NAME_PHOTO_URI, photoUri == null ? null : photoUri.toString());
         values.put(ContactsContract.Contacts.COLUMN_NAME_PHONE_TYPE, phoneType);
         values.put(ContactsContract.Contacts.COLUMN_NAME_SHOULD_RECORD, shouldRecord);
-        values.put(ContactsContract.Contacts.COLUMN_NAME_UNKNOWN_NUMBER, unkownNumber);
         values.put(ContactsContract.Contacts.COLUMN_NAME_PRIVATE_NUMBER, privateNumber);
 
         setId(db.insertOrThrow(ContactsContract.Contacts.TABLE_NAME, null, values));
@@ -198,15 +194,6 @@ public class Contact implements Comparable<Contact>, Parcelable {
         this.shouldRecord = shouldRecord;
     }
 
-
-    public boolean isUnkownNumber() {
-        return unkownNumber;
-    }
-
-    public void setUnkownNumber(boolean unkownNumber) {
-        this.unkownNumber = unkownNumber;
-    }
-
     public boolean isPrivateNumber() {
         return privateNumber;
     }
@@ -218,11 +205,6 @@ public class Contact implements Comparable<Contact>, Parcelable {
 
     public int compareTo(@NonNull Contact numberToCompare)
     {
-        if(this.isUnkownNumber() && !numberToCompare.isUnkownNumber() )
-            return -1;
-        if(!this.isUnkownNumber() && numberToCompare.isUnkownNumber())
-            return 1;
-
         return this.contactName.compareTo(numberToCompare.getContactName());
     }
 
@@ -316,7 +298,6 @@ public class Contact implements Comparable<Contact>, Parcelable {
         dest.writeInt(this.phoneType);
         dest.writeString(this.contactName);
         dest.writeParcelable(this.photoUri, flags);
-        dest.writeByte(this.unkownNumber ? (byte) 1 : (byte) 0);
         dest.writeByte(this.privateNumber ? (byte) 1 : (byte) 0);
         dest.writeByte(this.shouldRecord ? (byte) 1 : (byte) 0);
     }
@@ -327,7 +308,6 @@ public class Contact implements Comparable<Contact>, Parcelable {
         this.phoneType = in.readInt();
         this.contactName = in.readString();
         this.photoUri = in.readParcelable(Uri.class.getClassLoader());
-        this.unkownNumber = in.readByte() != 0;
         this.privateNumber = in.readByte() != 0;
         this.shouldRecord = in.readByte() != 0;
     }

@@ -74,7 +74,6 @@ public class ContactsRepository {
         contact.setId(cursor.getLong(cursor.getColumnIndex(ContactsContract.Contacts._ID)));
         contact.setShouldRecord(
                 cursor.getInt(cursor.getColumnIndex(ContactsContract.Contacts.COLUMN_NAME_SHOULD_RECORD)) == 1);
-        contact.setUnkownNumber(cursor.getInt(cursor.getColumnIndex(ContactsContract.Contacts.COLUMN_NAME_UNKNOWN_NUMBER)) == 1);
         return contact;
     }
 

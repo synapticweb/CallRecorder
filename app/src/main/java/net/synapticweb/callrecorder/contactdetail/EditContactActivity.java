@@ -125,7 +125,6 @@ public class EditContactActivity extends AppCompatActivity implements AdapterVie
             public void onClick(View v) {
                 if(dataChanged) {
 //                    Cursor cursor = (Cursor) phoneType.getSelectedItem(); //https://stackoverflow.com/questions/5787809/get-spinner-selected-items-text
-                    contact.setUnkownNumber(false);
                     if(oldPhotoUri != null) { //a fost selectată altă poză din galerie sau a fost luată altă poză
                         // cu camera sau a fost scoasă poza existentă.
                         //întotdeauna este poza noastră!
@@ -149,8 +148,6 @@ public class EditContactActivity extends AppCompatActivity implements AdapterVie
             contactPhoto.setImageURI(contact.getPhotoUri());
         else {
             if(contact.isPrivateNumber())
-                contactPhoto.setImageResource(R.drawable.user_contact_yellow);
-            else if(contact.isUnkownNumber())
                 contactPhoto.setImageResource(R.drawable.user_contact_red);
             else
                 contactPhoto.setImageResource(R.drawable.user_contact_blue);

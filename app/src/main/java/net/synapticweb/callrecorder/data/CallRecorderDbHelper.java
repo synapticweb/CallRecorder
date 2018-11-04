@@ -23,7 +23,6 @@ public class CallRecorderDbHelper extends SQLiteOpenHelper {
             Contacts.COLUMN_NAME_PHONE_TYPE + " INTEGER NOT NULL, " +
             Contacts.COLUMN_NAME_SHOULD_RECORD + " INTEGER NOT NULL DEFAULT  1, " +
             Contacts.COLUMN_NAME_PRIVATE_NUMBER + " INTEGER NOT NULL DEFAULT 0, " +
-            Contacts.COLUMN_NAME_UNKNOWN_NUMBER + " INTEGER NOT NULL DEFAULT 0, " +
             "CONSTRAINT no_duplicates UNIQUE(" + Contacts.COLUMN_NAME_NUMBER + ") )";
 
 

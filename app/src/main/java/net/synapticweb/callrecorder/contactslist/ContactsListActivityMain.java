@@ -94,8 +94,8 @@ public class ContactsListActivityMain extends AppCompatActivity  {
         Button hamburger = findViewById(R.id.hamburger);
         final DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.navigation_view);
-        navigationView.getMenu().findItem(R.id.make_system).setTitle(getResources().getString(R.string.make_system_title,
-                ((getApplicationInfo().flags & ApplicationInfo.FLAG_SYSTEM) == 1) ? "normal" : "system"));
+//        navigationView.getMenu().findItem(R.id.make_system).setTitle(getResources().getString(R.string.make_system_title,
+//                ((getApplicationInfo().flags & ApplicationInfo.FLAG_SYSTEM) == 1) ? "normal" : "system"));
 
 
         hamburger.setOnClickListener(new View.OnClickListener() {
@@ -113,9 +113,9 @@ public class ContactsListActivityMain extends AppCompatActivity  {
                         Intent intent = new Intent(ContactsListActivityMain.this, SettingsActivity.class);
                         startActivity(intent);
                         break;
-                    case R.id.make_system:
+//                    case R.id.make_system:
 //                        toggleSystem();
-                        break;
+//                        break;
                 }
                 drawer.closeDrawers();
                 return true;

@@ -1,3 +1,0 @@
-- record automat nr private
-delete on export
-- punere pe speaker în cazul în care voice_call e indisponibil

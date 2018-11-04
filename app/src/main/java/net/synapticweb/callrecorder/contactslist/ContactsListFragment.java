@@ -220,11 +220,9 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
                     holder.contactPhoto.setImageURI(contact.getPhotoUri());
                 } else {
                     if (contact.isPrivateNumber()) {
-                        holder.contactPhoto.setImageResource(R.drawable.user_contact_yellow);
+                        holder.contactPhoto.setImageResource(R.drawable.user_contact_red);
                         holder.mPhoneNumber.setVisibility(View.GONE);
                     }
-                    else if (contact.isUnkownNumber())
-                        holder.contactPhoto.setImageResource(R.drawable.user_contact_red);
                     else
                         holder.contactPhoto.setImageResource(R.drawable.user_contact_blue);
                 }
