@@ -58,6 +58,7 @@
             android:visibility="gone"
             />
 
+
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -67,6 +68,15 @@
             android:id="@+id/phone_number_detail_menu"
             android:layout_gravity="end"
            />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/edit"
+            android:background="@android:color/transparent"
+            android:id="@+id/edit_contact"
+            android:layout_gravity="end"
+            android:layout_marginEnd="15dp"/>
 
     </android.support.v7.widget.Toolbar>
 

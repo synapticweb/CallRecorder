@@ -149,6 +149,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
     @Override
     public void toggleSelectModeActionBar() {
         ImageButton closeBtn = parentActivity.findViewById(R.id.close_select_mode);
+        ImageButton editBtn = parentActivity.findViewById(R.id.edit_contact);
         TextView selectTitle = parentActivity.findViewById(R.id.actionbar_select_title);
         ImageButton exportBtn = parentActivity.findViewById(R.id.actionbar_select_export);
         ImageButton deleteBtn = parentActivity.findViewById(R.id.actionbar_select_delete);
@@ -161,6 +162,8 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         }
 
         closeBtn.setVisibility(selectMode ? View.VISIBLE : View.GONE);
+        if(!contact.isPrivateNumber())
+            editBtn.setVisibility(selectMode ? View.GONE : View.VISIBLE);
         if(isSinglePaneLayout()) {
             selectTitle.setText(contact.getContactName());
             selectTitle.setVisibility(selectMode ? View.VISIBLE : View.GONE);
@@ -236,9 +239,6 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
                             case R.id.delete_phone_number:
                                 presenter.deleteContact(contact);
                                 return true;
-                            case R.id.edit_phone_number:
-                                presenter.editContact(contact);
-                                return true;
                             case R.id.should_record:
                                 presenter.toggleShouldRecord(contact);
                             default:
@@ -253,14 +253,23 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
                     shouldRecordMenuItem.setTitle(R.string.stop_recording);
                 else
                     shouldRecordMenuItem.setTitle(R.string.start_recording);
-                MenuItem editMenuItem = popupMenu.getMenu().findItem(R.id.edit_phone_number);
-                if(contact.isPrivateNumber()) {
-                    editMenuItem.setEnabled(false);
+                if(contact.isPrivateNumber())
                     shouldRecordMenuItem.setEnabled(false);
-                }
                 popupMenu.show();
             }
         });
+
+        ImageButton editContact = parentActivity.findViewById(R.id.edit_contact);
+        if(contact.isPrivateNumber())
+            editContact.setVisibility(View.GONE);
+
+        editContact.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                presenter.editContact(contact);
+            }
+        });
+
 
         ImageButton closeBtn = parentActivity.findViewById(R.id.close_select_mode);
         closeBtn.setOnClickListener(new View.OnClickListener() {

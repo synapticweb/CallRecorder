@@ -11,7 +11,9 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.content.FileProvider;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -26,6 +28,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -96,9 +99,24 @@ public class EditContactActivity extends AppCompatActivity implements AdapterVie
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == android.R.id.home)
+            onCancelOrBackPressed();
+        //https://stackoverflow.com/questions/39715619/onactivityresult-not-called-when-pressed-back-arrow-on-screen-but-only-called-wh
+        //e foarte important să întoarcă true și nu altceva.
+        return true;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.edit_contact_activity);
+
+        Toolbar toolbar = findViewById(R.id.toolbar_edit);
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if(actionBar != null)
+            actionBar.setDisplayHomeAsUpEnabled(true);
 
         if(savedInstanceState != null) {
             contact = savedInstanceState.getParcelable("contact");
@@ -110,16 +128,7 @@ public class EditContactActivity extends AppCompatActivity implements AdapterVie
         else
             contact = getIntent().getExtras().getParcelable(ContactDetailPresenter.EDIT_EXTRA_CONTACT);
 
-        Button cancelButton = findViewById(R.id.edit_phone_number_cancel);
-
-        cancelButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onCancelOrBackPressed();
-            }
-        });
-
-        Button okButton = findViewById(R.id.edit_phone_number_ok);
+        ImageButton okButton = findViewById(R.id.edit_done);
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

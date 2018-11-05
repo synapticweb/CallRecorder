@@ -3,9 +3,9 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:fillViewport="true"
-    android:scrollbars="vertical"
-    >
+    android:scrollbars="vertical">
 
 <RelativeLayout
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -15,21 +15,36 @@
     android:id="@+id/edit_phone_number"
     >
 
+    <android.support.v7.widget.Toolbar
+        android:layout_height="?attr/actionBarSize"
+        android:layout_width="match_parent"
+        android:background="?attr/colorPrimary"
+        app:titleTextColor="@color/textOnDark"
+        android:id="@+id/toolbar_edit"
+        android:elevation="2dp"
+        android:theme="@style/toolbar_theme"
+        app:titleTextAppearance="@style/toolbar_font"
+        app:title="Edit contact"
+        >
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/done"
+            android:layout_gravity="end"
+            android:background="@android:color/transparent"
+            android:layout_marginEnd="15dp"
+            android:id="@+id/edit_done"
+            />
+
+    </android.support.v7.widget.Toolbar>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_centerInParent="true">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Edit contact"
-        android:gravity="center"
-        android:id="@+id/edit_phone_number_title"
-        android:textSize="24sp"
-        android:layout_marginTop="20dp"
-        />
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/edit_phone_number_photo"
@@ -162,38 +177,6 @@ Soluția a fost să adaug o margine ultimului linealayout orizontal.
 
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:weightSum="2"
-        android:layout_alignParentBottom="true"
-        style="?android:attr/buttonBarStyle"
-        >
-        <Button
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:text="Cancel"
-            android:drawableStart="@drawable/baseline_cancel_white_24"
-            android:padding="16dp"
-            style="@style/Widget.AppCompat.Button.Colored"
-            android:theme="@style/ButtonCancel"
-            android:id="@+id/edit_phone_number_cancel"
-            />
-
-        <Button
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:text="Ok"
-            android:drawableStart="@drawable/baseline_check_circle_white_24"
-            android:padding="16dp"
-            style="@style/Widget.AppCompat.Button.Colored"
-            android:theme="@style/ButtonOk"
-            android:id="@+id/edit_phone_number_ok"
-            />
-    </LinearLayout>
 
 </RelativeLayout>
 
