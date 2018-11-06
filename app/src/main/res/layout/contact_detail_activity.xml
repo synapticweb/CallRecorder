@@ -58,6 +58,17 @@
             android:visibility="gone"
             />
 
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/select_all"
+            android:background="@android:color/transparent"
+            android:id="@+id/actionbar_select_all"
+            android:layout_gravity="end"
+            android:layout_marginEnd="15dp"
+            android:visibility="gone"
+            />
+
 
         <ImageButton
             android:layout_width="wrap_content"

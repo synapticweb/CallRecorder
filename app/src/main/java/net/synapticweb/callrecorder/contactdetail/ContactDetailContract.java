@@ -3,6 +3,7 @@ package net.synapticweb.callrecorder.contactdetail;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.RecyclerView;
 
 import net.synapticweb.callrecorder.data.Contact;
 import net.synapticweb.callrecorder.data.Recording;
@@ -28,6 +29,9 @@ public interface ContactDetailContract {
         boolean isSinglePaneLayout();
         void setActionBarTitleIfActivityDetail();
         void toggleSelectedMultipleRecordings();
+        RecyclerView getRecordingsRecycler();
+        ContactDetailFragment.RecordingAdapter getRecordingsAdapter();
+        List<Integer> getSelectedItems();
     }
 
     interface ContactDetailPresenter {
@@ -41,5 +45,6 @@ public interface ContactDetailContract {
         void exportSelectedRecordings(String path);
         void toggleShouldRecord(Contact contact);
         void callContact(Contact contact);
+        void toggleSelectAll();
     }
 }

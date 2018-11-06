@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
 import com.afollestad.materialdialogs.DialogAction;
@@ -27,6 +28,7 @@ import net.synapticweb.callrecorder.data.RecordingsRepository;
 import net.synapticweb.callrecorder.player.PlayerActivity;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ContactDetailPresenter implements ContactDetailContract.ContactDetailPresenter {
@@ -168,5 +170,27 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
     public void callContact(Contact contact) {
         Intent intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", contact.getPhoneNumber(), null));
         view.getParentActivity().startActivity(intent);
+    }
+
+    @Override
+    public void toggleSelectAll() {
+        ContactDetailFragment.RecordingAdapter adapter = view.getRecordingsAdapter();
+        List<Integer> selectedItems = view.getSelectedItems();
+
+        List<Integer> notSelected = new ArrayList<>();
+        for(int i = 0; i < adapter.getItemCount(); ++i)
+            notSelected.add(i);
+        notSelected.removeAll(selectedItems);
+
+        if(notSelected.size() == 0)
+            view.clearSelectedMode();
+        else {
+            RecyclerView recordingsRecycler = view.getRecordingsRecycler();
+            for(int position : notSelected) {
+                CardView selectedRecordingCard = (CardView) recordingsRecycler.getLayoutManager().findViewByPosition(position);
+                if(selectedRecordingCard != null)
+                    selectRecording(selectedRecordingCard, position);
+            }
+        }
     }
 }

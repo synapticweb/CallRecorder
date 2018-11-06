@@ -74,6 +74,21 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
     }
 
     @Override
+    public RecyclerView getRecordingsRecycler() {
+        return recordingsRecycler;
+    }
+
+    @Override
+    public RecordingAdapter getRecordingsAdapter() {
+        return adapter;
+    }
+
+    @Override
+    public List<Integer> getSelectedItems() {
+        return selectedItems;
+    }
+
+    @Override
     public void setActionBarTitleIfActivityDetail() {
         ActionBar actionBar = parentActivity.getSupportActionBar();
         if(actionBar != null) {
@@ -155,6 +170,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         TextView selectTitle = parentActivity.findViewById(R.id.actionbar_select_title);
         ImageButton exportBtn = parentActivity.findViewById(R.id.actionbar_select_export);
         ImageButton deleteBtn = parentActivity.findViewById(R.id.actionbar_select_delete);
+        ImageButton selectAllBtn = parentActivity.findViewById(R.id.actionbar_select_all);
         ImageButton menuRightBtn = parentActivity.findViewById(R.id.phone_number_detail_menu);
         ActionBar actionBar = parentActivity.getSupportActionBar();
 
@@ -175,6 +191,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
 
         exportBtn.setVisibility(selectMode ? View.VISIBLE : View.GONE);
         deleteBtn.setVisibility(selectMode ? View.VISIBLE : View.GONE);
+        selectAllBtn.setVisibility(selectMode ? View.VISIBLE : View.GONE);
         menuRightBtn.setVisibility(selectMode ? View.GONE : View.VISIBLE);
 
         if(!isSinglePaneLayout()) {
@@ -344,6 +361,13 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
                     }
                 });
 
+            }
+        });
+        ImageButton selectAllBtn = parentActivity.findViewById(R.id.actionbar_select_all);
+        selectAllBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                presenter.toggleSelectAll();
             }
         });
     }
