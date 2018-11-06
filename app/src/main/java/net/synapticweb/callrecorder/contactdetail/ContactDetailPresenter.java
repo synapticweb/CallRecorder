@@ -4,6 +4,7 @@ package net.synapticweb.callrecorder.contactdetail;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -161,5 +162,11 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
         contact.setShouldRecord(!contact.shouldRecord());
         view.setContact(contact);
         view.displayRecordingStatus();
+    }
+
+    @Override
+    public void callContact(Contact contact) {
+        Intent intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", contact.getPhoneNumber(), null));
+        view.getParentActivity().startActivity(intent);
     }
 }

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -150,6 +151,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
     public void toggleSelectModeActionBar() {
         ImageButton closeBtn = parentActivity.findViewById(R.id.close_select_mode);
         ImageButton editBtn = parentActivity.findViewById(R.id.edit_contact);
+        ImageButton callBtn = parentActivity.findViewById(R.id.call_contact);
         TextView selectTitle = parentActivity.findViewById(R.id.actionbar_select_title);
         ImageButton exportBtn = parentActivity.findViewById(R.id.actionbar_select_export);
         ImageButton deleteBtn = parentActivity.findViewById(R.id.actionbar_select_delete);
@@ -162,8 +164,10 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         }
 
         closeBtn.setVisibility(selectMode ? View.VISIBLE : View.GONE);
-        if(!contact.isPrivateNumber())
+        if(!contact.isPrivateNumber()) {
             editBtn.setVisibility(selectMode ? View.GONE : View.VISIBLE);
+            callBtn.setVisibility(selectMode ? View.GONE : View.VISIBLE);
+        }
         if(isSinglePaneLayout()) {
             selectTitle.setText(contact.getContactName());
             selectTitle.setVisibility(selectMode ? View.VISIBLE : View.GONE);
@@ -260,17 +264,28 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         });
 
         ImageButton editContact = parentActivity.findViewById(R.id.edit_contact);
-        if(contact.isPrivateNumber())
+        ImageButton callContact = parentActivity.findViewById(R.id.call_contact);
+        if(contact.isPrivateNumber()) {
+            callContact.setVisibility(View.GONE);
             editContact.setVisibility(View.GONE);
+        }
+        else {
 
-        editContact.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                presenter.editContact(contact);
-            }
-        });
+            callContact.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                   presenter.callContact(contact);
+                }
+            });
 
+            editContact.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    presenter.editContact(contact);
+                }
+            });
 
+        }
         ImageButton closeBtn = parentActivity.findViewById(R.id.close_select_mode);
         closeBtn.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -1,6 +1,5 @@
 package net.synapticweb.callrecorder.contactdetail;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
@@ -41,5 +40,6 @@ public interface ContactDetailContract {
         void deleteSelectedRecordings();
         void exportSelectedRecordings(String path);
         void toggleShouldRecord(Contact contact);
+        void callContact(Contact contact);
     }
 }
