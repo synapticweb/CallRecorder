@@ -1,4 +1,4 @@
-package net.synapticweb.callrecorder;
+package net.synapticweb.callrecorder.contactdetail;
 
 import android.app.Activity;
 import android.os.AsyncTask;
@@ -7,7 +7,7 @@ import android.util.Log;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 
-import net.synapticweb.callrecorder.contactdetail.ContactDetailActivity;
+import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.data.Recording;
 
 import java.lang.ref.WeakReference;

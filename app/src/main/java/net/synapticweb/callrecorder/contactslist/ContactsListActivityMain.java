@@ -8,6 +8,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
 import android.os.Build;
 import android.provider.ContactsContract;
@@ -23,7 +24,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -35,7 +35,7 @@ import com.topjohnwu.superuser.Shell;
 
 import net.synapticweb.callrecorder.AppLibrary;
 import net.synapticweb.callrecorder.R;
-import net.synapticweb.callrecorder.SettingsActivity;
+import net.synapticweb.callrecorder.settings.SettingsActivity;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -77,7 +77,7 @@ public class ContactsListActivityMain extends AppCompatActivity  {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
             askForPermissions();
 
-        setMockPreferences();
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
         Log.wtf(TAG, "" + ContextCompat.checkSelfPermission(this, Manifest.permission.CAPTURE_AUDIO_OUTPUT));
 
@@ -219,13 +219,6 @@ public class ContactsListActivityMain extends AppCompatActivity  {
         }
     }
 
-    private void setMockPreferences() {
-        final SharedPreferences settings = getSharedPreferences(AppLibrary.PREFERENCES, MODE_PRIVATE);
-        final SharedPreferences.Editor editor = settings.edit();
-        editor.putBoolean(AppLibrary.Settings.AUTOMMATICALLY_RECORD_PRIVATE_CALLS, true);
-        editor.apply();
-    }
-
     private static class InstallSystemAsync extends AsyncTask<Void, Void, Void> {
         private WeakReference<ContactsListActivityMain> activityReference;
         private String direction;
@@ -290,7 +283,7 @@ public class ContactsListActivityMain extends AppCompatActivity  {
     }
 
     private void huaweiAlert() {
-        final SharedPreferences settings = getSharedPreferences(AppLibrary.PREFERENCES, MODE_PRIVATE);
+        final SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
         final String saveIfSkip = "skipProtectedAppsMessage";
         boolean skipMessage = settings.getBoolean(saveIfSkip, false);
         if (!skipMessage) {

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <SwitchPreference
+        android:key="auth_record_priv"
+        android:title="Private numbers calls"
+        android:summary="Autommatically record calls from private numbers"
+        android:defaultValue="true"
+        android:singleLine="false"/>
+
+    <SwitchPreference
+        android:key="paranoid"
+        android:title="Paranoid mode"
+        android:summary="Record all calls"
+        android:defaultValue="false"/>
+
+    <SwitchPreference
+        android:key="delete_on_export"
+        android:title="Delete on export"
+        android:summary="Delete recordings after they have been exported"
+        android:defaultValue="false"/>
+
+    <SwitchPreference
+        android:key="speaker_on"
+        android:title="Speaker on"
+        android:summary="Autommatically turn speaker on if the quality of the available recording audiosource is low."
+        android:defaultValue="false"/>
+
+</PreferenceScreen>

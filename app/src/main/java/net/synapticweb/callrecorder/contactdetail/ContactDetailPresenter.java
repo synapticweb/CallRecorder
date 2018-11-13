@@ -17,7 +17,6 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 
 import net.synapticweb.callrecorder.CallRecorderApplication;
-import net.synapticweb.callrecorder.ExportAsyncTask;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.contactslist.ContactsListFragment;
 import net.synapticweb.callrecorder.data.Contact;
@@ -182,15 +181,12 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
             notSelected.add(i);
         notSelected.removeAll(selectedItems);
 
-        if(notSelected.size() == 0)
-            view.clearSelectedMode();
-        else {
-            RecyclerView recordingsRecycler = view.getRecordingsRecycler();
-            for(int position : notSelected) {
-                CardView selectedRecordingCard = (CardView) recordingsRecycler.getLayoutManager().findViewByPosition(position);
-                if(selectedRecordingCard != null)
-                    selectRecording(selectedRecordingCard, position);
-            }
+        RecyclerView recordingsRecycler = view.getRecordingsRecycler();
+        for(int position : notSelected) {
+            //https://stackoverflow.com/questions/33784369/recyclerview-get-view-at-particular-position
+            CardView selectedRecordingCard = (CardView) recordingsRecycler.getLayoutManager().findViewByPosition(position);
+            if(selectedRecordingCard != null)
+                selectRecording(selectedRecordingCard, position);
         }
     }
 }

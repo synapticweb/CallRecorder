@@ -16,6 +16,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -29,6 +30,7 @@ import net.synapticweb.callrecorder.data.Contact;
 import net.synapticweb.callrecorder.data.ContactsContract.*;
 import net.synapticweb.callrecorder.data.RecordingsContract.*;
 import net.synapticweb.callrecorder.data.CallRecorderDbHelper;
+import net.synapticweb.callrecorder.settings.SettingsFragment;
 
 import static net.synapticweb.callrecorder.AppLibrary.*;
 
@@ -172,8 +174,8 @@ public class RecorderService extends Service {
 
         if(incoming) {
             if(privateCall) {
-                final SharedPreferences settings = getSharedPreferences(AppLibrary.PREFERENCES, MODE_PRIVATE);
-                boolean recordAutommatically = settings.getBoolean(AppLibrary.Settings.AUTOMMATICALLY_RECORD_PRIVATE_CALLS, false);
+                final SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(CallRecorderApplication.getInstance());
+                boolean recordAutommatically = settings.getBoolean(SettingsFragment.AUTOMMATICALLY_RECORD_PRIVATE_CALLS, false);
                 if(recordAutommatically){
                     startForeground(NOTIFICATION_ID, buildNotification(RECORD_ON_HOOKUP,
                             getResources().getString(R.string.private_number_name)));

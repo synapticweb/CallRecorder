@@ -36,7 +36,7 @@
             android:parentActivityName=".contactslist.ContactsListActivityMain">
         </activity>
 
-        <activity android:name=".SettingsActivity"
+        <activity android:name=".settings.SettingsActivity"
             android:parentActivityName=".contactslist.ContactsListActivityMain">
         </activity>
 

@@ -7,7 +7,7 @@ import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import net.synapticweb.callrecorder.ExportAsyncTask;
+import net.synapticweb.callrecorder.contactdetail.ExportAsyncTask;
 
 import java.io.File;
 import java.io.FileInputStream;

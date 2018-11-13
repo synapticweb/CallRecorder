@@ -14,11 +14,6 @@ public class AppLibrary {
     public static final int SQLITE_TRUE = 1;
     public static final int SQLITE_FALSE = 0;
     public static final int UNKNOWN_TYPE_PHONE_CODE = -1;
-    public static final String PREFERENCES = "callrecorder_preferences";
-
-    public static class Settings {
-        public static final String AUTOMMATICALLY_RECORD_PRIVATE_CALLS = "autommatically_record_private_calls";
-    }
 
     //https://stackoverflow.com/questions/2760995/arraylist-initialization-equivalent-to-array-initialization
     public static final List<PhoneTypeContainer> PHONE_TYPES = new ArrayList<>(Arrays.asList(
