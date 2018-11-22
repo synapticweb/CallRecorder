@@ -10,6 +10,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -41,13 +42,14 @@ import com.theartofdev.edmodo.cropper.CropImageView;
 import net.synapticweb.callrecorder.AppLibrary;
 import net.synapticweb.callrecorder.PhoneTypeContainer;
 import net.synapticweb.callrecorder.R;
+import net.synapticweb.callrecorder.TemplateActivity;
 import net.synapticweb.callrecorder.data.Contact;
 
 import java.io.File;
 import java.io.IOException;
 
 
-public class EditContactActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+public class EditContactActivity extends TemplateActivity implements AdapterView.OnItemSelectedListener {
     private Contact contact;
     private ImageView contactPhoto;
     private EditText contactName;
@@ -61,6 +63,17 @@ public class EditContactActivity extends AppCompatActivity implements AdapterVie
     private static final int PICK_IMAGE_REQUEST = 1;
     private static final int TAKE_PICTURE = 2;
     public static final String EDITED_CONTACT = "edited_contact";
+
+    @Override
+    protected Fragment createFragment() {
+        return null;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        checkIfThemeChanged();
+    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -110,6 +123,7 @@ public class EditContactActivity extends AppCompatActivity implements AdapterVie
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme();
         setContentView(R.layout.edit_contact_activity);
 
         Toolbar toolbar = findViewById(R.id.toolbar_edit);

@@ -92,7 +92,7 @@
                 android:id="@+id/edit_name"
                 android:inputType="text"
                 android:textSize="15sp"
-                app:backgroundTint="@color/gray"/>
+                />
         </LinearLayout>
 
     </LinearLayout>
@@ -131,7 +131,7 @@
                android:id="@+id/edit_number"
                android:inputType="phone"
                android:textSize="15sp"
-               app:backgroundTint="@color/gray"/>
+               />
        </LinearLayout>
 
    </LinearLayout>
@@ -170,7 +170,8 @@ Soluția a fost să adaug o margine ultimului linealayout orizontal.
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:id="@+id/edit_types"/>
+                android:id="@+id/edit_types"
+                />
         </LinearLayout>
 
     </LinearLayout>

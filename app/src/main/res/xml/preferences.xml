@@ -19,10 +19,20 @@
         android:summary="Delete recordings after they have been exported"
         android:defaultValue="false"/>
 
-    <SwitchPreference
-        android:key="speaker_on"
-        android:title="Speaker on"
-        android:summary="Autommatically turn speaker on if the quality of the available recording audiosource is low."
-        android:defaultValue="false"/>
+    <ListPreference
+        android:title="Speaker use"
+        android:key="speaker_use"
+        android:summary="Choose how to use the speaker while recording."
+        android:entries="@array/speaker_options_names"
+        android:entryValues="@array/speaker_options_values"
+        android:defaultValue="on_if_poor_quality"/>
+
+    <ListPreference
+        android:title="Theme"
+        android:key="theme"
+        android:summary="Choose the application theme"
+        android:entries="@array/theme_options_names"
+        android:entryValues="@array/theme_options_values"
+        android:defaultValue="light_theme" />
 
 </PreferenceScreen>

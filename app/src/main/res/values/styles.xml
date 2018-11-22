@@ -1,13 +1,64 @@
 <resources>
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <!-- Customize your theme here. -->
+    <style name="AppThemeLight" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:popupMenuStyle">@style/PopupMenu</item>
+
+        <item name="android:windowBackground">@color/backgroundLightTheme</item>
+        <item name="android:textColorPrimary">@color/textOnLight</item>
+        <item name="android:textColor">@color/textOnLight</item>
+        <item name="contactSlotStyle">@style/contactSlotLight</item>
+        <item name="contactSlotSeparatorStyle">@style/contactSlotSeparatorLight</item>
+        <item name="detailHeaderStyle">@style/detailHeader.Light</item>
     </style>
+
+    <style name="AppThemeDark" parent="Theme.AppCompat.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+
+        <item name="android:textColorPrimary">@color/textOnDark</item>
+        <item name="android:textColor">@color/textOnDark</item>
+        <item name="contactSlotStyle">@style/contactSlotDark</item>
+        <item name="contactSlotSeparatorStyle">@style/contactSlotSeparatorDark</item>
+        <item name="detailHeaderStyle">@style/detailHeader.Dark</item>
+        <!-- Material Dialog -->
+        <item name="md_positive_color">@color/white</item>
+        <item name="md_negative_color">@color/white</item>
+    </style>
+
+
+<!-- Stiluri diferite pentru un element în funcție de tema selectată:
+https://stackoverflow.com/questions/30487616/android-overriding-a-style-per-theme-->
+    <style name="contactSlotLight">
+        <item name="android:background">@color/white</item>
+    </style>
+
+    <style name="contactSlotDark">
+        <item name="android:background">@color/slotAndDetailHeaderDark</item>
+    </style>
+
+    <style name="contactSlotSeparatorLight">
+        <item name="android:background">#80777777</item>
+    </style>
+
+    <style name="contactSlotSeparatorDark">
+        <item name="android:background">#80999999</item>
+    </style>
+
+    <style name="detailHeader">
+        <item name="android:elevation">1dp</item>
+    </style>
+
+    <style name="detailHeader.Light">
+        <item name="android:background">@color/detailHeaderBackgroundLight</item>
+    </style>
+
+    <style name="detailHeader.Dark">
+        <item name="android:background">@color/slotAndDetailHeaderDark</item>
+    </style>
+
 
     <!--Necesar pentru a albi săgeata back a toolbarului -->
     <style name="toolbar_theme" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
@@ -18,17 +69,11 @@
         <item name="android:textSize">15sp</item>
     </style>
 <!-- Pentru background-ul alb: https://stackoverflow.com/questions/22320663/change-background-popupmenu-in-android -->
-    <style name="PopupMenu" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="android:popupBackground">@color/white</item>
-        <item name="android:textSize">14sp</item>
-    </style>
 <!--Ca să poată fi folosit cu android:theme, pentru a fi aplicat tuturor copiilor unui View trebuie să moștenească
  dintr-o temă: parent="Theme.AppCompat.Light"-->
-    <style name="recyclerview_text">
-        <item name="android:textColor">@color/textOnLight</item>
-    </style>
 
-    <style name="PlayerStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
+
+    <style name="PlayerStyleLight" parent="Theme.AppCompat.Light.Dialog.Alert">
         <item name="android:windowFrame">@null</item>
         <item name="android:windowIsFloating">true</item>
         <item name="android:windowIsTranslucent">true</item>
@@ -37,16 +82,21 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:textColor">@color/textOnLight</item>
+    </style>
+
+    <style name="PlayerStyleDark" parent="Theme.AppCompat.Dialog.Alert">
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:background">@android:color/transparent</item>
+        <item name="windowNoTitle">true</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:textColor">@color/textOnDark</item>
     </style>
 
     <!-- Pentru butoanele din activitatea edit
     https://www.androiddesignpatterns.com/2016/08/coloring-buttons-with-themeoverlays-background-tints.html-->
-    <style name="ButtonCancel" parent="ThemeOverlay.AppCompat.Light">
-        <item name="colorAccent">@color/colorAccent</item>
-    </style>
-
-    <style name="ButtonOk" parent="ThemeOverlay.AppCompat.Light">
-        <item name="colorAccent">@color/colorPrimaryDark</item>
-    </style>
-
 </resources>

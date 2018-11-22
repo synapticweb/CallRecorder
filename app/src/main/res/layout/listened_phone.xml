@@ -4,6 +4,8 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="75dp"
+    android:elevation="1dp"
+    style="?contactSlotStyle"
     >
 
     <de.hdodenhof.circleimageview.CircleImageView
@@ -26,21 +28,19 @@
         android:id="@+id/contact_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        style="@style/recyclerview_text"
         />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/phone_number"
-        style="@style/recyclerview_text"
        />
     </LinearLayout>
 <!--Pentru marginea de jos: -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0.1dp"
-        android:background="#80777777"
+        style="?contactSlotSeparatorStyle"
         android:layout_alignParentBottom="true"
         />
 

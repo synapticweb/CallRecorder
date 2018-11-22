@@ -20,7 +20,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
+        android:theme="@style/AppThemeLight"
         android:name=".CallRecorderApplication">
 
         <activity android:name=".contactslist.ContactsListActivityMain"
@@ -50,7 +50,8 @@
         <activity android:name=".player.PlayerActivity"
             android:parentActivityName=".contactdetail.ContactDetailActivity"
             android:configChanges="orientation|screenSize"
-            android:theme="@style/PlayerStyle"/> <!--Fără screenSize continuă să se restarteze. -->
+            android:theme="@style/PlayerStyleLight"
+           /> <!--Fără screenSize continuă să se restarteze. -->
 
         <provider
             android:name="android.support.v4.content.FileProvider"

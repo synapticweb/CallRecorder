@@ -4,6 +4,7 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
@@ -16,11 +17,12 @@ import android.widget.TextView;
 
 import net.synapticweb.callrecorder.AppLibrary;
 import net.synapticweb.callrecorder.R;
+import net.synapticweb.callrecorder.TemplateActivity;
 import net.synapticweb.callrecorder.contactdetail.ContactDetailPresenter;
 import net.synapticweb.callrecorder.data.Recording;
 
 
-public class PlayerActivity extends AppCompatActivity {
+public class PlayerActivity extends TemplateActivity {
     ImageButton playPause, stopPlaying, closeBtn;
     SeekBar playSeekBar;
     MediaPlayerHolder mediaPlayerHolder = null;
@@ -31,8 +33,14 @@ public class PlayerActivity extends AppCompatActivity {
     private static final String TAG = "CallRecorder";
 
     @Override
+    protected Fragment createFragment() {
+        return null;
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         Log.wtf(TAG, "onCreate");
+        setTheme();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.play_activity);
 

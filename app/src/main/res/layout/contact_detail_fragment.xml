@@ -6,6 +6,13 @@
     android:orientation="horizontal"
     >
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/header_container"
+        android:paddingBottom="20dp"
+        style="?detailHeaderStyle">
+
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/contact_photo_detail"
         android:layout_width="100dp"
@@ -17,7 +24,6 @@
         android:layout_marginStart="15dp"
         android:layout_marginTop="15dp"
         />
-
 
     <TextView
         android:layout_width="wrap_content"
@@ -47,6 +53,8 @@
         android:layout_below="@id/phone_type_detail"
         android:layout_toEndOf="@+id/contact_photo_detail"/>
 
+    </RelativeLayout>
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -57,7 +65,7 @@
         android:layout_marginTop="25dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
-        android:layout_below="@id/contact_photo_detail"/>
+        android:layout_below="@id/header_container"/>
 
     <!-- Marginile setate aici trebuie să fie identice cu cele din phoneNumberDetail::calculateCardViewDimensions().-->
     <android.support.v7.widget.RecyclerView
@@ -65,8 +73,8 @@
         android:layout_height="wrap_content"
         android:scrollbars="vertical"
         android:id="@+id/recordings"
-        android:layout_marginTop="30dp"
-        android:layout_below="@id/recording_status"
+        android:layout_marginTop="10dp"
+        android:layout_below="@id/header_container"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
         />

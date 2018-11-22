@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.os.Build;
 import android.provider.ContactsContract;
@@ -35,7 +36,9 @@ import com.topjohnwu.superuser.Shell;
 
 import net.synapticweb.callrecorder.AppLibrary;
 import net.synapticweb.callrecorder.R;
+import net.synapticweb.callrecorder.TemplateActivity;
 import net.synapticweb.callrecorder.settings.SettingsActivity;
+import net.synapticweb.callrecorder.settings.SettingsFragment;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -44,7 +47,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 
-public class ContactsListActivityMain extends AppCompatActivity  {
+public class ContactsListActivityMain extends TemplateActivity {
     private static final String TAG = "CallRecorder";
     private static final int PERMISSION_REQUEST = 2;
     private static final int REQUEST_NUMBER = 1;
@@ -52,7 +55,19 @@ public class ContactsListActivityMain extends AppCompatActivity  {
     private static final String MAKE_NORMAL_APP = "make_normal";
 
     @Override
+    protected Fragment createFragment() {
+        return new ContactsListFragment();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        checkIfThemeChanged();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_masterdetail);
 
@@ -62,14 +77,7 @@ public class ContactsListActivityMain extends AppCompatActivity  {
         if(actionBar != null)
             actionBar.setDisplayShowTitleEnabled(false);
 
-        FragmentManager fm = getSupportFragmentManager();
-        ContactsListFragment contactList = (ContactsListFragment) fm.findFragmentById(R.id.contacts_list_fragment_container);
-        if(contactList == null) {
-            contactList = new ContactsListFragment();
-            fm.beginTransaction().
-                    add(R.id.contacts_list_fragment_container, contactList).
-                    commit();
-        }
+        insertFragment(R.id.contacts_list_fragment_container);
 
         if(Build.MANUFACTURER.equalsIgnoreCase("huawei"))
             huaweiAlert();

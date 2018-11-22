@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="storage_chooser_theme">
+        <!-- Overview -->
+        <item>@color/colorPrimary</item> <!--  Top Header bg -->
+        <item>@color/textOnDark</item> <!-- header text   -->
+        <item>#252525</item> <!-- list bg  -->
+        <item>@android:color/white</item> <!--  storage list name text  -->
+        <item>#e1e1e1</item> <!-- free space text  -->
+        <item>@color/colorAccent</item> <!-- memory bar -->
+
+        <!-- secondary dialog colors -->
+        <item>@color/colorAccentLight</item> <!-- folder tint -->
+        <item>#252525</item> <!-- list bg -->
+        <item>@android:color/white</item> <!-- list text -->
+        <item>#151515</item> <!-- address bar tint -->
+        <item>@color/chevronBgColor</item> <!-- new folder hint tint -->
+        <item>@color/white</item> <!-- select button color -->
+        <item>@color/colorAccentLighter</item> <!-- new folder layour bg -->
+        <item>#2c9633</item> <!-- fab multiselect color -->
+        <item>#151515</item> <!-- address bar bg -->
+    </array>
+
+    <string-array name="speaker_options_names">
+        <item>Turn speaker on if recording source audio quality is poor.</item>
+        <item>Always turn speaker on when recording phone calls.</item>
+        <item>Never turn speaker on.</item>
+    </string-array>
+
+    <string-array name="speaker_options_values">
+        <item>on_if_poor_quality</item>
+        <item>always_on</item>
+        <item>never_on</item>
+    </string-array>
+
+    <string-array name="theme_options_names">
+        <item>Light theme</item>
+        <item>Dark theme</item>
+    </string-array>
+
+    <string-array name="theme_options_values">
+        <item>light_theme</item>
+        <item>dark_theme</item>
+    </string-array>
+
+</resources>

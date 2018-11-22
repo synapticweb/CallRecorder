@@ -1,15 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
-    <color name="complementaryAccent">#9DFF40</color>
+    <color name="primaryColor">#00838f</color>
+    <color name="primaryLightColor">#4fb3bf</color>
+    <color name="primaryDarkColor">#005662</color>
+    <color name="colorAccent">#cb0600</color>
+    <color name="colorAccentLight">#ff5030</color>
+    <color name="colorAccentLighter">#ff775f</color>
+    <color name="primaryTextColor">#ffffff</color>
+    <color name="secondaryTextColor">#ffffff</color>
+
+    <color name="backgroundLightTheme">#faf9f6</color>
+    <color name="backgroundLighterTheme">#f5feff</color>
+    <color name="backgroundDarkTheme">#5f5f5f</color>
+    <color name="slotAndDetailHeaderDark">#1e1e1e</color>
+    <color name="detailHeaderBackgroundLight">#f0edec</color>
+
     <color name="textOnDark">#FFFFFF</color>
     <color name="white">#FFF</color>
+    <color name="darkRecordingNotSelected">#ff424242</color>
+    <color name="darkRecordingSelected">#ff000000</color>
+    <color name="lightRecordingNotSelected">#fff</color>
+    <color name="lightRecordingSelected">#ddd</color>
     <color name="green">#008000</color>
     <color name="red">#ff0000</color>
-    <color name="gray">#999</color>
-    <color name="light_gray">#ddd</color>
     <color name="textOnLight">#a0000000</color>
     <color name="selected_contact">#f0e2e7</color>
+    <color name="darkMenuBackground">#2e2e2e</color>
+    <color name="darkWindowBackground">#2e2e2e</color>
 </resources>

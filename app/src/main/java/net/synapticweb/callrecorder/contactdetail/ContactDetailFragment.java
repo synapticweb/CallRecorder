@@ -37,6 +37,7 @@ import com.codekidlabs.storagechooser.StorageChooser;
 
 import net.synapticweb.callrecorder.AppLibrary;
 import net.synapticweb.callrecorder.R;
+import net.synapticweb.callrecorder.TemplateActivity;
 import net.synapticweb.callrecorder.data.Contact;
 import net.synapticweb.callrecorder.data.Recording;
 
@@ -55,7 +56,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
     private Contact contact;
     private boolean selectMode = false;
     private List<Integer> selectedItems = new ArrayList<>();
-    private AppCompatActivity parentActivity;
+    private TemplateActivity parentActivity;
     private static final String ARG_CONTACT = "arg_contact";
     private static final String SELECT_MODE_KEY = "select_mode_key";
     private static final String SELECTED_ITEMS_KEY = "selected_items_key";
@@ -64,7 +65,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        parentActivity = (AppCompatActivity) context;
+        parentActivity = (TemplateActivity) context;
     }
 
     @Override
@@ -97,7 +98,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
     }
 
     @Override
-    public AppCompatActivity getParentActivity() {
+    public TemplateActivity getParentActivity() {
         return parentActivity;
     }
 
@@ -221,8 +222,12 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
     public void toggleSelectedRecording(@NonNull CardView card) {
         ImageView selectedTick = card.findViewById(R.id.recording_selected);
         selectedTick.setVisibility((selectedTick.getVisibility() == View.VISIBLE) ? View.GONE : View.VISIBLE);
-        card.setCardBackgroundColor((card.getCardBackgroundColor().getDefaultColor() == getResources().getColor(R.color.white)) ? getResources().getColor(R.color.light_gray) :
-                getResources().getColor(R.color.white));
+        if(getParentActivity().getSettedTheme().equals(TemplateActivity.LIGHT_THEME))
+            card.setCardBackgroundColor((card.getCardBackgroundColor().getDefaultColor() == getResources().getColor(R.color.lightRecordingNotSelected)) ? getResources().getColor(R.color.lightRecordingSelected) :
+                    getResources().getColor(R.color.lightRecordingNotSelected));
+        else
+            card.setCardBackgroundColor((card.getCardBackgroundColor().getDefaultColor() == getResources().getColor(R.color.darkRecordingNotSelected)) ? getResources().getColor(R.color.darkRecordingSelected) :
+                    getResources().getColor(R.color.darkRecordingNotSelected));
     }
 
     @Override
@@ -250,8 +255,11 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         menuButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Context wrapper = new ContextThemeWrapper(parentActivity, R.style.PopupMenu);
-                PopupMenu popupMenu = new PopupMenu(wrapper, v);
+//pentru micșorarea fontului se folosește constructorul PopupMenu(ContextThemeWrapper, v). E necesar un wrapper
+// în jurul unui stil din styles.xml. Stilul trebuie să moștenească din Theme.AppCompat.Light.NoActionBar
+// pentru temele light și din Theme.AppCompat.NoActionBar pentru cele dark, altfel background-ul
+// va avea culoarea greșită.
+                PopupMenu popupMenu = new PopupMenu(parentActivity,v);
                 popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
@@ -340,6 +348,8 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
             public void onClick(View v) {
                 Content content = new Content();
                 content.setOverviewHeading(getResources().getString(R.string.export_heading));
+                StorageChooser.Theme theme = new StorageChooser.Theme(parentActivity);
+                theme.setScheme(getResources().getIntArray(R.array.storage_chooser_theme));
 
                 StorageChooser chooser = new StorageChooser.Builder()
                         .withActivity(parentActivity)
@@ -350,6 +360,8 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
                         .allowAddFolder(true)
                         .showHidden(true)
                         .withContent(content)
+                        .setTheme(getParentActivity().getSettedTheme().equals(TemplateActivity.DARK_THEME) ?
+                                theme : null)
                         .build();
 
                 chooser.show();
