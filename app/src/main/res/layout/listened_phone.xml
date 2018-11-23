@@ -36,6 +36,17 @@
         android:id="@+id/phone_number"
        />
     </LinearLayout>
+    <!-- Pentru vizualizarea selecției curente pe tabletă:-->
+
+    <LinearLayout
+        android:layout_width="7dp"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:id="@+id/tablet_current_selection"
+        style="?tabletCurrentSelectionStyle"
+        android:visibility="gone">
+    </LinearLayout>
+
 <!--Pentru marginea de jos: -->
     <LinearLayout
         android:layout_width="match_parent"

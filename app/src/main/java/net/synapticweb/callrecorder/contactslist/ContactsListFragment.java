@@ -126,9 +126,9 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
     @Override
     public void markSelectedContact(@Nullable  View previousSelected, @Nullable View currentSelected) {
         if(previousSelected != null)
-            previousSelected.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+            previousSelected.findViewById(R.id.tablet_current_selection).setVisibility(View.GONE);
         if(currentSelected != null)
-            currentSelected.setBackgroundColor(getResources().getColor(R.color.selected_contact));
+            currentSelected.findViewById(R.id.tablet_current_selection).setVisibility(View.VISIBLE);
     }
 
     @Override

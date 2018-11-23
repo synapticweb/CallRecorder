@@ -23,6 +23,7 @@
         <item name="contactSlotStyle">@style/contactSlotDark</item>
         <item name="contactSlotSeparatorStyle">@style/contactSlotSeparatorDark</item>
         <item name="detailHeaderStyle">@style/detailHeader.Dark</item>
+        <item name="tabletCurrentSelectionStyle">@style/tabletCurrentSelectionDark</item>
         <!-- Material Dialog -->
         <item name="md_positive_color">@color/white</item>
         <item name="md_negative_color">@color/white</item>
@@ -31,6 +32,14 @@
 
 <!-- Stiluri diferite pentru un element în funcție de tema selectată:
 https://stackoverflow.com/questions/30487616/android-overriding-a-style-per-theme-->
+    <style name="tabletCurrentSelectionLight">
+
+    </style>
+
+    <style name="tabletCurrentSelectionDark">
+        <item name="android:background">@color/selected_contact</item>
+    </style>
+
     <style name="contactSlotLight">
         <item name="android:background">@color/white</item>
     </style>

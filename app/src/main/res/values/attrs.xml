@@ -3,4 +3,5 @@
     <attr name="contactSlotStyle" format="reference"/>
     <attr name="contactSlotSeparatorStyle" format="reference" />
     <attr name="detailHeaderStyle" format="reference"/>
+    <attr name="tabletCurrentSelectionStyle" format="reference"/>
 </resources>

@@ -98,6 +98,7 @@ public class RecorderService extends Service {
                         .setContentIntent(tapNotificationPi)
                         .setLargeIcon(bitmap)
                         .setStyle(new NotificationCompat.BigTextStyle().bigText("Recording..."));
+
                 break;
             case RECORD_ON_HOOKUP:
                 builder = new NotificationCompat.Builder(CallRecorderApplication.getInstance(), CHANNEL_ID)

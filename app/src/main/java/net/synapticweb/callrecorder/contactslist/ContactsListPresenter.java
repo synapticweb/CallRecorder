@@ -57,8 +57,12 @@ public class ContactsListPresenter implements ContactsListContract.ContactsListP
             return ;
 
         ImageButton detailMenu = parentActivity.findViewById(R.id.phone_number_detail_menu);
+        ImageButton editContact = parentActivity.findViewById(R.id.edit_contact);
+        ImageButton callContact = parentActivity.findViewById(R.id.call_contact);
         if(contact != null) {
             detailMenu.setVisibility(View.VISIBLE);
+            editContact.setVisibility(View.VISIBLE);
+            callContact.setVisibility(View.VISIBLE);
 
             ContactDetailFragment contactDetail = ContactDetailFragment.newInstance(contact);
             parentActivity.getSupportFragmentManager().beginTransaction()
@@ -69,6 +73,8 @@ public class ContactsListPresenter implements ContactsListContract.ContactsListP
         }
         else {
             detailMenu.setVisibility(View.GONE);
+            editContact.setVisibility(View.GONE);
+            callContact.setVisibility(View.GONE);
 
             Fragment detailFragment = parentActivity.getSupportFragmentManager().findFragmentById(R.id.contact_detail_fragment_container);
             if(detailFragment != null) //dacă aplicația începe fără niciun contact detailFragment va fi null

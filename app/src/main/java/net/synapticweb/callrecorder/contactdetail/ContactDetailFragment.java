@@ -295,7 +295,6 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
             editContact.setVisibility(View.GONE);
         }
         else {
-
             callContact.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
