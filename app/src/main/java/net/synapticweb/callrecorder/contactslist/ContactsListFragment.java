@@ -224,7 +224,7 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
                         holder.mPhoneNumber.setVisibility(View.GONE);
                     }
                     else
-                        holder.contactPhoto.setImageResource(R.drawable.user_contact_blue);
+                        holder.contactPhoto.setImageResource(R.drawable.user_contact);
                 }
             }
 

@@ -173,7 +173,7 @@ public class EditContactActivity extends TemplateActivity implements AdapterView
             if(contact.isPrivateNumber())
                 contactPhoto.setImageResource(R.drawable.user_contact_red);
             else
-                contactPhoto.setImageResource(R.drawable.user_contact_blue);
+                contactPhoto.setImageResource(R.drawable.user_contact);
         }
 
         registerForContextMenu(contactPhoto);
@@ -277,7 +277,7 @@ public class EditContactActivity extends TemplateActivity implements AdapterView
     private void removePhoto() {
         oldPhotoUri = contact.getPhotoUri();
         contact.setPhotoUri((Uri) null); //ambigous method call
-        contactPhoto.setImageResource(R.drawable.user_contact_blue);
+        contactPhoto.setImageResource(R.drawable.user_contact);
         dataChanged = true;
     }
 

@@ -205,29 +205,36 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
     public void clearSelectedMode() {
         selectMode = false;
         toggleSelectModeActionBar();
-        toggleSelectedMultipleRecordings();
+        for(int adapterPosition : selectedItems) {
+            adapter.notifyItemChanged(adapterPosition);
+            //https://stackoverflow.com/questions/33784369/recyclerview-get-view-at-particular-position
+            CardView recordingSlot = (CardView) recordingsRecycler.getLayoutManager().findViewByPosition(adapterPosition);
+            if (recordingSlot != null) //este posibil ca recordingul să fi fost șters sau să nu fie în prezent
+                //pe ecran.
+                deselectRecording(recordingSlot);
+        }
         selectedItems.clear();
     }
 
+
     @Override
-    public void toggleSelectedMultipleRecordings() {
-        for (int adapterPosition : selectedItems) {
-            CardView recordingSlot = (CardView) recordingsRecycler.getLayoutManager().findViewByPosition(adapterPosition);
-            if (recordingSlot != null) //este posibil ca recordingul să fi fost șters
-                toggleSelectedRecording(recordingSlot);
-        }
+    public void selectRecording(@NonNull CardView card) {
+        ImageView selectedTick = card.findViewById(R.id.recording_selected);
+        selectedTick.setVisibility(View.VISIBLE);
+        if(getParentActivity().getSettedTheme().equals(TemplateActivity.LIGHT_THEME))
+            card.setCardBackgroundColor(getResources().getColor(R.color.lightRecordingSelected));
+        else
+            card.setCardBackgroundColor(getResources().getColor(R.color.darkRecordingSelected));
     }
 
     @Override
-    public void toggleSelectedRecording(@NonNull CardView card) {
+    public void deselectRecording(CardView card) {
         ImageView selectedTick = card.findViewById(R.id.recording_selected);
-        selectedTick.setVisibility((selectedTick.getVisibility() == View.VISIBLE) ? View.GONE : View.VISIBLE);
+        selectedTick.setVisibility(View.GONE);
         if(getParentActivity().getSettedTheme().equals(TemplateActivity.LIGHT_THEME))
-            card.setCardBackgroundColor((card.getCardBackgroundColor().getDefaultColor() == getResources().getColor(R.color.lightRecordingNotSelected)) ? getResources().getColor(R.color.lightRecordingSelected) :
-                    getResources().getColor(R.color.lightRecordingNotSelected));
+            card.setCardBackgroundColor(getResources().getColor(R.color.lightRecordingNotSelected));
         else
-            card.setCardBackgroundColor((card.getCardBackgroundColor().getDefaultColor() == getResources().getColor(R.color.darkRecordingNotSelected)) ? getResources().getColor(R.color.darkRecordingSelected) :
-                    getResources().getColor(R.color.darkRecordingNotSelected));
+            card.setCardBackgroundColor(getResources().getColor(R.color.darkRecordingNotSelected));
     }
 
     @Override
@@ -442,7 +449,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
             if(contact.isPrivateNumber())
                 contactPhotoView.setImageResource(R.drawable.user_contact_red);
             else
-                contactPhotoView.setImageResource(R.drawable.user_contact_blue);
+                contactPhotoView.setImageResource(R.drawable.user_contact);
         }
         displayRecordingStatus();
 
@@ -628,9 +635,12 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
             holder.recordingTime.setText(recording.getTime());
             holder.recordingType.setImageResource(recording.isIncoming() ? R.drawable.incoming : R.drawable.outgoing);
 
-            //pentru situația cînd este întors ecranul sau cînd activitatea trece în background:
+            //pentru situația cînd este întors ecranul sau cînd activitatea trece
+            // în background sau cînd se scrolează lista de recordinguri.
             if(selectedItems.contains(position))
-                toggleSelectedRecording((CardView) holder.itemView);
+                selectRecording((CardView) holder.itemView);
+            else
+                deselectRecording((CardView) holder.itemView);
         }
 
         @Override

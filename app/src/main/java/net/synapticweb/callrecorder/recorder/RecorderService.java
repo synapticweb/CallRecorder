@@ -40,7 +40,7 @@ public class RecorderService extends Service {
     private static String receivedNumPhone;
     private static Boolean privateCall = null;
     private static Boolean match = null;
-    private Boolean incoming = null;
+    private static Boolean incoming = null;
     public static boolean shouldStartAtHookup = false;
     private Long idIfMatch = null;
     private static String contactNameIfMatch = null;
@@ -94,19 +94,19 @@ public class RecorderService extends Service {
             case RECORD_AUTOMMATICALLY:
                 builder = new NotificationCompat.Builder(CallRecorderApplication.getInstance(), CHANNEL_ID)
                         .setSmallIcon(R.drawable.ic_album_white_24dp)
-                        .setContentTitle(callNameOrNumber)
+                        .setContentTitle(callNameOrNumber + (incoming ? " (incoming)" : " (outgoing)"))
                         .setContentIntent(tapNotificationPi)
                         .setLargeIcon(bitmap)
-                        .setStyle(new NotificationCompat.BigTextStyle().bigText("Recording..."));
+                        .setContentText("Recording...");
 
                 break;
             case RECORD_ON_HOOKUP:
                 builder = new NotificationCompat.Builder(CallRecorderApplication.getInstance(), CHANNEL_ID)
                         .setSmallIcon(R.drawable.ic_album_white_24dp)
-                        .setContentTitle(callNameOrNumber)
+                        .setContentTitle(callNameOrNumber + (incoming ? " (incoming)" : " (outgoing)"))
                         .setContentIntent(tapNotificationPi)
                         .setLargeIcon(bitmap)
-                        .setStyle(new NotificationCompat.BigTextStyle().bigText("Recording will begin when you answer the call."));
+                        .setContentText("Recording will begin when you answer the call.");
                 break;
             case RECORD_ON_REQUEST:
                 notificationIntent = new Intent(CallRecorderApplication.getInstance(), ControlRecordingReceiver.class);
@@ -123,12 +123,12 @@ public class RecorderService extends Service {
 
                 builder = new NotificationCompat.Builder(CallRecorderApplication.getInstance(), CHANNEL_ID)
                         .setSmallIcon(R.drawable.ic_album_white_24dp)
-                        .setContentTitle(callNameOrNumber)
+                        .setContentTitle(callNameOrNumber + (incoming ? " (incoming)" : " (outgoing)"))
                         .setContentIntent(tapNotificationPi)
                         .setLargeIcon(bitmap)
                         .addAction(new NotificationCompat.Action.Builder(R.drawable.ic_play_grey600_24dp,
                                 "Start recording", startRecordingPi).build() )
-                        .setStyle(new NotificationCompat.BigTextStyle().bigText("Press \"Start recording\" to begin recording."));
+                        .setContentText("Press \"Start recording\" to begin recording.");
         }
         if(builder != null)
             return builder.build();

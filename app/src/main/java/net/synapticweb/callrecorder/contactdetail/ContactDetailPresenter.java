@@ -107,13 +107,16 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
 
     @Override
     public void selectRecording(CardView card, int adapterPosition) {
-         view.toggleSelectedRecording(card);
          if(!view.getSelectMode()) {
              view.setSelectMode(true);
              view.toggleSelectModeActionBar();
          }
-         if(!view.removeIfPresentInSelectedItems(adapterPosition))
+         if(!view.removeIfPresentInSelectedItems(adapterPosition)) {
              view.addToSelectedItems(adapterPosition);
+             view.selectRecording(card);
+         }
+         else
+             view.deselectRecording(card);
 
          if(view.isEmptySelectedItems())
              view.clearSelectedMode();
@@ -183,10 +186,14 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
 
         RecyclerView recordingsRecycler = view.getRecordingsRecycler();
         for(int position : notSelected) {
+            view.addToSelectedItems(position);
+            adapter.notifyItemChanged(position);
             //https://stackoverflow.com/questions/33784369/recyclerview-get-view-at-particular-position
             CardView selectedRecordingCard = (CardView) recordingsRecycler.getLayoutManager().findViewByPosition(position);
-            if(selectedRecordingCard != null)
-                selectRecording(selectedRecordingCard, position);
+            if(selectedRecordingCard != null) //dacă recordingul nu este încă afișat pe ecran
+                // (sunt multe recordinguri și se scrolează) atunci selectedRecording va fi null. Dar mai înainte am
+                //notificat adapterul că s-a schimbat, ca să îl reconstruiască.
+               view.selectRecording(selectedRecordingCard);
         }
     }
 }

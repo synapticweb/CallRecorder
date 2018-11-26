@@ -20,7 +20,8 @@ public interface ContactDetailContract {
         void addToSelectedItems(int adapterPosition);
         boolean removeIfPresentInSelectedItems(int adapterPosition);
         void toggleSelectModeActionBar();
-        void toggleSelectedRecording(CardView card);
+        void selectRecording(CardView card);
+        void deselectRecording(CardView card);
         boolean isEmptySelectedItems();
         void clearSelectedMode();
         List<Recording> getSelectedRecordings();
@@ -28,7 +29,6 @@ public interface ContactDetailContract {
         void displayRecordingStatus();
         boolean isSinglePaneLayout();
         void setActionBarTitleIfActivityDetail();
-        void toggleSelectedMultipleRecordings();
         RecyclerView getRecordingsRecycler();
         ContactDetailFragment.RecordingAdapter getRecordingsAdapter();
         List<Integer> getSelectedItems();
