@@ -4,24 +4,20 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import net.synapticweb.callrecorder.contactdetail.ContactDetailActivity;
-import net.synapticweb.callrecorder.contactdetail.ContactDetailFragment;
 import net.synapticweb.callrecorder.data.Contact;
 import net.synapticweb.callrecorder.R;
 
@@ -30,8 +26,8 @@ import java.util.List;
 
 public class ContactsListFragment extends Fragment implements ContactsListContract.View {
     private ContactsListPresenter presenter;
-    private ListenedAdapter adapter;
-    private RecyclerView listenedPhones;
+    private ContactsAdapter adapter;
+    private RecyclerView contactsRecycler;
     private int currentPos = 0;
     private Long newAddedContactId = null;
     private boolean hasRestarted = false;
@@ -54,6 +50,16 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
     public void onDetach() {
         super.onDetach();
         parentActivity = null;
+    }
+
+    @Override
+    public RecyclerView getContactsRecycler() {
+        return contactsRecycler;
+    }
+
+    @Override
+    public ContactsAdapter getContactsAdapter() {
+        return adapter;
     }
 
     @Override
@@ -92,7 +98,7 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
     // ContactsListPresenter::loadContacts()
     @Override
     public void showContacts(List<Contact> contacts) {
-        adapter = new ListenedAdapter(contacts);
+        adapter = new ContactsAdapter(contacts);
         if(newAddedContactId != null) {
             for(Contact contact : adapter.getData())
                 if(contact.getId() == newAddedContactId) {
@@ -104,7 +110,7 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
         //înainte de asta aveam un adapter.replaceData() care înlocuia lista din adapter și apela notifyData
         //setChanged(). Performanța era mai bună dar problema era că la adăugarea unui contact nou rămînea
         //marcat și cel anterior.
-        listenedPhones.setAdapter(adapter);
+        contactsRecycler.setAdapter(adapter);
         adapter.notifyDataSetChanged();
         if(!isSinglePaneLayout() && !hasRestarted) { //dacă ne găsim după un restart al activității
             // datorat rotirii nu trebuie să mai înlocuim fragmentul detaliu, el este deja acolo. Dacă
@@ -124,11 +130,15 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
     }
 
     @Override
-    public void markSelectedContact(@Nullable  View previousSelected, @Nullable View currentSelected) {
-        if(previousSelected != null)
-            previousSelected.findViewById(R.id.tablet_current_selection).setVisibility(View.GONE);
-        if(currentSelected != null)
-            currentSelected.findViewById(R.id.tablet_current_selection).setVisibility(View.VISIBLE);
+    public void selectContact(View contactSlot) {
+        if(contactSlot != null)
+            contactSlot.findViewById(R.id.tablet_current_selection).setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void deselectContact(View contactSlot) {
+        if(contactSlot != null)
+            contactSlot.findViewById(R.id.tablet_current_selection).setVisibility(View.GONE);
     }
 
     @Override
@@ -138,15 +148,15 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
             currentPos = savedInstanceState.getInt(CURRENT_POS_KEY);
             hasRestarted = true;
         }
-        this.adapter = new ListenedAdapter(new ArrayList<Contact>(0));
+        this.adapter = new ContactsAdapter(new ArrayList<Contact>(0));
         this.presenter = new ContactsListPresenter(this);
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        listenedPhones = (RecyclerView) inflater.inflate(R.layout.list_contacts_fragment, container, false);
-        listenedPhones.setLayoutManager(new LinearLayoutManager(parentActivity));
+        contactsRecycler = (RecyclerView) inflater.inflate(R.layout.list_contacts_fragment, container, false);
+        contactsRecycler.setLayoutManager(new LinearLayoutManager(parentActivity));
 
         if(parentActivity != null) {
             FloatingActionButton fab = parentActivity.findViewById(R.id.add_numbers);
@@ -157,7 +167,7 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
                 }
             });
         }
-        return listenedPhones;
+        return contactsRecycler;
     }
 
     @Override
@@ -166,13 +176,13 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
             presenter.onAddContactResult(intent);
     }
 
-    public class PhoneHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class ContactHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         ImageView contactPhoto;
         TextView mContactName;
         TextView mPhoneNumber;
         Contact contact;
 
-        PhoneHolder(LayoutInflater inflater, ViewGroup parent)
+        ContactHolder(LayoutInflater inflater, ViewGroup parent)
         {
             super(inflater.inflate(R.layout.listened_phone, parent, false));
             itemView.setOnClickListener(this);
@@ -185,15 +195,13 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
         public void onClick(View view) {
             int previousPos = currentPos;
             currentPos = getAdapterPosition();
-            View previousSelected = listenedPhones.getLayoutManager().findViewByPosition(previousPos);
-            View currentSelected = listenedPhones.getLayoutManager().findViewByPosition(currentPos);
-            presenter.manageContactDetails(contact, previousSelected, currentSelected);
+            presenter.manageContactDetails(contact, previousPos, currentPos);
         }
     }
 
-    class ListenedAdapter extends RecyclerView.Adapter<PhoneHolder> {
+    class ContactsAdapter extends RecyclerView.Adapter<ContactHolder> {
         private List<Contact> contacts;
-        ListenedAdapter(List<Contact> list){
+        ContactsAdapter(List<Contact> list){
             contacts = list;
         }
 
@@ -203,13 +211,13 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
 
         @Override
         @NonNull
-        public PhoneHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        public ContactHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             LayoutInflater layoutInflater = LayoutInflater.from(parentActivity);
-            return new PhoneHolder(layoutInflater, parent);
+            return new ContactHolder(layoutInflater, parent);
         }
 
         @Override
-        public void onBindViewHolder(@NonNull PhoneHolder holder, int position) {
+        public void onBindViewHolder(@NonNull ContactHolder holder, int position) {
             Contact contact = contacts.get(position);
 
             if(!isSinglePaneLayout())
@@ -235,9 +243,11 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
             if(!isSinglePaneLayout())
                 holder.mPhoneNumber.setVisibility(View.GONE);
 
-            if(position == currentPos && !isSinglePaneLayout())
-                markSelectedContact(null, holder.itemView);
-        }
+            if(!isSinglePaneLayout() && position == currentPos)
+                selectContact(holder.itemView);
+            else if(!isSinglePaneLayout() && position != currentPos)
+                deselectContact(holder.itemView);
+         }
 
         Contact getItem(int position) {
             return contacts.get(position);

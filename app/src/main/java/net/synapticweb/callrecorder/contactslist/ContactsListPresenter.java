@@ -83,12 +83,17 @@ public class ContactsListPresenter implements ContactsListContract.ContactsListP
     }
 
     @Override
-    public void manageContactDetails(Contact contact, View previousSelected, View currentSelected) {
+    public void manageContactDetails(Contact contact, int previousSelectedPosition, int currentSelectedPosition) {
         if(view.isSinglePaneLayout())
             view.startContactDetailActivity(contact);
         else {
             setCurrentDetail(contact);
-            view.markSelectedContact(previousSelected, currentSelected);
+            View currentSelectedView = view.getContactsRecycler().getLayoutManager().findViewByPosition(currentSelectedPosition);
+            View previousSelectedView = view.getContactsRecycler().getLayoutManager().findViewByPosition(previousSelectedPosition);
+            view.selectContact(currentSelectedView);
+            view.getContactsAdapter().notifyItemChanged(currentSelectedPosition);
+            view.deselectContact(previousSelectedView);
+            view.getContactsAdapter().notifyItemChanged(previousSelectedPosition);
         }
     }
 
