@@ -13,8 +13,11 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 
+import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.Phonenumber;
 
 import net.synapticweb.callrecorder.AppLibrary;
 import net.synapticweb.callrecorder.CallRecorderApplication;
@@ -97,15 +100,6 @@ public class ContactsListPresenter implements ContactsListContract.ContactsListP
         }
     }
 
-    private void alertAtInsertContact(int message, Activity activity) {
-        new MaterialDialog.Builder(activity)
-                .title(R.string.number_exists_title)
-                .content(CallRecorderApplication.getInstance().getResources().getString(message))
-                .positiveText(android.R.string.ok)
-                .icon(CallRecorderApplication.getInstance().getResources().getDrawable(R.drawable.warning))
-                .show();
-    }
-
     @Override
     public void addNewContact() {
         Fragment fragment = (Fragment) view;
@@ -117,7 +111,8 @@ public class ContactsListPresenter implements ContactsListContract.ContactsListP
     public void onAddContactResult(Intent intent) {
         Uri numberUri;
         String newNumber = null, contactName = null, photoUri = null;
-        int phoneType = UNKNOWN_TYPE_PHONE_CODE;
+        int phoneType = AppLibrary.UNKNOWN_TYPE_PHONE_CODE;
+        Phonenumber.PhoneNumber phoneNumberWrapper;
 
         if(intent != null && (numberUri = intent.getData()) != null) {
             Cursor cursor = view.getParentActivity().getContentResolver().
@@ -128,20 +123,23 @@ public class ContactsListPresenter implements ContactsListContract.ContactsListP
                             null, null, null);
             if (cursor != null) {
                 cursor.moveToFirst();
-                newNumber = cursor.getString(cursor.getColumnIndex(android.provider.ContactsContract.CommonDataKinds.Phone.NUMBER));
+                newNumber = cursor.getString(cursor.getColumnIndex(android.provider.ContactsContract.CommonDataKinds.Phone.NUMBER)) ;
                 contactName = cursor.getString(cursor.getColumnIndex(android.provider.ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
                 photoUri = cursor.getString(cursor.getColumnIndex(android.provider.ContactsContract.CommonDataKinds.Phone.PHOTO_URI));
                 phoneType = cursor.getInt(cursor.getColumnIndex(android.provider.ContactsContract.CommonDataKinds.Phone.TYPE));
                 cursor.close();
             }
 
-            PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
+            final PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
             String countryCode = AppLibrary.getUserCountry(CallRecorderApplication.getInstance());
             if(countryCode == null)
                 countryCode = "US";
-
-            if(!phoneUtil.isPossibleNumber(newNumber, countryCode)) {
-                alertAtInsertContact(R.string.number_impossible, view.getParentActivity());
+            try {
+               phoneNumberWrapper = phoneUtil.parse(newNumber, countryCode);
+            }
+            catch (NumberParseException exc) {
+                fireAlert(view.getParentActivity(),R.string.number_invalid_title, R.string.number_invalid_message,
+                        android.R.string.ok, null, null);
                 return ;
             }
 
@@ -153,28 +151,46 @@ public class ContactsListPresenter implements ContactsListContract.ContactsListP
 
             boolean match = false;
             while (cursor.moveToNext()) {
-                PhoneNumberUtil.MatchType matchType = phoneUtil.isNumberMatch(cursor.getString(
-                        cursor.getColumnIndex(ContactsContract.Contacts.COLUMN_NAME_NUMBER)), newNumber);
+                PhoneNumberUtil.MatchType matchType = phoneUtil.isNumberMatch(phoneNumberWrapper, cursor.getString(
+                        cursor.getColumnIndex(ContactsContract.Contacts.COLUMN_NAME_NUMBER)));
                 if (matchType != PhoneNumberUtil.MatchType.NO_MATCH && matchType != PhoneNumberUtil.MatchType.NOT_A_NUMBER) {
                     match = true;
                     break;
                 }
             }
+            cursor.close();
 
-            if (match)
-                alertAtInsertContact(R.string.number_exists_message, view.getParentActivity());
-            else
-            {
-                Contact contact = new Contact(null, newNumber, contactName, photoUri, phoneType);
-                try {
-                    contact.copyPhotoIfExternal(view.getParentActivity());
-                    contact.insertInDatabase(CallRecorderApplication.getInstance());
-                }
-                catch (SQLException | IOException exc) {
-                    Log.wtf(TAG, exc.getMessage());
-                }
-                view.setNewAddedContactId(contact.getId());
+            if (match) {
+               fireAlert(view.getParentActivity(), R.string.number_exists_title, R.string.number_exists_message,
+                       android.R.string.ok, null, null);
+                return ;
             }
+
+            Contact contact = new Contact(null, newNumber, contactName, photoUri, phoneType);
+            try {
+                contact.copyPhotoIfExternal(view.getParentActivity());
+                contact.insertInDatabase(CallRecorderApplication.getInstance());
+            }
+            catch (SQLException | IOException exc) {
+                Log.wtf(TAG, exc.getMessage());
+            }
+            view.setNewAddedContactId(contact.getId());
         }
+    }
+
+    private void fireAlert(Activity activity, int title, int message, int positiveText, Integer negativeText,
+                           MaterialDialog.SingleButtonCallback onPositiveCallback) {
+        MaterialDialog.Builder builder = new MaterialDialog.Builder(activity)
+                .title(title)
+                .content(message)
+                .positiveText(positiveText)
+                .icon(CallRecorderApplication.getInstance().getResources().getDrawable(R.drawable.warning));
+
+                if(negativeText != null)
+                    builder.negativeText(negativeText);
+                if(onPositiveCallback != null)
+                    builder.onPositive(onPositiveCallback);
+
+                builder.show();
     }
 }

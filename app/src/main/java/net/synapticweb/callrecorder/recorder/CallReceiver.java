@@ -104,12 +104,8 @@ public class CallReceiver extends BroadcastReceiver {
             Log.wtf(TAG, intent.getAction());
             outCall = intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER);
             Log.wtf(TAG, "Outgoing number: " + outCall);
-            PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
-            String countryCode = AppLibrary.getUserCountry(context);
-            if(countryCode == null)
-                countryCode = "US";
 
-            if(!serviceStarted && phoneUtil.isPossibleNumber(outCall, countryCode)) //evit pornirea serviciului în caz de ussd, etc.
+            if(!serviceStarted)
             {
                 Intent intentService = new Intent(context, RecorderService.class);
                 serviceName = intentService.getComponent();

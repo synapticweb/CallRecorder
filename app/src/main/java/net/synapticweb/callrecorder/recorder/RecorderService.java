@@ -21,6 +21,10 @@ import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 //import android.support.v4.media.app.NotificationCompat.MediaStyle;device
+import com.google.i18n.phonenumbers.NumberParseException;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.Phonenumber;
+
 import java.io.IOException;
 import net.synapticweb.callrecorder.AppLibrary;
 import net.synapticweb.callrecorder.CallRecorderApplication;
@@ -171,6 +175,19 @@ public class RecorderService extends Service {
                 contactNameIfMatch = contact.getContactName(); //posibil subiect pentru un test.
                 shouldRecord = contact.shouldRecord();
             }
+            else { //în caz de ussd serviciul se oprește
+                PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
+                String countryCode = AppLibrary.getUserCountry(CallRecorderApplication.getInstance());
+                if(countryCode == null)
+                    countryCode = "US";
+                try {
+                    phoneUtil.parse(receivedNumPhone, countryCode);
+                }
+                catch (NumberParseException exc) {
+                    stopSelf();
+                }
+            }
+
         }
 
         if(incoming) {
