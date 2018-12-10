@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.AudioManager;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -27,7 +28,18 @@ public class ControlRecordingReceiver extends BroadcastReceiver {
             String phoneNumber = intent.getExtras().getString(RecorderService.PHONE_NUMBER);
             if(nm != null)
                 nm.notify(RecorderService.NOTIFICATION_ID, RecorderService.buildNotification(RecorderService.RECORD_AUTOMMATICALLY, callIdentifier));
-            RecorderBox.doRecording(CallRecorderApplication.getInstance(), phoneNumber);
+            RecorderBox.doRecording(CallRecorderApplication.getInstance(), phoneNumber, callIdentifier);
+        }
+        else if(intent.getAction().equals(RecorderBox.ACTION_STOP_SPEAKER)) {
+            String callIdentifier =  intent.getExtras().getString(RecorderService.CALL_IDENTIFIER);
+            AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+            if(audioManager != null && audioManager.isSpeakerphoneOn()) {
+                audioManager.setSpeakerphoneOn(false);
+                audioManager.setMode(AudioManager.MODE_NORMAL);
+                Log.wtf(TAG, "Speaker is on: " + audioManager.isSpeakerphoneOn());
+            }
+            if(nm != null)
+                nm.notify(RecorderService.NOTIFICATION_ID, RecorderService.buildNotification(RecorderService.RECORD_AUTOMMATICALLY, callIdentifier));
         }
     }
 }

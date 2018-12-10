@@ -41,7 +41,7 @@ import static net.synapticweb.callrecorder.AppLibrary.*;
 
 public class RecorderService extends Service {
     private static final String TAG = "CallRecorder";
-    private static String receivedNumPhone;
+    private static String receivedNumPhone = null;
     private static Boolean privateCall = null;
     private static Boolean match = null;
     private static Boolean incoming = null;
@@ -57,6 +57,7 @@ public class RecorderService extends Service {
     public static final int RECORD_AUTOMMATICALLY = 1;
     public static final int RECORD_ON_HOOKUP = 2;
     public static final int RECORD_ON_REQUEST = 3;
+    public static final int RECORD_AUTOMMATICALLY_SPEAKER_ON = 4;
 
     @Override
     public IBinder onBind(Intent i){
@@ -92,52 +93,46 @@ public class RecorderService extends Service {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             createChannel();
-        NotificationCompat.Builder builder = null;
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(CallRecorderApplication.getInstance(), CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_album_white_24dp)
+                .setContentTitle(callNameOrNumber + (incoming ? " (incoming)" : " (outgoing)"))
+                .setContentIntent(tapNotificationPi)
+                .setLargeIcon(bitmap);
+
+        String callIdentifier;
+        if(privateCall)
+            callIdentifier = CallRecorderApplication.getInstance().getResources().getString(R.string.private_number_name);
+        else
+            callIdentifier = match ? contactNameIfMatch : receivedNumPhone;
 
         switch(typeOfNotification) {
+            case RECORD_AUTOMMATICALLY_SPEAKER_ON:
+                notificationIntent = new Intent(CallRecorderApplication.getInstance(), ControlRecordingReceiver.class);
+                notificationIntent.setAction(RecorderBox.ACTION_STOP_SPEAKER);
+                notificationIntent.putExtra(CALL_IDENTIFIER, callIdentifier);
+                PendingIntent stopSpeakerPi = PendingIntent.getBroadcast(CallRecorderApplication.getInstance(), 0, notificationIntent, 0);
+                builder.addAction(new NotificationCompat.Action.Builder(R.drawable.ic_play_grey600_24dp,
+                                "Stop speaker", stopSpeakerPi).build() )
+                        .setContentText("Recording... (speaker on)");
+                break;
             case RECORD_AUTOMMATICALLY:
-                builder = new NotificationCompat.Builder(CallRecorderApplication.getInstance(), CHANNEL_ID)
-                        .setSmallIcon(R.drawable.ic_album_white_24dp)
-                        .setContentTitle(callNameOrNumber + (incoming ? " (incoming)" : " (outgoing)"))
-                        .setContentIntent(tapNotificationPi)
-                        .setLargeIcon(bitmap)
-                        .setContentText("Recording...");
-
+                builder.setContentText("Recording...");
                 break;
             case RECORD_ON_HOOKUP:
-                builder = new NotificationCompat.Builder(CallRecorderApplication.getInstance(), CHANNEL_ID)
-                        .setSmallIcon(R.drawable.ic_album_white_24dp)
-                        .setContentTitle(callNameOrNumber + (incoming ? " (incoming)" : " (outgoing)"))
-                        .setContentIntent(tapNotificationPi)
-                        .setLargeIcon(bitmap)
-                        .setContentText("Recording will begin when you answer the call.");
+                builder.setContentText("Recording will begin when you answer the call.");
                 break;
             case RECORD_ON_REQUEST:
                 notificationIntent = new Intent(CallRecorderApplication.getInstance(), ControlRecordingReceiver.class);
                 notificationIntent.setAction(RecorderBox.ACTION_START_RECORDING);
-                String callIdentifier;
-                if(privateCall)
-                    callIdentifier = CallRecorderApplication.getInstance().getResources().getString(R.string.private_number_name);
-                else
-                    callIdentifier = match ? contactNameIfMatch : receivedNumPhone;
-
                 notificationIntent.putExtra(CALL_IDENTIFIER, callIdentifier);
                 notificationIntent.putExtra(PHONE_NUMBER, receivedNumPhone != null ? receivedNumPhone : "private_phone");
                 PendingIntent startRecordingPi = PendingIntent.getBroadcast(CallRecorderApplication.getInstance(), 0, notificationIntent, 0);
-
-                builder = new NotificationCompat.Builder(CallRecorderApplication.getInstance(), CHANNEL_ID)
-                        .setSmallIcon(R.drawable.ic_album_white_24dp)
-                        .setContentTitle(callNameOrNumber + (incoming ? " (incoming)" : " (outgoing)"))
-                        .setContentIntent(tapNotificationPi)
-                        .setLargeIcon(bitmap)
-                        .addAction(new NotificationCompat.Action.Builder(R.drawable.ic_play_grey600_24dp,
+                builder.addAction(new NotificationCompat.Action.Builder(R.drawable.ic_play_grey600_24dp,
                                 "Start recording", startRecordingPi).build() )
                         .setContentText("Press \"Start recording\" to begin recording.");
         }
-        if(builder != null)
-            return builder.build();
 
-        return  null;
+        return builder.build();
     }
 
     public static void onIncomingOfhook() {
@@ -151,7 +146,8 @@ public class RecorderService extends Service {
                 callIdentifier = match ? contactNameIfMatch : receivedNumPhone;
             if(nm != null)
                 nm.notify(NOTIFICATION_ID, buildNotification(RECORD_AUTOMMATICALLY, callIdentifier));
-            RecorderBox.doRecording(CallRecorderApplication.getInstance(), receivedNumPhone != null ? receivedNumPhone : "private_phone");
+            RecorderBox.doRecording(CallRecorderApplication.getInstance(),
+                    receivedNumPhone != null ? receivedNumPhone : "private_phone", callIdentifier);
         }
     }
 
@@ -187,14 +183,14 @@ public class RecorderService extends Service {
                     stopSelf();
                 }
             }
-
         }
+        final SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(CallRecorderApplication.getInstance());
+        boolean recordAutommatically = settings.getBoolean(SettingsFragment.AUTOMMATICALLY_RECORD_PRIVATE_CALLS, false);
+        boolean paranoidMode = settings.getBoolean(SettingsFragment.PARANOID_MODE, false);
 
         if(incoming) {
             if(privateCall) {
-                final SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(CallRecorderApplication.getInstance());
-                boolean recordAutommatically = settings.getBoolean(SettingsFragment.AUTOMMATICALLY_RECORD_PRIVATE_CALLS, false);
-                if(recordAutommatically){
+                if(recordAutommatically || paranoidMode){
                     startForeground(NOTIFICATION_ID, buildNotification(RECORD_ON_HOOKUP,
                             getResources().getString(R.string.private_number_name)));
                     shouldStartAtHookup = true;
@@ -204,9 +200,12 @@ public class RecorderService extends Service {
                             getResources().getString(R.string.private_number_name)));
             }
             else { //normal call, number present.
-                if(match) {
+                if(match || paranoidMode) {
+                    if(paranoidMode)
+                        shouldRecord = true;
                     if(shouldRecord) {
-                        startForeground(NOTIFICATION_ID, buildNotification(RECORD_ON_HOOKUP, contactNameIfMatch));
+                        startForeground(NOTIFICATION_ID, buildNotification(RECORD_ON_HOOKUP, contactNameIfMatch
+                                != null ? contactNameIfMatch : receivedNumPhone));
                         shouldStartAtHookup = true;
                     }
                     else
@@ -217,10 +216,13 @@ public class RecorderService extends Service {
             }
         }
         else { //outgoing call
-            if(match) {
+            if(match || paranoidMode) {
+                if(paranoidMode)
+                    shouldRecord = true;
                 if(shouldRecord) {
-                    startForeground(NOTIFICATION_ID, buildNotification(RECORD_AUTOMMATICALLY, contactNameIfMatch));
-                    RecorderBox.doRecording(CallRecorderApplication.getInstance(), receivedNumPhone);
+                    String callIdentifier = contactNameIfMatch != null ? contactNameIfMatch : receivedNumPhone;
+                    startForeground(NOTIFICATION_ID, buildNotification(RECORD_AUTOMMATICALLY, callIdentifier));
+                    RecorderBox.doRecording(CallRecorderApplication.getInstance(), receivedNumPhone, callIdentifier);
                 }
                 else
                     startForeground(NOTIFICATION_ID, buildNotification(RECORD_ON_REQUEST, contactNameIfMatch));
@@ -231,13 +233,24 @@ public class RecorderService extends Service {
         return START_NOT_STICKY;
     }
 
+    private void resetState() {
+        receivedNumPhone = null;
+        privateCall = null;
+        match = null;
+        incoming = null;
+        shouldStartAtHookup = false;
+        idIfMatch = null;
+        contactNameIfMatch = null;
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
         RecorderBox.disposeRecorder();
-
-        if(!RecorderBox.getRecordingDone()) //dacă nu s-a pornit înregistrarea nu avem nimic de făcut
-            return ;
+        if(!RecorderBox.getRecordingDone()) {//dacă nu s-a pornit înregistrarea nu avem nimic de făcut
+            resetState();
+            return;
+        }
 
         CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(getApplicationContext());
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
@@ -305,6 +318,7 @@ public class RecorderService extends Service {
         catch(SQLException exc) {
             Log.wtf(TAG, exc.getMessage());
         }
-
+        RecorderBox.resetState();
+        resetState();
     }
 }

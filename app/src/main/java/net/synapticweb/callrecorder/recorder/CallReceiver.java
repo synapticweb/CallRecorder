@@ -21,6 +21,7 @@ public class CallReceiver extends BroadcastReceiver {
     public static final String ARG_INCOMING = "arg_incoming";
     private static String inCall = "no-incall";
     private static boolean serviceStarted = false;
+    private static boolean incomingOffhookCalled = false;
     private static ComponentName serviceName;
 
     public CallReceiver()
@@ -78,15 +79,16 @@ public class CallReceiver extends BroadcastReceiver {
                 }
 
                 else if(state.equals(TelephonyManager.EXTRA_STATE_OFFHOOK)) {
-                    //Citește: dacă serviciul este pornit ȘI: ORI nr este null (privat), ORI este diferit
+                    //Citește: dacă serviciul este pornit ȘI nu a fost încă apelat onIncomingOffHook
+                    // ȘI: ORI nr este null (privat), ORI este diferit
                     // de no-incall (a fost modificat într-un nr. obișnuit), deci este incoming, nu outgoing.
-                    if(serviceStarted && (inCall == null || !inCall.equals("no-incall")) ) {
+                    if(serviceStarted && !incomingOffhookCalled && (inCall == null || !inCall.equals("no-incall")) ) {
                         RecorderService.onIncomingOfhook();
+                        incomingOffhookCalled = true;
                     }
                 }
 
-                else if(state.equals(TelephonyManager.EXTRA_STATE_IDLE))
-                {
+                else if(state.equals(TelephonyManager.EXTRA_STATE_IDLE)) {
                     if(serviceStarted) {
                         Intent stopIntent = new Intent(context, RecorderService.class);
                         stopIntent.setComponent(serviceName);
@@ -94,6 +96,7 @@ public class CallReceiver extends BroadcastReceiver {
                         serviceStarted = false;
                         Log.wtf(TAG, "Service stopped by CallReceiver");
                     }
+                    incomingOffhookCalled = false;
                 }
             }
         }

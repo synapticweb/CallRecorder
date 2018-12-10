@@ -1,14 +1,19 @@
 package net.synapticweb.callrecorder.contactdetail;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 
+import net.synapticweb.callrecorder.CallRecorderApplication;
 import net.synapticweb.callrecorder.R;
+import net.synapticweb.callrecorder.data.Contact;
 import net.synapticweb.callrecorder.data.Recording;
+import net.synapticweb.callrecorder.settings.SettingsFragment;
 
 import java.lang.ref.WeakReference;
 
@@ -37,16 +42,18 @@ public class ExportAsyncTask extends AsyncTask<Recording, Integer, Boolean> {
     public long alreadyCopied = 0;
     private String path;
     private long totalSize;
-    private String phoneNumber;
+    private Contact contact;
     private MaterialDialog dialog;
     private WeakReference<Activity> activityRef; //http://sohailaziz05.blogspot.com/2014/10/asynctask-and-context-leaking.html
+    private WeakReference<ContactDetailPresenter> presenterRef;
     private static final String TAG = "CallRecorder";
 
-    public ExportAsyncTask(String foderPath, long totalSize, String phoneNumber, Activity activity) {
+    ExportAsyncTask(String foderPath, long totalSize, Contact contact, Activity activity, ContactDetailPresenter presenter) {
         this.path = foderPath;
         this.totalSize = totalSize;
-        this.phoneNumber = phoneNumber;
+        this.contact = contact;
         activityRef = new WeakReference<>(activity);
+        presenterRef =  new WeakReference<>(presenter);
     }
 
     public void callPublishProgress(int progress) {
@@ -89,11 +96,20 @@ public class ExportAsyncTask extends AsyncTask<Recording, Integer, Boolean> {
     @Override
     protected void onPostExecute(Boolean result) {
         dialog.dismiss();
+        final SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(CallRecorderApplication.getInstance());
+        final boolean deleteOnExport = settings.getBoolean(SettingsFragment.DELETE_ON_EXPORT, false);
         if(result) {
             new MaterialDialog.Builder(activityRef.get())
                     .title("Success")
                     .content("The recording(s) were successfully exported.")
                     .positiveText("OK")
+                    .onPositive(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                            if(deleteOnExport)
+                                presenterRef.get().loadRecordings(contact);
+                        }
+                    })
                     .icon(activityRef.get().getResources().getDrawable(R.drawable.success))
                     .show();
         }
@@ -102,6 +118,13 @@ public class ExportAsyncTask extends AsyncTask<Recording, Integer, Boolean> {
                     .title("Error")
                     .content("An error occurred while exporting the recording(s). Some files might be corrupted or missing.")
                     .positiveText("OK")
+                    .onPositive(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                            if(deleteOnExport)
+                                presenterRef.get().loadRecordings(contact);
+                        }
+                    })
                     .icon(activityRef.get().getResources().getDrawable(R.drawable.error))
                     .show();
         }
@@ -109,9 +132,13 @@ public class ExportAsyncTask extends AsyncTask<Recording, Integer, Boolean> {
 
     @Override
     protected Boolean doInBackground(Recording...recordings) {
+        final SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(CallRecorderApplication.getInstance());
+        boolean deleteOnExport = settings.getBoolean(SettingsFragment.DELETE_ON_EXPORT, false);
         for(Recording recording : recordings) {
             try {
-                recording.export(path, this, totalSize, phoneNumber);
+                recording.export(path, this, totalSize, contact.getPhoneNumber());
+                if(deleteOnExport)
+                    recording.delete(CallRecorderApplication.getInstance());
                 if(isCancelled())
                     break;
             }

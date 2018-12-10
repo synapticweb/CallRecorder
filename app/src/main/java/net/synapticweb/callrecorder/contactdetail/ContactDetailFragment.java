@@ -3,10 +3,12 @@ package net.synapticweb.callrecorder.contactdetail;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -36,10 +38,12 @@ import com.codekidlabs.storagechooser.Content;
 import com.codekidlabs.storagechooser.StorageChooser;
 
 import net.synapticweb.callrecorder.AppLibrary;
+import net.synapticweb.callrecorder.CallRecorderApplication;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.TemplateActivity;
 import net.synapticweb.callrecorder.data.Contact;
 import net.synapticweb.callrecorder.data.Recording;
+import net.synapticweb.callrecorder.settings.SettingsFragment;
 
 import java.util.ArrayList;
 import java.util.List;
