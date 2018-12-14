@@ -43,7 +43,7 @@
     <string name="number_invalid_title">Information</string>
     <string name="number_invalid_message">This number is not valid.</string>
     <string name="number_exists_title">Information</string>
-    <string name="number_exists_message">This number already exists in the application's database.</string>
+    <string name="number_exists_message">This number already exists in the application\'s database.</string>
     <string name="nonstandard_number_title">Warning</string>
     <string name="nonstandard_number_message">The number you picked up is not a standard number. Do you still want to add the number to the database?"</string>
     <string name="yes">YES</string>

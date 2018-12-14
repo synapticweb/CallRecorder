@@ -10,10 +10,11 @@ import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.content.FileProvider;
-import android.support.v4.util.Pair;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.FileProvider;
+import androidx.core.util.Pair;
 import android.util.Log;
 import android.util.LongSparseArray;
 
@@ -164,7 +165,8 @@ public class Contact implements Comparable<Contact>, Parcelable {
          throw new SQLException("This Contacts row was not deleted");
     }
 
-  @Nullable static public Contact searchNumberInPhoneContacts(final String number, @NonNull final Context context) {
+  @Nullable
+  static public Contact searchNumberInPhoneContacts(final String number, @NonNull final Context context) {
         Contact contact = null;
       Cursor cursor = context.getContentResolver()
               .query(android.provider.ContactsContract.CommonDataKinds.Phone.CONTENT_URI, new String[]{

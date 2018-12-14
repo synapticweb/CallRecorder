@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
 import android.util.Log;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -16,6 +15,8 @@ import net.synapticweb.callrecorder.data.Recording;
 import net.synapticweb.callrecorder.settings.SettingsFragment;
 
 import java.lang.ref.WeakReference;
+
+import androidx.annotation.NonNull;
 
 /*Am decis să folosesc AsyncTask pentru copierea recordingurilor, astfel încît threadul UI să rămînă liber - pentru a putea
    anula taskul dacă ar fi necesar. AS m-a obligat să fac clasa ExportAsyncTask statică - cică altfel colectorul de gunoaie

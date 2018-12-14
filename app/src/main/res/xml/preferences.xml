@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<androidx.preference.PreferenceScreen xmlns:app="http://schemas.app.com/apk/res/app"
+    xmlns:android="http://schemas.android.com/apk/res/android">
     <SwitchPreference
         android:key="auth_record_priv"
         android:title="Private numbers calls"
@@ -22,7 +23,7 @@
     <ListPreference
         android:title="Speaker use"
         android:key="speaker_use"
-        android:summary="Choose how to use the speaker while recording."
+        app:useSimpleSummaryProvider="true"
         android:entries="@array/speaker_options_names"
         android:entryValues="@array/speaker_options_values"
         android:defaultValue="on_if_poor_quality"/>
@@ -30,9 +31,8 @@
     <ListPreference
         android:title="Theme"
         android:key="theme"
-        android:summary="Choose the application theme"
+        app:useSimpleSummaryProvider="true"
         android:entries="@array/theme_options_names"
         android:entryValues="@array/theme_options_values"
         android:defaultValue="light_theme" />
-
-</PreferenceScreen>
+</androidx.preference.PreferenceScreen>

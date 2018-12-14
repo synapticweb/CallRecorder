@@ -55,7 +55,7 @@
            /> <!--Fără screenSize continuă să se restarteze. -->
 
         <provider
-            android:name="android.support.v4.content.FileProvider"
+            android:name="androidx.core.content.FileProvider"
             android:authorities="net.synapticweb.callrecorder.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">

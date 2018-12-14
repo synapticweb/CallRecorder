@@ -1,7 +1,6 @@
 package net.synapticweb.callrecorder;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
 import android.telephony.TelephonyManager;
 
 import java.util.ArrayList;
@@ -9,6 +8,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
+
+import androidx.annotation.Nullable;
 
 public class AppLibrary {
     public static final int SQLITE_TRUE = 1;

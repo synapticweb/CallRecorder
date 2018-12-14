@@ -1,7 +1,7 @@
 package net.synapticweb.callrecorder.player;
 
 import android.media.MediaPlayer;
-import android.support.v7.app.AppCompatActivity;
+
 import android.util.Log;
 import android.view.WindowManager;
 
@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 //https://medium.com/google-developers/building-a-simple-audio-app-in-android-part-2-3-a514f6224b83
 

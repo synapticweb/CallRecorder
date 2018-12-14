@@ -1,16 +1,18 @@
 package net.synapticweb.callrecorder.settings;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.Toolbar;
+
 
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.TemplateActivity;
 
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.Toolbar;
+import androidx.preference.PreferenceFragmentCompat;
+
 public class SettingsActivity extends TemplateActivity {
     @Override
-    protected Fragment createFragment() {
+    protected PreferenceFragmentCompat createFragment() {
         return null;
     }
 
@@ -25,7 +27,7 @@ public class SettingsActivity extends TemplateActivity {
         if(actionBar != null)
             actionBar.setDisplayHomeAsUpEnabled(true);
 
-        getFragmentManager().beginTransaction()
+        getSupportFragmentManager().beginTransaction()
                 .replace(R.id.settings_container, new SettingsFragment())
                 .commit();
     }

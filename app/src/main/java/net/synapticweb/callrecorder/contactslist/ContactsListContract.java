@@ -2,11 +2,10 @@ package net.synapticweb.callrecorder.contactslist;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.support.v7.widget.RecyclerView;
-import android.view.View;
-
 import net.synapticweb.callrecorder.data.Contact;
 import java.util.List;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 public interface ContactsListContract {
     interface View {
