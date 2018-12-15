@@ -41,6 +41,7 @@ public class Contact implements Comparable<Contact>, Parcelable {
     private Uri photoUri = null;
     private boolean privateNumber = false;
     private boolean shouldRecord = true;
+    private Integer color = null;
     private static final String TAG = "CallRecorder";
 
     public Contact(){
@@ -297,6 +298,14 @@ public class Contact implements Comparable<Contact>, Parcelable {
         this.id = id;
     }
 
+    public Integer getColor() {
+        return color;
+    }
+
+    public void setColor(Integer color) {
+        this.color = color;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -311,9 +320,10 @@ public class Contact implements Comparable<Contact>, Parcelable {
         dest.writeParcelable(this.photoUri, flags);
         dest.writeByte(this.privateNumber ? (byte) 1 : (byte) 0);
         dest.writeByte(this.shouldRecord ? (byte) 1 : (byte) 0);
+        dest.writeValue(this.color);
     }
 
-    private Contact(Parcel in) {
+    protected Contact(Parcel in) {
         this.id = (Long) in.readValue(Long.class.getClassLoader());
         this.phoneNumber = in.readString();
         this.phoneType = in.readInt();
@@ -321,9 +331,10 @@ public class Contact implements Comparable<Contact>, Parcelable {
         this.photoUri = in.readParcelable(Uri.class.getClassLoader());
         this.privateNumber = in.readByte() != 0;
         this.shouldRecord = in.readByte() != 0;
+        this.color = (Integer) in.readValue(Integer.class.getClassLoader());
     }
 
-    public static final Parcelable.Creator<Contact> CREATOR = new Parcelable.Creator<Contact>() {
+    public static final Creator<Contact> CREATOR = new Creator<Contact>() {
         @Override
         public Contact createFromParcel(Parcel source) {
             return new Contact(source);

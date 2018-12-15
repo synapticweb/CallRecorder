@@ -10,7 +10,7 @@ import android.content.pm.ResolveInfo;
 import android.os.AsyncTask;
 
 import android.os.Build;
-import android.preference.PreferenceManager;
+
 import android.provider.ContactsContract;
 
 
@@ -24,6 +24,7 @@ import androidx.core.view.GravityCompat;
 
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.preference.PreferenceManager;
 
 import android.os.Bundle;
 

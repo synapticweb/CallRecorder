@@ -11,6 +11,7 @@
         <item name="contactSlotStyle">@style/contactSlotLight</item>
         <item name="contactSlotSeparatorStyle">@style/contactSlotSeparatorLight</item>
         <item name="detailHeaderStyle">@style/detailHeader.Light</item>
+        <item name="tabletCurrentSelectionStyle">@style/tabletCurrentSelectionLight</item>
     </style>
 
     <style name="AppThemeDark" parent="Theme.AppCompat.NoActionBar">
@@ -33,11 +34,11 @@
 <!-- Stiluri diferite pentru un element în funcție de tema selectată:
 https://stackoverflow.com/questions/30487616/android-overriding-a-style-per-theme-->
     <style name="tabletCurrentSelectionLight">
-
+        <item name="android:background">@color/colorAccent</item>
     </style>
 
     <style name="tabletCurrentSelectionDark">
-        <item name="android:background">@color/selected_contact</item>
+        <item name="android:background">@color/colorAccent</item>
     </style>
 
     <style name="contactSlotLight">

@@ -5,6 +5,8 @@ import android.content.ClipData;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -176,6 +178,8 @@ public class EditContactActivity extends TemplateActivity implements AdapterView
                 contactPhoto.setImageResource(R.drawable.user_contact_red);
             else
                 contactPhoto.setImageResource(R.drawable.user_contact);
+                contactPhoto.setColorFilter(new
+                    PorterDuffColorFilter(contact.getColor(), PorterDuff.Mode.LIGHTEN));
         }
 
         registerForContextMenu(contactPhoto);
@@ -280,6 +284,8 @@ public class EditContactActivity extends TemplateActivity implements AdapterView
         oldPhotoUri = contact.getPhotoUri();
         contact.setPhotoUri((Uri) null); //ambigous method call
         contactPhoto.setImageResource(R.drawable.user_contact);
+        contactPhoto.setColorFilter(new
+                PorterDuffColorFilter(contact.getColor(), PorterDuff.Mode.LIGHTEN));
         dataChanged = true;
     }
 

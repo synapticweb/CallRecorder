@@ -6,6 +6,8 @@ import android.content.Intent;
 
 import android.content.res.Configuration;
 
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -28,12 +30,10 @@ import com.codekidlabs.storagechooser.Content;
 import com.codekidlabs.storagechooser.StorageChooser;
 
 import net.synapticweb.callrecorder.AppLibrary;
-import net.synapticweb.callrecorder.CallRecorderApplication;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.TemplateActivity;
 import net.synapticweb.callrecorder.data.Contact;
 import net.synapticweb.callrecorder.data.Recording;
-import net.synapticweb.callrecorder.settings.SettingsFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -451,8 +451,11 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         else {
             if(contact.isPrivateNumber())
                 contactPhotoView.setImageResource(R.drawable.user_contact_red);
-            else
+            else {
                 contactPhotoView.setImageResource(R.drawable.user_contact);
+                contactPhotoView.setColorFilter(new
+                        PorterDuffColorFilter(contact.getColor(), PorterDuff.Mode.LIGHTEN));
+            }
         }
         displayRecordingStatus();
 

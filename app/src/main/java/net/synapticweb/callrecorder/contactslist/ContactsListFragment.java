@@ -1,8 +1,11 @@
 package net.synapticweb.callrecorder.contactslist;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.os.Bundle;
 
 import android.view.LayoutInflater;
@@ -13,12 +16,15 @@ import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import net.synapticweb.callrecorder.AppLibrary;
 import net.synapticweb.callrecorder.contactdetail.ContactDetailActivity;
 import net.synapticweb.callrecorder.data.Contact;
 import net.synapticweb.callrecorder.R;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -35,6 +41,9 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
     private Long newAddedContactId = null;
     private boolean hasRestarted = false;
     private AppCompatActivity parentActivity;
+    private int colorPointer = 0;
+    @SuppressLint("UseSparseArrays")
+    private Map<Long, Integer> contactsColors = new HashMap<>();
     private final static String CURRENT_POS_KEY = "current_pos";
     public final static String ARG_CONTACT = "arg_contact";
 
@@ -204,8 +213,22 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
 
     class ContactsAdapter extends RecyclerView.Adapter<ContactHolder> {
         private List<Contact> contacts;
-        ContactsAdapter(List<Contact> list){
-            contacts = list;
+        ContactsAdapter(List<Contact> contactList){
+            List<Contact> updatedList = new ArrayList<>();
+            for(Contact contact : contactList) {
+                int color;
+                if(contactsColors.containsKey(contact.getId()))
+                    color = contactsColors.get(contact.getId());
+                else {
+                    if(colorPointer == AppLibrary.colorList.size() - 1)
+                        colorPointer = 0;
+                    color = AppLibrary.colorList.get(colorPointer++);
+                    contactsColors.put(contact.getId(), color);
+                }
+                contact.setColor(color);
+                updatedList.add(contact);
+            }
+            contacts = updatedList;
         }
 
         List<Contact> getData() {
@@ -222,10 +245,6 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
         @Override
         public void onBindViewHolder(@NonNull ContactHolder holder, int position) {
             Contact contact = contacts.get(position);
-
-            if(!isSinglePaneLayout())
-                holder.contactPhoto.setVisibility(View.GONE);
-            else {
                 if (contact.getPhotoUri() != null) {
                     holder.contactPhoto.setImageURI(null); //cînd se schimbă succesiv 2 poze făcute de cameră se folosește același fișier și optimizările android fac necesar acest hack pentru a obține refresh-ul pozei
                     holder.contactPhoto.setImageURI(contact.getPhotoUri());
@@ -234,10 +253,13 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
                         holder.contactPhoto.setImageResource(R.drawable.user_contact_red);
                         holder.mPhoneNumber.setVisibility(View.GONE);
                     }
-                    else
+                    else {
                         holder.contactPhoto.setImageResource(R.drawable.user_contact);
+                        //PorteDuffColorFilter ia întotdeauna un aRGB.
+                        holder.contactPhoto.setColorFilter(new
+                                PorterDuffColorFilter(contact.getColor(), PorterDuff.Mode.LIGHTEN));
+                    }
                 }
-            }
 
             holder.mContactName.setText(contact.getContactName());
             holder.contact = contact;

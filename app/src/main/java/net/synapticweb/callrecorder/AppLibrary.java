@@ -25,6 +25,21 @@ public class AppLibrary {
             new PhoneTypeContainer(7, "Other")
     ));
 
+    public static final List<Integer> colorList = new ArrayList<>(Arrays.asList(
+            0xFF666666, 	//Gray
+            0xFF800000, 	//Maroon
+            0xFFFFFF00, 	//Yellow
+            0xFF808000, 	//Olive
+            0xFF00FF00, 	//Lime
+            0xFF008000, 	//Green
+            0xFF00FFFF, 	//Aqua
+            0xFF008080, 	//Teal
+            0xFF0000FF, 	//Blue
+            0xFF000080, 	//Navy
+            0xFFFF00FF, 	//Fuchsia
+            0xFF800080 		//Purple
+    ));
+
     //https://stackoverflow.com/questions/3659809/where-am-i-get-country
     //De văzut și https://stackoverflow.com/questions/26971806/unexpected-telephonymanager-getsimcountryiso-behaviour
     @Nullable
