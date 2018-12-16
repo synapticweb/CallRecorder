@@ -27,4 +27,7 @@
     <color name="selected_contact">#f0e2e7</color>
     <color name="darkMenuBackground">#2e2e2e</color>
     <color name="darkWindowBackground">#2e2e2e</color>
+    <color name="slotLight">@color/white</color>
+    <color name="slotDarkSelected">#3c3c3c</color>
+    <color name="slotLightSelected">#f0f0f0</color>
 </resources>

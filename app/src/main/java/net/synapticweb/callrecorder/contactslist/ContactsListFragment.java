@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import net.synapticweb.callrecorder.AppLibrary;
+import net.synapticweb.callrecorder.TemplateActivity;
 import net.synapticweb.callrecorder.contactdetail.ContactDetailActivity;
 import net.synapticweb.callrecorder.data.Contact;
 import net.synapticweb.callrecorder.R;
@@ -143,14 +144,26 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
 
     @Override
     public void selectContact(View contactSlot) {
-        if(contactSlot != null)
+        if(contactSlot != null) {
             contactSlot.findViewById(R.id.tablet_current_selection).setVisibility(View.VISIBLE);
+            TemplateActivity parentActivity = (TemplateActivity) getParentActivity();
+            if(parentActivity.getSettedTheme().equals(TemplateActivity.LIGHT_THEME))
+                contactSlot.setBackgroundColor(getResources().getColor(R.color.slotLightSelected));
+            else
+                contactSlot.setBackgroundColor(getResources().getColor(R.color.slotDarkSelected));
+        }
     }
 
     @Override
     public void deselectContact(View contactSlot) {
-        if(contactSlot != null)
+        if(contactSlot != null) {
             contactSlot.findViewById(R.id.tablet_current_selection).setVisibility(View.GONE);
+            TemplateActivity parentActivity = (TemplateActivity) getParentActivity();
+            if(parentActivity.getSettedTheme().equals(TemplateActivity.LIGHT_THEME))
+                contactSlot.setBackgroundColor(getResources().getColor(R.color.slotLight));
+            else
+                contactSlot.setBackgroundColor(getResources().getColor(R.color.slotAndDetailHeaderDark));
+        }
     }
 
     @Override
@@ -255,7 +268,12 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
                     }
                     else {
                         holder.contactPhoto.setImageResource(R.drawable.user_contact);
-                        //PorteDuffColorFilter ia întotdeauna un aRGB.
+                        //PorteDuffColorFilter ia întotdeauna un aRGB. modificarea culorii funcționează în felul
+                        //următor: user_contact.xml are în centru culoarea #E6E6E6 (luminozitate 230), mai mare decît
+                        //toate culorile din listă. La margine are negru,luminozitate mai mică decît toate culorile
+                        //din listă. Aplicînd modul LIGHTEN (https://developer.android.com/reference/android/graphics/PorterDuff.Mode.html#LIGHTEN)
+                        // se inlocuiește totdeauna culoarea de pe margine și este păstrată culoarea din centru.
+                        //Alternativa ar fi https://github.com/harjot-oberai/VectorMaster .
                         holder.contactPhoto.setColorFilter(new
                                 PorterDuffColorFilter(contact.getColor(), PorterDuff.Mode.LIGHTEN));
                     }

@@ -25,19 +25,24 @@ public class AppLibrary {
             new PhoneTypeContainer(7, "Other")
     ));
 
+    //http://tools.medialab.sciences-po.fr/iwanthue/
     public static final List<Integer> colorList = new ArrayList<>(Arrays.asList(
-            0xFF666666, 	//Gray
-            0xFF800000, 	//Maroon
-            0xFFFFFF00, 	//Yellow
-            0xFF808000, 	//Olive
-            0xFF00FF00, 	//Lime
-            0xFF008000, 	//Green
-            0xFF00FFFF, 	//Aqua
-            0xFF008080, 	//Teal
-            0xFF0000FF, 	//Blue
-            0xFF000080, 	//Navy
-            0xFFFF00FF, 	//Fuchsia
-            0xFF800080 		//Purple
+            0xFFa18c00,
+            0xFF5300b2,
+            0xFF37ca00,
+            0xFFc70089,
+            0xFF01da57,
+            0xFFf81a6e,
+            0xFF549b00,
+            0xFFde61e1,
+            0xFF73b100,
+            0xFF311d41,
+            0xFFef9515,
+            0xFF0298d2,
+            0xFF952900,
+            0xFF00a5a8,
+            0xFF382200,
+            0xFF00735e
     ));
 
     //https://stackoverflow.com/questions/3659809/where-am-i-get-country

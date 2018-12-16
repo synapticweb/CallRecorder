@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <attr name="contactSlotStyle" format="reference"/>
-    <attr name="contactSlotSeparatorStyle" format="reference" />
+    <attr name="separatorStyle" format="reference" />
     <attr name="detailHeaderStyle" format="reference"/>
     <attr name="tabletCurrentSelectionStyle" format="reference"/>
 </resources>
