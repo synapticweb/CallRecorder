@@ -29,6 +29,13 @@
         android:defaultValue="on_if_poor_quality"/>
 
     <ListPreference
+        android:title="Recording format"
+        android:key="format"
+        android:entries="@array/format_names"
+        android:entryValues="@array/format_values"
+        android:defaultValue="amr_nb"/>
+
+    <ListPreference
         android:title="Theme"
         android:key="theme"
         app:useSimpleSummaryProvider="true"

@@ -34,13 +34,27 @@
     </string-array>
 
     <string-array name="theme_options_names">
-        <item>Light theme</item>
-        <item>Dark theme</item>
+        <item>Light</item>
+        <item>Dark</item>
     </string-array>
 
     <string-array name="theme_options_values">
         <item>light_theme</item>
         <item>dark_theme</item>
+    </string-array>
+
+    <string-array name="format_names">
+        <item>AAC</item>
+        <item>High Efficiency AAC</item>
+        <item>AMR</item>
+        <item>AMR HD</item>
+    </string-array>
+
+    <string-array name="format_values">
+        <item>aac</item>
+        <item>he_aac</item>
+        <item>amr_nb</item>
+        <item>amr_wb</item>
     </string-array>
 
 </resources>

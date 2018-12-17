@@ -263,7 +263,7 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
                     holder.contactPhoto.setImageURI(contact.getPhotoUri());
                 } else {
                     if (contact.isPrivateNumber()) {
-                        holder.contactPhoto.setImageResource(R.drawable.user_contact_red);
+                        holder.contactPhoto.setImageResource(R.drawable.incognito);
                         holder.mPhoneNumber.setVisibility(View.GONE);
                     }
                     else {

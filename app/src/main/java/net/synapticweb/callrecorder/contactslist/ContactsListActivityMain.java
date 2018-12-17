@@ -8,27 +8,18 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.AsyncTask;
-
 import android.os.Build;
-
 import android.provider.ContactsContract;
-
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
-
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
-
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
-
 import android.os.Bundle;
-
-
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -40,13 +31,9 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.topjohnwu.superuser.Shell;
-
-import net.synapticweb.callrecorder.AppLibrary;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.TemplateActivity;
 import net.synapticweb.callrecorder.settings.SettingsActivity;
-import net.synapticweb.callrecorder.settings.SettingsFragment;
-
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;

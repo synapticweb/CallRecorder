@@ -450,7 +450,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         }
         else {
             if(contact.isPrivateNumber())
-                contactPhotoView.setImageResource(R.drawable.user_contact_red);
+                contactPhotoView.setImageResource(R.drawable.incognito);
             else {
                 contactPhotoView.setImageResource(R.drawable.user_contact);
                 contactPhotoView.setColorFilter(new

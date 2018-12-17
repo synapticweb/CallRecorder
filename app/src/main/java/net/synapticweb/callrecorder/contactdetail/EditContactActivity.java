@@ -175,7 +175,7 @@ public class EditContactActivity extends TemplateActivity implements AdapterView
             contactPhoto.setImageURI(contact.getPhotoUri());
         else {
             if(contact.isPrivateNumber())
-                contactPhoto.setImageResource(R.drawable.user_contact_red);
+                contactPhoto.setImageResource(R.drawable.incognito);
             else
                 contactPhoto.setImageResource(R.drawable.user_contact);
                 contactPhoto.setColorFilter(new

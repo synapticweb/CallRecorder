@@ -20,6 +20,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     public static final String APP_THEME = "theme";
     public static final String DELETE_ON_EXPORT = "delete_on_export";
     public static final String SPEAKER_USE = "speaker_use";
+    public static final String FORMAT = "format";
 
 
     @Override
@@ -38,6 +39,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         Preference themeOption = findPreference(APP_THEME);
         Preference paranoidMode = findPreference(PARANOID_MODE);
         Preference speakerUse = findPreference(SPEAKER_USE);
+        Preference format = findPreference(FORMAT);
         paranoidMode.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -68,5 +70,13 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 return true;
             }
         });
+
+        format.setSummaryProvider(new Preference.SummaryProvider<ListPreference>() {
+            @Override
+            public CharSequence provideSummary(ListPreference preference) {
+                return preference.getEntry();
+            }
+        });
+
     }
 }
