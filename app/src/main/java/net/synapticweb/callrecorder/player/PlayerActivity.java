@@ -50,7 +50,8 @@ public class PlayerActivity extends TemplateActivity {
 
         Toolbar toolbar = findViewById(R.id.toolbar_play);
         recording = getIntent().getParcelableExtra(ContactDetailPresenter.RECORDING_EXTRA);
-        toolbar.setTitle("Playing " + recording.getDate() + " " + recording.getTime());
+        String title = recording.getName() != null ? recording.getName() : recording.getDate() + " " + recording.getTime();
+        toolbar.setTitle("Playing " + title);
         setSupportActionBar(toolbar);
 
         playPause = findViewById(R.id.player_button_play_pause);
@@ -96,7 +97,7 @@ public class PlayerActivity extends TemplateActivity {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if(fromUser)
                     userSelectedPosition = progress;
-                playedTime.setText(AppLibrary.getDurationHuman(progress));
+                playedTime.setText(AppLibrary.getDurationHuman(progress, false));
             }
 
             @Override
@@ -123,7 +124,7 @@ public class PlayerActivity extends TemplateActivity {
         mediaPlayerHolder.loadMedia(recording.getPath());
 
         playedTime.setText("00:00");
-        totalTime.setText(AppLibrary.getDurationHuman(mediaPlayerHolder.getTotalDuration()));
+        totalTime.setText(AppLibrary.getDurationHuman(mediaPlayerHolder.getTotalDuration(), false));
 
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
         int currentPosition = pref.getInt("player_currentPosition", 0);

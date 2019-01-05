@@ -133,7 +133,7 @@
        </LinearLayout>
 
    </LinearLayout>
-<!-- După ce am pus scrollview, în landscape butoanele ok și cancel apăreau suprapuse peste drop-down listul cu phone type.
+<!-- După ce am pus scrollview, în landscape butoanele info_ok_change_name și cancel apăreau suprapuse peste drop-down listul cu phone type.
 Soluția a fost să adaug o margine ultimului linealayout orizontal.
 -->
     <LinearLayout

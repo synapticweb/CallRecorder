@@ -78,6 +78,17 @@
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:src="@drawable/info"
+                android:background="@android:color/transparent"
+                android:id="@+id/actionbar_info"
+                android:layout_gravity="end"
+                android:layout_marginEnd="15dp"
+                android:visibility="gone"
+                />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:src="@drawable/baseline_more_vert_white_24"
                 android:layout_marginEnd="10dp"
                 android:background="@android:color/transparent"

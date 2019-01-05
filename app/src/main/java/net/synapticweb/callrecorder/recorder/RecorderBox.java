@@ -25,7 +25,7 @@ class RecorderBox {
     private static File audioFile = null;
     private static Long startTimestamp = null;
     private static boolean recordingDone = false;
-
+    private static String recordingFormat;
     static final String ACTION_START_RECORDING = "net.synapticweb.callrecorder.START_RECORDING";
     static final String ACTION_STOP_SPEAKER = "net.synapticweb.callrecorder.STOP_SPEAKER";
 
@@ -46,11 +46,11 @@ class RecorderBox {
     static void doRecording(Context context, String phoneNumber, String callIdentifier) {
         final SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(CallRecorderApplication.getInstance());
         String speakerUse = settings.getString(SettingsFragment.SPEAKER_USE, "always_off");
-        String recordingFormat = settings.getString(SettingsFragment.FORMAT, "amr_nb");
+        String settingsFormat = settings.getString(SettingsFragment.FORMAT, "amr_nb");
         audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         NotificationManager notificationManager = (NotificationManager) context.
                 getSystemService(Context.NOTIFICATION_SERVICE);
-        String fileExtension = recordingFormat.equals("aac") || recordingFormat.equals("he_aac") ? ".3gp" : ".amr";
+        String fileExtension = settingsFormat.equals("aac") || settingsFormat.equals("he_aac") ? ".3gp" : ".amr";
         int outputFormat, audioEncoder;
 
         if(recorder != null)
@@ -62,21 +62,26 @@ class RecorderBox {
             Log.wtf(TAG, "Error creating the audio file: " + ioe.getMessage());
         }
 
-        switch (recordingFormat) {
+        switch (settingsFormat) {
             case "aac": outputFormat = MediaRecorder.OutputFormat.THREE_GPP;
                 audioEncoder = MediaRecorder.AudioEncoder.AAC;
+                recordingFormat = "AAC";
                 break;
             case "he_aac": outputFormat = MediaRecorder.OutputFormat.THREE_GPP;
                 audioEncoder = MediaRecorder.AudioEncoder.HE_AAC;
+                recordingFormat = "High Efficiency AAC";
                 break;
             case "amr_nb": outputFormat = MediaRecorder.OutputFormat.AMR_NB;
                 audioEncoder = MediaRecorder.AudioEncoder.AMR_NB;
+                recordingFormat = "AMR";
                 break;
             case "amr_wb": outputFormat = MediaRecorder.OutputFormat.AMR_WB;
                 audioEncoder = MediaRecorder.OutputFormat.AMR_WB;
+                recordingFormat = "AMR HD";
                 break;
             default: outputFormat = MediaRecorder.OutputFormat.AMR_NB;
                 audioEncoder = MediaRecorder.AudioEncoder.AMR_NB;
+                recordingFormat = "AMR";
         }
 
         makeRecorder(true, MediaRecorder.AudioSource.VOICE_CALL, outputFormat, audioEncoder);
@@ -176,6 +181,11 @@ class RecorderBox {
     static String getAudioFilePath() {
         return audioFile.getAbsolutePath();
     }
+
+    static public String getRecordingFormat() {
+        return recordingFormat;
+    }
+
 
     static boolean getRecordingDone(){
         return recordingDone;

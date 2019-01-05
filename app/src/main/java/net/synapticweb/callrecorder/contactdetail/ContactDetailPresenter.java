@@ -2,16 +2,24 @@ package net.synapticweb.callrecorder.contactdetail;
 
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 
 import android.util.Log;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 
+import net.synapticweb.callrecorder.AppLibrary;
 import net.synapticweb.callrecorder.CallRecorderApplication;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.contactslist.ContactsListFragment;
@@ -34,13 +42,81 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class ContactDetailPresenter implements ContactDetailContract.ContactDetailPresenter {
     private ContactDetailContract.View view;
-    public static final int EDIT_REQUEST_CODE = 1;
-    public static final String EDIT_EXTRA_CONTACT = "edit_extra_contact";
+    static final int EDIT_REQUEST_CODE = 1;
+    static final String EDIT_EXTRA_CONTACT = "edit_extra_contact";
     public static final String RECORDING_EXTRA = "recording_extra";
     private static final String TAG = "CallRecorder";
 
      ContactDetailPresenter(ContactDetailContract.View view) {
         this.view = view;
+    }
+
+    @Override
+    public void onInfoClick() {
+        if(view.getSelectedItems().size() > 1) {
+            long totalSize = 0;
+            for(int position : view.getSelectedItems()) {
+                Recording recording = view.getRecordingsAdapter().getItem(position);
+                totalSize += recording.getSize();
+            }
+
+            new MaterialDialog.Builder(view.getParentActivity())
+                    .title("Recordings info")
+                    .content("Total size: " + AppLibrary.getFileSizeHuman(totalSize) + "\n\nTo get detailed info about a specific recording you must select only that recording.")
+                    .positiveText(android.R.string.ok)
+                    .show();
+            return ;
+        }
+
+        MaterialDialog dialog = new MaterialDialog.Builder(view.getParentActivity())
+                .title("Recording info")
+                .customView(R.layout.info_dialog, false)
+                .positiveText(android.R.string.ok).build();
+
+        final Recording recording = view.getRecordingsAdapter().getItem(view.getSelectedItems().get(0));
+        final EditText nameEdit = dialog.getView().findViewById(R.id.info_name_edit);
+        final String nameEditText = recording.getName() != null ? recording.getName() : "Name not set";
+        nameEdit.setText(nameEditText);
+        TextView size = dialog.getView().findViewById(R.id.info_size_data);
+        size.setText(AppLibrary.getFileSizeHuman(recording.getSize()));
+
+        TextView format = dialog.getView().findViewById(R.id.info_format_data);
+        format.setText(recording.getFormat());
+        TextView length = dialog.getView().findViewById(R.id.info_length_data);
+        length.setText(AppLibrary.getDurationHuman(recording.getLength(), true));
+
+        final Button changeName = dialog.getView().findViewById(R.id.info_change_name);
+        final ImageButton okChange = dialog.getView().findViewById(R.id.info_name_done);
+        changeName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                nameEdit.selectAll();
+                nameEdit.setEnabled(true);
+                InputMethodManager imm = (InputMethodManager) view.getParentActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                if(imm != null)
+                    imm.showSoftInput(nameEdit, InputMethodManager.SHOW_IMPLICIT);
+                okChange.setVisibility(View.VISIBLE);
+                changeName.setEnabled(false);
+            }
+        });
+        okChange.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String nameChanged = nameEdit.getText().toString().trim();
+                nameEdit.setText(nameChanged);
+                if(!nameChanged.equals(nameEditText)) {
+                    recording.setName(nameChanged.length() > 0 ? nameChanged : null);
+                    recording.updateRecording(view.getParentActivity());
+                }
+                if(nameChanged.length() == 0)
+                    nameEdit.setText("Name not set");
+                nameEdit.setSelection(0,0);
+                nameEdit.setEnabled(false);
+                okChange.setVisibility(View.GONE);
+                changeName.setEnabled(true);
+            }
+        });
+        dialog.show();
     }
 
     @Override
@@ -109,7 +185,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
 
     @Override
     public void selectRecording(CardView card, int adapterPosition) {
-         if(!view.getSelectMode()) {
+         if(!view.isSelectModeOn()) {
              view.setSelectMode(true);
              view.toggleSelectModeActionBar();
          }

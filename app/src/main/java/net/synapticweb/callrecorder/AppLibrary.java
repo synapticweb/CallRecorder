@@ -65,13 +65,42 @@ public class AppLibrary {
     }
 
     //https://stackoverflow.com/questions/625433/how-to-convert-milliseconds-to-x-mins-x-seconds-in-java
-    public static String getDurationHuman(long millis) {
-//        long hours = TimeUnit.MILLISECONDS.toHours(millis);
-//        millis -= TimeUnit.HOURS.toMillis(hours);
+    public static String getDurationHuman(long millis, boolean spokenStyle) {
+        long hours = TimeUnit.MILLISECONDS.toHours(millis);
+        millis -= TimeUnit.HOURS.toMillis(hours);
         long minutes = TimeUnit.MILLISECONDS.toMinutes(millis);
         millis -= TimeUnit.MINUTES.toMillis(minutes);
         long seconds = TimeUnit.MILLISECONDS.toSeconds(millis);
-        return String.format(Locale.US, "%02d:%02d", minutes, seconds);
+        if(spokenStyle) {
+            String duration = "";
+            if(hours > 0)
+                duration += (hours + " hour" + (hours > 1 ? "s" : ""));
+            if(minutes > 0)
+                duration += ((hours > 0 ? ", " : "") + minutes + " minute" + (minutes > 1 ? "s" : "") );
+            if(seconds > 0)
+                duration += ((minutes > 0 || hours > 0 ? ", " : "") + seconds + " second" + (seconds > 1 ? "s" : "") );
+            return duration;
+        }
+        else {
+            if (hours > 0)
+                return String.format(Locale.US, "%02d:%02d:%02d", hours, minutes, seconds);
+            else
+                return String.format(Locale.US, "%02d:%02d", minutes, seconds);
+        }
+    }
+
+    public static String getFileSizeHuman(long size) {
+        int numUnits = (int) size / 1024;
+        String unit = "KB";
+        if(numUnits > 1000) {
+            numUnits = (int) size / 1048576;
+            unit = "MB";
+            if(numUnits > 1000) {
+                numUnits = (int) (size / 1099511627776L);
+                unit = "GB";
+            }
+        }
+        return numUnits + unit;
     }
 
     //https://stackoverflow.com/questions/4605527/converting-pixels-to-dp

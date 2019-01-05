@@ -13,5 +13,7 @@ public class RecordingsContract {
         public static final String COLUMN_NAME_PATH = "path";
         public static final String COLUMN_NAME_START_TIMESTAMP = "start_timestamp";
         public static final String COLUMN_NAME_END_TIMESTAMP = "end_timestamp";
+        public static final String COLUMN_NAME_NAME = "name";
+        public static final String COLUMN_NAME_FORMAT = "format";
     }
 }

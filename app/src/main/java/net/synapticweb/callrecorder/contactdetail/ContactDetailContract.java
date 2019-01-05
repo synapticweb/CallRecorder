@@ -18,7 +18,7 @@ public interface ContactDetailContract {
         Contact getContact();
         void paintViews(List<Recording> recordings);
         void setSelectMode(boolean isSelectModeOn);
-        boolean getSelectMode();
+        boolean isSelectModeOn();
         void addToSelectedItems(int adapterPosition);
         boolean removeIfPresentInSelectedItems(int adapterPosition);
         void toggleSelectModeActionBar();
@@ -48,5 +48,6 @@ public interface ContactDetailContract {
         void toggleShouldRecord(Contact contact);
         void callContact(Contact contact);
         void toggleSelectAll();
+        void onInfoClick();
     }
 }

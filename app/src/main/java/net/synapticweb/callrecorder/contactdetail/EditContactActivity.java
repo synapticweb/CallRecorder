@@ -336,6 +336,7 @@ public class EditContactActivity extends TemplateActivity implements AdapterView
         else if(requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             chosenPhotoUri = result.getUri();
+            contactPhoto.clearColorFilter();
             contactPhoto.setImageURI(null); //cînd se schimbă succesiv 2 poze făcute de cameră se folosește același fișier și optimizările android fac necesar acest hack pentru a obține refresh-ul pozei
             contactPhoto.setImageURI(chosenPhotoUri);
             this.oldPhotoUri = contact.getPhotoUri();

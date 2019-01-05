@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -124,7 +125,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
     }
 
     @Override
-    public boolean getSelectMode() {
+    public boolean isSelectModeOn() {
         return selectMode;
     }
 
@@ -175,6 +176,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         ImageButton exportBtn = parentActivity.findViewById(R.id.actionbar_select_export);
         ImageButton deleteBtn = parentActivity.findViewById(R.id.actionbar_select_delete);
         ImageButton selectAllBtn = parentActivity.findViewById(R.id.actionbar_select_all);
+        ImageButton infoBtn = parentActivity.findViewById(R.id.actionbar_info);
         ImageButton menuRightBtn = parentActivity.findViewById(R.id.phone_number_detail_menu);
         ActionBar actionBar = parentActivity.getSupportActionBar();
 
@@ -196,6 +198,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         exportBtn.setVisibility(selectMode ? View.VISIBLE : View.GONE);
         deleteBtn.setVisibility(selectMode ? View.VISIBLE : View.GONE);
         selectAllBtn.setVisibility(selectMode ? View.VISIBLE : View.GONE);
+        infoBtn.setVisibility(selectMode ? View.VISIBLE : View.GONE);
         menuRightBtn.setVisibility(selectMode ? View.GONE : View.VISIBLE);
 
         if(!isSinglePaneLayout()) {
@@ -391,6 +394,13 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
                 presenter.toggleSelectAll();
             }
         });
+        ImageButton infoBtn = parentActivity.findViewById(R.id.actionbar_info);
+        infoBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+               presenter.onInfoClick();
+            }
+        });
     }
 
     @Override
@@ -445,6 +455,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
                 R.string.detail_phonenumber_intro), contact.getPhoneNumber())));
 
         if(contact.getPhotoUri() != null) {
+            contactPhotoView.clearColorFilter();
             contactPhotoView.setImageURI(null); //cînd se schimbă succesiv 2 poze făcute de cameră se folosește același fișier și optimizările android fac necesar acest hack pentru a obține refresh-ul pozei
             contactPhotoView.setImageURI(contact.getPhotoUri());
         }
@@ -601,7 +612,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
 
         @Override
         public void onClick(View v) {
-            if(getSelectMode()) {
+            if(isSelectModeOn()) {
                 presenter.selectRecording((CardView) v, this.getAdapterPosition());
             }
             else { //usual short click

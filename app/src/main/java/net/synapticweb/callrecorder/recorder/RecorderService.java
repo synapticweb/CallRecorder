@@ -312,6 +312,7 @@ public class RecorderService extends Service {
         values.put(Recordings.COLUMN_NAME_PATH, RecorderBox.getAudioFilePath());
         values.put(Recordings.COLUMN_NAME_START_TIMESTAMP, RecorderBox.getStartTimestamp());
         values.put(Recordings.COLUMN_NAME_END_TIMESTAMP, System.currentTimeMillis());
+        values.put(Recordings.COLUMN_NAME_FORMAT, RecorderBox.getRecordingFormat());
 
         try {
             db.insert(Recordings.TABLE_NAME, null, values);

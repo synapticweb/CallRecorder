@@ -1,11 +1,13 @@
 package net.synapticweb.callrecorder.data;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import net.synapticweb.callrecorder.contactdetail.ExportAsyncTask;
 
@@ -25,14 +27,59 @@ public class Recording implements Parcelable {
     private String path;
     private Boolean incoming;
     private Long startTimestamp, endTimestamp;
+    private String name;
+    private String format;
+    private static final String TAG = "CallRecorder";
 
-    public Recording(long id, String path, Boolean incoming, Long startTimestamp, Long endTimestamp) {
+
+    public Recording(long id, String path, Boolean incoming, Long startTimestamp, Long endTimestamp,
+                     String format, String name) {
         this.id = id;
         this.path = path;
         this.incoming = incoming;
         this.startTimestamp = startTimestamp;
         this.endTimestamp = endTimestamp;
+        this.name = name;
+        this.format = format;
     }
+
+    public long getLength() {
+        return endTimestamp - startTimestamp;
+    }
+
+    public void updateRecording(Context context) {
+        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(context);
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(RecordingsContract.Recordings._ID, id);
+        values.put(RecordingsContract.Recordings.COLUMN_NAME_PATH, path);
+        values.put(RecordingsContract.Recordings.COLUMN_NAME_INCOMING, incoming);
+        values.put(RecordingsContract.Recordings.COLUMN_NAME_START_TIMESTAMP, startTimestamp);
+        values.put(RecordingsContract.Recordings.COLUMN_NAME_END_TIMESTAMP, endTimestamp);
+        values.put(RecordingsContract.Recordings.COLUMN_NAME_NAME, name);
+        values.put(RecordingsContract.Recordings.COLUMN_NAME_FORMAT, format);
+
+        try {
+            db.update(RecordingsContract.Recordings.TABLE_NAME, values,
+                    RecordingsContract.Recordings._ID + "=" + id, null);
+        }
+        catch (SQLException exception) {
+            Log.wtf(TAG, exception.getMessage());
+        }
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public long getSize() {
+        return new File(path).length();
+    }
+
 
     public String getDate() {
         Calendar recordingCal = Calendar.getInstance();
@@ -103,6 +150,14 @@ public class Recording implements Parcelable {
         this.incoming = incoming;
     }
 
+    public void setFormat(String format) {
+        this.format = format;
+    }
+
+    public String getFormat() {
+        return format;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -115,17 +170,21 @@ public class Recording implements Parcelable {
         dest.writeValue(this.incoming);
         dest.writeValue(this.startTimestamp);
         dest.writeValue(this.endTimestamp);
+        dest.writeString(this.name);
+        dest.writeString(this.format);
     }
 
-    private Recording(Parcel in) {
+    protected Recording(Parcel in) {
         this.id = in.readLong();
         this.path = in.readString();
         this.incoming = (Boolean) in.readValue(Boolean.class.getClassLoader());
         this.startTimestamp = (Long) in.readValue(Long.class.getClassLoader());
         this.endTimestamp = (Long) in.readValue(Long.class.getClassLoader());
+        this.name = in.readString();
+        this.format = in.readString();
     }
 
-    public static final Parcelable.Creator<Recording> CREATOR = new Parcelable.Creator<Recording>() {
+    public static final Creator<Recording> CREATOR = new Creator<Recording>() {
         @Override
         public Recording createFromParcel(Parcel source) {
             return new Recording(source);
