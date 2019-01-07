@@ -1,5 +1,6 @@
 package net.synapticweb.callrecorder.contactdetail;
 
+import android.animation.Animator;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -19,7 +20,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -44,6 +44,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.cardview.widget.CardView;
+import androidx.core.app.NavUtils;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -95,10 +96,8 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
 
     @Override
     public void setActionBarTitleIfActivityDetail() {
-        ActionBar actionBar = parentActivity.getSupportActionBar();
-        if(actionBar != null) {
-            actionBar.setTitle(contact.getContactName());
-        }
+        TextView title = parentActivity.findViewById(R.id.actionbar_title);
+        title.setText(contact.getContactName());
     }
 
     @Override
@@ -167,50 +166,87 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         presenter.loadRecordings(contact);
     }
 
+    private void toggleView(final View view, final boolean selectModeOn, Float alpha) {
+        if(alpha == null) {
+            view.animate()
+                    .alpha(view.getAlpha() == 0.0f ? 1.0f : 0.0f)
+                    .setDuration(250)
+                    .setListener(new Animator.AnimatorListener() {
+                        @Override
+                        public void onAnimationStart(Animator animator) {
+                        }
+                        @Override
+                        public void onAnimationEnd(Animator animator) {
+                            if (selectModeOn)
+                                view.setVisibility(selectMode ? View.VISIBLE : View.GONE);
+                            else
+                                view.setVisibility(selectMode ? View.GONE : View.VISIBLE);
+                        }
+                        @Override
+                        public void onAnimationCancel(Animator animator) {
+                        }
+                        @Override
+                        public void onAnimationRepeat(Animator animator) {
+                        }
+                    });
+        }
+        else {
+            view.setAlpha(alpha);
+            if (selectModeOn)
+                view.setVisibility(selectMode ? View.VISIBLE : View.GONE);
+            else
+                view.setVisibility(selectMode ? View.GONE : View.VISIBLE);
+        }
+    }
+
+    //Această funcție este apelată în 2 situații: 1: Cînd se intră/iese din selectMode. În acest caz butoanele apar
+    //și dispar cu un efect de fadein/fadeout. Butoanele care nu sunt vizibile cu selectMode=off au setat în layout
+    //alpha=0. Celelalte nu au alpha setat, deci este implicit 1. Efectul constă în tranziția timp de 250ms a
+    //proprietății alpha de la 0 la 1 și de la 1 la 0. La sfîrșitul tranziției se modifică vizibilitatea.
+    //2: la construcția fragmentului, adică după încărcarea unui contact sau la rotirea ecranului. Mai înainte
+    //funcția era apelată la fiecare onResume, dar asta a dus la buguri inutile și am renunțat.
+    //animateAlpha este true în cazul 1 și false în cazul 2.
+    //În cazul 1 nu ne interesează alte valori ale alpha decît cele pe care le are view-ul animat - tot ce
+    //facem este să inversăm această valoare, deci al treilea aparametru al toggleView este null.
+    //în cazul 2 avem 2 situații: selectMode=on, selectMode=off. Cînd selectMode=off setăm alpha la aceleași
+    //valori ca în layout. Cînd selectMode=on inversăm aceste valori.
     @Override
-    public void toggleSelectModeActionBar() {
-        ImageButton closeBtn = parentActivity.findViewById(R.id.close_select_mode);
-        ImageButton editBtn = parentActivity.findViewById(R.id.edit_contact);
+    public void toggleSelectModeActionBar(boolean animateAplha) {
+        ImageButton navigateBackBtn = parentActivity.findViewById(R.id.navigate_back);
+        final ImageButton closeBtn = parentActivity.findViewById(R.id.close_select_mode);
+        final ImageButton editBtn = parentActivity.findViewById(R.id.edit_contact);
         ImageButton callBtn = parentActivity.findViewById(R.id.call_contact);
-        TextView selectTitle = parentActivity.findViewById(R.id.actionbar_select_title);
         ImageButton exportBtn = parentActivity.findViewById(R.id.actionbar_select_export);
         ImageButton deleteBtn = parentActivity.findViewById(R.id.actionbar_select_delete);
         ImageButton selectAllBtn = parentActivity.findViewById(R.id.actionbar_select_all);
         ImageButton infoBtn = parentActivity.findViewById(R.id.actionbar_info);
         ImageButton menuRightBtn = parentActivity.findViewById(R.id.phone_number_detail_menu);
-        ActionBar actionBar = parentActivity.getSupportActionBar();
 
-        if(actionBar != null && isSinglePaneLayout()) {
-            actionBar.setDisplayHomeAsUpEnabled(!selectMode);
-            actionBar.setDisplayShowTitleEnabled(!selectMode);
-        }
+        if(isSinglePaneLayout())
+            toggleView(navigateBackBtn, false, animateAplha ? null : selectMode ? 0f : 1f);
 
-        closeBtn.setVisibility(selectMode ? View.VISIBLE : View.GONE);
+        toggleView(closeBtn, true, animateAplha ? null : selectMode ? 1f : 0f);
         if(!contact.isPrivateNumber()) {
-            editBtn.setVisibility(selectMode ? View.GONE : View.VISIBLE);
-            callBtn.setVisibility(selectMode ? View.GONE : View.VISIBLE);
-        }
-        if(isSinglePaneLayout()) {
-            selectTitle.setText(contact.getContactName());
-            selectTitle.setVisibility(selectMode ? View.VISIBLE : View.GONE);
+            toggleView(editBtn, false, animateAplha ? null : selectMode ? 0f : 1f);
+            toggleView(callBtn, false, animateAplha  ? null : selectMode ? 0f : 1f);
         }
 
-        exportBtn.setVisibility(selectMode ? View.VISIBLE : View.GONE);
-        deleteBtn.setVisibility(selectMode ? View.VISIBLE : View.GONE);
-        selectAllBtn.setVisibility(selectMode ? View.VISIBLE : View.GONE);
-        infoBtn.setVisibility(selectMode ? View.VISIBLE : View.GONE);
-        menuRightBtn.setVisibility(selectMode ? View.GONE : View.VISIBLE);
+        toggleView(exportBtn, true, animateAplha ? null : selectMode ? 1f : 0f);
+        toggleView(deleteBtn, true, animateAplha  ? null  : selectMode ? 1f : 0f);
+        toggleView(selectAllBtn, true, animateAplha ? null : selectMode ? 1f : 0f);
+        toggleView(infoBtn, true, animateAplha ? null : selectMode ? 1f : 0f);
+        toggleView(menuRightBtn, false, animateAplha ? null : selectMode ? 0f : 1f);
 
         if(!isSinglePaneLayout()) {
             Button hamburger = parentActivity.findViewById(R.id.hamburger);
-            hamburger.setVisibility(selectMode ? View.GONE : View.VISIBLE);
+            toggleView(hamburger, false, animateAplha ? null : selectMode ? 0f : 1f);
         }
     }
 
     @Override
     public void clearSelectedMode() {
         selectMode = false;
-        toggleSelectModeActionBar();
+        toggleSelectModeActionBar(true);
         for(int adapterPosition : selectedItems) {
             adapter.notifyItemChanged(adapterPosition);
             //https://stackoverflow.com/questions/33784369/recyclerview-get-view-at-particular-position
@@ -264,6 +300,13 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
     }
 
     private void setDetailsButtonsListeners() {
+        ImageButton navigateBack = parentActivity.findViewById(R.id.navigate_back);
+        navigateBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                NavUtils.navigateUpFromSameTask(parentActivity);
+            }
+        });
         final ImageButton menuButton = parentActivity.findViewById(R.id.phone_number_detail_menu);
         menuButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -435,6 +478,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         calculateCardViewDimensions();
         recordingsRecycler.setLayoutManager(new GridLayoutManager(parentActivity, cardViewColumns));
         recordingsRecycler.setAdapter(adapter);
+        toggleSelectModeActionBar(false);
 
         return detailView;
     }

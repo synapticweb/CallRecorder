@@ -173,7 +173,6 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
         RecordingsRepository.getRecordings(contact, new RecordingsRepository.loadRecordingsCallback() {
             @Override
             public void onRecordingsLoaded(List<Recording> recordings) {
-                view.toggleSelectModeActionBar();
                 view.paintViews(recordings);
                 //aici ar trebui să fie cod care să pună tickuri pe recordingurile selectate cînd
                 //este întors device-ul. Dar dacă pun aici codul nu se execută pentru că nu vor fi gata
@@ -187,7 +186,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
     public void selectRecording(CardView card, int adapterPosition) {
          if(!view.isSelectModeOn()) {
              view.setSelectMode(true);
-             view.toggleSelectModeActionBar();
+             view.toggleSelectModeActionBar(true);
          }
          if(!view.removeIfPresentInSelectedItems(adapterPosition)) {
              view.addToSelectedItems(adapterPosition);

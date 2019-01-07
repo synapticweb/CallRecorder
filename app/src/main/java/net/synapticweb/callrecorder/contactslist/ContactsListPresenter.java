@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -63,10 +64,6 @@ public class ContactsListPresenter implements ContactsListContract.ContactsListP
         ImageButton editContact = parentActivity.findViewById(R.id.edit_contact);
         ImageButton callContact = parentActivity.findViewById(R.id.call_contact);
         if(contact != null) {
-            detailMenu.setVisibility(View.VISIBLE);
-            editContact.setVisibility(View.VISIBLE);
-            callContact.setVisibility(View.VISIBLE);
-
             ContactDetailFragment contactDetail = ContactDetailFragment.newInstance(contact);
             parentActivity.getSupportFragmentManager().beginTransaction()
                     .replace(R.id.contact_detail_fragment_container, contactDetail)
@@ -75,6 +72,7 @@ public class ContactsListPresenter implements ContactsListContract.ContactsListP
             //contact nou. Soluția: https://stackoverflow.com/questions/7575921/illegalstateexception-can-not-perform-this-action-after-onsaveinstancestate-wit
         }
         else {
+            //celelalte butoane nu pot să fie vizibile deoarece ștergerea unui contact nu se poate face cu selectMode on
             detailMenu.setVisibility(View.GONE);
             editContact.setVisibility(View.GONE);
             callContact.setVisibility(View.GONE);

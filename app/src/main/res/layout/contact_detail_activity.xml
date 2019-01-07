@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    >
 
     <androidx.appcompat.widget.Toolbar
         android:layout_height="?attr/actionBarSize"
@@ -19,23 +20,44 @@
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:src="@drawable/back"
+            android:layout_marginEnd="20dp"
+            android:id="@+id/navigate_back"
+            android:layout_gravity="start"
+            android:background="@android:color/transparent"
+            />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:src="@drawable/close"
-            android:layout_marginEnd="15dp"
+            android:layout_marginEnd="20dp"
             android:id="@+id/close_select_mode"
             android:layout_gravity="start"
             android:background="@android:color/transparent"
             android:visibility="gone"
+            android:alpha="0"
             />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/actionbar_select_title"
-            android:layout_marginStart="15dp"
+            android:id="@+id/actionbar_title"
             android:layout_gravity="center_vertical"
-            android:visibility="gone"
             android:maxLength="20"
             style="@style/toolbar_font"/>
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/select_export"
+            android:background="@android:color/transparent"
+            android:id="@+id/test_button"
+            android:layout_gravity="end"
+            android:layout_marginEnd="20dp"
+            android:visibility="gone"
+            android:alpha="0"
+            />
 
         <ImageButton
             android:layout_width="wrap_content"
@@ -46,6 +68,7 @@
             android:layout_gravity="end"
             android:layout_marginEnd="20dp"
             android:visibility="gone"
+            android:alpha="0"
             />
 
         <ImageButton
@@ -57,6 +80,7 @@
             android:layout_gravity="end"
             android:layout_marginEnd="10dp"
             android:visibility="gone"
+            android:alpha="0"
             />
 
         <ImageButton
@@ -68,6 +92,7 @@
             android:layout_gravity="end"
             android:layout_marginEnd="10dp"
             android:visibility="gone"
+            android:alpha="0"
             />
 
         <ImageButton
@@ -79,6 +104,7 @@
             android:layout_gravity="end"
             android:layout_marginEnd="10dp"
             android:visibility="gone"
+            android:alpha="0"
             />
 
 

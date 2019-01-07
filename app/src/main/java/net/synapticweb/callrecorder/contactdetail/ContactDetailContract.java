@@ -21,7 +21,7 @@ public interface ContactDetailContract {
         boolean isSelectModeOn();
         void addToSelectedItems(int adapterPosition);
         boolean removeIfPresentInSelectedItems(int adapterPosition);
-        void toggleSelectModeActionBar();
+        void toggleSelectModeActionBar(boolean animateAlpha);
         void selectRecording(CardView card);
         void deselectRecording(CardView card);
         boolean isEmptySelectedItems();

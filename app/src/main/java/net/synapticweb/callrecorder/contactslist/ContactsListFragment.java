@@ -40,7 +40,6 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
     private RecyclerView contactsRecycler;
     private int currentPos = 0;
     private Long newAddedContactId = null;
-    private boolean hasRestarted = false;
     private AppCompatActivity parentActivity;
     private int colorPointer = 0;
     @SuppressLint("UseSparseArrays")
@@ -125,15 +124,16 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
         //marcat și cel anterior.
         contactsRecycler.setAdapter(adapter);
         adapter.notifyDataSetChanged();
-        if(!isSinglePaneLayout() && !hasRestarted) { //dacă ne găsim după un restart al activității
-            // datorat rotirii nu trebuie să mai înlocuim fragmentul detaliu, el este deja acolo. Dacă
-            // îl înlocuim onResume() al fragmnetului detaliu va fi apelat de 2 ori: prima dată din cauza
-            // restartului fragmentului detaliu - cu datele de stare, a doua oară datorită înlocuirii - fără
-            //datele de stare.
-            if(adapter.getItemCount() > 0)
+        if(!isSinglePaneLayout() ) { //dacă ne găsim după un restart al activității
+            // datorat rotirii sau după reluarea activității la venirea din background, nu trebuie să mai înlocuim
+            // fragmentul detaliu, el este deja acolo. Dacă îl înlocuim onResume() al fragmnetului detaliu va fi
+            // apelat de 2 ori: prima dată din cauza restartului fragmentului detaliu - cu datele de stare,
+            // a doua oară datorită înlocuirii - fără datele de stare.
+            Fragment detailFragment = parentActivity.getSupportFragmentManager().findFragmentById(R.id.contact_detail_fragment_container);
+            if(adapter.getItemCount() > 0 && detailFragment == null)
                 presenter.setCurrentDetail(adapter.getItem(currentPos));
-            else
-                presenter.setCurrentDetail(null);
+            else if(adapter.getItemCount() == 0)
+                    presenter.setCurrentDetail(null);
         }
         TextView noContent = parentActivity.findViewById(R.id.no_content);
         if(adapter.getItemCount() > 0)
@@ -171,7 +171,6 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
         super.onCreate(savedInstanceState);
         if(savedInstanceState != null) {
             currentPos = savedInstanceState.getInt(CURRENT_POS_KEY);
-            hasRestarted = true;
         }
         this.adapter = new ContactsAdapter(new ArrayList<Contact>(0));
         this.presenter = new ContactsListPresenter(this);

@@ -2,6 +2,7 @@ package net.synapticweb.callrecorder.contactdetail;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.TextView;
 
 
 import net.synapticweb.callrecorder.R;
@@ -38,11 +39,18 @@ public class ContactDetailActivity extends TemplateActivity {
         insertFragment(R.id.contact_detail_fragment_container);
 
         Toolbar toolbar = findViewById(R.id.toolbar_detail);
-        toolbar.setTitle(contact.getContactName());
+
+        TextView title = findViewById(R.id.actionbar_title);
+        title.setText(contact.getContactName());
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
-        if(actionBar != null)
-            actionBar.setDisplayHomeAsUpEnabled(true);
+        if(actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(false);
+            actionBar.setDisplayShowTitleEnabled(false);
+        }
+
+//        LayoutTransition layoutTransition = toolbar.getLayoutTransition();
+//        layoutTransition.enableTransitionType(LayoutTransition.APPEARING);
     }
 
 }
