@@ -29,11 +29,12 @@ public class Recording implements Parcelable {
     private Long startTimestamp, endTimestamp;
     private String name;
     private String format;
+    private String mode;
     private static final String TAG = "CallRecorder";
 
 
     public Recording(long id, String path, Boolean incoming, Long startTimestamp, Long endTimestamp,
-                     String format, String name) {
+                     String format, String name, String mode) {
         this.id = id;
         this.path = path;
         this.incoming = incoming;
@@ -41,6 +42,7 @@ public class Recording implements Parcelable {
         this.endTimestamp = endTimestamp;
         this.name = name;
         this.format = format;
+        this.mode = mode;
     }
 
     public long getLength() {
@@ -58,6 +60,7 @@ public class Recording implements Parcelable {
         values.put(RecordingsContract.Recordings.COLUMN_NAME_END_TIMESTAMP, endTimestamp);
         values.put(RecordingsContract.Recordings.COLUMN_NAME_NAME, name);
         values.put(RecordingsContract.Recordings.COLUMN_NAME_FORMAT, format);
+        values.put(RecordingsContract.Recordings.COLUMN_NAME_MODE, mode);
 
         try {
             db.update(RecordingsContract.Recordings.TABLE_NAME, values,
@@ -126,6 +129,25 @@ public class Recording implements Parcelable {
         out.flush();
     }
 
+    public String getHumanReadingFormat() {
+        final int wavBitrate = 705, aacHighBitrate = 128, aacMedBitrate = 64, aacBasBitrate = 32;
+        switch (format) {
+            case "wav":
+                return "Lossless quality (WAV), 44khz 16bit WAV " + (mode.equals("mono") ? wavBitrate : wavBitrate * 2)
+                        + "kbps " + mode.substring(0, 1).toUpperCase() + mode.substring(1);
+            case "aac_hi":
+                return "High quality (AAC), 44khz 16bit AAC128 " + (mode.equals("mono") ? aacHighBitrate : aacHighBitrate * 2)
+                        + "kbps " + mode.substring(0, 1).toUpperCase() + mode.substring(1);
+            case "aac_med":
+                return "Medium quality (AAC), 44khz 16bit AAC64 " + (mode.equals("mono") ? aacMedBitrate : aacMedBitrate * 2)
+                        + "kbps " + mode.substring(0, 1).toUpperCase() + mode.substring(1);
+            case "aac_bas":
+                return "Basic quality (AAC), 44khz 16bit AAC32 " + (mode.equals("mono") ? aacBasBitrate : aacBasBitrate * 2)
+                        + "kbps " + mode.substring(0, 1).toUpperCase() + mode.substring(1);
+        }
+        return null;
+    }
+
     public long getId() {
         return id;
     }
@@ -172,6 +194,7 @@ public class Recording implements Parcelable {
         dest.writeValue(this.endTimestamp);
         dest.writeString(this.name);
         dest.writeString(this.format);
+        dest.writeString(this.mode);
     }
 
     protected Recording(Parcel in) {
@@ -182,6 +205,7 @@ public class Recording implements Parcelable {
         this.endTimestamp = (Long) in.readValue(Long.class.getClassLoader());
         this.name = in.readString();
         this.format = in.readString();
+        this.mode = in.readString();
     }
 
     public static final Creator<Recording> CREATOR = new Creator<Recording>() {

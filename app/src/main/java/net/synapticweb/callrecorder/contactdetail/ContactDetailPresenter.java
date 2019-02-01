@@ -81,7 +81,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
         size.setText(AppLibrary.getFileSizeHuman(recording.getSize()));
 
         TextView format = dialog.getView().findViewById(R.id.info_format_data);
-        format.setText(recording.getFormat());
+        format.setText(recording.getHumanReadingFormat());
         TextView length = dialog.getView().findViewById(R.id.info_length_data);
         length.setText(AppLibrary.getDurationHuman(recording.getLength(), true));
 

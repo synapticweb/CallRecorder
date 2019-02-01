@@ -19,8 +19,10 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     public static final String PARANOID_MODE = "paranoid";
     public static final String APP_THEME = "theme";
     public static final String DELETE_ON_EXPORT = "delete_on_export";
-    public static final String SPEAKER_USE = "speaker_use";
+    public static final String SPEAKER_USE = "put_on_speaker";
     public static final String FORMAT = "format";
+    public static final String MODE = "mode";
+
 
 
     @Override
@@ -38,8 +40,8 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
         Preference themeOption = findPreference(APP_THEME);
         Preference paranoidMode = findPreference(PARANOID_MODE);
-        Preference speakerUse = findPreference(SPEAKER_USE);
         Preference format = findPreference(FORMAT);
+        Preference mode = findPreference(MODE);
         paranoidMode.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -56,12 +58,6 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             }
         });
 
-        speakerUse.setSummaryProvider(new Preference.SummaryProvider<ListPreference>() {
-            @Override
-            public CharSequence provideSummary(ListPreference preference) {
-                return preference.getEntry();
-            }
-        });
 
         themeOption.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
@@ -72,6 +68,13 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         });
 
         format.setSummaryProvider(new Preference.SummaryProvider<ListPreference>() {
+            @Override
+            public CharSequence provideSummary(ListPreference preference) {
+                return preference.getEntry();
+            }
+        });
+
+        mode.setSummaryProvider(new Preference.SummaryProvider<ListPreference>() {
             @Override
             public CharSequence provideSummary(ListPreference preference) {
                 return preference.getEntry();

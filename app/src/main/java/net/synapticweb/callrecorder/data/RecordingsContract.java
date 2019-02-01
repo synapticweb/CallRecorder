@@ -15,5 +15,6 @@ public class RecordingsContract {
         public static final String COLUMN_NAME_END_TIMESTAMP = "end_timestamp";
         public static final String COLUMN_NAME_NAME = "name";
         public static final String COLUMN_NAME_FORMAT = "format";
+        public static final String COLUMN_NAME_MODE = "mode";
     }
 }

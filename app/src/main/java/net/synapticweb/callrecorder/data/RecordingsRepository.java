@@ -29,7 +29,8 @@ public class RecordingsRepository {
                     cursor.getLong(cursor.getColumnIndex(RecordingsContract.Recordings.COLUMN_NAME_START_TIMESTAMP)),
                     cursor.getLong(cursor.getColumnIndex(RecordingsContract.Recordings.COLUMN_NAME_END_TIMESTAMP)),
                     cursor.getString(cursor.getColumnIndex(RecordingsContract.Recordings.COLUMN_NAME_FORMAT)),
-                    cursor.getString(cursor.getColumnIndex(RecordingsContract.Recordings.COLUMN_NAME_NAME)));
+                    cursor.getString(cursor.getColumnIndex(RecordingsContract.Recordings.COLUMN_NAME_NAME)),
+                    cursor.getString(cursor.getColumnIndex(RecordingsContract.Recordings.COLUMN_NAME_MODE)));
             list.add(recording);
         }
         cursor.close();

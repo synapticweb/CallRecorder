@@ -14,6 +14,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.AudioManager;
 import android.os.Build;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
@@ -24,7 +25,6 @@ import android.util.Log;
 //import android.support.v4.media.app.NotificationCompat.MediaStyle;device
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
-import com.google.i18n.phonenumbers.Phonenumber;
 
 import java.io.IOException;
 import net.synapticweb.callrecorder.AppLibrary;
@@ -49,6 +49,10 @@ public class RecorderService extends Service {
     public static boolean shouldStartAtHookup = false;
     private Long idIfMatch = null;
     private static String contactNameIfMatch = null;
+    private static Recorder recorder;
+    private static SharedPreferences settings;
+    private static Thread speakerOnThread;
+    private static AudioManager audioManager;
 
     public static final int NOTIFICATION_ID = 1;
     private static final String CHANNEL_ID = "call_recorder_channel";
@@ -58,7 +62,9 @@ public class RecorderService extends Service {
     public static final int RECORD_AUTOMMATICALLY = 1;
     public static final int RECORD_ON_HOOKUP = 2;
     public static final int RECORD_ON_REQUEST = 3;
-    public static final int RECORD_AUTOMMATICALLY_SPEAKER_ON = 4;
+    public static final int RECORD_AUTOMMATICALLY_SPEAKER_OFF = 4;
+    static final String ACTION_START_RECORDING = "net.synapticweb.callrecorder.START_RECORDING";
+    static final String ACTION_STOP_SPEAKER = "net.synapticweb.callrecorder.STOP_SPEAKER";
 
     @Override
     public IBinder onBind(Intent i){
@@ -67,6 +73,13 @@ public class RecorderService extends Service {
 
     public void onCreate(){
         super.onCreate();
+        recorder = new Recorder();
+        settings = PreferenceManager.getDefaultSharedPreferences(CallRecorderApplication.getInstance());
+        audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+    }
+
+    public static Recorder getRecorder() {
+        return recorder;
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -107,24 +120,28 @@ public class RecorderService extends Service {
             callIdentifier = match ? contactNameIfMatch : receivedNumPhone;
 
         switch(typeOfNotification) {
-            case RECORD_AUTOMMATICALLY_SPEAKER_ON:
-                notificationIntent = new Intent(CallRecorderApplication.getInstance(), ControlRecordingReceiver.class);
-                notificationIntent.setAction(RecorderBox.ACTION_STOP_SPEAKER);
-                notificationIntent.putExtra(CALL_IDENTIFIER, callIdentifier);
-                PendingIntent stopSpeakerPi = PendingIntent.getBroadcast(CallRecorderApplication.getInstance(), 0, notificationIntent, 0);
-                builder.addAction(new NotificationCompat.Action.Builder(R.drawable.ic_play_grey600_24dp,
-                                "Stop speaker", stopSpeakerPi).build() )
-                        .setContentText("Recording... (speaker on)");
+            case RECORD_AUTOMMATICALLY_SPEAKER_OFF:
+                builder.setContentText("Recording...");
                 break;
             case RECORD_AUTOMMATICALLY:
-                builder.setContentText("Recording...");
+                if(settings.getBoolean(SettingsFragment.SPEAKER_USE, false)) {
+                    notificationIntent = new Intent(CallRecorderApplication.getInstance(), ControlRecordingReceiver.class);
+                    notificationIntent.setAction(ACTION_STOP_SPEAKER);
+                    notificationIntent.putExtra(CALL_IDENTIFIER, callIdentifier);
+                    PendingIntent stopSpeakerPi = PendingIntent.getBroadcast(CallRecorderApplication.getInstance(), 0, notificationIntent, 0);
+                    builder.addAction(new NotificationCompat.Action.Builder(R.drawable.ic_play_grey600_24dp,
+                            "Stop speaker", stopSpeakerPi).build() )
+                    .setContentText("Recording... (speaker on)");
+                }
+                else
+                    builder.setContentText("Recording...");
                 break;
             case RECORD_ON_HOOKUP:
                 builder.setContentText("Recording will begin when you answer the call.");
                 break;
             case RECORD_ON_REQUEST:
                 notificationIntent = new Intent(CallRecorderApplication.getInstance(), ControlRecordingReceiver.class);
-                notificationIntent.setAction(RecorderBox.ACTION_START_RECORDING);
+                notificationIntent.setAction(ACTION_START_RECORDING);
                 notificationIntent.putExtra(CALL_IDENTIFIER, callIdentifier);
                 notificationIntent.putExtra(PHONE_NUMBER, receivedNumPhone != null ? receivedNumPhone : "private_phone");
                 PendingIntent startRecordingPi = PendingIntent.getBroadcast(CallRecorderApplication.getInstance(), 0, notificationIntent, 0);
@@ -147,11 +164,14 @@ public class RecorderService extends Service {
                 callIdentifier = match ? contactNameIfMatch : receivedNumPhone;
             if(nm != null)
                 nm.notify(NOTIFICATION_ID, buildNotification(RECORD_AUTOMMATICALLY, callIdentifier));
-            RecorderBox.doRecording(CallRecorderApplication.getInstance(),
-                    receivedNumPhone != null ? receivedNumPhone : "private_phone", callIdentifier);
+
+            recorder.startRecording(receivedNumPhone);
+            if(settings.getBoolean(SettingsFragment.SPEAKER_USE, false))
+                putSpeakerOn();
         }
     }
 
+    @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
 
@@ -185,7 +205,6 @@ public class RecorderService extends Service {
                 }
             }
         }
-        final SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(CallRecorderApplication.getInstance());
         boolean recordAutommatically = settings.getBoolean(SettingsFragment.AUTOMMATICALLY_RECORD_PRIVATE_CALLS, false);
         boolean paranoidMode = settings.getBoolean(SettingsFragment.PARANOID_MODE, false);
 
@@ -223,7 +242,10 @@ public class RecorderService extends Service {
                 if(shouldRecord) {
                     String callIdentifier = contactNameIfMatch != null ? contactNameIfMatch : receivedNumPhone;
                     startForeground(NOTIFICATION_ID, buildNotification(RECORD_AUTOMMATICALLY, callIdentifier));
-                    RecorderBox.doRecording(CallRecorderApplication.getInstance(), receivedNumPhone, callIdentifier);
+
+                    recorder.startRecording(receivedNumPhone);
+                    if(settings.getBoolean(SettingsFragment.SPEAKER_USE, false))
+                        putSpeakerOn();
                 }
                 else
                     startForeground(NOTIFICATION_ID, buildNotification(RECORD_ON_REQUEST, contactNameIfMatch));
@@ -242,16 +264,49 @@ public class RecorderService extends Service {
         shouldStartAtHookup = false;
         idIfMatch = null;
         contactNameIfMatch = null;
+        recorder = null;
+    }
+
+    //de aici: https://stackoverflow.com/questions/39725367/how-to-turn-on-speaker-for-incoming-call-programmatically-in-android-l
+    static void putSpeakerOn() {
+        speakerOnThread =  new Thread() {
+            @Override
+            public void run() {
+                try {
+                    while(true) {
+                        sleep(1000);
+                        audioManager.setMode(AudioManager.MODE_IN_CALL);
+                        if (!audioManager.isSpeakerphoneOn())
+                            audioManager.setSpeakerphoneOn(true);
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        speakerOnThread.start();
+    }
+
+     static void putSpeakerOff() {
+        if(speakerOnThread != null)
+            speakerOnThread.interrupt();
+        speakerOnThread = null;
+        if (audioManager != null && audioManager.isSpeakerphoneOn()) {
+            audioManager.setMode(AudioManager.MODE_NORMAL);
+            audioManager.setSpeakerphoneOn(false);
+        }
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        RecorderBox.disposeRecorder();
-        if(!RecorderBox.getRecordingDone()) {//dacă nu s-a pornit înregistrarea nu avem nimic de făcut
+
+        putSpeakerOff();
+        if(!recorder.isRunning()) {
             resetState();
             return;
         }
+        recorder.stopRecording();
 
         CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(getApplicationContext());
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
@@ -309,10 +364,11 @@ public class RecorderService extends Service {
         ContentValues values = new ContentValues();
         values.put(Recordings.COLUMN_NAME_PHONE_NUM_ID, idToInsert);
         values.put(Recordings.COLUMN_NAME_INCOMING, incoming ? SQLITE_TRUE : SQLITE_FALSE);
-        values.put(Recordings.COLUMN_NAME_PATH, RecorderBox.getAudioFilePath());
-        values.put(Recordings.COLUMN_NAME_START_TIMESTAMP, RecorderBox.getStartTimestamp());
+        values.put(Recordings.COLUMN_NAME_PATH, recorder.getAudioFilePath());
+        values.put(Recordings.COLUMN_NAME_START_TIMESTAMP, recorder.getStartingTime());
         values.put(Recordings.COLUMN_NAME_END_TIMESTAMP, System.currentTimeMillis());
-        values.put(Recordings.COLUMN_NAME_FORMAT, RecorderBox.getRecordingFormat());
+        values.put(Recordings.COLUMN_NAME_FORMAT, recorder.getFormat());
+        values.put(Recordings.COLUMN_NAME_MODE, recorder.getMode());
 
         try {
             db.insert(Recordings.TABLE_NAME, null, values);
@@ -320,7 +376,7 @@ public class RecorderService extends Service {
         catch(SQLException exc) {
             Log.wtf(TAG, exc.getMessage());
         }
-        RecorderBox.resetState();
+
         resetState();
     }
 }

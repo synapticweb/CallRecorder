@@ -16,7 +16,8 @@ public class CallRecorderDbHelper extends SQLiteOpenHelper {
             Recordings.COLUMN_NAME_START_TIMESTAMP + " INTEGER NOT NULL, " +
             Recordings.COLUMN_NAME_END_TIMESTAMP + " INTEGER NOT NULL, " +
             Recordings.COLUMN_NAME_FORMAT + " TEXT NOT NULL, " +
-            Recordings.COLUMN_NAME_NAME + " TEXT DEFAULT NULL )";
+            Recordings.COLUMN_NAME_NAME + " TEXT DEFAULT NULL, " +
+            Recordings.COLUMN_NAME_MODE + " TEXT NOT NULL )";
 
     private static final String SQL_CREATE_LISTENED = "CREATE TABLE " + Contacts.TABLE_NAME + " (" + Contacts._ID + " INTEGER NOT NULL PRIMARY KEY, " +
             Contacts.COLUMN_NAME_NUMBER + " TEXT, " +

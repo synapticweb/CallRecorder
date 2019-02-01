@@ -21,17 +21,17 @@
         <item>#151515</item> <!-- address bar bg -->
     </array>
 
-    <string-array name="speaker_options_names">
-        <item>Turn speaker on if recording source audio quality is poor.</item>
-        <item>Always turn speaker on when recording phone calls.</item>
-        <item>Never turn speaker on.</item>
-    </string-array>
+    <!--<string-array name="speaker_options_names">-->
+        <!--<item>Turn speaker on if recording source audio quality is poor.</item>-->
+        <!--<item>Always turn speaker on when recording phone calls.</item>-->
+        <!--<item>Never turn speaker on.</item>-->
+    <!--</string-array>-->
 
-    <string-array name="speaker_options_values">
-        <item>on_if_poor_quality</item>
-        <item>always_on</item>
-        <item>always_off</item>
-    </string-array>
+    <!--<string-array name="speaker_options_values">-->
+        <!--<item>on_if_poor_quality</item>-->
+        <!--<item>always_on</item>-->
+        <!--<item>always_off</item>-->
+    <!--</string-array>-->
 
     <string-array name="theme_options_names">
         <item>Light</item>
@@ -44,17 +44,27 @@
     </string-array>
 
     <string-array name="format_names">
-        <item>AAC</item>
-        <item>High Efficiency AAC</item>
-        <item>AMR</item>
-        <item>AMR HD</item>
+        <item>WAV</item>
+        <item>AAC High (128kbps)</item>
+        <item>AAC Medium (64kbps)</item>
+        <item>AAC Basic (32kbps)</item>
     </string-array>
 
     <string-array name="format_values">
-        <item>aac</item>
-        <item>he_aac</item>
-        <item>amr_nb</item>
-        <item>amr_wb</item>
+        <item>wav</item>
+        <item>aac_hi</item>
+        <item>aac_med</item>
+        <item>aac_bas</item>
+    </string-array>
+
+    <string-array name="mode_names">
+        <item>Mono</item>
+        <item>Stereo</item>
+    </string-array>
+
+    <string-array name="mode_values">
+        <item>mono</item>
+        <item>stereo</item>
     </string-array>
 
 </resources>

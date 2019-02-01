@@ -20,20 +20,26 @@
         android:summary="Delete recordings after they have been exported"
         android:defaultValue="false"/>
 
-    <ListPreference
+    <SwitchPreference
         android:title="Speaker use"
-        android:key="speaker_use"
-        app:useSimpleSummaryProvider="true"
-        android:entries="@array/speaker_options_names"
-        android:entryValues="@array/speaker_options_values"
-        android:defaultValue="on_if_poor_quality"/>
+        android:key="put_on_speaker"
+        android:summary="Put phone on speaker while recording calls"
+        android:defaultValue="false"/>
 
     <ListPreference
         android:title="Recording format"
         android:key="format"
         android:entries="@array/format_names"
         android:entryValues="@array/format_values"
-        android:defaultValue="amr_nb"/>
+        app:useSimpleSummaryProvider="true"
+        android:defaultValue="aac_med"/>
+
+    <ListPreference
+       android:title="Mode"
+        android:key="mode"
+        android:entries="@array/mode_names"
+        android:entryValues="@array/mode_values"
+        android:defaultValue="mono" />
 
     <ListPreference
         android:title="Theme"
