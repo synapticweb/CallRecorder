@@ -14,11 +14,17 @@
         android:summary="Record all calls"
         android:defaultValue="false"/>
 
-    <SwitchPreference
-        android:key="delete_on_export"
-        android:title="Delete on export"
-        android:summary="Delete recordings after they have been exported"
-        android:defaultValue="false"/>
+    <ListPreference
+        android:key="storage"
+        android:title="Recordings storage"
+        android:entries="@array/storage_names"
+        android:entryValues="@array/storage_values"
+        android:defaultValue="private"
+        />
+
+    <Preference
+        android:key="public_storage_path"
+        android:title="Where to store recordings" />
 
     <SwitchPreference
         android:title="Speaker use"
@@ -35,7 +41,7 @@
         android:defaultValue="aac_med"/>
 
     <ListPreference
-       android:title="Mode"
+       android:title="Recording mode"
         android:key="mode"
         android:entries="@array/mode_names"
         android:entryValues="@array/mode_values"

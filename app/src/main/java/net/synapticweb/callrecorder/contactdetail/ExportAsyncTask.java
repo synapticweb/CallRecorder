@@ -97,8 +97,8 @@ public class ExportAsyncTask extends AsyncTask<Recording, Integer, Boolean> {
     @Override
     protected void onPostExecute(Boolean result) {
         dialog.dismiss();
-        final SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(CallRecorderApplication.getInstance());
-        final boolean deleteOnExport = settings.getBoolean(SettingsFragment.DELETE_ON_EXPORT, false);
+//        final SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(CallRecorderApplication.getInstance());
+//        final boolean deleteOnExport = settings.getBoolean(SettingsFragment.DELETE_ON_EXPORT, false);
         if(result) {
             new MaterialDialog.Builder(activityRef.get())
                     .title("Success")
@@ -107,8 +107,8 @@ public class ExportAsyncTask extends AsyncTask<Recording, Integer, Boolean> {
                     .onPositive(new MaterialDialog.SingleButtonCallback() {
                         @Override
                         public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                            if(deleteOnExport)
-                                presenterRef.get().loadRecordings(contact);
+//                            if(deleteOnExport)
+//                                presenterRef.get().loadRecordings(contact);
                         }
                     })
                     .icon(activityRef.get().getResources().getDrawable(R.drawable.success))
@@ -122,8 +122,8 @@ public class ExportAsyncTask extends AsyncTask<Recording, Integer, Boolean> {
                     .onPositive(new MaterialDialog.SingleButtonCallback() {
                         @Override
                         public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                            if(deleteOnExport)
-                                presenterRef.get().loadRecordings(contact);
+//                            if(deleteOnExport)
+//                                presenterRef.get().loadRecordings(contact);
                         }
                     })
                     .icon(activityRef.get().getResources().getDrawable(R.drawable.error))
@@ -134,12 +134,12 @@ public class ExportAsyncTask extends AsyncTask<Recording, Integer, Boolean> {
     @Override
     protected Boolean doInBackground(Recording...recordings) {
         final SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(CallRecorderApplication.getInstance());
-        boolean deleteOnExport = settings.getBoolean(SettingsFragment.DELETE_ON_EXPORT, false);
+//        boolean deleteOnExport = settings.getBoolean(SettingsFragment.DELETE_ON_EXPORT, false);
         for(Recording recording : recordings) {
             try {
                 recording.export(path, this, totalSize, contact.getPhoneNumber());
-                if(deleteOnExport)
-                    recording.delete(CallRecorderApplication.getInstance());
+//                if(deleteOnExport)
+//                    recording.delete(CallRecorderApplication.getInstance());
                 if(isCancelled())
                     break;
             }

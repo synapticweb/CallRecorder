@@ -21,17 +21,15 @@
         <item>#151515</item> <!-- address bar bg -->
     </array>
 
-    <!--<string-array name="speaker_options_names">-->
-        <!--<item>Turn speaker on if recording source audio quality is poor.</item>-->
-        <!--<item>Always turn speaker on when recording phone calls.</item>-->
-        <!--<item>Never turn speaker on.</item>-->
-    <!--</string-array>-->
+   <string-array name="storage_names">
+       <item>Private (files are visible only to this app)</item>
+       <item>Public (files are visible to all apps)</item>-
+   </string-array>
 
-    <!--<string-array name="speaker_options_values">-->
-        <!--<item>on_if_poor_quality</item>-->
-        <!--<item>always_on</item>-->
-        <!--<item>always_off</item>-->
-    <!--</string-array>-->
+    <string-array name="storage_values">
+        <item>private</item>
+        <item>public</item>
+    </string-array>
 
     <string-array name="theme_options_names">
         <item>Light</item>
