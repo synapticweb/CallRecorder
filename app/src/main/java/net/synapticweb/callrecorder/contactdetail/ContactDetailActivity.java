@@ -48,9 +48,5 @@ public class ContactDetailActivity extends TemplateActivity {
             actionBar.setDisplayHomeAsUpEnabled(false);
             actionBar.setDisplayShowTitleEnabled(false);
         }
-
-//        LayoutTransition layoutTransition = toolbar.getLayoutTransition();
-//        layoutTransition.enableTransitionType(LayoutTransition.APPEARING);
     }
-
 }

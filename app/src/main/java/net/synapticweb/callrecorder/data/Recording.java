@@ -4,12 +4,12 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
-import net.synapticweb.callrecorder.contactdetail.ExportAsyncTask;
+import net.synapticweb.callrecorder.CrApp;
+import net.synapticweb.callrecorder.contactdetail.MoveAsyncTask;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -43,6 +43,11 @@ public class Recording implements Parcelable {
         this.name = name;
         this.format = format;
         this.mode = mode;
+    }
+
+    public boolean isSavedInPrivateSpace() {
+        return new File(path).getParentFile().
+                compareTo(CrApp.getInstance().getFilesDir()) == 0;
     }
 
     public long getLength() {
@@ -108,11 +113,9 @@ public class Recording implements Parcelable {
         new File(path).delete();
     }
 
-    public void export(String folderPath, ExportAsyncTask asyncTask, long totalSize, String phoneNumber) throws IOException {
-        String timeSeparator = (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) ? "_" : ":";
-        String fileName = phoneNumber + " - " + new SimpleDateFormat("d_MMM_yyyy_HH" + timeSeparator
-                + "mm" + timeSeparator + "ss", Locale.US).
-                format(new Date(startTimestamp)) + ".amr";
+    public void move(String folderPath, MoveAsyncTask asyncTask, long totalSize)
+            throws IOException {
+        String fileName = new File(path).getName();
         InputStream in = new FileInputStream(path);
         OutputStream out = new FileOutputStream(new File(folderPath, fileName));
 
@@ -127,6 +130,9 @@ public class Recording implements Parcelable {
         }
         in.close();
         out.flush();
+        new File(path).delete();
+        path = new File(folderPath, fileName).getAbsolutePath();
+        updateRecording(CrApp.getInstance());
     }
 
     public String getHumanReadingFormat() {

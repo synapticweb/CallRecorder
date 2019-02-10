@@ -29,7 +29,7 @@
     <string name="discard_edit_message">Discard your changes?</string>
     <string name="delete_recording_confirm_title">Delete recordings</string>
     <string name="delete_recording_confirm_message">Delete %1$d recording(s)? This action cannot be undone.</string>
-    <string name="export_heading">Choose where to export the selected recording(s).</string>
+    <string name="export_heading">Choose where to move the selected recording(s).</string>
     <string name="error">Error</string>
     <string name="succes">Succes</string>
     <string name="error_export">An error occurred while exporting the recordings.</string>

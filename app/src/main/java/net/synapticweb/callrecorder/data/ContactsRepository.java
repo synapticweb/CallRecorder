@@ -3,7 +3,7 @@ package net.synapticweb.callrecorder.data;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import net.synapticweb.callrecorder.CallRecorderApplication;
+import net.synapticweb.callrecorder.CrApp;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,7 +17,7 @@ public class ContactsRepository {
     }
 
     public static Contact getFirstContact() {
-        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(CallRecorderApplication.getInstance());
+        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(CrApp.getInstance());
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
         Cursor cursor = db.
@@ -32,7 +32,7 @@ public class ContactsRepository {
 
     public static Contact getNextContact(Contact current) {
         long id = current.getId() + 1;
-        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(CallRecorderApplication.getInstance());
+        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(CrApp.getInstance());
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
         Cursor cursor = db.
@@ -47,7 +47,7 @@ public class ContactsRepository {
 
     public static Contact getPreviousContact(Contact current) {
         long id = current.getId() - 1;
-        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(CallRecorderApplication.getInstance());
+        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(CrApp.getInstance());
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
         Cursor cursor = db.
@@ -78,7 +78,7 @@ public class ContactsRepository {
     }
 
     public static void getContacts(LoadContactsCallback callback) {
-        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(CallRecorderApplication.getInstance());
+        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(CrApp.getInstance());
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
         List<Contact> contacts = new ArrayList<>();
 

@@ -65,4 +65,9 @@
         <item>stereo</item>
     </string-array>
 
+    <string-array name="storage_chooser_options">
+        <item>Move in app\'s private space</item>
+        <item>Move in phone\'s public storage</item>
+    </string-array>
+
 </resources>

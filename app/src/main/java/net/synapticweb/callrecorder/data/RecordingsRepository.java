@@ -3,7 +3,7 @@ package net.synapticweb.callrecorder.data;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import net.synapticweb.callrecorder.CallRecorderApplication;
+import net.synapticweb.callrecorder.CrApp;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +14,7 @@ public class RecordingsRepository {
     }
 
     public static void getRecordings(Contact contact, loadRecordingsCallback callback) {
-        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(CallRecorderApplication.getInstance());
+        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(CrApp.getInstance());
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
         List<Recording> list =  new ArrayList<>();
 

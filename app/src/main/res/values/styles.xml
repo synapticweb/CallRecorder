@@ -6,8 +6,9 @@
         <item name="colorAccent">@color/colorAccent</item>
 
         <item name="android:windowBackground">@color/backgroundLightTheme</item>
-        <item name="android:textColorPrimary">@color/textOnLight</item>
-        <item name="android:textColor">@color/textOnLight</item>
+        <item name="android:textColorPrimary">@color/text_on_light</item>
+        <!-- https://stackoverflow.com/questions/17769198/android-change-color-of-disabled-text-using-theme-style-->
+        <item name="android:textColor">@color/text_on_light</item>
         <item name="contactSlotStyle">@style/contactSlotLight</item>
         <item name="separatorStyle">@style/separatorLight</item>
         <item name="detailHeaderStyle">@style/detailHeader.Light</item>
@@ -19,8 +20,8 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
 
-        <item name="android:textColorPrimary">@color/textOnDark</item>
-        <item name="android:textColor">@color/textOnDark</item>
+        <item name="android:textColorPrimary">@color/text_on_dark</item>
+        <item name="android:textColor">@color/text_on_dark</item>
         <item name="contactSlotStyle">@style/contactSlotDark</item>
         <item name="separatorStyle">@style/separatorDark</item>
         <item name="detailHeaderStyle">@style/detailHeader.Dark</item>

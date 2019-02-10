@@ -28,7 +28,7 @@ import com.google.i18n.phonenumbers.PhoneNumberUtil;
 
 import java.io.IOException;
 import net.synapticweb.callrecorder.AppLibrary;
-import net.synapticweb.callrecorder.CallRecorderApplication;
+import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.contactslist.ContactsListActivityMain;
 import net.synapticweb.callrecorder.data.Contact;
@@ -74,7 +74,7 @@ public class RecorderService extends Service {
     public void onCreate(){
         super.onCreate();
         recorder = new Recorder();
-        settings = PreferenceManager.getDefaultSharedPreferences(CallRecorderApplication.getInstance());
+        settings = PreferenceManager.getDefaultSharedPreferences(CrApp.getInstance());
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
     }
 
@@ -85,7 +85,7 @@ public class RecorderService extends Service {
     @RequiresApi(Build.VERSION_CODES.O)
     private static void createChannel() {
         NotificationManager mNotificationManager =
-                (NotificationManager) CallRecorderApplication.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
+                (NotificationManager) CrApp.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
 
         // The user-visible name of the channel.
         CharSequence name = "Call recorder";
@@ -101,13 +101,13 @@ public class RecorderService extends Service {
     }
 
     public static Notification buildNotification(int typeOfNotification, String callNameOrNumber) {
-        Intent notificationIntent = new Intent(CallRecorderApplication.getInstance(), ContactsListActivityMain.class);
-        PendingIntent tapNotificationPi = PendingIntent.getBroadcast(CallRecorderApplication.getInstance(), 0, notificationIntent, 0);
-        Bitmap bitmap = BitmapFactory.decodeResource(CallRecorderApplication.getInstance().getResources(), R.drawable.record);
+        Intent notificationIntent = new Intent(CrApp.getInstance(), ContactsListActivityMain.class);
+        PendingIntent tapNotificationPi = PendingIntent.getBroadcast(CrApp.getInstance(), 0, notificationIntent, 0);
+        Bitmap bitmap = BitmapFactory.decodeResource(CrApp.getInstance().getResources(), R.drawable.record);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             createChannel();
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(CallRecorderApplication.getInstance(), CHANNEL_ID)
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(CrApp.getInstance(), CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_album_white_24dp)
                 .setContentTitle(callNameOrNumber + (incoming ? " (incoming)" : " (outgoing)"))
                 .setContentIntent(tapNotificationPi)
@@ -115,7 +115,7 @@ public class RecorderService extends Service {
 
         String callIdentifier;
         if(privateCall)
-            callIdentifier = CallRecorderApplication.getInstance().getResources().getString(R.string.private_number_name);
+            callIdentifier = CrApp.getInstance().getResources().getString(R.string.private_number_name);
         else
             callIdentifier = match ? contactNameIfMatch : receivedNumPhone;
 
@@ -125,10 +125,10 @@ public class RecorderService extends Service {
                 break;
             case RECORD_AUTOMMATICALLY:
                 if(settings.getBoolean(SettingsFragment.SPEAKER_USE, false)) {
-                    notificationIntent = new Intent(CallRecorderApplication.getInstance(), ControlRecordingReceiver.class);
+                    notificationIntent = new Intent(CrApp.getInstance(), ControlRecordingReceiver.class);
                     notificationIntent.setAction(ACTION_STOP_SPEAKER);
                     notificationIntent.putExtra(CALL_IDENTIFIER, callIdentifier);
-                    PendingIntent stopSpeakerPi = PendingIntent.getBroadcast(CallRecorderApplication.getInstance(), 0, notificationIntent, 0);
+                    PendingIntent stopSpeakerPi = PendingIntent.getBroadcast(CrApp.getInstance(), 0, notificationIntent, 0);
                     builder.addAction(new NotificationCompat.Action.Builder(R.drawable.ic_play_grey600_24dp,
                             "Stop speaker", stopSpeakerPi).build() )
                     .setContentText("Recording... (speaker on)");
@@ -140,11 +140,11 @@ public class RecorderService extends Service {
                 builder.setContentText("Recording will begin when you answer the call.");
                 break;
             case RECORD_ON_REQUEST:
-                notificationIntent = new Intent(CallRecorderApplication.getInstance(), ControlRecordingReceiver.class);
+                notificationIntent = new Intent(CrApp.getInstance(), ControlRecordingReceiver.class);
                 notificationIntent.setAction(ACTION_START_RECORDING);
                 notificationIntent.putExtra(CALL_IDENTIFIER, callIdentifier);
                 notificationIntent.putExtra(PHONE_NUMBER, receivedNumPhone != null ? receivedNumPhone : "private_phone");
-                PendingIntent startRecordingPi = PendingIntent.getBroadcast(CallRecorderApplication.getInstance(), 0, notificationIntent, 0);
+                PendingIntent startRecordingPi = PendingIntent.getBroadcast(CrApp.getInstance(), 0, notificationIntent, 0);
                 builder.addAction(new NotificationCompat.Action.Builder(R.drawable.ic_play_grey600_24dp,
                                 "Start recording", startRecordingPi).build() )
                         .setContentText("Press \"Start recording\" to begin recording.");
@@ -155,11 +155,11 @@ public class RecorderService extends Service {
 
     public static void onIncomingOfhook() {
         if(shouldStartAtHookup) {
-            NotificationManager nm = (NotificationManager) CallRecorderApplication.getInstance().
+            NotificationManager nm = (NotificationManager) CrApp.getInstance().
                     getSystemService(Context.NOTIFICATION_SERVICE);
             String callIdentifier;
             if(privateCall)
-                callIdentifier = CallRecorderApplication.getInstance().getResources().getString(R.string.private_number_name);
+                callIdentifier = CrApp.getInstance().getResources().getString(R.string.private_number_name);
             else
                 callIdentifier = match ? contactNameIfMatch : receivedNumPhone;
             if(nm != null)
@@ -186,7 +186,7 @@ public class RecorderService extends Service {
         if(!privateCall) {//și nu trebuie să mai verificăm dacă nr este în baza de date sau, dacă nu
             // este în baza de date, dacă este în contacte.
             Contact contact;
-            match = ((contact = Contact.getContactIfNumberInDb(receivedNumPhone, CallRecorderApplication.getInstance())) != null);
+            match = ((contact = Contact.getContactIfNumberInDb(receivedNumPhone, CrApp.getInstance())) != null);
             if(match) {
                 idIfMatch = contact.getId();
                 contactNameIfMatch = contact.getContactName(); //posibil subiect pentru un test.
@@ -194,7 +194,7 @@ public class RecorderService extends Service {
             }
             else { //în caz de ussd serviciul se oprește
                 PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
-                String countryCode = AppLibrary.getUserCountry(CallRecorderApplication.getInstance());
+                String countryCode = AppLibrary.getUserCountry(CrApp.getInstance());
                 if(countryCode == null)
                     countryCode = "US";
                 try {

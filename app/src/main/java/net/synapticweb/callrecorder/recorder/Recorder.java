@@ -3,10 +3,14 @@ package net.synapticweb.callrecorder.recorder;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import net.synapticweb.callrecorder.CallRecorderApplication;
+
+import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.settings.SettingsFragment;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 class Recorder {
     private static final String TAG = "CallRecorder";
@@ -15,13 +19,14 @@ class Recorder {
     private long startingTime;
     private final String format;
     private final String mode;
+    private SharedPreferences settings;
     private static final String WAV_FORMAT = "wav";
     static final String AAC_HIGH_FORMAT = "aac_hi";
     static final String AAC_MEDIUM_FORMAT = "aac_med";
     static final String MONO = "mono";
 
      Recorder() {
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(CallRecorderApplication.getInstance());
+        settings = PreferenceManager.getDefaultSharedPreferences(CrApp.getInstance());
         format = settings.getString(SettingsFragment.FORMAT, "");
         mode = settings.getString(SettingsFragment.MODE, "");
     }
@@ -35,6 +40,7 @@ class Recorder {
         return audioFile.getAbsolutePath();
     }
 
+    @SuppressWarnings("ConstantConditions")
     void startRecording(String phoneNumber) {
         if(phoneNumber == null)
             throw new NullPointerException("Recorder.startRecoring(): phoneNumber cannot be null");
@@ -42,14 +48,29 @@ class Recorder {
         if(recordingThread != null)
             stopRecording();
         String extension = format.equals(WAV_FORMAT) ? ".wav" : ".aac";
+        File recordingsDir;
 
-        audioFile = new File(CallRecorderApplication.getInstance().getFilesDir(), phoneNumber + System.currentTimeMillis() + extension);
+        try {
+           recordingsDir = settings.getString(SettingsFragment.STORAGE, "private").equals("private") ?
+                    CrApp.getInstance().getFilesDir() :
+                    new File(settings.getString(SettingsFragment.STORAGE_PATH, null));
+        }
+        catch (NullPointerException e){
+            Log.wtf(TAG, "Recordings directory is not set.");
+            return ;
+        }
+
+        phoneNumber = phoneNumber.replaceAll("[()/.,* ;+]", "_");
+        String fileName = "Recording" + phoneNumber + new SimpleDateFormat("-d-MMM-yyyy-HH-mm-ss", Locale.US).
+                format(new Date(System.currentTimeMillis())) + extension;
+        audioFile = new File(recordingsDir, fileName);
         try {
             if(format.equals(WAV_FORMAT))
                 recordingThread = new Thread(new RecordingThreadWav(mode));
             else
                 recordingThread = new Thread(new RecordingThreadAac(audioFile, format, mode));
         }
+
         catch(RuntimeException e) {
             Log.wtf(TAG, e.getMessage());
             return ;

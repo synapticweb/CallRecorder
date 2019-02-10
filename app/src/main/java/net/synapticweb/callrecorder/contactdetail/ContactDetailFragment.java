@@ -13,7 +13,11 @@ import android.os.Build;
 import android.os.Bundle;
 
 import android.text.Html;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.style.RelativeSizeSpan;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -397,38 +401,15 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         });
 
         ImageButton exportBtn = parentActivity.findViewById(R.id.actionbar_select_export);
+        registerForContextMenu(exportBtn);
+        //foarte necesar. Altfel meniul contextual va fi arătat numai la long click.
         exportBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                Content content = new Content();
-                content.setOverviewHeading(getResources().getString(R.string.export_heading));
-                StorageChooser.Theme theme = new StorageChooser.Theme(parentActivity);
-                theme.setScheme(getResources().getIntArray(R.array.storage_chooser_theme));
-
-                StorageChooser chooser = new StorageChooser.Builder()
-                        .withActivity(parentActivity)
-                        .withFragmentManager(parentActivity.getFragmentManager())
-                        .allowCustomPath(true)
-                        .setType(StorageChooser.DIRECTORY_CHOOSER)
-                        .withMemoryBar(true)
-                        .allowAddFolder(true)
-                        .showHidden(true)
-                        .withContent(content)
-                        .setTheme(getParentActivity().getSettedTheme().equals(TemplateActivity.DARK_THEME) ?
-                                theme : null)
-                        .build();
-
-                chooser.show();
-
-                chooser.setOnSelectListener(new StorageChooser.OnSelectListener() {
-                    @Override
-                    public void onSelect(String path) {
-                        presenter.exportSelectedRecordings(path);
-                    }
-                });
-
+            public void onClick(View view) {
+                view.showContextMenu();
             }
         });
+
         ImageButton selectAllBtn = parentActivity.findViewById(R.id.actionbar_select_all);
         selectAllBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -443,6 +424,69 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
                presenter.onInfoClick();
             }
         });
+    }
+
+    @Override
+    public void onCreateContextMenu(@NonNull ContextMenu menu, @NonNull View v, @Nullable ContextMenu.ContextMenuInfo menuInfo) {
+//        super.onCreateContextMenu(menu, v, menuInfo);
+        MenuInflater inflater = parentActivity.getMenuInflater();
+        inflater.inflate(R.menu.storage_chooser_options, menu);
+
+        boolean allowMovePrivate = true;
+        for(Recording recording : getSelectedRecordings())
+            if(recording.isSavedInPrivateSpace()) {
+                allowMovePrivate = false;
+                break;
+            }
+        for(int i = 0; i < menu.size(); i++) {
+            MenuItem item = menu.getItem(i);
+            SpannableString spanString = new SpannableString(menu.getItem(i).getTitle().toString());
+            int end = spanString.length();
+            spanString.setSpan(new RelativeSizeSpan(0.87f), 0, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            item.setTitle(spanString);
+        }
+
+        MenuItem menuItem = menu.getItem(0);
+        menuItem.setEnabled(allowMovePrivate);
+    }
+
+    @Override
+    public boolean onContextItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.private_storage: presenter.moveSelectedRecordings(parentActivity.
+                    getFilesDir().getAbsolutePath());
+                return true;
+            case R.id.public_storage:
+                Content content = new Content();
+                content.setOverviewHeading(parentActivity.getResources().getString(R.string.export_heading));
+                StorageChooser.Theme theme = new StorageChooser.Theme(parentActivity);
+                theme.setScheme(parentActivity.getResources().getIntArray(R.array.storage_chooser_theme));
+
+                StorageChooser chooser = new StorageChooser.Builder()
+                        .withActivity(parentActivity)
+                        .withFragmentManager(parentActivity.getFragmentManager())
+                        .allowCustomPath(true)
+                        .setType(StorageChooser.DIRECTORY_CHOOSER)
+                        .withMemoryBar(true)
+                        .allowAddFolder(true)
+                        .showHidden(true)
+                        .withContent(content)
+                        .setTheme(parentActivity.getSettedTheme().equals(TemplateActivity.DARK_THEME) ?
+                                theme : null)
+                        .build();
+
+                chooser.show();
+
+                chooser.setOnSelectListener(new StorageChooser.OnSelectListener() {
+                    @Override
+                    public void onSelect(String path) {
+                        presenter.moveSelectedRecordings(path);
+                    }
+                });
+                return true;
+
+            default: return super.onContextItemSelected(item);
+        }
     }
 
     @Override
@@ -479,6 +523,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         recordingsRecycler.setAdapter(adapter);
         toggleSelectModeActionBar(false);
 
+//        registerForContextMenu(parentActivity.findViewById(R.id.actionbar_select_export));
         return detailView;
     }
 

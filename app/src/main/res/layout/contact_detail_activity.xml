@@ -52,18 +52,6 @@
             android:layout_height="wrap_content"
             android:src="@drawable/select_export"
             android:background="@android:color/transparent"
-            android:id="@+id/test_button"
-            android:layout_gravity="end"
-            android:layout_marginEnd="20dp"
-            android:visibility="gone"
-            android:alpha="0"
-            />
-
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/select_export"
-            android:background="@android:color/transparent"
             android:id="@+id/actionbar_select_export"
             android:layout_gravity="end"
             android:layout_marginEnd="20dp"

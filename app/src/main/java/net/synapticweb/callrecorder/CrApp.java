@@ -5,11 +5,11 @@ import android.app.Application;
 import com.topjohnwu.superuser.Shell;
 
 //Oferă context cînd nu este nicio activitate disponibilă. Are nevoie ca să funcționeze de
-// android:name=".CallRecorderApplication" în AndroidManifest.xml
-public class CallRecorderApplication extends Application {
-    private static CallRecorderApplication instance;
+// android:name=".CrApp" în AndroidManifest.xml
+public class CrApp extends Application {
+    private static CrApp instance;
 
-    public CallRecorderApplication() {
+    public CrApp() {
         instance = this;
     }
 
@@ -20,7 +20,7 @@ public class CallRecorderApplication extends Application {
         Shell.Config.verboseLogging(BuildConfig.DEBUG);
     }
 
-    public static CallRecorderApplication getInstance() {
+    public static CrApp getInstance() {
         return instance;
     }
 

@@ -2,7 +2,9 @@ package net.synapticweb.callrecorder.recorder;
 
 import android.media.AudioRecord;
 import android.util.Log;
-import net.synapticweb.callrecorder.CallRecorderApplication;
+
+import net.synapticweb.callrecorder.CrApp;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -25,7 +27,7 @@ class RecordingThreadWav extends RecordingThread implements Runnable {
     RecordingThreadWav(String mode) {
         super(mode);
         try {
-            outputStream = new FileOutputStream(new File(CallRecorderApplication.getInstance().getFilesDir(), TMP_FILE));
+            outputStream = new FileOutputStream(new File(CrApp.getInstance().getFilesDir(), TMP_FILE));
         }
         catch (FileNotFoundException e) {
             throw new RuntimeException(e);
@@ -81,7 +83,7 @@ class RecordingThreadWav extends RecordingThread implements Runnable {
             long totalAudioLen, totalDataLen;
             long byteRate = SAMPLE_RATE * channels * BITS_PER_SAMPLE / 8;
             byte[] buffer = new byte[1048576];
-            File tmpFile = new File(CallRecorderApplication.getInstance().getFilesDir(), TMP_FILE);
+            File tmpFile = new File(CrApp.getInstance().getFilesDir(), TMP_FILE);
 
             try {
                 tmpInput = new FileInputStream(tmpFile);

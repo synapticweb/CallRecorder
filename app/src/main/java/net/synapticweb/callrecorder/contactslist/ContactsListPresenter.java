@@ -8,7 +8,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -17,7 +16,7 @@ import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
 
 import net.synapticweb.callrecorder.AppLibrary;
-import net.synapticweb.callrecorder.CallRecorderApplication;
+import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.contactdetail.ContactDetailFragment;
 import net.synapticweb.callrecorder.data.Contact;
@@ -31,8 +30,6 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-
-import static net.synapticweb.callrecorder.AppLibrary.UNKNOWN_TYPE_PHONE_CODE;
 
 public class ContactsListPresenter implements ContactsListContract.ContactsListPresenter {
     @NonNull private ContactsListContract.View view;
@@ -129,7 +126,7 @@ public class ContactsListPresenter implements ContactsListContract.ContactsListP
             }
 
             final PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
-            String countryCode = AppLibrary.getUserCountry(CallRecorderApplication.getInstance());
+            String countryCode = AppLibrary.getUserCountry(CrApp.getInstance());
             if(countryCode == null)
                 countryCode = "US";
             try {
@@ -141,7 +138,7 @@ public class ContactsListPresenter implements ContactsListContract.ContactsListP
                 return ;
             }
 
-            CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(CallRecorderApplication.getInstance());
+            CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(CrApp.getInstance());
             SQLiteDatabase db = mDbHelper.getReadableDatabase();
             cursor = db.query(
                     ContactsContract.Contacts.TABLE_NAME, new String[]{ContactsContract.Contacts.COLUMN_NAME_NUMBER},
@@ -167,7 +164,7 @@ public class ContactsListPresenter implements ContactsListContract.ContactsListP
             Contact contact = new Contact(null, newNumber, contactName, photoUri, phoneType);
             try {
                 contact.copyPhotoIfExternal(view.getParentActivity());
-                contact.insertInDatabase(CallRecorderApplication.getInstance());
+                contact.insertInDatabase(CrApp.getInstance());
             }
             catch (SQLException | IOException exc) {
                 Log.wtf(TAG, exc.getMessage());
@@ -182,7 +179,7 @@ public class ContactsListPresenter implements ContactsListContract.ContactsListP
                 .title(title)
                 .content(message)
                 .positiveText(positiveText)
-                .icon(CallRecorderApplication.getInstance().getResources().getDrawable(R.drawable.warning));
+                .icon(CrApp.getInstance().getResources().getDrawable(R.drawable.warning));
 
                 if(negativeText != null)
                     builder.negativeText(negativeText);

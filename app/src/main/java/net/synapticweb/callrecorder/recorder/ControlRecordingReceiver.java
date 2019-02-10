@@ -1,23 +1,14 @@
 package net.synapticweb.callrecorder.recorder;
 
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.media.AudioManager;
-import android.os.Build;
-import androidx.core.app.NotificationCompat;
 
 import android.preference.PreferenceManager;
-import android.util.Log;
 
-import net.synapticweb.callrecorder.CallRecorderApplication;
-import net.synapticweb.callrecorder.R;
-import net.synapticweb.callrecorder.contactslist.ContactsListActivityMain;
+import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.settings.SettingsFragment;
 
 
@@ -26,7 +17,7 @@ public class ControlRecordingReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(CallRecorderApplication.getInstance());
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(CrApp.getInstance());
         NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         String callIdentifier =  intent.getExtras().getString(RecorderService.CALL_IDENTIFIER);
 

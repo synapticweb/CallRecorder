@@ -44,7 +44,7 @@ public interface ContactDetailContract {
         void selectRecording(CardView card, int adapterPosition);
         void startPlayerActivity(Recording recording);
         void deleteSelectedRecordings();
-        void exportSelectedRecordings(String path);
+        void moveSelectedRecordings(String path);
         void toggleShouldRecord(Contact contact);
         void callContact(Contact contact);
         void toggleSelectAll();

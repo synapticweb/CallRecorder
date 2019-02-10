@@ -20,7 +20,7 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 
 import net.synapticweb.callrecorder.AppLibrary;
-import net.synapticweb.callrecorder.CallRecorderApplication;
+import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.contactslist.ContactsListFragment;
 import net.synapticweb.callrecorder.data.Contact;
@@ -154,7 +154,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
     @Override
     public void editContact(final Contact contact) {
         Fragment fragment = (Fragment) view;
-        Intent intent = new Intent(CallRecorderApplication.getInstance(), EditContactActivity.class);
+        Intent intent = new Intent(CrApp.getInstance(), EditContactActivity.class);
         intent.putExtra(EDIT_EXTRA_CONTACT, contact);
         fragment.startActivityForResult(intent, EDIT_REQUEST_CODE);
     }
@@ -201,7 +201,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
 
     @Override
     public void startPlayerActivity(Recording recording) {
-        Intent playIntent = new Intent(CallRecorderApplication.getInstance(), PlayerActivity.class);
+        Intent playIntent = new Intent(CrApp.getInstance(), PlayerActivity.class);
         playIntent.putExtra(RECORDING_EXTRA, recording);
         view.getParentActivity().startActivity(playIntent);
     }
@@ -210,7 +210,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
     public void deleteSelectedRecordings() {
         for(Recording recording : view.getSelectedRecordings()) {
             try {
-                recording.delete(CallRecorderApplication.getInstance());
+                recording.delete(CrApp.getInstance());
             }
             catch (Exception exc) {
                 Log.wtf(TAG, exc.getMessage());
@@ -219,21 +219,21 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
     }
 
     @Override
-    public void exportSelectedRecordings(String path) {
+    public void moveSelectedRecordings(String path) {
          int totalSize = 0;
          List<Recording> recordings = view.getSelectedRecordings();
          Recording[] recordingsArray = new Recording[recordings.size()];
          for(Recording recording : recordings)
              totalSize += new File(recording.getPath()).length();
 
-        new ExportAsyncTask(path, totalSize, view.getContact(), view.getParentActivity(), this).
+        new MoveAsyncTask(path, totalSize, view.getParentActivity()).
                 execute(recordings.toArray(recordingsArray));
         view.clearSelectedMode();
     }
 
     @Override
     public void toggleShouldRecord(Contact contact) {
-        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(CallRecorderApplication.getInstance());
+        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(CrApp.getInstance());
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
         ContentValues values = new ContentValues();
 

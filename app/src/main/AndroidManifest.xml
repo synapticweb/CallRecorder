@@ -22,7 +22,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppThemeLight"
-        android:name=".CallRecorderApplication">
+        android:name=".CrApp">
 
         <activity android:name=".contactslist.ContactsListActivityMain"
             android:launchMode="singleTop">
