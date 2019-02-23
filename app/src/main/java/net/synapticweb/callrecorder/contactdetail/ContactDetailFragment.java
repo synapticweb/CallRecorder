@@ -7,6 +7,7 @@ import android.content.Intent;
 
 import android.content.res.Configuration;
 
+import android.content.res.Resources;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.os.Build;
@@ -23,7 +24,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.Transformation;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -49,7 +53,9 @@ import androidx.appcompat.widget.PopupMenu;
 import androidx.cardview.widget.CardView;
 import androidx.core.app.NavUtils;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 
@@ -60,7 +66,6 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
     private ImageView contactPhotoView;
     private RecyclerView recordingsRecycler;
     private RelativeLayout detailView;
-    private int widthCard, cardViewColumns;
     private Contact contact;
     private boolean selectMode = false;
     private List<Integer> selectedItems = new ArrayList<>();
@@ -244,42 +249,87 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
             Button hamburger = parentActivity.findViewById(R.id.hamburger);
             toggleView(hamburger, false, animateAplha ? null : selectMode ? 0f : 1f);
         }
+
     }
 
     @Override
     public void clearSelectedMode() {
         selectMode = false;
         toggleSelectModeActionBar(true);
-        for(int adapterPosition : selectedItems) {
-            adapter.notifyItemChanged(adapterPosition);
+        for(int i = 0; i < adapter.getItemCount(); ++i) {
             //https://stackoverflow.com/questions/33784369/recyclerview-get-view-at-particular-position
-            CardView recordingSlot = (CardView) recordingsRecycler.getLayoutManager().findViewByPosition(adapterPosition);
-            if (recordingSlot != null) //este posibil ca recordingul să fi fost șters sau să nu fie în prezent
+            View recordingSlot = recordingsRecycler.getLayoutManager().findViewByPosition(i);
+            if (recordingSlot != null) { //este posibil ca recordingul să fi fost șters sau să nu fie în prezent
                 //pe ecran.
+                toggleSelectModeRecording(recordingSlot, true);
                 deselectRecording(recordingSlot);
+            }
+            adapter.notifyItemChanged(i);
         }
         selectedItems.clear();
     }
 
+    private void modifyMargins(View recording, float interpolatedTime) {
+        CheckBox checkBox = recording.findViewById(R.id.recording_checkbox);
+        Resources res = getContext().getResources();
+        checkBox.setVisibility((selectMode ? View.VISIBLE : View.GONE));
+        RelativeLayout.LayoutParams lpCheckBox = (RelativeLayout.LayoutParams) checkBox.getLayoutParams();
+        lpCheckBox.setMarginStart(selectMode ?
+                (int) (res.getDimension(R.dimen.recording_checkbox_visible_start_margin) * interpolatedTime) :
+                (int) (res.getDimension(R.dimen.recording_checkbox_gone_start_margin) * interpolatedTime));
+        checkBox.setLayoutParams(lpCheckBox);
 
-    @Override
-    public void selectRecording(@NonNull CardView card) {
-        ImageView selectedTick = card.findViewById(R.id.recording_selected);
-        selectedTick.setVisibility(View.VISIBLE);
-        if(getParentActivity().getSettedTheme().equals(TemplateActivity.LIGHT_THEME))
-            card.setCardBackgroundColor(getResources().getColor(R.color.lightRecordingSelected));
-        else
-            card.setCardBackgroundColor(getResources().getColor(R.color.darkRecordingSelected));
+        ImageView recordingAdorn = recording.findViewById(R.id.recording_adorn);
+        RelativeLayout.LayoutParams lpRecAdorn = (RelativeLayout.LayoutParams) recordingAdorn.getLayoutParams();
+        lpRecAdorn.setMarginStart(selectMode ?
+                (int) (res.getDimension(R.dimen.recording_adorn_selected_margin_start) * interpolatedTime) :
+                (int) (res.getDimension(R.dimen.recording_adorn_unselected_margin_start) * interpolatedTime));
+        recordingAdorn.setLayoutParams(lpRecAdorn);
+
+        TextView title = recording.findViewById(R.id.recording_title);
+        RelativeLayout.LayoutParams lpTitle = (RelativeLayout.LayoutParams) title.getLayoutParams();
+        lpTitle.setMarginStart(selectMode ?
+                (int) (res.getDimension(R.dimen.recording_title_selected_margin_start) * interpolatedTime) :
+                (int) (res.getDimension(R.dimen.recording_title_unselected_margin_start) * interpolatedTime));
+        title.setLayoutParams(lpTitle);
     }
 
     @Override
-    public void deselectRecording(CardView card) {
-        ImageView selectedTick = card.findViewById(R.id.recording_selected);
-        selectedTick.setVisibility(View.GONE);
-        if(getParentActivity().getSettedTheme().equals(TemplateActivity.LIGHT_THEME))
-            card.setCardBackgroundColor(getResources().getColor(R.color.lightRecordingNotSelected));
+    public void toggleSelectModeRecording(final View recording, boolean animate) {
+        //https://stackoverflow.com/questions/13881419/android-change-left-margin-using-animation
+        if(animate) {
+            Animation animation = new Animation() {
+                @Override
+                protected void applyTransformation(float interpolatedTime, Transformation t) {
+                    modifyMargins(recording, interpolatedTime);
+                }
+            };
+            animation.setDuration(500);
+            recording.startAnimation(animation);
+        }
         else
-            card.setCardBackgroundColor(getResources().getColor(R.color.darkRecordingNotSelected));
+            modifyMargins(recording, 1);
+    }
+
+
+    @Override
+    public void selectRecording(@NonNull android.view.View recording) {
+        CheckBox checkBox = recording.findViewById(R.id.recording_checkbox);
+        checkBox.setChecked(true);
+//        if(getParentActivity().getSettedTheme().equals(TemplateActivity.LIGHT_THEME))
+//            recording.setBackgroundColor(getResources().getColor(R.color.lightRecordingSelected));
+//        else
+//            recording.setBackgroundColor(getResources().getColor(R.color.darkRecordingSelected));
+    }
+
+    @Override
+    public void deselectRecording(View recording) {
+        CheckBox checkBox = recording.findViewById(R.id.recording_checkbox);
+        checkBox.setChecked(false);
+//        if(getParentActivity().getSettedTheme().equals(TemplateActivity.LIGHT_THEME))
+//            card.setCardBackgroundColor(getResources().getColor(R.color.lightRecordingNotSelected));
+//        else
+//            card.setCardBackgroundColor(getResources().getColor(R.color.darkRecordingNotSelected));
     }
 
     @Override
@@ -392,8 +442,6 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
                             @Override
                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                 presenter.deleteSelectedRecordings();
-                                presenter.loadRecordings(contact);
-                                clearSelectedMode();
                             }
                         })
                         .show();
@@ -518,12 +566,13 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         // Se pare că numai pe lolipop, de verificat. https://github.com/hdodenhof/CircleImageView/issues/31
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && Build.VERSION.SDK_INT < Build.VERSION_CODES.N)
             contactPhotoView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-        calculateCardViewDimensions();
-        recordingsRecycler.setLayoutManager(new GridLayoutManager(parentActivity, cardViewColumns));
+//        calculateCardViewDimensions();
+        recordingsRecycler.setLayoutManager(new LinearLayoutManager(parentActivity));
+        recordingsRecycler.addItemDecoration(new DividerItemDecoration(getContext(),
+                DividerItemDecoration.VERTICAL));
         recordingsRecycler.setAdapter(adapter);
         toggleSelectModeActionBar(false);
 
-//        registerForContextMenu(parentActivity.findViewById(R.id.actionbar_select_export));
         return detailView;
     }
 
@@ -567,43 +616,6 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
             noContent.setVisibility(View.VISIBLE);
     }
 
-    //întoarce lățimea în dp a containerului care conține fragmentul cu detalii.
-    private int getContainerWidth() {
-        Configuration configuration = getResources().getConfiguration();
-        if(parentActivity.findViewById(R.id.contacts_list_fragment_container) != null &&
-                parentActivity.findViewById(R.id.contact_detail_fragment_container) != null) { //suntem pe tabletă
-            return configuration.screenWidthDp / 2;
-        }
-        else
-            //https://stackoverflow.com/questions/6465680/how-to-determine-the-screen-width-in-terms-of-dp-or-dip-at-runtime-in-android
-            return configuration.screenWidthDp;
-
-    }
-
-    private void calculateCardViewDimensions() {
-        int screenWidthDp = getContainerWidth();
-        final int cardMargin = 3, recyclerMargin = 10, minimumCardWidth = 100, maximumCardWidth = 250;
-
-        int numCols = 3;
-        int usableScreen = screenWidthDp - ((numCols * 2 * cardMargin) + (recyclerMargin * 2)) ;
-        int widthCard = (int) Math.floor(usableScreen / numCols);
-        if(widthCard < minimumCardWidth) {
-            numCols = 2;
-            usableScreen = screenWidthDp - ((numCols * 2 * cardMargin) + (recyclerMargin * 2)) ;
-            widthCard = (int) Math.floor(usableScreen / numCols);
-        }
-        else if(widthCard > maximumCardWidth) {
-            while(widthCard > maximumCardWidth) {
-                numCols++;
-                usableScreen = screenWidthDp - ((numCols * 2 * cardMargin) + (recyclerMargin * 2)) ;
-                widthCard = (int) Math.floor(usableScreen / numCols);
-            }
-        }
-
-        this.widthCard = widthCard;
-        this.cardViewColumns = numCols;
-//        Log.wtf(TAG, "Window width: " + screenWidthDp + " CardWidth: " + widthCard + " Numcols: " + cardViewColumns );
-    }
 
     public void displayRecordingStatus(){
         if(contact.isPrivateNumber()) {
@@ -628,80 +640,30 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
     }
 
     class RecordingHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
-        TextView recordingDate, recordingTime;
-        ImageView recordingType, soundSymbol, recordingSelected;
-        final static double soundSymbolToCardRatio = 0.45;
-        final static double soundSymbolHeightToWidthRatio = 0.672;
-        final static double dateAndTimeMarginsToCardRatio = 0.05;
-        final static double recordingTypeToCardRatio = 0.12;
-        final static double recordingTypeMarginsToCardRatio = 0.04;
-        final static double selectedTickToCardRatio = 0.2;
-        final static double selectedTickMarginsToCardRatio = 0.03;
-
-        private void setDimensions() {
-            //dimensiunile cardView-ului, deja calculate:
-            itemView.getLayoutParams().width = AppLibrary.pxFromDp(parentActivity, widthCard);
-            itemView.getLayoutParams().height = AppLibrary.pxFromDp(parentActivity, widthCard);
-
-            //dimensiunile simbolului pentru sunet:
-            int soundSymbolWidth = (int) Math.floor(widthCard * soundSymbolToCardRatio);
-            int soundSymbolHeight = (int) (soundSymbolHeightToWidthRatio * soundSymbolWidth);
-            soundSymbol.getLayoutParams().width = AppLibrary.pxFromDp(parentActivity,soundSymbolWidth);
-            soundSymbol.getLayoutParams().height = AppLibrary.pxFromDp(parentActivity,soundSymbolHeight);
-
-            //marginile TextView-urilor cu data și ora:
-            RelativeLayout.LayoutParams lpRecordingDate = (RelativeLayout.LayoutParams) recordingDate.getLayoutParams();
-            lpRecordingDate.setMargins(0,
-                    AppLibrary.pxFromDp(parentActivity, (int )(widthCard * dateAndTimeMarginsToCardRatio)), 0, 0);
-            recordingDate.setLayoutParams(lpRecordingDate);
-            RelativeLayout.LayoutParams lpRecordingTime = (RelativeLayout.LayoutParams) recordingTime.getLayoutParams();
-            lpRecordingTime.setMargins(0,
-                    0, 0, AppLibrary.pxFromDp(parentActivity, (int )(widthCard * dateAndTimeMarginsToCardRatio)));
-            recordingTime.setLayoutParams(lpRecordingTime);
-
-            //dimensiunile și marginile recordingType:
-            RelativeLayout.LayoutParams lpRecordingType = (RelativeLayout.LayoutParams) recordingType.getLayoutParams();
-            lpRecordingType.width = AppLibrary.pxFromDp(parentActivity, (int) (widthCard * recordingTypeToCardRatio));
-            lpRecordingType.height = AppLibrary.pxFromDp(parentActivity, (int) (widthCard * recordingTypeToCardRatio));
-            lpRecordingType.setMargins(
-                    AppLibrary.pxFromDp(parentActivity, (int)(widthCard * recordingTypeMarginsToCardRatio)), 0, 0,
-                    AppLibrary.pxFromDp(parentActivity, (int)(widthCard * recordingTypeMarginsToCardRatio)) );
-            recordingType.setLayoutParams(lpRecordingType);
-
-            //dimensiunile și marginile tickului selected:
-            RelativeLayout.LayoutParams lpRecordingSelected = (RelativeLayout.LayoutParams) recordingSelected.getLayoutParams();
-            lpRecordingSelected.width = AppLibrary.pxFromDp(parentActivity, (int) (widthCard * selectedTickToCardRatio));
-            lpRecordingSelected.height = AppLibrary.pxFromDp(parentActivity, (int) (widthCard * selectedTickToCardRatio));
-            lpRecordingSelected.setMargins(0,
-                    AppLibrary.pxFromDp(parentActivity, (int )(widthCard * selectedTickMarginsToCardRatio)),
-                    AppLibrary.pxFromDp(parentActivity, (int)(widthCard * selectedTickMarginsToCardRatio)), 0 );
-            recordingSelected.setLayoutParams(lpRecordingSelected);
-        }
+        TextView title;
+        ImageView recordingType;
+        CheckBox checkBox;
 
         RecordingHolder(LayoutInflater inflater, ViewGroup parent) {
             super(inflater.inflate(R.layout.recording, parent, false));
-            recordingDate = itemView.findViewById(R.id.recording_date);
-            recordingTime = itemView.findViewById(R.id.recording_time);
             recordingType = itemView.findViewById(R.id.recording_type);
-            soundSymbol = itemView.findViewById(R.id.sound_symbol);
-            recordingSelected = itemView.findViewById(R.id.recording_selected);
+            title = itemView.findViewById(R.id.recording_title);
+            checkBox = itemView.findViewById(R.id.recording_checkbox);
 
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
-
-            setDimensions();
         }
 
         @Override
         public boolean onLongClick(View v) {
-            presenter.selectRecording((CardView) v, this.getAdapterPosition());
+            presenter.selectRecording(v, this.getAdapterPosition());
             return true;
         }
 
         @Override
         public void onClick(View v) {
             if(isSelectModeOn()) {
-                presenter.selectRecording((CardView) v, this.getAdapterPosition());
+                presenter.selectRecording(v, this.getAdapterPosition());
             }
             else { //usual short click
                 presenter.startPlayerActivity(((RecordingAdapter) recordingsRecycler.getAdapter()).
@@ -734,18 +696,29 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         }
 
         @Override
-        public void onBindViewHolder(@NonNull RecordingHolder holder, int position) {
+        public void onBindViewHolder(@NonNull RecordingHolder holder, final int position) {
             Recording recording = recordings.get(position);
-            holder.recordingDate.setText(recording.getDate());
-            holder.recordingTime.setText(recording.getTime());
+            holder.title.setText("Recording " + recording.getDate() + " " + recording.getTime());
             holder.recordingType.setImageResource(recording.isIncoming() ? R.drawable.incoming : R.drawable.outgoing);
-
+            holder.checkBox.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    presenter.selectRecording(view, position);
+                }
+            });
             //pentru situația cînd este întors ecranul sau cînd activitatea trece
             // în background sau cînd se scrolează lista de recordinguri.
-            if(selectedItems.contains(position))
-                selectRecording((CardView) holder.itemView);
-            else
-                deselectRecording((CardView) holder.itemView);
+
+                toggleSelectModeRecording(holder.itemView, false);
+                if(selectedItems.contains(position))
+                    selectRecording(holder.itemView);
+                else
+                    deselectRecording(holder.itemView);
+
+//            if(selectedItems.contains(position))
+//                selectRecording(holder.itemView);
+//            else
+//                deselectRecording(holder.itemView);
         }
 
         @Override

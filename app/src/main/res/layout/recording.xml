@@ -1,72 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Lățimea și lungimea sunt doar de formă specificate aici. În realitate sunt setate la run-time. Marginile
-date aici trebuie să fie identice cu cele din PhoneNumberDetail::calculateCardViewDimensions().-->
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_height="100dp"
-    android:layout_width="100dp"
-    android:layout_margin="3dp"
-    app:cardCornerRadius="4dp"
-    >
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="70dp"
+    android:layout_width="match_parent"
+    android:id="@+id/recording">
 
-    <RelativeLayout  xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        >
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/recording_checkbox"
+        android:layout_alignParentStart="true"
+        android:layout_centerInParent="true"
+        android:layout_marginStart="30dp"
+        android:visibility="gone"
+        />
 
-        <TextView
-            android:layout_marginTop="7dp"
-            android:id="@+id/recording_date"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAlignment="center"
-            android:textSize="17sp" />
+    <ImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:id="@+id/recording_adorn"
+        android:layout_centerVertical="true"
+        android:src="@drawable/sound_symbol"
+        android:layout_toEndOf="@id/recording_checkbox"
+        android:layout_marginStart="20dp"
+        />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:id="@+id/sound_symbol_box"
-            android:layout_centerVertical="true">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toEndOf="@id/recording_adorn"
+        android:layout_toStartOf="@id/recording_type"
+        android:id="@+id/recording_title"
+        android:layout_marginStart="20dp"
+        android:text="test"
+        />
 
-            <!--Idem, dimensiuni de formă. -->
-            <ImageView
-                android:layout_width="50dp"
-                android:layout_height="34dp"
-                android:id="@+id/sound_symbol"
-                android:background="@drawable/sound_symbol" />
+    <ImageView
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginEnd="25dp"
+        android:id="@+id/recording_type"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        />
 
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/recording_time"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:textAlignment="center"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="7dp"
-            />
-<!-- Sursa se va seta la runtime. Dimensiuni de formă.-->
-        <ImageView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentStart="true"
-            android:id="@+id/recording_type"/>
-
-        <!--Dimensiuni de formă. -->
-        <ImageView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:src="@drawable/checkmark"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:id="@+id/recording_selected"
-            android:visibility="gone"/>
-
-    </RelativeLayout>
-
-    </androidx.cardview.widget.CardView>
-
+</RelativeLayout>

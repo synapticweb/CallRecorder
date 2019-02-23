@@ -2,7 +2,6 @@ package net.synapticweb.callrecorder.contactdetail;
 
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
@@ -10,10 +9,6 @@ import android.os.Bundle;
 
 import android.util.Log;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.DialogAction;
@@ -36,7 +31,6 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -73,10 +67,11 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
                 .customView(R.layout.info_dialog, false)
                 .positiveText(android.R.string.ok).build();
 
+        //There should be only one if we are here.
         final Recording recording = view.getRecordingsAdapter().getItem(view.getSelectedItems().get(0));
-        final EditText nameEdit = dialog.getView().findViewById(R.id.info_name_edit);
-        final String nameEditText = recording.getName() != null ? recording.getName() : "Name not set";
-        nameEdit.setText(nameEditText);
+//        final EditText nameEdit = dialog.getView().findViewById(R.id.info_name_edit);
+//        final String nameEditText = recording.getName() != null ? recording.getName() : "Name not set";
+//        nameEdit.setText(nameEditText);
         TextView size = dialog.getView().findViewById(R.id.info_size_data);
         size.setText(AppLibrary.getFileSizeHuman(recording.getSize()));
 
@@ -84,38 +79,40 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
         format.setText(recording.getHumanReadingFormat());
         TextView length = dialog.getView().findViewById(R.id.info_length_data);
         length.setText(AppLibrary.getDurationHuman(recording.getLength(), true));
+        TextView path = dialog.getView().findViewById(R.id.info_path_data);
+        path.setText(recording.isSavedInPrivateSpace() ? "Private application storage" : recording.getPath());
 
-        final Button changeName = dialog.getView().findViewById(R.id.info_change_name);
-        final ImageButton okChange = dialog.getView().findViewById(R.id.info_name_done);
-        changeName.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                nameEdit.selectAll();
-                nameEdit.setEnabled(true);
-                InputMethodManager imm = (InputMethodManager) view.getParentActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                if(imm != null)
-                    imm.showSoftInput(nameEdit, InputMethodManager.SHOW_IMPLICIT);
-                okChange.setVisibility(View.VISIBLE);
-                changeName.setEnabled(false);
-            }
-        });
-        okChange.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String nameChanged = nameEdit.getText().toString().trim();
-                nameEdit.setText(nameChanged);
-                if(!nameChanged.equals(nameEditText)) {
-                    recording.setName(nameChanged.length() > 0 ? nameChanged : null);
-                    recording.updateRecording(view.getParentActivity());
-                }
-                if(nameChanged.length() == 0)
-                    nameEdit.setText("Name not set");
-                nameEdit.setSelection(0,0);
-                nameEdit.setEnabled(false);
-                okChange.setVisibility(View.GONE);
-                changeName.setEnabled(true);
-            }
-        });
+//        final Button changeName = dialog.getView().findViewById(R.id.info_change_name);
+//        final ImageButton okChange = dialog.getView().findViewById(R.id.info_name_done);
+//        changeName.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                nameEdit.selectAll();
+//                nameEdit.setEnabled(true);
+//                InputMethodManager imm = (InputMethodManager) view.getParentActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+//                if(imm != null)
+//                    imm.showSoftInput(nameEdit, InputMethodManager.SHOW_IMPLICIT);
+//                okChange.setVisibility(View.VISIBLE);
+//                changeName.setEnabled(false);
+//            }
+//        });
+//        okChange.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                String nameChanged = nameEdit.getText().toString().trim();
+//                nameEdit.setText(nameChanged);
+//                if(!nameChanged.equals(nameEditText)) {
+//                    recording.setName(nameChanged.length() > 0 ? nameChanged : null);
+//                    recording.updateRecording(view.getParentActivity());
+//                }
+//                if(nameChanged.length() == 0)
+//                    nameEdit.setText("Name not set");
+//                nameEdit.setSelection(0,0);
+//                nameEdit.setEnabled(false);
+//                okChange.setVisibility(View.GONE);
+//                changeName.setEnabled(true);
+//            }
+//        });
         dialog.show();
     }
 
@@ -182,18 +179,41 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
         });
     }
 
+    //Ideea este ca la long click pe un recording marginile recordingului să se modifice și să apară checkboxul.
+    //De asemenea la închiderea select mode marginile se modifică din nou și checkboxul dispare.
+    //ContactDetailFragment.toggleSelectModeRecording() face acest lucru, dar se pune problema cum să fie apelată
+    //această funcție. O posibilitate este ca ContactDetailPresenter.selectRecording() și ContactDetailFragment.
+    //clearSelectMode() doar să apeleze adapter.notifyDataSetChanged() și sarcina de a apela toggleSelectModeRecording()
+    //să revină RecordingAdapter.onBindViewHolder(), care este apelată pentru fiecare recording în urma adapter.notifyDataSetChanged()
+    //Această soluție nu funcționa bine cu animația. Dacă foloseam animație apăreau buguri ciudate - e.g. după long
+    //press recordingurile care nu fuseseră vizibile nu se modificau, etc. Dacă scoteam animația totul funcționa
+    //perfect.
+    //Soluția a fost ca animația să fie inclusă condițional - doar dacă toggleSelectModeRecording() este apelat
+    //din ContactDetailPresenter.selectRecording() sau din clearSelectMode. Pentru că această funcție trebuie apelată
+    //și cînd aplicația revine din background sau cînd ecranul este întors. Cînd toggleSelectModeRecording() este apelat
+    //din una din cele 2 funcții specificate apelul specifică folosirea animației. Pentru recordingurile care încă
+    //nu sunt vizibile (sunt null) nu se apelează (evident!) toggleSelectModeRecording(), dar se apelează notifyItemChanged(),
+    //care îl face pe adapter să apeleze onBindViewHolder() pentru recordingul respectiv ceea ce face să se apeleze
+    //toggleSelectModeRecording() fără animație. Tot fără animație se apelează această funcție la pornirea activității
+    //la întoarcerea din background și la rotire. Acest setup rezolvă problema descrisă.
     @Override
-    public void selectRecording(CardView card, int adapterPosition) {
+    public void selectRecording(android.view.View recording, int adapterPosition) {
          if(!view.isSelectModeOn()) {
              view.setSelectMode(true);
              view.toggleSelectModeActionBar(true);
+             for(int i = 0; i < view.getRecordingsAdapter().getItemCount(); ++i) {
+                 View recordingSlot = view.getRecordingsRecycler().getLayoutManager().findViewByPosition(i);
+                 if(recordingSlot != null)
+                    view.toggleSelectModeRecording(recordingSlot, true);
+                 view.getRecordingsAdapter().notifyItemChanged(i);
+             }
          }
          if(!view.removeIfPresentInSelectedItems(adapterPosition)) {
              view.addToSelectedItems(adapterPosition);
-             view.selectRecording(card);
+             view.selectRecording(recording);
          }
          else
-             view.deselectRecording(card);
+             view.deselectRecording(recording);
 
          if(view.isEmptySelectedItems())
              view.clearSelectedMode();
@@ -208,9 +228,11 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
 
     @Override
     public void deleteSelectedRecordings() {
-        for(Recording recording : view.getSelectedRecordings()) {
+        for(int position : view.getSelectedItems()) {
+            Recording recording = view.getRecordingsAdapter().getItem(position);
             try {
                 recording.delete(CrApp.getInstance());
+                view.getRecordingsAdapter().notifyItemRemoved(position);
             }
             catch (Exception exc) {
                 Log.wtf(TAG, exc.getMessage());
@@ -266,11 +288,11 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
             view.addToSelectedItems(position);
             adapter.notifyItemChanged(position);
             //https://stackoverflow.com/questions/33784369/recyclerview-get-view-at-particular-position
-            CardView selectedRecordingCard = (CardView) recordingsRecycler.getLayoutManager().findViewByPosition(position);
-            if(selectedRecordingCard != null) //dacă recordingul nu este încă afișat pe ecran
+            View selectedRecording = recordingsRecycler.getLayoutManager().findViewByPosition(position);
+            if(selectedRecording != null) //dacă recordingul nu este încă afișat pe ecran
                 // (sunt multe recordinguri și se scrolează) atunci selectedRecording va fi null. Dar mai înainte am
                 //notificat adapterul că s-a schimbat, ca să îl reconstruiască.
-               view.selectRecording(selectedRecordingCard);
+               view.selectRecording(selectedRecording);
         }
     }
 }

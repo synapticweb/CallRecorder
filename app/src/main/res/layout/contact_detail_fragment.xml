@@ -73,8 +73,6 @@
         android:id="@+id/recordings"
         android:layout_marginTop="10dp"
         android:layout_below="@id/header_container"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp"
         />
 
 </RelativeLayout>

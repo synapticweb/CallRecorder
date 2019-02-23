@@ -1,6 +1,7 @@
 package net.synapticweb.callrecorder.contactdetail;
 
 import android.os.Bundle;
+import android.view.View;
 
 
 import net.synapticweb.callrecorder.data.Contact;
@@ -22,8 +23,9 @@ public interface ContactDetailContract {
         void addToSelectedItems(int adapterPosition);
         boolean removeIfPresentInSelectedItems(int adapterPosition);
         void toggleSelectModeActionBar(boolean animateAlpha);
-        void selectRecording(CardView card);
-        void deselectRecording(CardView card);
+        void toggleSelectModeRecording(android.view.View recording, boolean animate);
+        void selectRecording(android.view.View recording);
+        void deselectRecording(android.view.View recording);
         boolean isEmptySelectedItems();
         void clearSelectedMode();
         List<Recording> getSelectedRecordings();
@@ -41,7 +43,7 @@ public interface ContactDetailContract {
         void editContact(final Contact contact);
         void onEditActivityResult(Bundle result);
         void loadRecordings(Contact contact);
-        void selectRecording(CardView card, int adapterPosition);
+        void selectRecording(android.view.View recording, int adapterPosition);
         void startPlayerActivity(Recording recording);
         void deleteSelectedRecordings();
         void moveSelectedRecordings(String path);

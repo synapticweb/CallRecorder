@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="date_recording_left_margin_selected">95dp</dimen>
-    <dimen name="date_recording_left_margin_unselected">70dp</dimen>
-    <dimen name="type_of_recording_left_margin_selected">35dp</dimen>
-    <dimen name="type_of_recording_left_margin_unselected">0dp</dimen>
+    <dimen name="recording_checkbox_visible_start_margin">20dp</dimen>
+    <dimen name="recording_checkbox_gone_start_margin">30dp</dimen>
+    <dimen name="recording_adorn_selected_margin_start">10dp</dimen>
+    <dimen name="recording_adorn_unselected_margin_start">20dp</dimen>
+    <dimen name="recording_title_selected_margin_start">10dp</dimen>
+    <dimen name="recording_title_unselected_margin_start">20dp</dimen>
 </resources>

@@ -208,7 +208,7 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
 
         ContactHolder(LayoutInflater inflater, ViewGroup parent)
         {
-            super(inflater.inflate(R.layout.listened_phone, parent, false));
+            super(inflater.inflate(R.layout.contact, parent, false));
             itemView.setOnClickListener(this);
             contactPhoto = itemView.findViewById(R.id.contact_photo);
             mContactName = itemView.findViewById(R.id.contact_name);

@@ -1,100 +1,135 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingStart="25dp">
+    android:paddingStart="20dp"
+    android:paddingEnd="20dp">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <!--<TextView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:id="@+id/info_name_label"-->
+        <!--android:text="Name: "/>-->
+
+    <!--<EditText-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:minEms="7"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:textSize="14sp"-->
+        <!--android:enabled="false"-->
+        <!--android:id="@+id/info_name_edit"-->
+        <!--android:layout_toEndOf="@id/info_name_label"-->
+        <!--android:layout_alignBaseline="@id/info_name_label"-->
+        <!--android:layout_marginStart="5dp"-->
+        <!--android:maxWidth="200dp"-->
+        <!--android:maxLines="1"-->
+        <!--/>-->
+
+    <!--<ImageButton-->
+        <!--android:layout_width="24dp"-->
+        <!--android:layout_height="24dp"-->
+        <!--android:src="@drawable/info_ok_change_name"-->
+        <!--android:layout_toEndOf="@id/info_name_edit"-->
+        <!--android:id="@+id/info_name_done"-->
+        <!--android:background="@android:color/transparent"-->
+        <!--android:visibility="gone"/>-->
+
+    <!--<Button-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="Change name"-->
+        <!--android:layout_below="@id/info_name_edit"-->
+        <!--android:layout_centerHorizontal="true"-->
+        <!--android:id="@+id/info_change_name"-->
+        <!--android:layout_marginBottom="20dp"-->
+        <!--/>-->
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/info_name_label"
-        android:text="Name: "/>
+        android:orientation="vertical"
+        android:layout_marginBottom="6dp"
+        android:layout_marginTop="6dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/info_length_label"
+            android:text="Duration: "
+            android:textStyle="bold"
+            />
 
-    <EditText
-        android:layout_width="wrap_content"
-        android:minEms="7"
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/info_length_data"
+            android:layout_marginTop="4dp"
+            android:textSize="13sp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="14sp"
-        android:enabled="false"
-        android:id="@+id/info_name_edit"
-        android:layout_toEndOf="@id/info_name_label"
-        android:layout_alignBaseline="@id/info_name_label"
-        android:layout_marginStart="5dp"
-        android:maxWidth="200dp"
-        android:maxLines="1"
-        />
+        android:orientation="vertical"
+        android:layout_marginBottom="6dp"
+        android:layout_marginTop="6dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/info_size_label"
+            android:text="Size: "
+            android:textStyle="bold"
+            />
 
-    <ImageButton
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:src="@drawable/info_ok_change_name"
-        android:layout_toEndOf="@id/info_name_edit"
-        android:id="@+id/info_name_done"
-        android:background="@android:color/transparent"
-        android:visibility="gone"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/info_size_data"
+            android:layout_marginTop="4dp"
+            android:textSize="13sp"/>
+</LinearLayout>
 
-    <Button
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Change name"
-        android:layout_below="@id/info_name_edit"
-        android:layout_centerHorizontal="true"
-        android:id="@+id/info_change_name"
-        android:layout_marginBottom="20dp"
-        />
+        android:orientation="vertical"
+        android:layout_marginBottom="6dp"
+        android:layout_marginTop="6dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/info_format_label"
+            android:text="Format: "
+            android:textStyle="bold"
+            />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/info_length_label"
-        android:text="Duration: "
-        android:layout_below="@id/info_change_name"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
-        />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/info_format_data"
+            android:layout_marginTop="4dp"
+            android:textSize="13sp"/>
+    </LinearLayout>
 
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/info_length_data"
-        android:layout_toEndOf="@id/info_length_label"
-        android:layout_below="@id/info_change_name"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"/>
+        android:orientation="vertical"
+        android:layout_marginBottom="6dp"
+        android:layout_marginTop="6dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/info_path_label"
+            android:text="Location: "
+            android:textStyle="bold"
+            />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/info_size_label"
-        android:text="Size: "
-        android:layout_below="@id/info_length_label"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
-        />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/info_path_data"
+            android:layout_marginTop="4dp"
+            android:textSize="13sp"/>
+    </LinearLayout>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/info_size_data"
-        android:layout_toEndOf="@id/info_size_label"
-        android:layout_below="@id/info_length_data"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/info_format_label"
-        android:text="Format: "
-        android:layout_below="@id/info_size_label"
-        android:layout_marginTop="5dp"
-        />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/info_format_data"
-        android:layout_toEndOf="@id/info_format_label"
-        android:layout_below="@id/info_size_data"
-        android:layout_marginTop="5dp" />
-</RelativeLayout>
+</LinearLayout>
