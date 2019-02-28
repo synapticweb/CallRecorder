@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_height="70dp"
+    android:layout_height="@dimen/recording_height"
     android:layout_width="match_parent"
     android:id="@+id/recording">
 
@@ -10,18 +10,18 @@
         android:id="@+id/recording_checkbox"
         android:layout_alignParentStart="true"
         android:layout_centerInParent="true"
-        android:layout_marginStart="30dp"
+        android:layout_marginStart="@dimen/recording_checkbox_gone_start_margin"
         android:visibility="gone"
         />
 
     <ImageView
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="@dimen/recording_adorn_side"
+        android:layout_height="@dimen/recording_adorn_side"
         android:id="@+id/recording_adorn"
         android:layout_centerVertical="true"
         android:src="@drawable/sound_symbol"
         android:layout_toEndOf="@id/recording_checkbox"
-        android:layout_marginStart="20dp"
+        android:layout_marginStart="@dimen/recording_adorn_unselected_margin_start"
         />
 
     <TextView
@@ -31,14 +31,13 @@
         android:layout_toEndOf="@id/recording_adorn"
         android:layout_toStartOf="@id/recording_type"
         android:id="@+id/recording_title"
-        android:layout_marginStart="20dp"
-        android:text="test"
+        android:layout_marginStart="@dimen/recording_title_unselected_margin_start"
         />
 
     <ImageView
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:layout_marginEnd="25dp"
+        android:layout_width="@dimen/recording_type_side"
+        android:layout_height="@dimen/recording_type_side"
+        android:layout_marginEnd="@dimen/recording_type_margin_end"
         android:id="@+id/recording_type"
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"

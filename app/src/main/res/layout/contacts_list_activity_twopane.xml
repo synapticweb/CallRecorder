@@ -105,6 +105,18 @@
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:src="@drawable/rename"
+                android:background="@android:color/transparent"
+                android:id="@+id/actionbar_rename"
+                android:layout_gravity="end"
+                android:layout_marginEnd="10dp"
+                android:visibility="gone"
+                android:alpha="0"
+                />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:src="@drawable/baseline_more_vert_white_24"
                 android:layout_marginEnd="10dp"
                 android:background="@android:color/transparent"

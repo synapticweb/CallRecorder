@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <dimen name="recording_height">70dp</dimen>
     <dimen name="recording_checkbox_visible_start_margin">20dp</dimen>
     <dimen name="recording_checkbox_gone_start_margin">30dp</dimen>
     <dimen name="recording_adorn_selected_margin_start">10dp</dimen>
     <dimen name="recording_adorn_unselected_margin_start">20dp</dimen>
     <dimen name="recording_title_selected_margin_start">10dp</dimen>
     <dimen name="recording_title_unselected_margin_start">20dp</dimen>
+    <dimen name="recording_adorn_side">50dp</dimen>
+    <dimen name="recording_type_side">20dp</dimen>
+    <dimen name="recording_type_margin_end">25dp</dimen>
 </resources>

@@ -5,8 +5,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
-import android.content.res.Configuration;
-
 import android.content.res.Resources;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
@@ -38,7 +36,6 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.codekidlabs.storagechooser.Content;
 import com.codekidlabs.storagechooser.StorageChooser;
 
-import net.synapticweb.callrecorder.AppLibrary;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.TemplateActivity;
 import net.synapticweb.callrecorder.data.Contact;
@@ -50,11 +47,9 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.PopupMenu;
-import androidx.cardview.widget.CardView;
 import androidx.core.app.NavUtils;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -229,6 +224,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         ImageButton selectAllBtn = parentActivity.findViewById(R.id.actionbar_select_all);
         ImageButton infoBtn = parentActivity.findViewById(R.id.actionbar_info);
         ImageButton menuRightBtn = parentActivity.findViewById(R.id.phone_number_detail_menu);
+        ImageButton renameBtn = parentActivity.findViewById(R.id.actionbar_rename);
 
         if(isSinglePaneLayout())
             toggleView(navigateBackBtn, false, animateAplha ? null : selectMode ? 0f : 1f);
@@ -243,6 +239,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         toggleView(deleteBtn, true, animateAplha  ? null  : selectMode ? 1f : 0f);
         toggleView(selectAllBtn, true, animateAplha ? null : selectMode ? 1f : 0f);
         toggleView(infoBtn, true, animateAplha ? null : selectMode ? 1f : 0f);
+        toggleView(renameBtn, true, animateAplha ? null : selectMode ? 1f : 0f);
         toggleView(menuRightBtn, false, animateAplha ? null : selectMode ? 0f : 1f);
 
         if(!isSinglePaneLayout()) {
@@ -250,6 +247,20 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
             toggleView(hamburger, false, animateAplha ? null : selectMode ? 0f : 1f);
         }
 
+    }
+
+    @Override
+    public void enableRenameButton() {
+        ImageButton renameBtn = parentActivity.findViewById(R.id.actionbar_rename);
+        renameBtn.setEnabled(true);
+        renameBtn.setImageAlpha(255);
+    }
+
+    @Override
+    public void disableRenameButton() {
+        ImageButton renameBtn = parentActivity.findViewById(R.id.actionbar_rename);
+        renameBtn.setEnabled(false);
+        renameBtn.setImageAlpha(75);
     }
 
     @Override
@@ -267,6 +278,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
             adapter.notifyItemChanged(i);
         }
         selectedItems.clear();
+        enableRenameButton();
     }
 
     private void modifyMargins(View recording, float interpolatedTime) {
@@ -470,6 +482,14 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
             @Override
             public void onClick(View view) {
                presenter.onInfoClick();
+            }
+        });
+
+        ImageButton renameBtn = parentActivity.findViewById(R.id.actionbar_rename);
+        renameBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                presenter.onRenameClick();
             }
         });
     }
@@ -680,6 +700,12 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
             notifyDataSetChanged();
         }
 
+        void removeItem(Recording recording) {
+            int position = recordings.indexOf(recording);
+            recordings.remove(recording);
+            notifyItemRemoved(position);
+        }
+
         RecordingAdapter(List<Recording> recordings) {
             this.recordings = recordings;
         }
@@ -698,7 +724,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         @Override
         public void onBindViewHolder(@NonNull RecordingHolder holder, final int position) {
             Recording recording = recordings.get(position);
-            holder.title.setText("Recording " + recording.getDate() + " " + recording.getTime());
+            holder.title.setText(recording.getName());
             holder.recordingType.setImageResource(recording.isIncoming() ? R.drawable.incoming : R.drawable.outgoing);
             holder.checkBox.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -714,11 +740,6 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
                     selectRecording(holder.itemView);
                 else
                     deselectRecording(holder.itemView);
-
-//            if(selectedItems.contains(position))
-//                selectRecording(holder.itemView);
-//            else
-//                deselectRecording(holder.itemView);
         }
 
         @Override

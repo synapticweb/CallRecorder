@@ -27,20 +27,20 @@ public class Recording implements Parcelable {
     private String path;
     private Boolean incoming;
     private Long startTimestamp, endTimestamp;
-    private String name;
+    private Boolean isNameSet;
     private String format;
     private String mode;
     private static final String TAG = "CallRecorder";
 
 
     public Recording(long id, String path, Boolean incoming, Long startTimestamp, Long endTimestamp,
-                     String format, String name, String mode) {
+                     String format, Boolean isNameSet, String mode) {
         this.id = id;
         this.path = path;
         this.incoming = incoming;
         this.startTimestamp = startTimestamp;
         this.endTimestamp = endTimestamp;
-        this.name = name;
+        this.isNameSet = isNameSet;
         this.format = format;
         this.mode = mode;
     }
@@ -63,7 +63,7 @@ public class Recording implements Parcelable {
         values.put(RecordingsContract.Recordings.COLUMN_NAME_INCOMING, incoming);
         values.put(RecordingsContract.Recordings.COLUMN_NAME_START_TIMESTAMP, startTimestamp);
         values.put(RecordingsContract.Recordings.COLUMN_NAME_END_TIMESTAMP, endTimestamp);
-        values.put(RecordingsContract.Recordings.COLUMN_NAME_NAME, name);
+        values.put(RecordingsContract.Recordings.COLUMN_NAME_IS_NAME_SET, isNameSet);
         values.put(RecordingsContract.Recordings.COLUMN_NAME_FORMAT, format);
         values.put(RecordingsContract.Recordings.COLUMN_NAME_MODE, mode);
 
@@ -77,11 +77,10 @@ public class Recording implements Parcelable {
     }
 
     public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+        if(!isNameSet)
+            return "Recording " + getDate() + " " + getTime();
+        String fileName = new File(path).getName();
+        return fileName.substring(0, fileName.length() - 4);
     }
 
     public long getSize() {
@@ -186,6 +185,10 @@ public class Recording implements Parcelable {
         return format;
     }
 
+    public Boolean getIsNameSet() { return isNameSet; }
+
+    public void setIsNameSet(Boolean isNameSet) { this.isNameSet = isNameSet; }
+
     @Override
     public int describeContents() {
         return 0;
@@ -198,7 +201,7 @@ public class Recording implements Parcelable {
         dest.writeValue(this.incoming);
         dest.writeValue(this.startTimestamp);
         dest.writeValue(this.endTimestamp);
-        dest.writeString(this.name);
+        dest.writeValue(this.isNameSet);
         dest.writeString(this.format);
         dest.writeString(this.mode);
     }
@@ -209,7 +212,7 @@ public class Recording implements Parcelable {
         this.incoming = (Boolean) in.readValue(Boolean.class.getClassLoader());
         this.startTimestamp = (Long) in.readValue(Long.class.getClassLoader());
         this.endTimestamp = (Long) in.readValue(Long.class.getClassLoader());
-        this.name = in.readString();
+        this.isNameSet = (Boolean) in.readValue(Boolean.class.getClassLoader());
         this.format = in.readString();
         this.mode = in.readString();
     }

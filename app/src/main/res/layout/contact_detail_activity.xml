@@ -31,7 +31,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/close"
-            android:layout_marginEnd="10dp"
+            android:layout_marginEnd="7dp"
             android:id="@+id/close_select_mode"
             android:layout_gravity="start"
             android:background="@android:color/transparent"
@@ -66,7 +66,7 @@
             android:background="@android:color/transparent"
             android:id="@+id/actionbar_select_delete"
             android:layout_gravity="end"
-            android:layout_marginEnd="10dp"
+            android:layout_marginEnd="7dp"
             android:visibility="gone"
             android:alpha="0"
             />
@@ -78,7 +78,7 @@
             android:background="@android:color/transparent"
             android:id="@+id/actionbar_select_all"
             android:layout_gravity="end"
-            android:layout_marginEnd="10dp"
+            android:layout_marginEnd="7dp"
             android:visibility="gone"
             android:alpha="0"
             />
@@ -90,7 +90,19 @@
             android:background="@android:color/transparent"
             android:id="@+id/actionbar_info"
             android:layout_gravity="end"
-            android:layout_marginEnd="10dp"
+            android:layout_marginEnd="7dp"
+            android:visibility="gone"
+            android:alpha="0"
+            />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/rename"
+            android:background="@android:color/transparent"
+            android:id="@+id/actionbar_rename"
+            android:layout_gravity="end"
+            android:layout_marginEnd="7dp"
             android:visibility="gone"
             android:alpha="0"
             />

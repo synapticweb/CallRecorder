@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -46,6 +47,57 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
     }
 
     @Override
+    public void onRenameClick() {
+        new MaterialDialog.Builder(view.getParentActivity())
+                .title("Rename this recording")
+                .inputType(InputType.TYPE_CLASS_TEXT)
+                .input("Enter new name for recording", null, false, new MaterialDialog.InputCallback() {
+                    @Override
+                    public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
+                        if(view.getSelectedItems().size() != 1) {
+                            Log.wtf(TAG, "Calling onRenameClick when multiple recordings are selected");
+                            return ;
+                        }
+                        Recording selRec = view.getSelectedRecordings().get(0); //de testat. size == 1
+                        String parent = new File(selRec.getPath()).getParent();
+                        String oldFileName = new File(selRec.getPath()).getName();
+                        String ext = oldFileName.substring(oldFileName.length() - 3);
+                        String newFileName = input + "." + ext;
+
+                        if(new File(parent, newFileName).exists()) {
+                            new MaterialDialog.Builder(view.getParentActivity())
+                                    .title("Warning")
+                                    .content("This file name is already used.")
+                                    .positiveText("OK")
+                                    .icon(CrApp.getInstance().getResources().getDrawable(R.drawable.warning))
+                                    .show();
+                            return;
+                        }
+                        try {
+                            if(new File(selRec.getPath()).renameTo(new File(parent, newFileName)) ) {
+                                selRec.setPath(new File(parent, newFileName).getAbsolutePath());
+                                selRec.setIsNameSet(true);
+                                selRec.updateRecording(CrApp.getInstance());
+                                view.getRecordingsAdapter().notifyItemChanged(view.getSelectedItems().get(0));
+                            }
+                            else
+                                throw new Exception("File.renameTo() has returned false.");
+                        }
+                        catch (Exception e) {
+                            Log.wtf(TAG, e.getMessage());
+                            new MaterialDialog.Builder(view.getParentActivity())
+                                    .title("Error")
+                                    .content("An error ocurred while renaming the recording.")
+                                    .positiveText("OK")
+                                    .icon(CrApp.getInstance().getResources().getDrawable(R.drawable.error))
+                                    .show();
+                        }
+                    }
+
+                }).show();
+    }
+
+    @Override
     public void onInfoClick() {
         if(view.getSelectedItems().size() > 1) {
             long totalSize = 0;
@@ -67,11 +119,12 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
                 .customView(R.layout.info_dialog, false)
                 .positiveText(android.R.string.ok).build();
 
-        //There should be only one if we are here.
+        //There should be only one if we are here:
+        if(view.getSelectedItems().size() != 1) {
+            Log.wtf(TAG, "Calling onInfoClick when multiple recordings are selected");
+            return ;
+        }
         final Recording recording = view.getRecordingsAdapter().getItem(view.getSelectedItems().get(0));
-//        final EditText nameEdit = dialog.getView().findViewById(R.id.info_name_edit);
-//        final String nameEditText = recording.getName() != null ? recording.getName() : "Name not set";
-//        nameEdit.setText(nameEditText);
         TextView size = dialog.getView().findViewById(R.id.info_size_data);
         size.setText(AppLibrary.getFileSizeHuman(recording.getSize()));
 
@@ -82,37 +135,6 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
         TextView path = dialog.getView().findViewById(R.id.info_path_data);
         path.setText(recording.isSavedInPrivateSpace() ? "Private application storage" : recording.getPath());
 
-//        final Button changeName = dialog.getView().findViewById(R.id.info_change_name);
-//        final ImageButton okChange = dialog.getView().findViewById(R.id.info_name_done);
-//        changeName.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                nameEdit.selectAll();
-//                nameEdit.setEnabled(true);
-//                InputMethodManager imm = (InputMethodManager) view.getParentActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-//                if(imm != null)
-//                    imm.showSoftInput(nameEdit, InputMethodManager.SHOW_IMPLICIT);
-//                okChange.setVisibility(View.VISIBLE);
-//                changeName.setEnabled(false);
-//            }
-//        });
-//        okChange.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                String nameChanged = nameEdit.getText().toString().trim();
-//                nameEdit.setText(nameChanged);
-//                if(!nameChanged.equals(nameEditText)) {
-//                    recording.setName(nameChanged.length() > 0 ? nameChanged : null);
-//                    recording.updateRecording(view.getParentActivity());
-//                }
-//                if(nameChanged.length() == 0)
-//                    nameEdit.setText("Name not set");
-//                nameEdit.setSelection(0,0);
-//                nameEdit.setEnabled(false);
-//                okChange.setVisibility(View.GONE);
-//                changeName.setEnabled(true);
-//            }
-//        });
         dialog.show();
     }
 
@@ -211,9 +233,14 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
          if(!view.removeIfPresentInSelectedItems(adapterPosition)) {
              view.addToSelectedItems(adapterPosition);
              view.selectRecording(recording);
+             if(view.getSelectedItems().size() > 1)
+                 view.disableRenameButton();
          }
-         else
+         else {
              view.deselectRecording(recording);
+             if(view.getSelectedItems().size() == 1)
+                 view.enableRenameButton();
+         }
 
          if(view.isEmptySelectedItems())
              view.clearSelectedMode();
@@ -228,16 +255,19 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
 
     @Override
     public void deleteSelectedRecordings() {
-        for(int position : view.getSelectedItems()) {
-            Recording recording = view.getRecordingsAdapter().getItem(position);
+        for(Recording recording :  view.getSelectedRecordings()) {
             try {
                 recording.delete(CrApp.getInstance());
-                view.getRecordingsAdapter().notifyItemRemoved(position);
+                view.getRecordingsAdapter().removeItem(recording);
             }
             catch (Exception exc) {
                 Log.wtf(TAG, exc.getMessage());
             }
         }
+
+        view.getSelectedItems().clear();
+        if(view.getRecordingsAdapter().getItemCount() == 0)
+            view.clearSelectedMode();
     }
 
     @Override
