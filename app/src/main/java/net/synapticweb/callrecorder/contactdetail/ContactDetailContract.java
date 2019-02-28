@@ -36,8 +36,6 @@ public interface ContactDetailContract {
         RecyclerView getRecordingsRecycler();
         ContactDetailFragment.RecordingAdapter getRecordingsAdapter();
         List<Integer> getSelectedItems();
-        void enableRenameButton();
-        void disableRenameButton();
     }
 
     interface ContactDetailPresenter {

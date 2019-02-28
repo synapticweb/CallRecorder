@@ -233,14 +233,10 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
          if(!view.removeIfPresentInSelectedItems(adapterPosition)) {
              view.addToSelectedItems(adapterPosition);
              view.selectRecording(recording);
-             if(view.getSelectedItems().size() > 1)
-                 view.disableRenameButton();
          }
-         else {
+         else
              view.deselectRecording(recording);
-             if(view.getSelectedItems().size() == 1)
-                 view.enableRenameButton();
-         }
+
 
          if(view.isEmptySelectedItems())
              view.clearSelectedMode();

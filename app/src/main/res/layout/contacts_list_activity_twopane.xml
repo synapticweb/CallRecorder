@@ -57,23 +57,23 @@
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/select_export"
+                android:src="@drawable/baseline_more_vert_white_24"
+                android:layout_marginEnd="10dp"
                 android:background="@android:color/transparent"
-                android:id="@+id/actionbar_select_export"
+                android:id="@+id/contact_detail_selected_menu"
                 android:layout_gravity="end"
-                android:layout_marginEnd="20dp"
                 android:visibility="gone"
-                android:alpha="0"
                 />
+
 
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/select_delete"
+                android:src="@drawable/select_export"
                 android:background="@android:color/transparent"
-                android:id="@+id/actionbar_select_delete"
+                android:id="@+id/actionbar_select_move"
                 android:layout_gravity="end"
-                android:layout_marginEnd="15dp"
+                android:layout_marginEnd="10dp"
                 android:visibility="gone"
                 android:alpha="0"
                 />
@@ -85,7 +85,7 @@
                 android:background="@android:color/transparent"
                 android:id="@+id/actionbar_select_all"
                 android:layout_gravity="end"
-                android:layout_marginEnd="15dp"
+                android:layout_marginEnd="10dp"
                 android:visibility="gone"
                 android:alpha="0"
                 />
@@ -97,22 +97,11 @@
                 android:background="@android:color/transparent"
                 android:id="@+id/actionbar_info"
                 android:layout_gravity="end"
-                android:layout_marginEnd="15dp"
-                android:visibility="gone"
-                android:alpha="0"
-                />
-
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/rename"
-                android:background="@android:color/transparent"
-                android:id="@+id/actionbar_rename"
-                android:layout_gravity="end"
                 android:layout_marginEnd="10dp"
                 android:visibility="gone"
                 android:alpha="0"
                 />
+
 
             <ImageButton
                 android:layout_width="wrap_content"
@@ -120,9 +109,8 @@
                 android:src="@drawable/baseline_more_vert_white_24"
                 android:layout_marginEnd="10dp"
                 android:background="@android:color/transparent"
-                android:id="@+id/phone_number_detail_menu"
+                android:id="@+id/contact_detail_menu"
                 android:layout_gravity="end"
-                android:visibility="gone"
                 />
 
             <ImageButton
@@ -132,8 +120,7 @@
                 android:background="@android:color/transparent"
                 android:id="@+id/edit_contact"
                 android:layout_gravity="end"
-                android:layout_marginEnd="15dp"
-                android:visibility="gone"/>
+                android:layout_marginEnd="15dp"/>
 
             <ImageButton
                 android:layout_width="wrap_content"
@@ -142,8 +129,7 @@
                 android:background="@android:color/transparent"
                 android:id="@+id/call_contact"
                 android:layout_gravity="end"
-                android:layout_marginEnd="15dp"
-                android:visibility="gone"/>
+                android:layout_marginEnd="15dp"/>
 
         </androidx.appcompat.widget.Toolbar>
 

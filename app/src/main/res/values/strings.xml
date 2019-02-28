@@ -48,5 +48,7 @@
     <string name="nonstandard_number_message">The number you picked up is not a standard number. Do you still want to add the number to the database?"</string>
     <string name="yes">YES</string>
     <string name="no">NO</string>
+    <string name="delete_recording">Delete</string>
+    <string name="rename_recording">Rename</string>
 
 </resources>

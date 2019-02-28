@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/rename_recording"
+        android:title="@string/rename_recording">
+    </item>
+    <item
+        android:id="@+id/delete_recording"
+        android:title="@string/delete_recording">
+    </item>
+</menu>

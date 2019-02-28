@@ -57,7 +57,7 @@ public class ContactsListPresenter implements ContactsListContract.ContactsListP
         if(parentActivity == null)
             return ;
 
-        ImageButton detailMenu = parentActivity.findViewById(R.id.phone_number_detail_menu);
+        ImageButton detailMenu = parentActivity.findViewById(R.id.contact_detail_menu);
         ImageButton editContact = parentActivity.findViewById(R.id.edit_contact);
         ImageButton callContact = parentActivity.findViewById(R.id.call_contact);
         if(contact != null) {

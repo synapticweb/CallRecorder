@@ -219,12 +219,11 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         final ImageButton closeBtn = parentActivity.findViewById(R.id.close_select_mode);
         final ImageButton editBtn = parentActivity.findViewById(R.id.edit_contact);
         ImageButton callBtn = parentActivity.findViewById(R.id.call_contact);
-        ImageButton exportBtn = parentActivity.findViewById(R.id.actionbar_select_export);
-        ImageButton deleteBtn = parentActivity.findViewById(R.id.actionbar_select_delete);
+        ImageButton moveBtn = parentActivity.findViewById(R.id.actionbar_select_move);
         ImageButton selectAllBtn = parentActivity.findViewById(R.id.actionbar_select_all);
         ImageButton infoBtn = parentActivity.findViewById(R.id.actionbar_info);
-        ImageButton menuRightBtn = parentActivity.findViewById(R.id.phone_number_detail_menu);
-        ImageButton renameBtn = parentActivity.findViewById(R.id.actionbar_rename);
+        ImageButton menuRightBtn = parentActivity.findViewById(R.id.contact_detail_menu);
+        ImageButton menuRightSelectedBtn = parentActivity.findViewById(R.id.contact_detail_selected_menu);
 
         if(isSinglePaneLayout())
             toggleView(navigateBackBtn, false, animateAplha ? null : selectMode ? 0f : 1f);
@@ -235,11 +234,10 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
             toggleView(callBtn, false, animateAplha  ? null : selectMode ? 0f : 1f);
         }
 
-        toggleView(exportBtn, true, animateAplha ? null : selectMode ? 1f : 0f);
-        toggleView(deleteBtn, true, animateAplha  ? null  : selectMode ? 1f : 0f);
+        toggleView(moveBtn, true, animateAplha ? null : selectMode ? 1f : 0f);
         toggleView(selectAllBtn, true, animateAplha ? null : selectMode ? 1f : 0f);
         toggleView(infoBtn, true, animateAplha ? null : selectMode ? 1f : 0f);
-        toggleView(renameBtn, true, animateAplha ? null : selectMode ? 1f : 0f);
+        toggleView(menuRightSelectedBtn, true, animateAplha ? null : selectMode ? 1f : 0f);
         toggleView(menuRightBtn, false, animateAplha ? null : selectMode ? 0f : 1f);
 
         if(!isSinglePaneLayout()) {
@@ -247,20 +245,6 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
             toggleView(hamburger, false, animateAplha ? null : selectMode ? 0f : 1f);
         }
 
-    }
-
-    @Override
-    public void enableRenameButton() {
-        ImageButton renameBtn = parentActivity.findViewById(R.id.actionbar_rename);
-        renameBtn.setEnabled(true);
-        renameBtn.setImageAlpha(255);
-    }
-
-    @Override
-    public void disableRenameButton() {
-        ImageButton renameBtn = parentActivity.findViewById(R.id.actionbar_rename);
-        renameBtn.setEnabled(false);
-        renameBtn.setImageAlpha(75);
     }
 
     @Override
@@ -278,7 +262,6 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
             adapter.notifyItemChanged(i);
         }
         selectedItems.clear();
-        enableRenameButton();
     }
 
     private void modifyMargins(View recording, float interpolatedTime) {
@@ -372,7 +355,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
                 NavUtils.navigateUpFromSameTask(parentActivity);
             }
         });
-        final ImageButton menuButton = parentActivity.findViewById(R.id.phone_number_detail_menu);
+        final ImageButton menuButton = parentActivity.findViewById(R.id.contact_detail_menu);
         menuButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -397,7 +380,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
                     }
                 });
                 MenuInflater inflater = popupMenu.getMenuInflater();
-                inflater.inflate(R.menu.phone_number_popup, popupMenu.getMenu());
+                inflater.inflate(R.menu.contact_popup, popupMenu.getMenu());
                 MenuItem shouldRecordMenuItem = popupMenu.getMenu().findItem(R.id.should_record);
                 if(contact.shouldRecord())
                     shouldRecordMenuItem.setTitle(R.string.stop_recording);
@@ -439,31 +422,55 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
             }
         });
 
-        ImageButton deleteRecording = parentActivity.findViewById(R.id.actionbar_select_delete);
-        deleteRecording.setOnClickListener(new View.OnClickListener() {
+        final ImageButton menuButtonSelected = parentActivity.findViewById(R.id.contact_detail_selected_menu);
+        menuButtonSelected.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                new MaterialDialog.Builder(parentActivity)
-                        .title(R.string.delete_recording_confirm_title)
-                        .content(String.format(getResources().getString(
-                                R.string.delete_recording_confirm_message), selectedItems.size()))
-                        .positiveText(android.R.string.ok)
-                        .negativeText(android.R.string.cancel)
-                        .icon(parentActivity.getResources().getDrawable(R.drawable.warning))
-                        .onPositive(new MaterialDialog.SingleButtonCallback() {
-                            @Override
-                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                presenter.deleteSelectedRecordings();
-                            }
-                        })
-                        .show();
+            public void onClick(View view) {
+                PopupMenu popupMenu = new PopupMenu(parentActivity,view);
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.rename_recording:
+                                presenter.onRenameClick();
+                                return true;
+                            case R.id.delete_recording:
+                                new MaterialDialog.Builder(parentActivity)
+                                        .title(R.string.delete_recording_confirm_title)
+                                        .content(String.format(getResources().getString(
+                                                R.string.delete_recording_confirm_message),
+                                                selectedItems.size()))
+                                        .positiveText(android.R.string.ok)
+                                        .negativeText(android.R.string.cancel)
+                                        .icon(parentActivity.getResources().getDrawable(R.drawable.warning))
+                                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                            @Override
+                                            public void onClick(@NonNull MaterialDialog dialog,
+                                                                @NonNull DialogAction which) {
+                                                presenter.deleteSelectedRecordings();
+                                            }
+                                        })
+                                        .show();
+                                return true;
+                            default:
+                                return false;
+                        }
+                    }
+                });
+
+                MenuInflater inflater = popupMenu.getMenuInflater();
+                inflater.inflate(R.menu.contact_selected_popup, popupMenu.getMenu());
+                MenuItem renameMenuItem = popupMenu.getMenu().findItem(R.id.rename_recording);
+                if(selectedItems.size() > 1)
+                    renameMenuItem.setEnabled(false);
+                popupMenu.show();
             }
         });
 
-        ImageButton exportBtn = parentActivity.findViewById(R.id.actionbar_select_export);
-        registerForContextMenu(exportBtn);
+        ImageButton moveBtn = parentActivity.findViewById(R.id.actionbar_select_move);
+        registerForContextMenu(moveBtn);
         //foarte necesar. Altfel meniul contextual va fi arătat numai la long click.
-        exportBtn.setOnClickListener(new View.OnClickListener() {
+        moveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 view.showContextMenu();
@@ -485,13 +492,6 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
             }
         });
 
-        ImageButton renameBtn = parentActivity.findViewById(R.id.actionbar_rename);
-        renameBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                presenter.onRenameClick();
-            }
-        });
     }
 
     @Override
