@@ -19,7 +19,6 @@
         android:layout_height="@dimen/recording_adorn_side"
         android:id="@+id/recording_adorn"
         android:layout_centerVertical="true"
-        android:src="@drawable/sound_symbol"
         android:layout_toEndOf="@id/recording_checkbox"
         android:layout_marginStart="@dimen/recording_adorn_unselected_margin_start"
         />

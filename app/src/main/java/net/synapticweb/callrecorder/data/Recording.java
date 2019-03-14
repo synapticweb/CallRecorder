@@ -21,6 +21,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Recording implements Parcelable {
     private long id;
@@ -81,6 +83,12 @@ public class Recording implements Parcelable {
             return "Recording " + getDate() + " " + getTime();
         String fileName = new File(path).getName();
         return fileName.substring(0, fileName.length() - 4);
+    }
+
+    public static boolean hasIllegalChar(CharSequence fileName) {
+        Pattern pattern = Pattern.compile("[^a-zA-Z0-9.\\- ]");
+        Matcher matcher = pattern.matcher(fileName);
+        return matcher.find();
     }
 
     public long getSize() {

@@ -12,7 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-class Recorder {
+public class Recorder {
     private static final String TAG = "CallRecorder";
     private File audioFile;
     private Thread recordingThread;
@@ -20,9 +20,10 @@ class Recorder {
     private final String format;
     private final String mode;
     private SharedPreferences settings;
-    private static final String WAV_FORMAT = "wav";
-    static final String AAC_HIGH_FORMAT = "aac_hi";
-    static final String AAC_MEDIUM_FORMAT = "aac_med";
+    public static final String WAV_FORMAT = "wav";
+    public static final String AAC_HIGH_FORMAT = "aac_hi";
+    public static final String AAC_MEDIUM_FORMAT = "aac_med";
+    public static final String AAC_BASIC_FORMAT = "aac_bas";
     static final String MONO = "mono";
 
      Recorder() {

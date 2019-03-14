@@ -28,9 +28,11 @@ class RecordingThreadAac extends RecordingThread implements Runnable {
         switch (format) {
             case Recorder.AAC_HIGH_FORMAT: bitRate = 128000;
                 break;
-            case Recorder.AAC_MEDIUM_FORMAT:bitRate = 64000;
+            case Recorder.AAC_MEDIUM_FORMAT: bitRate = 64000;
                 break;
-            default:bitRate = 32000;
+            case Recorder.AAC_BASIC_FORMAT: bitRate = 32000;
+                break;
+            default:bitRate = 64000;
         }
 
         mediaCodec = createMediaCodec(bufferSize);

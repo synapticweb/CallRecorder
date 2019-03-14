@@ -40,6 +40,7 @@ import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.TemplateActivity;
 import net.synapticweb.callrecorder.data.Contact;
 import net.synapticweb.callrecorder.data.Recording;
+import net.synapticweb.callrecorder.recorder.Recorder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -661,7 +662,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
 
     class RecordingHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         TextView title;
-        ImageView recordingType;
+        ImageView recordingType, recordingAdorn;
         CheckBox checkBox;
 
         RecordingHolder(LayoutInflater inflater, ViewGroup parent) {
@@ -669,6 +670,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
             recordingType = itemView.findViewById(R.id.recording_type);
             title = itemView.findViewById(R.id.recording_title);
             checkBox = itemView.findViewById(R.id.recording_checkbox);
+            recordingAdorn = itemView.findViewById(R.id.recording_adorn);
 
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
@@ -724,8 +726,22 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         @Override
         public void onBindViewHolder(@NonNull RecordingHolder holder, final int position) {
             Recording recording = recordings.get(position);
+            int adornRes;
+            switch (recording.getFormat()) {
+                case Recorder.WAV_FORMAT: adornRes = R.drawable.sound_symbol_wav;
+                    break;
+                case Recorder.AAC_HIGH_FORMAT: adornRes = R.drawable.sound_symbol_aac128;
+                    break;
+                case Recorder.AAC_MEDIUM_FORMAT: adornRes = R.drawable.sound_symbol_aac64;
+                    break;
+                case Recorder.AAC_BASIC_FORMAT: adornRes = R.drawable.sound_symbol_aac32;
+                    break;
+                default:adornRes = R.drawable.sound_symbol_aac64;
+            }
+
             holder.title.setText(recording.getName());
             holder.recordingType.setImageResource(recording.isIncoming() ? R.drawable.incoming : R.drawable.outgoing);
+            holder.recordingAdorn.setImageResource(adornRes);
             holder.checkBox.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

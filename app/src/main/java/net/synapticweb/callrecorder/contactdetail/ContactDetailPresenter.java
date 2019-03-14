@@ -49,15 +49,25 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
     @Override
     public void onRenameClick() {
         new MaterialDialog.Builder(view.getParentActivity())
-                .title("Rename this recording")
+                .title("Rename recording")
                 .inputType(InputType.TYPE_CLASS_TEXT)
-                .input("Enter new name for recording", null, false, new MaterialDialog.InputCallback() {
+                .input("Enter new recording name", null, false, new MaterialDialog.InputCallback() {
                     @Override
                     public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
                         if(view.getSelectedItems().size() != 1) {
                             Log.wtf(TAG, "Calling onRenameClick when multiple recordings are selected");
                             return ;
                         }
+                        if(Recording.hasIllegalChar(input)) {
+                            new MaterialDialog.Builder(view.getParentActivity())
+                                    .title("Error")
+                                    .content("The recording name you entered contains illegal characters.")
+                                    .positiveText("OK")
+                                    .icon(CrApp.getInstance().getResources().getDrawable(R.drawable.error))
+                                    .show();
+                            return;
+                        }
+
                         Recording selRec = view.getSelectedRecordings().get(0); //de testat. size == 1
                         String parent = new File(selRec.getPath()).getParent();
                         String oldFileName = new File(selRec.getPath()).getName();
@@ -66,10 +76,10 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
 
                         if(new File(parent, newFileName).exists()) {
                             new MaterialDialog.Builder(view.getParentActivity())
-                                    .title("Warning")
+                                    .title("Error")
                                     .content("This file name is already used.")
                                     .positiveText("OK")
-                                    .icon(CrApp.getInstance().getResources().getDrawable(R.drawable.warning))
+                                    .icon(CrApp.getInstance().getResources().getDrawable(R.drawable.error))
                                     .show();
                             return;
                         }
