@@ -50,7 +50,7 @@ public class PlayerActivity extends TemplateActivity {
 
         Toolbar toolbar = findViewById(R.id.toolbar_play);
         recording = getIntent().getParcelableExtra(ContactDetailPresenter.RECORDING_EXTRA);
-        String title = recording.getName() != null ? recording.getName() : recording.getDate() + " " + recording.getTime();
+        String title = recording.getName() != null ? recording.getName() : recording.getDate(true) + " " + recording.getTime();
         toolbar.setTitle("Playing " + title);
         setSupportActionBar(toolbar);
 

@@ -73,7 +73,7 @@
                 android:background="@android:color/transparent"
                 android:id="@+id/actionbar_select_move"
                 android:layout_gravity="end"
-                android:layout_marginEnd="10dp"
+                android:layout_marginEnd="20dp"
                 android:visibility="gone"
                 android:alpha="0"
                 />
@@ -85,7 +85,7 @@
                 android:background="@android:color/transparent"
                 android:id="@+id/actionbar_select_all"
                 android:layout_gravity="end"
-                android:layout_marginEnd="10dp"
+                android:layout_marginEnd="20dp"
                 android:visibility="gone"
                 android:alpha="0"
                 />
@@ -97,7 +97,7 @@
                 android:background="@android:color/transparent"
                 android:id="@+id/actionbar_info"
                 android:layout_gravity="end"
-                android:layout_marginEnd="10dp"
+                android:layout_marginEnd="20dp"
                 android:visibility="gone"
                 android:alpha="0"
                 />

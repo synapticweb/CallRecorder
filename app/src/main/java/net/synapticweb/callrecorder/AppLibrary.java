@@ -3,6 +3,7 @@ package net.synapticweb.callrecorder;
 import android.content.Context;
 import android.telephony.TelephonyManager;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -90,17 +91,21 @@ public class AppLibrary {
     }
 
     public static String getFileSizeHuman(long size) {
-        int numUnits = (int) size / 1024;
+        double numUnits =  size / 1024;
         String unit = "KB";
         if(numUnits > 1000) {
             numUnits = (int) size / 1048576;
             unit = "MB";
+            double diff = (size - numUnits * 1048576) / 1048576;
+            numUnits = numUnits + diff;
             if(numUnits > 1000) {
-                numUnits = (int) (size / 1099511627776L);
+                numUnits = size / 1099511627776L;
                 unit = "GB";
+                 diff = (size - numUnits * 1099511627776L) / 1099511627776L;
+                numUnits = numUnits + diff;
             }
         }
-        return numUnits + unit;
+        return new DecimalFormat("#.#").format(numUnits) + " " + unit;
     }
 
     //https://stackoverflow.com/questions/4605527/converting-pixels-to-dp

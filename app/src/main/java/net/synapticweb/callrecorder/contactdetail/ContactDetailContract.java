@@ -36,6 +36,9 @@ public interface ContactDetailContract {
         RecyclerView getRecordingsRecycler();
         ContactDetailFragment.RecordingAdapter getRecordingsAdapter();
         List<Integer> getSelectedItems();
+        void updateTitle();
+        void disableMoveBtn();
+        void enableMoveBtn();
     }
 
     interface ContactDetailPresenter {
@@ -43,7 +46,7 @@ public interface ContactDetailContract {
         void editContact(final Contact contact);
         void onEditActivityResult(Bundle result);
         void loadRecordings(Contact contact);
-        void selectRecording(android.view.View recording, int adapterPosition);
+        void selectRecording(android.view.View recording, int adapterPosition, boolean exists);
         void startPlayerActivity(Recording recording);
         void deleteSelectedRecordings();
         void moveSelectedRecordings(String path);

@@ -10,4 +10,5 @@
     <dimen name="recording_adorn_side">50dp</dimen>
     <dimen name="recording_type_side">20dp</dimen>
     <dimen name="recording_type_margin_end">25dp</dimen>
+    <dimen name="recording_nonexistent">25dp</dimen>
 </resources>

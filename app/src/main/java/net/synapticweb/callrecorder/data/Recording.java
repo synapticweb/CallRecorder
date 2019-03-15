@@ -47,6 +47,10 @@ public class Recording implements Parcelable {
         this.mode = mode;
     }
 
+    public boolean exists() {
+        return new File(path).isFile();
+    }
+
     public boolean isSavedInPrivateSpace() {
         return new File(path).getParentFile().
                 compareTo(CrApp.getInstance().getFilesDir()) == 0;
@@ -80,7 +84,7 @@ public class Recording implements Parcelable {
 
     public String getName() {
         if(!isNameSet)
-            return "Recording " + getDate() + " " + getTime();
+            return "Recording " + getDate(true) + " " + getTime();
         String fileName = new File(path).getName();
         return fileName.substring(0, fileName.length() - 4);
     }
@@ -96,13 +100,17 @@ public class Recording implements Parcelable {
     }
 
 
-    public String getDate() {
+    public String getDate(boolean shortFormat) {
         Calendar recordingCal = Calendar.getInstance();
         recordingCal.setTimeInMillis(startTimestamp);
-        if(recordingCal.get(Calendar.YEAR) < Calendar.getInstance().get(Calendar.YEAR) )
-            return new SimpleDateFormat("d MMM ''yy", Locale.US).format(new Date(startTimestamp)); //22 Aug '17
+        if(shortFormat) {
+            if (recordingCal.get(Calendar.YEAR) < Calendar.getInstance().get(Calendar.YEAR))
+                return new SimpleDateFormat("d MMM ''yy", Locale.US).format(new Date(startTimestamp)); //22 Aug '17
+            else
+                return new SimpleDateFormat("d MMM", Locale.US).format(new Date(startTimestamp));
+        }
         else
-            return new SimpleDateFormat("d MMM", Locale.US).format(new Date(startTimestamp));
+            return new SimpleDateFormat("d MMMM yyyy", Locale.US).format(new Date(startTimestamp));
     }
 
     public String getTime() {

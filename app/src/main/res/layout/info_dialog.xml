@@ -5,44 +5,27 @@
     android:paddingStart="20dp"
     android:paddingEnd="20dp">
 
-    <!--<TextView-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:id="@+id/info_name_label"-->
-        <!--android:text="Name: "/>-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginBottom="6dp"
+        android:layout_marginTop="6dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/info_date_label"
+            android:text="Date: "
+            android:textStyle="bold"
+            />
 
-    <!--<EditText-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:minEms="7"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:textSize="14sp"-->
-        <!--android:enabled="false"-->
-        <!--android:id="@+id/info_name_edit"-->
-        <!--android:layout_toEndOf="@id/info_name_label"-->
-        <!--android:layout_alignBaseline="@id/info_name_label"-->
-        <!--android:layout_marginStart="5dp"-->
-        <!--android:maxWidth="200dp"-->
-        <!--android:maxLines="1"-->
-        <!--/>-->
-
-    <!--<ImageButton-->
-        <!--android:layout_width="24dp"-->
-        <!--android:layout_height="24dp"-->
-        <!--android:src="@drawable/info_ok_change_name"-->
-        <!--android:layout_toEndOf="@id/info_name_edit"-->
-        <!--android:id="@+id/info_name_done"-->
-        <!--android:background="@android:color/transparent"-->
-        <!--android:visibility="gone"/>-->
-
-    <!--<Button-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:text="Change name"-->
-        <!--android:layout_below="@id/info_name_edit"-->
-        <!--android:layout_centerHorizontal="true"-->
-        <!--android:id="@+id/info_change_name"-->
-        <!--android:layout_marginBottom="20dp"-->
-        <!--/>-->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/info_date_data"
+            android:layout_marginTop="4dp"
+            android:textSize="13sp"/>
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"

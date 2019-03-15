@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.os.Build;
@@ -30,6 +31,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -203,6 +205,12 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         }
     }
 
+    @Override
+    public void updateTitle() {
+        TextView title = parentActivity.findViewById(R.id.actionbar_title);
+        title.setText(selectMode ? String.valueOf(selectedItems.size()) : contact.getContactName());
+    }
+
     //Această funcție este apelată în 2 situații: 1: Cînd se intră/iese din selectMode. În acest caz butoanele apar
     //și dispar cu un efect de fadein/fadeout. Butoanele care nu sunt vizibile cu selectMode=off au setat în layout
     //alpha=0. Celelalte nu au alpha setat, deci este implicit 1. Efectul constă în tranziția timp de 250ms a
@@ -226,6 +234,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         ImageButton menuRightBtn = parentActivity.findViewById(R.id.contact_detail_menu);
         ImageButton menuRightSelectedBtn = parentActivity.findViewById(R.id.contact_detail_selected_menu);
 
+        updateTitle();
         if(isSinglePaneLayout())
             toggleView(navigateBackBtn, false, animateAplha ? null : selectMode ? 0f : 1f);
 
@@ -462,7 +471,9 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
                 MenuInflater inflater = popupMenu.getMenuInflater();
                 inflater.inflate(R.menu.contact_selected_popup, popupMenu.getMenu());
                 MenuItem renameMenuItem = popupMenu.getMenu().findItem(R.id.rename_recording);
-                if(selectedItems.size() > 1)
+                Recording recording = ((RecordingAdapter) recordingsRecycler.getAdapter()).
+                        getItem(selectedItems.get(0));
+                if(selectedItems.size() > 1 || !recording.exists())
                     renameMenuItem.setEnabled(false);
                 popupMenu.show();
             }
@@ -660,9 +671,23 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         }
     }
 
+    @Override
+    public void enableMoveBtn() {
+        ImageButton moveBtn = parentActivity.findViewById(R.id.actionbar_select_move);
+        moveBtn.setEnabled(true);
+        moveBtn.setImageAlpha(255);
+    }
+
+    @Override
+    public void disableMoveBtn() {
+        ImageButton moveBtn = parentActivity.findViewById(R.id.actionbar_select_move);
+        moveBtn.setEnabled(false);
+        moveBtn.setImageAlpha(75);
+    }
+
     class RecordingHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         TextView title;
-        ImageView recordingType, recordingAdorn;
+        ImageView recordingType, recordingAdorn, exclamation;
         CheckBox checkBox;
 
         RecordingHolder(LayoutInflater inflater, ViewGroup parent) {
@@ -671,6 +696,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
             title = itemView.findViewById(R.id.recording_title);
             checkBox = itemView.findViewById(R.id.recording_checkbox);
             recordingAdorn = itemView.findViewById(R.id.recording_adorn);
+            exclamation = itemView.findViewById(R.id.recording_exclamation);
 
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
@@ -678,18 +704,24 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
 
         @Override
         public boolean onLongClick(View v) {
-            presenter.selectRecording(v, this.getAdapterPosition());
+            Recording recording = ((RecordingAdapter) recordingsRecycler.getAdapter()).
+                    getItem(getAdapterPosition());
+            presenter.selectRecording(v, this.getAdapterPosition(), recording.exists());
             return true;
         }
 
         @Override
         public void onClick(View v) {
+            Recording recording = ((RecordingAdapter) recordingsRecycler.getAdapter()).
+                    getItem(getAdapterPosition());
             if(isSelectModeOn()) {
-                presenter.selectRecording(v, this.getAdapterPosition());
+                presenter.selectRecording(v, this.getAdapterPosition(), recording.exists());
             }
             else { //usual short click
-                presenter.startPlayerActivity(((RecordingAdapter) recordingsRecycler.getAdapter()).
-                        getItem(getAdapterPosition()));
+                if(recording.exists())
+                    presenter.startPlayerActivity(recording);
+                else
+                    Toast.makeText(parentActivity, "Cannot find the audio file", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -725,7 +757,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
 
         @Override
         public void onBindViewHolder(@NonNull RecordingHolder holder, final int position) {
-            Recording recording = recordings.get(position);
+            final Recording recording = recordings.get(position);
             int adornRes;
             switch (recording.getFormat()) {
                 case Recorder.WAV_FORMAT: adornRes = R.drawable.sound_symbol_wav;
@@ -745,17 +777,50 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
             holder.checkBox.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    presenter.selectRecording(view, position);
+                    presenter.selectRecording(view, position, recording.exists());
                 }
             });
+
+            if(!recording.exists())
+                markNonexistent(holder);
+
             //pentru situația cînd este întors ecranul sau cînd activitatea trece
             // în background sau cînd se scrolează lista de recordinguri.
-
                 toggleSelectModeRecording(holder.itemView, false);
                 if(selectedItems.contains(position))
                     selectRecording(holder.itemView);
                 else
                     deselectRecording(holder.itemView);
+        }
+
+        private void markNonexistent(RecordingHolder holder) {
+            holder.exclamation.setVisibility(View.VISIBLE);
+//https://stackoverflow.com/questions/25454316/how-do-i-partially-gray-out-an-image-when-pressed
+            //A se vedea și https://stackoverflow.com/questions/28308325/androidset-gray-scale-filter-to-imageview
+            int filter = getParentActivity().getSettedTheme().equals(TemplateActivity.LIGHT_THEME) ?
+                    Color.argb(255,0,0,0) : Color.argb(255,255, 255, 255);
+            holder.recordingAdorn.setColorFilter(filter);
+            holder.recordingType.setColorFilter(filter);
+            holder.recordingAdorn.setImageAlpha(100);
+            holder.recordingType.setImageAlpha(100);
+            holder.title.setAlpha(0.5f);
+        }
+
+        private void unMarkNonexistent(RecordingHolder holder) {
+            holder.exclamation.setVisibility(View.GONE);
+            holder.recordingAdorn.setColorFilter(null);
+            holder.recordingType.setColorFilter(null);
+            holder.recordingType.setImageAlpha(255);
+            holder.recordingAdorn.setImageAlpha(255);
+            holder.title.setAlpha(1f);
+        }
+
+        //necesar pentru că, altfel, după ce se intră în select mode, la următoarea randare a listei apar
+        //recordinguri cu semnul exclamării cu toate că fișierele există - e din cauză că itemii sunt reciclați.
+        @Override
+        public void onViewRecycled(@NonNull RecordingHolder holder) {
+            super.onViewRecycled(holder);
+            unMarkNonexistent(holder);
         }
 
         @Override

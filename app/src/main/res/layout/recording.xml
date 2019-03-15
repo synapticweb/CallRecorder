@@ -23,6 +23,15 @@
         android:layout_marginStart="@dimen/recording_adorn_unselected_margin_start"
         />
 
+    <ImageView
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:src="@drawable/exclamation"
+        android:id="@+id/recording_exclamation"
+        android:layout_alignTop="@id/recording_adorn"
+        android:layout_alignEnd="@id/recording_adorn"
+        android:visibility="gone"/>
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

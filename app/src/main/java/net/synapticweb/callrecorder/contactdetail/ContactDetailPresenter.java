@@ -41,6 +41,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
     static final String EDIT_EXTRA_CONTACT = "edit_extra_contact";
     public static final String RECORDING_EXTRA = "recording_extra";
     private static final String TAG = "CallRecorder";
+    private int nonExistentCount;
 
      ContactDetailPresenter(ContactDetailContract.View view) {
         this.view = view;
@@ -60,10 +61,10 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
                         }
                         if(Recording.hasIllegalChar(input)) {
                             new MaterialDialog.Builder(view.getParentActivity())
-                                    .title("Error")
-                                    .content("The recording name you entered contains illegal characters.")
+                                    .title("Information")
+                                    .content("The recording name you entered contains illegal characters. The recording was not renamed")
                                     .positiveText("OK")
-                                    .icon(CrApp.getInstance().getResources().getDrawable(R.drawable.error))
+                                    .icon(CrApp.getInstance().getResources().getDrawable(R.drawable.info))
                                     .show();
                             return;
                         }
@@ -76,10 +77,10 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
 
                         if(new File(parent, newFileName).exists()) {
                             new MaterialDialog.Builder(view.getParentActivity())
-                                    .title("Error")
-                                    .content("This file name is already used.")
+                                    .title("Information")
+                                    .content("This file name is already used. The recording was not renamed.")
                                     .positiveText("OK")
-                                    .icon(CrApp.getInstance().getResources().getDrawable(R.drawable.error))
+                                    .icon(CrApp.getInstance().getResources().getDrawable(R.drawable.info))
                                     .show();
                             return;
                         }
@@ -135,6 +136,8 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
             return ;
         }
         final Recording recording = view.getRecordingsAdapter().getItem(view.getSelectedItems().get(0));
+        TextView date = dialog.getView().findViewById(R.id.info_date_data);
+        date.setText(recording.getDate(false) + " " + recording.getTime());
         TextView size = dialog.getView().findViewById(R.id.info_size_data);
         size.setText(AppLibrary.getFileSizeHuman(recording.getSize()));
 
@@ -144,6 +147,10 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
         length.setText(AppLibrary.getDurationHuman(recording.getLength(), true));
         TextView path = dialog.getView().findViewById(R.id.info_path_data);
         path.setText(recording.isSavedInPrivateSpace() ? "Private application storage" : recording.getPath());
+        if(!recording.exists()) {
+            path.setText(path.getText() + "\n(The file does not exist)");
+            path.setTextColor(CrApp.getInstance().getResources().getColor(android.R.color.holo_red_light));
+        }
 
         dialog.show();
     }
@@ -229,7 +236,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
     //toggleSelectModeRecording() fără animație. Tot fără animație se apelează această funcție la pornirea activității
     //la întoarcerea din background și la rotire. Acest setup rezolvă problema descrisă.
     @Override
-    public void selectRecording(android.view.View recording, int adapterPosition) {
+    public void selectRecording(android.view.View recording, int adapterPosition, boolean exists) {
          if(!view.isSelectModeOn()) {
              view.setSelectMode(true);
              view.toggleSelectModeActionBar(true);
@@ -243,13 +250,23 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
          if(!view.removeIfPresentInSelectedItems(adapterPosition)) {
              view.addToSelectedItems(adapterPosition);
              view.selectRecording(recording);
+             if(!exists) {
+                 nonExistentCount++;
+                 view.disableMoveBtn();
+             }
          }
-         else
+         else {
              view.deselectRecording(recording);
-
+             if(!exists)
+                 nonExistentCount--;
+             if(nonExistentCount == 0)
+                 view.enableMoveBtn();
+         }
 
          if(view.isEmptySelectedItems())
              view.clearSelectedMode();
+         else
+             view.updateTitle();
     }
 
     @Override
@@ -281,12 +298,22 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
          int totalSize = 0;
          List<Recording> recordings = view.getSelectedRecordings();
          Recording[] recordingsArray = new Recording[recordings.size()];
-         for(Recording recording : recordings)
+         view.clearSelectedMode();
+         for(Recording recording : recordings) {
+             if(new File(recording.getPath()).getParent().equals(path)) {
+                 new MaterialDialog.Builder(view.getParentActivity())
+                         .title("Information")
+                         .content("The specified destination directory is the same with the current directory of one of the selected recordings. No recordings were moved.")
+                         .positiveText("OK")
+                         .icon(view.getParentActivity().getResources().getDrawable(R.drawable.info))
+                         .show();
+                 return ;
+             }
              totalSize += new File(recording.getPath()).length();
+         }
 
         new MoveAsyncTask(path, totalSize, view.getParentActivity()).
                 execute(recordings.toArray(recordingsArray));
-        view.clearSelectedMode();
     }
 
     @Override
@@ -330,5 +357,6 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
                 //notificat adapterul că s-a schimbat, ca să îl reconstruiască.
                view.selectRecording(selectedRecording);
         }
+        view.updateTitle();
     }
 }
