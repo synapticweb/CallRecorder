@@ -377,13 +377,15 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
                 popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
-                        switch (item.getItemId())
-                        {
+                        switch (item.getItemId()) {
                             case R.id.delete_phone_number:
                                 presenter.deleteContact(contact);
                                 return true;
                             case R.id.should_record:
                                 presenter.toggleShouldRecord(contact);
+                                return true;
+                            case R.id.storage_info:
+                                presenter.storageInfo();
                             default:
                                 return false;
                         }
@@ -727,7 +729,11 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
     }
 
     class RecordingAdapter extends RecyclerView.Adapter<RecordingHolder> {
-        List<Recording> recordings;
+        private List<Recording> recordings;
+
+        List<Recording> getRecordings() {
+            return recordings;
+        }
 
         void replaceData(List<Recording> recordings) {
             this.recordings = recordings;

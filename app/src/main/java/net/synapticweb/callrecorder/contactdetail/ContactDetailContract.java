@@ -55,5 +55,6 @@ public interface ContactDetailContract {
         void toggleSelectAll();
         void onInfoClick();
         void onRenameClick();
+        void storageInfo();
     }
 }

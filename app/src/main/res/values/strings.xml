@@ -50,5 +50,6 @@
     <string name="no">NO</string>
     <string name="delete_recording">Delete</string>
     <string name="rename_recording">Rename</string>
+    <string name="storage_info">Storage info</string>
 
 </resources>

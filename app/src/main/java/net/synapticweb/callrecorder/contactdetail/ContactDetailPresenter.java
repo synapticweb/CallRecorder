@@ -48,6 +48,30 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
     }
 
     @Override
+    public void storageInfo() {
+        long sizePrivate = 0, sizePublic = 0;
+        for(Recording recording : view.getRecordingsAdapter().getRecordings()) {
+            long size = new File(recording.getPath()).length();
+            if(recording.isSavedInPrivateSpace())
+                sizePrivate += size;
+            else
+                sizePublic += size;
+        }
+
+        MaterialDialog dialog = new MaterialDialog.Builder(view.getParentActivity())
+                .title("Storage info")
+                .customView(R.layout.info_storage_dialog, false)
+                .positiveText(android.R.string.ok).build();
+        TextView privateStorage = dialog.getView().findViewById(R.id.info_storage_private_data);
+        privateStorage.setText(AppLibrary.getFileSizeHuman(sizePrivate));
+
+        TextView publicStorage = dialog.getView().findViewById(R.id.info_storage_public_data);
+        publicStorage.setText(AppLibrary.getFileSizeHuman(sizePublic));
+
+        dialog.show();
+    }
+
+    @Override
     public void onRenameClick() {
         new MaterialDialog.Builder(view.getParentActivity())
                 .title("Rename recording")
