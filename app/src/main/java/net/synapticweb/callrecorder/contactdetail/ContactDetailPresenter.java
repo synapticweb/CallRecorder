@@ -312,9 +312,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
             }
         }
 
-        view.getSelectedItems().clear();
-        if(view.getRecordingsAdapter().getItemCount() == 0)
-            view.clearSelectedMode();
+        view.clearSelectedMode();
     }
 
     @Override
@@ -322,7 +320,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
          int totalSize = 0;
          List<Recording> recordings = view.getSelectedRecordings();
          Recording[] recordingsArray = new Recording[recordings.size()];
-         view.clearSelectedMode();
+
          for(Recording recording : recordings) {
              if(new File(recording.getPath()).getParent().equals(path)) {
                  new MaterialDialog.Builder(view.getParentActivity())
