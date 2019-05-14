@@ -3,20 +3,20 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
     <SwitchPreference
         android:key="auth_record_priv"
-        android:title="Private numbers calls"
-        android:summary="Autommatically record calls from private numbers"
+        android:title="@string/auth_record_priv_title"
+        android:summary="@string/auth_record_priv_sum"
         android:defaultValue="true"
         android:singleLine="false"/>
 
     <SwitchPreference
         android:key="paranoid"
-        android:title="Paranoid mode"
-        android:summary="Record all calls"
+        android:title="@string/paranoid_title"
+        android:summary="@string/paranoid_sum"
         android:defaultValue="false"/>
 
     <ListPreference
         android:key="storage"
-        android:title="Recordings storage"
+        android:title="@string/prefs_storage_title"
         android:entries="@array/storage_names"
         android:entryValues="@array/storage_values"
         android:defaultValue="private"
@@ -24,16 +24,16 @@
 
     <Preference
         android:key="public_storage_path"
-        android:title="Where to store recordings" />
+        android:title="@string/prefs_storage_path_title" />
 
     <SwitchPreference
-        android:title="Speaker use"
+        android:title="@string/prefs_speaker_title"
         android:key="put_on_speaker"
-        android:summary="Put phone on speaker while recording calls"
+        android:summary="@string/prefs_speaker_sum"
         android:defaultValue="false"/>
 
     <ListPreference
-        android:title="Recording format"
+        android:title="@string/prefs_format_title"
         android:key="format"
         android:entries="@array/format_names"
         android:entryValues="@array/format_values"
@@ -41,14 +41,14 @@
         android:defaultValue="aac_med"/>
 
     <ListPreference
-       android:title="Recording mode"
+       android:title="@string/prefs_mode_title"
         android:key="mode"
         android:entries="@array/mode_names"
         android:entryValues="@array/mode_values"
         android:defaultValue="mono" />
 
     <ListPreference
-        android:title="Theme"
+        android:title="@string/prefs_theme_title"
         android:key="theme"
         app:useSimpleSummaryProvider="true"
         android:entries="@array/theme_options_names"

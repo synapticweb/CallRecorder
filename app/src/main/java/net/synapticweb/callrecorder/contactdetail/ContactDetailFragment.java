@@ -17,6 +17,7 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.RelativeSizeSpan;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
@@ -68,6 +69,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
     private boolean selectMode = false;
     private List<Integer> selectedItems = new ArrayList<>();
     private TemplateActivity parentActivity;
+    private int selectedItemsDeleted = 0;
     private static final String ARG_CONTACT = "arg_contact";
     private static final String SELECT_MODE_KEY = "select_mode_key";
     private static final String SELECTED_ITEMS_KEY = "selected_items_key";
@@ -98,6 +100,16 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
     @Override
     public List<Integer> getSelectedItems() {
         return selectedItems;
+    }
+
+    @Override
+    public int getSelectedItemsDeleted() {
+        return selectedItemsDeleted;
+    }
+
+    @Override
+    public void setSelectedItemsDeleted(int selectedItemsDeleted) {
+        this.selectedItemsDeleted = selectedItemsDeleted;
     }
 
     @Override
@@ -207,6 +219,8 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
 
     @Override
     public void updateTitle() {
+        if(!isSinglePaneLayout())
+            return ;
         TextView title = parentActivity.findViewById(R.id.actionbar_title);
         title.setText(selectMode ? String.valueOf(selectedItems.size()) : contact.getContactName());
     }
@@ -245,6 +259,8 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         }
 
         toggleView(moveBtn, true, animateAplha ? null : selectMode ? 1f : 0f);
+        if(selectMode && checkIfSelectedRecordingsDeleted())
+            disableMoveBtn();
         toggleView(selectAllBtn, true, animateAplha ? null : selectMode ? 1f : 0f);
         toggleView(infoBtn, true, animateAplha ? null : selectMode ? 1f : 0f);
         toggleView(menuRightSelectedBtn, true, animateAplha ? null : selectMode ? 1f : 0f);
@@ -255,6 +271,17 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
             toggleView(hamburger, false, animateAplha ? null : selectMode ? 0f : 1f);
         }
 
+    }
+
+    private boolean checkIfSelectedRecordingsDeleted() {
+        selectedItemsDeleted = 0;
+        for(Recording recording : adapter.getRecordings())
+            if(!recording.exists()) {
+                int index = adapter.getRecordings().indexOf(recording);
+                if(selectedItems.contains(index))
+                    selectedItemsDeleted++;
+            }
+            return selectedItemsDeleted > 0;
     }
 
     @Override
@@ -540,7 +567,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
                 return true;
             case R.id.public_storage:
                 Content content = new Content();
-                content.setOverviewHeading(parentActivity.getResources().getString(R.string.export_heading));
+                content.setOverviewHeading(parentActivity.getResources().getString(R.string.move_heading));
                 StorageChooser.Theme theme = new StorageChooser.Theme(parentActivity);
                 theme.setScheme(parentActivity.getResources().getIntArray(R.array.storage_chooser_theme));
 
@@ -605,7 +632,6 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         recordingsRecycler.addItemDecoration(new DividerItemDecoration(getContext(),
                 DividerItemDecoration.VERTICAL));
         recordingsRecycler.setAdapter(adapter);
-        toggleSelectModeActionBar(false);
 
         return detailView;
     }
@@ -620,10 +646,17 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
 
     @Override
     public void paintViews(List<Recording> recordings){
+        //Acest apel era făcut mai înainte în onCreateView. Ulterior am descoperit un bug: dacă am un recording
+        //selectat și șterg fișierul asociat, la întoarcerea fragmentului rămîne disponibil butonul de move, ceea ce
+        //e incorect. Soluția a fost să verific de fiecare dată cînd se apelează onResume() și selectMode este on
+        // dacă vreunul dintre recordingurile selectate a fost șters (această verificare este realizată de
+        // checkIfSelectedRecordingsDeleted(), apelată în toggleSelectModeActionBar, apelat la rîndul lui acum
+        // în paintView, adică de fiecare dată cînd rulează onResume).
+        toggleSelectModeActionBar(false);
         typePhoneView.setText(getSpannedText(String.format(getResources().getString(
-                R.string.detail_phonetype_intro), contact.getPhoneTypeName())));
+                R.string.detail_phonetype), contact.getPhoneTypeName())));
         phoneNumberView.setText(getSpannedText(String.format(getResources().getString(
-                R.string.detail_phonenumber_intro), contact.getPhoneNumber())));
+                R.string.detail_phonenumber), contact.getPhoneNumber())));
 
         if(contact.getPhotoUri() != null) {
             contactPhotoView.clearColorFilter();
@@ -718,12 +751,13 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
                     getItem(getAdapterPosition());
             if(isSelectModeOn()) {
                 presenter.selectRecording(v, this.getAdapterPosition(), recording.exists());
+                Log.d(TAG, "");
             }
             else { //usual short click
                 if(recording.exists())
                     presenter.startPlayerActivity(recording);
                 else
-                    Toast.makeText(parentActivity, "Cannot find the audio file", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(parentActivity, R.string.audio_file_missing, Toast.LENGTH_SHORT).show();
             }
         }
     }

@@ -21,7 +21,9 @@ import android.util.LongSparseArray;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 
 import net.synapticweb.callrecorder.AppLibrary;
+import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.PhoneTypeContainer;
+import net.synapticweb.callrecorder.R;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -118,7 +120,8 @@ public class Contact implements Comparable<Contact>, Parcelable {
     public void copyPhotoIfExternal(Context context) throws IOException {
       if(photoUri != null && !photoUri.getAuthority().equals("net.synapticweb.callrecorder.fileprovider")) {
           Bitmap originalPhotoBitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), photoUri);
-          File copiedPhotoFile = new File(context.getFilesDir(), getPhoneNumber() + ".jpg");
+          //am adăugat System.currentTimeMillis() pentru consistență cu EditContactActivity.setPhotoPath().
+          File copiedPhotoFile = new File(context.getFilesDir(), getPhoneNumber() + System.currentTimeMillis() + ".jpg");
           OutputStream os = new FileOutputStream(copiedPhotoFile);
           originalPhotoBitmap.compress(Bitmap.CompressFormat.JPEG, 70, os);
           setPhotoUri(FileProvider.getUriForFile(context, "net.synapticweb.callrecorder.fileprovider", copiedPhotoFile));
@@ -228,7 +231,7 @@ public class Contact implements Comparable<Contact>, Parcelable {
 
     public void setPhoneNumber(String phoneNumber) {
         if(phoneNumber == null)
-            this.phoneNumber = "Private number";
+            this.phoneNumber = CrApp.getInstance().getResources().getString(R.string.private_number_name);
         else
             this.phoneNumber = phoneNumber;
     }
@@ -256,7 +259,13 @@ public class Contact implements Comparable<Contact>, Parcelable {
     }
 
     public void setPhoneType(int phoneTypeCode) {
-        this.phoneType = phoneTypeCode;
+        for(PhoneTypeContainer type : AppLibrary.PHONE_TYPES) {
+            if (phoneTypeCode == type.getTypeCode()) {
+                this.phoneType = phoneTypeCode;
+                return;
+            }
+        }
+        this.phoneType = AppLibrary.UNKNOWN_TYPE_PHONE_CODE;
     }
 
     public String getContactName() {
@@ -266,9 +275,9 @@ public class Contact implements Comparable<Contact>, Parcelable {
     public void setContactName(String contactName) {
         if(contactName == null) {
             if(isPrivateNumber())
-                this.contactName = "Private number";
+                this.contactName = CrApp.getInstance().getResources().getString(R.string.private_number_name);
             else
-                this.contactName = "Unknown contact";
+                this.contactName = CrApp.getInstance().getResources().getString(R.string.unkown_contact);
         }
         else
             this.contactName = contactName;

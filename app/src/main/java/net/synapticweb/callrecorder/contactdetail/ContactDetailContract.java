@@ -39,6 +39,8 @@ public interface ContactDetailContract {
         void updateTitle();
         void disableMoveBtn();
         void enableMoveBtn();
+        int getSelectedItemsDeleted();
+        void setSelectedItemsDeleted(int selectedItemsDeleted);
     }
 
     interface ContactDetailPresenter {

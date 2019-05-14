@@ -21,7 +21,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/info_storage_private_label"
-            android:text="Private space: "
+            android:text="@string/info_storage_private"
             android:textStyle="bold"
             />
 
@@ -42,7 +42,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/info_storage_public_label"
-            android:text="Public filesystem: "
+            android:text="@string/info_storage_public"
             android:textStyle="bold"
             />
 

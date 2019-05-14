@@ -150,9 +150,9 @@ public class ContactsListActivityMain extends TemplateActivity {
     @Override
     public void onBackPressed() {
         new MaterialDialog.Builder(this)
-                .title("Confirm")
+                .title(R.string.exit_app_title)
                 .icon(getResources().getDrawable(R.drawable.question_mark))
-                .content("Exit the application?")
+                .content(R.string.exit_app_message)
                 .positiveText(android.R.string.ok)
                 .negativeText(android.R.string.cancel)
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
@@ -205,9 +205,8 @@ public class ContactsListActivityMain extends TemplateActivity {
             }
             if(notGranted) {
                 new MaterialDialog.Builder(this)
-                        .title("Warning")
-                        .content("The app was not granted the necessary permissions for proper functioning. " +
-                                "As a result, some or all of the app functionality will be lost.")
+                        .title(R.string.warning_title)
+                        .content(R.string.permissions_not_granted)
                         .neutralText(android.R.string.ok)
                         .icon(getResources().getDrawable(R.drawable.warning))
                         .onNeutral(new MaterialDialog.SingleButtonCallback() {
@@ -294,9 +293,9 @@ public class ContactsListActivityMain extends TemplateActivity {
         intent.setClassName("com.huawei.systemmanager", "com.huawei.systemmanager.optimize.process.ProtectActivity");
             if (isCallable(intent)) {
                 new MaterialDialog.Builder(this)
-                        .title("Huawei Protected Apps")
+                        .title(R.string.huawei_protected_title)
                         .icon(getResources().getDrawable(R.drawable.warning))
-                        .content(String.format("%s requires to be enabled in 'Protected Apps' to function properly.%n",
+                        .content(String.format(getString(R.string.huawei_protected_message),
                                 getString(R.string.app_name)))
                         .checkBoxPrompt("Do not show again", false, new CompoundButton.OnCheckedChangeListener() {
                             @Override

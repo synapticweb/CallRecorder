@@ -13,6 +13,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import net.synapticweb.callrecorder.AppLibrary;
+import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.TemplateActivity;
 import net.synapticweb.callrecorder.contactdetail.ContactDetailPresenter;
@@ -51,7 +52,7 @@ public class PlayerActivity extends TemplateActivity {
         Toolbar toolbar = findViewById(R.id.toolbar_play);
         recording = getIntent().getParcelableExtra(ContactDetailPresenter.RECORDING_EXTRA);
         String title = recording.getName() != null ? recording.getName() : recording.getDate(true) + " " + recording.getTime();
-        toolbar.setTitle("Playing " + title);
+        toolbar.setTitle(CrApp.getInstance().getResources().getString(R.string.playing) + title);
         setSupportActionBar(toolbar);
 
         playPause = findViewById(R.id.player_button_play_pause);

@@ -41,7 +41,6 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
     static final String EDIT_EXTRA_CONTACT = "edit_extra_contact";
     public static final String RECORDING_EXTRA = "recording_extra";
     private static final String TAG = "CallRecorder";
-    private int nonExistentCount;
 
      ContactDetailPresenter(ContactDetailContract.View view) {
         this.view = view;
@@ -59,7 +58,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
         }
 
         MaterialDialog dialog = new MaterialDialog.Builder(view.getParentActivity())
-                .title("Storage info")
+                .title(R.string.storage_info)
                 .customView(R.layout.info_storage_dialog, false)
                 .positiveText(android.R.string.ok).build();
         TextView privateStorage = dialog.getView().findViewById(R.id.info_storage_private_data);
@@ -74,9 +73,10 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
     @Override
     public void onRenameClick() {
         new MaterialDialog.Builder(view.getParentActivity())
-                .title("Rename recording")
+                .title(R.string.rename_recording_title)
                 .inputType(InputType.TYPE_CLASS_TEXT)
-                .input("Enter new recording name", null, false, new MaterialDialog.InputCallback() {
+                .input(CrApp.getInstance().getResources().getString(R.string.rename_recording_input_text),
+                        null, false, new MaterialDialog.InputCallback() {
                     @Override
                     public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
                         if(view.getSelectedItems().size() != 1) {
@@ -85,8 +85,8 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
                         }
                         if(Recording.hasIllegalChar(input)) {
                             new MaterialDialog.Builder(view.getParentActivity())
-                                    .title("Information")
-                                    .content("The recording name you entered contains illegal characters. The recording was not renamed")
+                                    .title(R.string.information_title)
+                                    .content(R.string.rename_illegal_chars)
                                     .positiveText("OK")
                                     .icon(CrApp.getInstance().getResources().getDrawable(R.drawable.info))
                                     .show();
@@ -101,8 +101,8 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
 
                         if(new File(parent, newFileName).exists()) {
                             new MaterialDialog.Builder(view.getParentActivity())
-                                    .title("Information")
-                                    .content("This file name is already used. The recording was not renamed.")
+                                    .title(R.string.information_title)
+                                    .content(R.string.rename_already_used)
                                     .positiveText("OK")
                                     .icon(CrApp.getInstance().getResources().getDrawable(R.drawable.info))
                                     .show();
@@ -121,8 +121,8 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
                         catch (Exception e) {
                             Log.wtf(TAG, e.getMessage());
                             new MaterialDialog.Builder(view.getParentActivity())
-                                    .title("Error")
-                                    .content("An error ocurred while renaming the recording.")
+                                    .title(R.string.error_title)
+                                    .content(R.string.rename_error)
                                     .positiveText("OK")
                                     .icon(CrApp.getInstance().getResources().getDrawable(R.drawable.error))
                                     .show();
@@ -142,15 +142,15 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
             }
 
             new MaterialDialog.Builder(view.getParentActivity())
-                    .title("Recordings info")
-                    .content("Total size: " + AppLibrary.getFileSizeHuman(totalSize) + "\n\nTo get detailed info about a specific recording you must select only that recording.")
+                    .title(R.string.recordings_info_title)
+                    .content(String.format(CrApp.getInstance().getResources().getString(R.string.recordings_info_text), AppLibrary.getFileSizeHuman(totalSize)))
                     .positiveText(android.R.string.ok)
                     .show();
             return ;
         }
 
         MaterialDialog dialog = new MaterialDialog.Builder(view.getParentActivity())
-                .title("Recording info")
+                .title(R.string.recording_info_title)
                 .customView(R.layout.info_dialog, false)
                 .positiveText(android.R.string.ok).build();
 
@@ -161,7 +161,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
         }
         final Recording recording = view.getRecordingsAdapter().getItem(view.getSelectedItems().get(0));
         TextView date = dialog.getView().findViewById(R.id.info_date_data);
-        date.setText(recording.getDate(false) + " " + recording.getTime());
+        date.setText(String.format("%s %s", recording.getDate(false), recording.getTime()));
         TextView size = dialog.getView().findViewById(R.id.info_size_data);
         size.setText(AppLibrary.getFileSizeHuman(recording.getSize()));
 
@@ -170,9 +170,11 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
         TextView length = dialog.getView().findViewById(R.id.info_length_data);
         length.setText(AppLibrary.getDurationHuman(recording.getLength(), true));
         TextView path = dialog.getView().findViewById(R.id.info_path_data);
-        path.setText(recording.isSavedInPrivateSpace() ? "Private application storage" : recording.getPath());
+        path.setText(recording.isSavedInPrivateSpace() ? CrApp.getInstance().getResources().
+                getString(R.string.private_storage) : recording.getPath());
         if(!recording.exists()) {
-            path.setText(path.getText() + "\n(The file does not exist)");
+            path.setText(String.format("%s%s", path.getText(), CrApp.getInstance().getResources().
+                    getString(R.string.nonexistent_file)));
             path.setTextColor(CrApp.getInstance().getResources().getColor(android.R.color.holo_red_light));
         }
 
@@ -183,9 +185,9 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
     public void deleteContact(final Contact contact) {
         final AppCompatActivity parentActivity = view.getParentActivity();
         new MaterialDialog.Builder(parentActivity)
-                .title(R.string.delete_number_confirm_title)
+                .title(R.string.delete_contact_confirm_title)
                 .content(String.format(parentActivity.getResources().
-                        getString(R.string.delete_number_confirm_message), contact.getContactName()))
+                        getString(R.string.delete_contact_confirm_message), contact.getContactName()))
                 .positiveText(android.R.string.ok)
                 .negativeText(android.R.string.cancel)
                 .icon(parentActivity.getResources().getDrawable(R.drawable.warning))
@@ -275,15 +277,15 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
              view.addToSelectedItems(adapterPosition);
              view.selectRecording(recording);
              if(!exists) {
-                 nonExistentCount++;
+                 view.setSelectedItemsDeleted(view.getSelectedItemsDeleted() + 1);
                  view.disableMoveBtn();
              }
          }
          else {
              view.deselectRecording(recording);
              if(!exists)
-                 nonExistentCount--;
-             if(nonExistentCount == 0)
+                 view.setSelectedItemsDeleted(view.getSelectedItemsDeleted() - 1);
+             if(view.getSelectedItemsDeleted() == 0)
                  view.enableMoveBtn();
          }
 
@@ -291,6 +293,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
              view.clearSelectedMode();
          else
              view.updateTitle();
+//         Log.wtf(TAG, view.getSelectedItems().toString());
     }
 
     @Override
@@ -324,8 +327,8 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
          for(Recording recording : recordings) {
              if(new File(recording.getPath()).getParent().equals(path)) {
                  new MaterialDialog.Builder(view.getParentActivity())
-                         .title("Information")
-                         .content("The specified destination directory is the same with the current directory of one of the selected recordings. No recordings were moved.")
+                         .title(R.string.information_title)
+                         .content(R.string.move_destination_same)
                          .positiveText("OK")
                          .icon(view.getParentActivity().getResources().getDrawable(R.drawable.info))
                          .show();

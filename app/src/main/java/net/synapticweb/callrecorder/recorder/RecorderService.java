@@ -9,6 +9,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
@@ -103,7 +104,8 @@ public class RecorderService extends Service {
     public static Notification buildNotification(int typeOfNotification, String callNameOrNumber) {
         Intent notificationIntent = new Intent(CrApp.getInstance(), ContactsListActivityMain.class);
         PendingIntent tapNotificationPi = PendingIntent.getBroadcast(CrApp.getInstance(), 0, notificationIntent, 0);
-        Bitmap bitmap = BitmapFactory.decodeResource(CrApp.getInstance().getResources(), R.drawable.record);
+        Resources res = CrApp.getInstance().getResources();
+        Bitmap bitmap = BitmapFactory.decodeResource(res, R.drawable.record);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             createChannel();
@@ -121,7 +123,7 @@ public class RecorderService extends Service {
 
         switch(typeOfNotification) {
             case RECORD_AUTOMMATICALLY_SPEAKER_OFF:
-                builder.setContentText("Recording...");
+                builder.setContentText(res.getString(R.string.recording));
                 break;
             case RECORD_AUTOMMATICALLY:
                 if(settings.getBoolean(SettingsFragment.SPEAKER_USE, false)) {
@@ -130,14 +132,14 @@ public class RecorderService extends Service {
                     notificationIntent.putExtra(CALL_IDENTIFIER, callIdentifier);
                     PendingIntent stopSpeakerPi = PendingIntent.getBroadcast(CrApp.getInstance(), 0, notificationIntent, 0);
                     builder.addAction(new NotificationCompat.Action.Builder(R.drawable.ic_play_grey600_24dp,
-                            "Stop speaker", stopSpeakerPi).build() )
-                    .setContentText("Recording... (speaker on)");
+                            res.getString(R.string.stop_speaker), stopSpeakerPi).build() )
+                    .setContentText(res.getString(R.string.recording_speaker_on));
                 }
                 else
-                    builder.setContentText("Recording...");
+                    builder.setContentText(res.getString(R.string.recording));
                 break;
             case RECORD_ON_HOOKUP:
-                builder.setContentText("Recording will begin when you answer the call.");
+                builder.setContentText(res.getString(R.string.recording_answer_call));
                 break;
             case RECORD_ON_REQUEST:
                 notificationIntent = new Intent(CrApp.getInstance(), ControlRecordingReceiver.class);
@@ -146,8 +148,8 @@ public class RecorderService extends Service {
                 notificationIntent.putExtra(PHONE_NUMBER, receivedNumPhone != null ? receivedNumPhone : "private_phone");
                 PendingIntent startRecordingPi = PendingIntent.getBroadcast(CrApp.getInstance(), 0, notificationIntent, 0);
                 builder.addAction(new NotificationCompat.Action.Builder(R.drawable.ic_play_grey600_24dp,
-                                "Start recording", startRecordingPi).build() )
-                        .setContentText("Press \"Start recording\" to begin recording.");
+                                res.getString(R.string.start_recording_notification), startRecordingPi).build() )
+                        .setContentText(res.getString(R.string.start_recording_notification_text));
         }
 
         return builder.build();

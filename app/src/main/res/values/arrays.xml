@@ -22,8 +22,8 @@
     </array>
 
    <string-array name="storage_names">
-       <item>Private (files are visible only to this app)</item>
-       <item>Public (files are visible to all apps)</item>-
+       <item>@string/settings_storage_names_private</item>
+       <item>@string/settings_storage_names_public</item>-
    </string-array>
 
     <string-array name="storage_values">
@@ -32,8 +32,8 @@
     </string-array>
 
     <string-array name="theme_options_names">
-        <item>Light</item>
-        <item>Dark</item>
+        <item>@string/settings_theme_light</item>
+        <item>@string/settings_theme_dark</item>
     </string-array>
 
     <string-array name="theme_options_values">
@@ -63,11 +63,6 @@
     <string-array name="mode_values">
         <item>mono</item>
         <item>stereo</item>
-    </string-array>
-
-    <string-array name="storage_chooser_options">
-        <item>Move in app\'s private space</item>
-        <item>Move in phone\'s public storage</item>
     </string-array>
 
 </resources>

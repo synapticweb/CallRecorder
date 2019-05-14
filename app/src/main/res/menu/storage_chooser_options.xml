@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:title="Move to private application storage"
+        android:title="@string/storage_options_move_private"
         android:id="@+id/private_storage" />
     <item
-        android:title="Move to public phone storage"
+        android:title="@string/storage_options_move_public"
         android:id="@+id/public_storage" />
 </menu>

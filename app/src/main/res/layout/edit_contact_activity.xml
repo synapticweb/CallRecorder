@@ -78,7 +78,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Contact name:"
+                android:text="@string/edit_contact_name"
                 android:textSize="15sp"
                 android:id="@+id/edit_name_label"
                 />
@@ -117,7 +117,7 @@
                android:layout_width="0dp"
                android:layout_height="wrap_content"
                android:layout_weight="1"
-               android:text="Phone number:"
+               android:text="@string/edit_phone_number"
                android:textSize="15sp"
                android:id="@+id/edit_number_label"
                />
@@ -159,7 +159,7 @@ Soluția a fost să adaug o margine ultimului linealayout orizontal.
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Phone type:"
+                android:text="@string/edit_phone_type"
                 android:textSize="15sp"
                 android:id="@+id/edit_type_label"
                 />

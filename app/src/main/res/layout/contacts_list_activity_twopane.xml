@@ -151,7 +151,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/no_content"
-                    android:text="There are currently no contacts."
+                    android:text="@string/no_contacts"
                     android:textAlignment="center"
                     android:layout_marginTop="?attr/actionBarSize"
                     android:paddingTop="25dp"

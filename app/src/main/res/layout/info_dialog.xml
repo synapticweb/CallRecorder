@@ -15,7 +15,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/info_date_label"
-            android:text="Date: "
+            android:text="@string/info_dialog_date"
             android:textStyle="bold"
             />
 
@@ -37,7 +37,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/info_length_label"
-            android:text="Duration: "
+            android:text="@string/info_dialog_duration"
             android:textStyle="bold"
             />
 
@@ -59,7 +59,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/info_size_label"
-            android:text="Size: "
+            android:text="@string/info_dialog_size"
             android:textStyle="bold"
             />
 
@@ -81,7 +81,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/info_format_label"
-            android:text="Format: "
+            android:text="@string/info_dialog_format"
             android:textStyle="bold"
             />
 
@@ -103,7 +103,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/info_path_label"
-            android:text="Location: "
+            android:text="@string/info_dialog_location"
             android:textStyle="bold"
             />
 

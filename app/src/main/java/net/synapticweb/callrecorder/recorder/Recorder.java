@@ -44,7 +44,7 @@ public class Recorder {
     @SuppressWarnings("ConstantConditions")
     void startRecording(String phoneNumber) {
         if(phoneNumber == null)
-            throw new NullPointerException("Recorder.startRecoring(): phoneNumber cannot be null");
+            phoneNumber = "PrivateCall";
 
         if(recordingThread != null)
             stopRecording();

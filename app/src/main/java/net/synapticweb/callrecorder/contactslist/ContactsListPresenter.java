@@ -133,7 +133,7 @@ public class ContactsListPresenter implements ContactsListContract.ContactsListP
                phoneNumberWrapper = phoneUtil.parse(newNumber, countryCode);
             }
             catch (NumberParseException exc) {
-                fireAlert(view.getParentActivity(),R.string.number_invalid_title, R.string.number_invalid_message,
+                fireAlert(view.getParentActivity(),R.string.information_title, R.string.number_invalid_message,
                         android.R.string.ok, null, null);
                 return ;
             }
@@ -156,7 +156,7 @@ public class ContactsListPresenter implements ContactsListContract.ContactsListP
             cursor.close();
 
             if (match) {
-               fireAlert(view.getParentActivity(), R.string.number_exists_title, R.string.number_exists_message,
+               fireAlert(view.getParentActivity(), R.string.information_title, R.string.number_exists_message,
                        android.R.string.ok, null, null);
                 return ;
             }

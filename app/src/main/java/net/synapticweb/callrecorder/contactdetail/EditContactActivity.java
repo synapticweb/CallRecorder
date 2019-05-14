@@ -92,7 +92,7 @@ public class EditContactActivity extends TemplateActivity implements AdapterView
     private void onCancelOrBackPressed() {
         if (dataChanged) {
             new MaterialDialog.Builder(EditContactActivity.this)
-                    .title(R.string.discard_edit_title)
+                    .title(R.string.warning_title)
                     .icon(getResources().getDrawable(R.drawable.warning))
                     .content(R.string.discard_edit_message)
                     .positiveText(android.R.string.ok)

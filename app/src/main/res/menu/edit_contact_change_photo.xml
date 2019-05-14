@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:title="Remove photo"
+    <item android:title="@string/edit_photo_remove"
         android:id="@+id/change_photo_remove"
         />
-    <item android:title="Select new photo"
+    <item android:title="@string/edit_photo_select_new"
         android:id="@+id/change_photo_select"/>
-    <item android:title="Take new photo"
+    <item android:title="@string/edit_photo_take"
         android:id="@+id/change_photo_takenew"/>
 </menu>

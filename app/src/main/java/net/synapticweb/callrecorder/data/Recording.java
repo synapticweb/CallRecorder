@@ -2,6 +2,7 @@ package net.synapticweb.callrecorder.data;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.res.Resources;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Parcel;
@@ -9,6 +10,7 @@ import android.os.Parcelable;
 import android.util.Log;
 
 import net.synapticweb.callrecorder.CrApp;
+import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.contactdetail.MoveAsyncTask;
 
 import java.io.File;
@@ -152,18 +154,19 @@ public class Recording implements Parcelable {
 
     public String getHumanReadingFormat() {
         final int wavBitrate = 705, aacHighBitrate = 128, aacMedBitrate = 64, aacBasBitrate = 32;
+        Resources res = CrApp.getInstance().getResources();
         switch (format) {
             case "wav":
-                return "Lossless quality (WAV), 44khz 16bit WAV " + (mode.equals("mono") ? wavBitrate : wavBitrate * 2)
+                return res.getString(R.string.lossless_quality) + " (WAV), 44khz 16bit WAV " + (mode.equals("mono") ? wavBitrate : wavBitrate * 2)
                         + "kbps " + mode.substring(0, 1).toUpperCase() + mode.substring(1);
             case "aac_hi":
-                return "High quality (AAC), 44khz 16bit AAC128 " + (mode.equals("mono") ? aacHighBitrate : aacHighBitrate * 2)
+                return res.getString(R.string.hi_quality) + " (AAC), 44khz 16bit AAC128 " + (mode.equals("mono") ? aacHighBitrate : aacHighBitrate * 2)
                         + "kbps " + mode.substring(0, 1).toUpperCase() + mode.substring(1);
             case "aac_med":
-                return "Medium quality (AAC), 44khz 16bit AAC64 " + (mode.equals("mono") ? aacMedBitrate : aacMedBitrate * 2)
+                return res.getString(R.string.med_quality) + " (AAC), 44khz 16bit AAC64 " + (mode.equals("mono") ? aacMedBitrate : aacMedBitrate * 2)
                         + "kbps " + mode.substring(0, 1).toUpperCase() + mode.substring(1);
             case "aac_bas":
-                return "Basic quality (AAC), 44khz 16bit AAC32 " + (mode.equals("mono") ? aacBasBitrate : aacBasBitrate * 2)
+                return res.getString(R.string.bas_quality) + " (AAC), 44khz 16bit AAC32 " + (mode.equals("mono") ? aacBasBitrate : aacBasBitrate * 2)
                         + "kbps " + mode.substring(0, 1).toUpperCase() + mode.substring(1);
         }
         return null;

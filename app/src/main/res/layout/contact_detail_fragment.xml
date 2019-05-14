@@ -58,7 +58,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/no_content"
         android:visibility="gone"
-        android:text="No recordings are currently associated with this contact."
+        android:text="@string/no_recordings"
         android:textAlignment="center"
         android:layout_marginTop="25dp"
         android:layout_marginStart="20dp"

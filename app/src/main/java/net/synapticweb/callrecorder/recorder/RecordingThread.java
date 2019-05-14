@@ -15,44 +15,46 @@ abstract class RecordingThread {
 
     RecordingThread(String mode) {
         channels = (mode.equals(Recorder.MONO) ? 1 : 2);
-        bufferSize = AudioRecord.getMinBufferSize(SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
+        bufferSize = AudioRecord.getMinBufferSize(SAMPLE_RATE, channels == 1 ? AudioFormat.CHANNEL_IN_MONO : AudioFormat.CHANNEL_IN_STEREO,
+                AudioFormat.ENCODING_PCM_16BIT);
         audioRecord = createAudioRecord();
         audioRecord.startRecording();
     }
 
     private AudioRecord createAudioRecord() {
-        AudioRecord audioRecord = null;
+        AudioRecord audioRecord;
         try {
             audioRecord = new AudioRecord(MediaRecorder.AudioSource.VOICE_CALL, SAMPLE_RATE,
                     channels == 1 ? AudioFormat.CHANNEL_IN_MONO : AudioFormat.CHANNEL_IN_STEREO,
                     AudioFormat.ENCODING_PCM_16BIT, bufferSize * 10);
+            if(audioRecord.getState() != AudioRecord.STATE_INITIALIZED)
+                throw new Exception("VOICE_CALL source unavailable");
         }
         catch (Exception e1) {
-            Log.wtf(TAG, "VOICE_CALL source unavailable");
+            Log.wtf(TAG, e1.getMessage());
             try {
                 audioRecord = new AudioRecord(MediaRecorder.AudioSource.VOICE_RECOGNITION, SAMPLE_RATE,
                         channels == 1 ? AudioFormat.CHANNEL_IN_MONO : AudioFormat.CHANNEL_IN_STEREO,
                         AudioFormat.ENCODING_PCM_16BIT, bufferSize * 10);
-            }
-            catch (Exception e2){
-                Log.wtf(TAG, "VOICE_RECOGNITION source unavailable");
+                if (audioRecord.getState() != AudioRecord.STATE_INITIALIZED)
+                    throw new Exception("VOICE_RECOGNITION source unavailable");
+            } catch (Exception e2) {
+                Log.wtf(TAG, e2.getMessage());
                 try {
                     audioRecord = new AudioRecord(MediaRecorder.AudioSource.VOICE_COMMUNICATION, SAMPLE_RATE,
                             channels == 1 ? AudioFormat.CHANNEL_IN_MONO : AudioFormat.CHANNEL_IN_STEREO,
                             AudioFormat.ENCODING_PCM_16BIT, bufferSize * 10);
-                }
-                catch (Exception e3){
-                    Log.wtf(TAG, "VOICE_COMMUNICATION source unavailable");
+                    if (audioRecord.getState() != AudioRecord.STATE_INITIALIZED)
+                        throw new Exception("VOICE_COMMUNICATION source unavailable");
+                } catch (Exception e3) {
+                    Log.wtf(TAG, e3.getMessage());
+                    audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, SAMPLE_RATE,
+                            channels == 1 ? AudioFormat.CHANNEL_IN_MONO : AudioFormat.CHANNEL_IN_STEREO,
+                            AudioFormat.ENCODING_PCM_16BIT, bufferSize * 10);
+                    if (audioRecord.getState() != AudioRecord.STATE_INITIALIZED)
+                        throw new RuntimeException("Unable to initialize AudioRecord");
                 }
             }
-        }
-        if(audioRecord == null)
-            audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, SAMPLE_RATE,
-                    channels == 1 ? AudioFormat.CHANNEL_IN_MONO : AudioFormat.CHANNEL_IN_STEREO,
-                    AudioFormat.ENCODING_PCM_16BIT, bufferSize * 10);
-
-        if (audioRecord.getState() != AudioRecord.STATE_INITIALIZED) {
-            throw new RuntimeException("Unable to initialize AudioRecord");
         }
 
         if (android.media.audiofx.NoiseSuppressor.isAvailable()) {

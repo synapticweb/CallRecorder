@@ -6,6 +6,7 @@ import android.view.View;
 import com.codekidlabs.storagechooser.Content;
 import com.codekidlabs.storagechooser.StorageChooser;
 
+import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.TemplateActivity;
 
@@ -57,7 +58,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         }
         else {
             storagePath.setEnabled(false);
-            storagePath.setSummary("Private app space");
+            storagePath.setSummary(CrApp.getInstance().getResources().getString(R.string.private_storage));
         }
     }
 
@@ -85,7 +86,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             @Override
             public boolean onPreferenceClick(final Preference preference) {
                 Content content = new Content();
-                content.setOverviewHeading("Choose where to store recordings");
+                content.setOverviewHeading(CrApp.getInstance().getResources().getString(R.string.choose_recordings_storage));
                 StorageChooser.Theme theme = new StorageChooser.Theme(getActivity());
                 theme.setScheme(getResources().getIntArray(R.array.storage_chooser_theme));
 

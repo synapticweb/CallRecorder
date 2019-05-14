@@ -55,8 +55,8 @@ public class MoveAsyncTask extends AsyncTask<Recording, Integer, Boolean> {
     @Override
     protected void onPreExecute() {
         dialog = new MaterialDialog.Builder(activityRef.get())
-                .title("Progress")
-                .content("Exporting recordings...")
+                .title(R.string.progress_title)
+                .content(R.string.progress_text)
                 .progress(false, 100, true)
                 .negativeText("Cancel")
                 .onNegative(new MaterialDialog.SingleButtonCallback() {
@@ -78,8 +78,8 @@ public class MoveAsyncTask extends AsyncTask<Recording, Integer, Boolean> {
     @Override
     protected void onCancelled() {
         new MaterialDialog.Builder(activityRef.get())
-                .title("Warning")
-                .content("The export was canceled. Some files might be corrupted or missing.")
+                .title(R.string.warning_title)
+                .content(R.string.canceled_move)
                 .positiveText("OK")
                 .icon(activityRef.get().getResources().getDrawable(R.drawable.warning))
                 .show();
@@ -90,16 +90,16 @@ public class MoveAsyncTask extends AsyncTask<Recording, Integer, Boolean> {
         dialog.dismiss();
         if(result) {
             new MaterialDialog.Builder(activityRef.get())
-                    .title("Success")
-                    .content("The recording(s) were successfully exported.")
+                    .title(R.string.success_move_title)
+                    .content(R.string.success_move_text)
                     .positiveText("OK")
                     .icon(activityRef.get().getResources().getDrawable(R.drawable.success))
                     .show();
         }
         else {
             new MaterialDialog.Builder(activityRef.get())
-                    .title("Error")
-                    .content("An error occurred while exporting the recording(s). Some files might be corrupted or missing.")
+                    .title(R.string.error_title)
+                    .content(R.string.error_move)
                     .positiveText("OK")
                     .icon(activityRef.get().getResources().getDrawable(R.drawable.error))
                     .show();
