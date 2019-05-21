@@ -93,6 +93,7 @@ class RecordingThreadAac extends RecordingThread implements Runnable {
         return mediaCodec;
     }
 
+
     private boolean handleCodecInput(AudioRecord audioRecord,
                                      MediaCodec mediaCodec, ByteBuffer[] codecInputBuffers,
                                      boolean running) {
@@ -109,6 +110,7 @@ class RecordingThreadAac extends RecordingThread implements Runnable {
             }
         }
 
+        addGain(audioRecordData);
         int codecInputBufferIndex = mediaCodec.dequeueInputBuffer(10 * 1000);
 
         if (codecInputBufferIndex >= 0) {

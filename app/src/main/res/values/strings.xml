@@ -20,8 +20,8 @@
         lets CallRecorder use the device\'s internal source of sound for recording instead of using the microphone.
     This leads to slightly better audio quality.</string>
     <string name="make_system_title">Make %1$s app</string>
-    <string name="number_invalid_message">This number is not valid.</string>
-    <string name="number_exists_message">This number already exists in the application\'s database.</string>
+    <string name="number_invalid_message">This phone number is not valid.</string>
+    <string name="number_exists_message">This phone number already exists in the application\'s database.</string>
     <string name="delete_recording_popup_text">Delete</string>
     <string name="rename_recording_popup_text">Rename</string>
     <string name="storage_info">Storage info</string>
@@ -97,4 +97,6 @@
     <string name="prefs_format_title">Recording format</string>
     <string name="prefs_mode_title">Recording mode</string>
     <string name="prefs_theme_title">Theme</string>
+    <string name="prefs_gain_title">Apply volume gain when recording</string>
+    <string name="no_gain">No gain</string>
 </resources>

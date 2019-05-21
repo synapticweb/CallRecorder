@@ -1,8 +1,7 @@
 <resources>
-
     <style name="AppThemeLight" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorPrimary">@color/primaryColor</item>
+        <item name="colorPrimaryDark">@color/primaryDarkColor</item>
         <item name="colorAccent">@color/colorAccent</item>
 
         <item name="android:windowBackground">@color/backgroundLightTheme</item>
@@ -16,8 +15,8 @@
     </style>
 
     <style name="AppThemeDark" parent="Theme.AppCompat.NoActionBar">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorPrimary">@color/primaryColor</item>
+        <item name="colorPrimaryDark">@color/primaryDarkColor</item>
         <item name="colorAccent">@color/colorAccent</item>
 
         <item name="android:textColorPrimary">@color/text_on_dark</item>
@@ -90,8 +89,8 @@ https://stackoverflow.com/questions/30487616/android-overriding-a-style-per-them
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:background">@android:color/transparent</item>
         <item name="windowNoTitle">true</item>
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorPrimary">@color/primaryColor</item>
+        <item name="colorPrimaryDark">@color/primaryDarkColor</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:textColor">@color/textOnLight</item>
     </style>
@@ -102,8 +101,8 @@ https://stackoverflow.com/questions/30487616/android-overriding-a-style-per-them
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:background">@android:color/transparent</item>
         <item name="windowNoTitle">true</item>
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorPrimary">@color/primaryColor</item>
+        <item name="colorPrimaryDark">@color/primaryDarkColor</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:textColor">@color/textOnDark</item>
     </style>

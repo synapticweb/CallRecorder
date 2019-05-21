@@ -11,6 +11,7 @@ import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.TemplateActivity;
 
 import java.io.File;
+import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -31,6 +32,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     public static final String SPEAKER_USE = "put_on_speaker";
     public static final String FORMAT = "format";
     public static final String MODE = "mode";
+    public static final String GAIN = "gain";
 
     @Override
     public void onResume() {
@@ -81,6 +83,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         Preference mode = findPreference(MODE);
         Preference storage = findPreference(STORAGE);
         final Preference storagePath = findPreference(STORAGE_PATH);
+        Preference gain = findPreference(GAIN);
 
         storagePath.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
@@ -150,6 +153,12 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             }
         });
 
+        gain.setSummaryProvider(new Preference.SummaryProvider<ListPreference>() {
+            @Override
+            public CharSequence provideSummary(ListPreference preference) {
+                return preference.getEntry();
+            }
+        });
 
         themeOption.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
