@@ -691,7 +691,9 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         }
         if(contact.shouldRecord()) {
             recordingStatusView.setText(R.string.rec_status_recording);
-            recordingStatusView.setTextColor(getResources().getColor(R.color.green));
+            recordingStatusView.setTextColor(getResources().getColor(
+                    getParentActivity().getSettedTheme().equals(TemplateActivity.LIGHT_THEME) ?
+                            R.color.green_light : R.color.green_dark));
         }
         else {
             recordingStatusView.setText(R.string.rec_status_not_recording);
@@ -800,19 +802,27 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
             final Recording recording = recordings.get(position);
             int adornRes;
             switch (recording.getFormat()) {
-                case Recorder.WAV_FORMAT: adornRes = R.drawable.sound_symbol_wav;
+                case Recorder.WAV_FORMAT: adornRes = getParentActivity().getSettedTheme().equals(TemplateActivity.LIGHT_THEME) ?
+                        R.drawable.sound_symbol_wav_light : R.drawable.sound_symbol_wav_dark;
                     break;
-                case Recorder.AAC_HIGH_FORMAT: adornRes = R.drawable.sound_symbol_aac128;
+                case Recorder.AAC_HIGH_FORMAT: adornRes = getParentActivity().getSettedTheme().equals(TemplateActivity.LIGHT_THEME) ?
+                        R.drawable.sound_symbol_aac128_light : R.drawable.sound_symbol_aac128_dark;
                     break;
-                case Recorder.AAC_MEDIUM_FORMAT: adornRes = R.drawable.sound_symbol_aac64;
+                case Recorder.AAC_MEDIUM_FORMAT: adornRes =
+                        getParentActivity().getSettedTheme().equals(TemplateActivity.LIGHT_THEME) ?
+                                R.drawable.sound_symbol_aac64_light : R.drawable.sound_symbol_aac64_dark;
                     break;
-                case Recorder.AAC_BASIC_FORMAT: adornRes = R.drawable.sound_symbol_aac32;
+                case Recorder.AAC_BASIC_FORMAT: adornRes = getParentActivity().getSettedTheme().equals(TemplateActivity.LIGHT_THEME) ?
+                        R.drawable.sound_symbol_aac32_light : R.drawable.sound_symbol_aac32_dark;
                     break;
-                default:adornRes = R.drawable.sound_symbol_aac64;
+                default:adornRes = getParentActivity().getSettedTheme().equals(TemplateActivity.LIGHT_THEME) ?
+                        R.drawable.sound_symbol_aac64_light : R.drawable.sound_symbol_aac64_dark;
             }
 
             holder.title.setText(recording.getName());
-            holder.recordingType.setImageResource(recording.isIncoming() ? R.drawable.incoming : R.drawable.outgoing);
+            holder.recordingType.setImageResource(recording.isIncoming() ? R.drawable.incoming :
+                    getParentActivity().getSettedTheme().equals(TemplateActivity.LIGHT_THEME) ?
+                            R.drawable.outgoing_light : R.drawable.outgoing_dark);
             holder.recordingAdorn.setImageResource(adornRes);
             holder.checkBox.setOnClickListener(new View.OnClickListener() {
                 @Override

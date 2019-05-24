@@ -28,22 +28,14 @@ public class AppLibrary {
 
     //http://tools.medialab.sciences-po.fr/iwanthue/
     public static final List<Integer> colorList = new ArrayList<>(Arrays.asList(
-            0xFFa18c00,
-            0xFF5300b2,
-            0xFF37ca00,
-            0xFFc70089,
-            0xFF01da57,
-            0xFFf81a6e,
-            0xFF549b00,
-            0xFFde61e1,
-            0xFF73b100,
-            0xFF311d41,
-            0xFFef9515,
-            0xFF0298d2,
-            0xFF952900,
-            0xFF00a5a8,
-            0xFF382200,
-            0xFF00735e
+            0xFF7b569b,
+            0xFFb8ad38,
+            0xFF586dd7,
+            0xFF45aecf,
+            0xFFd9a26a,
+            0xFFe26855,
+            0xFF8c6d2c,
+            0xFFa4572e
     ));
 
     //https://stackoverflow.com/questions/3659809/where-am-i-get-country

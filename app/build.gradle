@@ -35,7 +35,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.1.0-alpha06'
     implementation 'androidx.recyclerview:recyclerview:1.1.0-alpha05'
     implementation 'de.hdodenhof:circleimageview:2.2.0'
-    implementation 'com.theartofdev.edmodo:android-image-cropper:2.7.0'
+    implementation 'com.theartofdev.edmodo:android-image-cropper:2.8.0'
     implementation 'com.github.codekidX:storage-chooser:2.0.4.4'
     implementation 'com.afollestad.material-dialogs:core:0.9.6.0'
     implementation 'com.googlecode.libphonenumber:libphonenumber:8.9.10'

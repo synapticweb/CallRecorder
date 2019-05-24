@@ -2,7 +2,7 @@
 <resources>
     <!--old primaryColor #2d6c55-->
     <color name="primaryColor">#6C8C1C</color>
-    <color name="primaryDarkColor">#235644</color>
+    <color name="primaryDarkColor">#597317</color>
     <!--old colorAccent #cb0600-->
     <color name="colorAccent">#D91916</color>
     <color name="colorAccentLight">#ff5030</color>
@@ -22,8 +22,9 @@
     <color name="darkRecordingSelected">#ff000000</color>
     <color name="lightRecordingNotSelected">#fff</color>
     <color name="lightRecordingSelected">#ddd</color>
-    <color name="green">#008000</color>
-    <color name="red">#ff0000</color>
+    <color name="green_dark">#52CC52</color>
+    <color name="green_light">#008000</color>
+    <color name="red">#E62222</color>
     <color name="textOnLight">#a0000000</color>
     <color name="selected_contact">#f0e2e7</color>
     <color name="darkMenuBackground">#2e2e2e</color>
