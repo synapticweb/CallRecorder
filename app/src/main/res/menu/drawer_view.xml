@@ -7,6 +7,10 @@
     <!--<item android:id="@+id/make_system"-->
         <!--android:icon="@drawable/baseline_android_black_36"/>-->
 
+    <item android:id="@+id/help"
+    android:icon="@drawable/help"
+        android:title="@string/help"/>
+
     <item android:id="@+id/about"
         android:title="@string/about_name"
         android:icon="@drawable/baseline_info_black_36"/>

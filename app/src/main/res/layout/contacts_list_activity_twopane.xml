@@ -7,10 +7,9 @@
     android:id="@+id/drawer_layout"
     android:fitsSystemWindows="true">
 
-    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         >
 
         <androidx.appcompat.widget.Toolbar
@@ -189,12 +188,11 @@
     </FrameLayout>
 
     <com.google.android.material.navigation.NavigationView
-        android:layout_width="wrap_content"
+        android:layout_width="320dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
         app:menu="@menu/drawer_view"
-        app:headerLayout="@layout/navdraw_header"
         android:id="@+id/navigation_view">
 
     </com.google.android.material.navigation.NavigationView>

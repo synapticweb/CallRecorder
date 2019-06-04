@@ -99,4 +99,5 @@
     <string name="prefs_theme_title">Theme</string>
     <string name="prefs_gain_title">Apply volume gain when recording</string>
     <string name="no_gain">No gain</string>
+    <string name="help">Help</string>
 </resources>

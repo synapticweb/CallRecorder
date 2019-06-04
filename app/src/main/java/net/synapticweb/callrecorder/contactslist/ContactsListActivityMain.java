@@ -4,10 +4,8 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.provider.ContactsContract;
 import androidx.annotation.NonNull;
@@ -25,17 +23,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.LinearLayout;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
-import com.topjohnwu.superuser.Shell;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.TemplateActivity;
 import net.synapticweb.callrecorder.settings.SettingsActivity;
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -45,8 +42,8 @@ public class ContactsListActivityMain extends TemplateActivity {
     private static final String TAG = "CallRecorder";
     private static final int PERMISSION_REQUEST = 2;
     private static final int REQUEST_NUMBER = 1;
-    private static final String MAKE_SYSTEM_APP = "make_system";
-    private static final String MAKE_NORMAL_APP = "make_normal";
+//    private static final String MAKE_SYSTEM_APP = "make_system";
+//    private static final String MAKE_NORMAL_APP = "make_normal";
 
     @Override
     protected Fragment createFragment() {
@@ -99,6 +96,20 @@ public class ContactsListActivityMain extends TemplateActivity {
 //        navigationView.getMenu().findItem(R.id.make_system).setTitle(getResources().getString(R.string.make_system_title,
 //                ((getApplicationInfo().flags & ApplicationInfo.FLAG_SYSTEM) == 1) ? "normal" : "system"));
 
+        int navWidth, headerHeight;
+        int pixelsDp = (int) (getResources().getDisplayMetrics().widthPixels / getResources().getDisplayMetrics().density);
+        navWidth = (pixelsDp >= 480) ? (int) (getResources().getDisplayMetrics().widthPixels * 0.4) :
+                (int) (getResources().getDisplayMetrics().widthPixels * 0.8);
+
+        DrawerLayout.LayoutParams params = (DrawerLayout.LayoutParams) navigationView.getLayoutParams();
+        params.width = navWidth;
+        navigationView.setLayoutParams(params);
+
+//        headerHeight = (int) (getResources().getDisplayMetrics().heightPixels * 0.1);
+//        LinearLayout header = (LinearLayout) navigationView.getHeaderView(0);
+//        LinearLayout.LayoutParams params2 = (LinearLayout.LayoutParams) header.getLayoutParams();
+//        params2.height = headerHeight;
+//        header.setLayoutParams(params2);
 
         hamburger.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -125,21 +136,21 @@ public class ContactsListActivityMain extends TemplateActivity {
         });
     }
 
-    private void toggleSystem() {
-        new MaterialDialog.Builder(this)
-                .title("Make system app")
-                .content(R.string.make_system)
-                .positiveText("Make CallRecorder system app")
-                .negativeText("Cancel")
-                .onPositive(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        String direction = ((getApplicationInfo().flags & ApplicationInfo.FLAG_SYSTEM) == 1) ? MAKE_NORMAL_APP : MAKE_SYSTEM_APP;
-                        new InstallSystemAsync(ContactsListActivityMain.this, direction).execute();
-                    }
-                })
-                .show();
-    }
+//    private void toggleSystem() {
+//        new MaterialDialog.Builder(this)
+//                .title("Make system app")
+//                .content(R.string.make_system)
+//                .positiveText("Make CallRecorder system app")
+//                .negativeText("Cancel")
+//                .onPositive(new MaterialDialog.SingleButtonCallback() {
+//                    @Override
+//                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+//                        String direction = ((getApplicationInfo().flags & ApplicationInfo.FLAG_SYSTEM) == 1) ? MAKE_NORMAL_APP : MAKE_SYSTEM_APP;
+//                        new InstallSystemAsync(ContactsListActivityMain.this, direction).execute();
+//                    }
+//                })
+//                .show();
+//    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -220,68 +231,68 @@ public class ContactsListActivityMain extends TemplateActivity {
         }
     }
 
-    private static class InstallSystemAsync extends AsyncTask<Void, Void, Void> {
-        private WeakReference<ContactsListActivityMain> activityReference;
-        private String direction;
-
-        InstallSystemAsync(Context context, String direction) {
-            activityReference = new WeakReference<>( (ContactsListActivityMain) context);
-            this.direction = direction;
-        }
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            final String MAKE_SYSTEM_SCRIPT = "mount -o rw,remount /system;\n" +
-                    "mkdir /system/priv-app/CallRecorder;\n" +
-                    "cp  /data/app/net.synapticweb.callrecorder-*/base.apk /system/priv-app/CallRecorder/CallRecorder.apk;\n" +
-                    "cp /data/app/net.synapticweb.callrecorder-*/split_lib*  /system/priv-app/CallRecorder;\n" +
-                    "cp -r /data/app/net.synapticweb.callrecorder-*/oat /system/priv-app/CallRecorder;\n" +
-                    "mv /system/priv-app/CallRecorder/oat/x86/base.odex /system/priv-app/CallRecorder/oat/x86/CallRecorder.odex;\n" +
-//                    "mv /system/priv-app/CallRecorder/oat/x86/base.vdex /system/priv-app/CallRecorder/oat/x86/CallRecorder.vdex" +
-                    "chown -R root:root /system/priv-app/CallRecorder;\n" +
-                    "chmod 0755 /system/priv-app/CallRecorder /system/priv-app/CallRecorder/oat /system/priv-app/CallRecorder/oat/x86;\n" +
-                    "chmod 0644 /system/priv-app/CallRecorder/*.apk /system/priv-app/CallRecorder/oat/x86/CallRecorder.odex;\n" +
-                    "rm -rf  /data/app/net.synapticweb.callrecorder-*\n";
-            final String MAKE_NORMAL_SCRIPT = "mount -o rw,remount /system;\n" +
-                    "mkdir /data/app/net.synapticweb.callrecorder-1;\n" +
-                    "cp /system/priv-app/CallRecorder/CallRecorder.apk /data/app/net.synapticweb.callrecorder-1/base.apk;\n" +
-                    "cp /system/priv-app/CallRecorder/split_lib* /data/app/net.synapticweb.callrecorder-1;\n" +
-                    "cp -r /system/priv-app/CallRecorder/oat /data/app/net.synapticweb.callrecorder-1;\n" +
-                    "mv /data/app/net.synapticweb.callrecorder-1/oat/x86/CallRecorder.odex /data/app/net.synapticweb.callrecorder-1/oat/x86/base.odex;\n" +
-                    "mkdir /data/app/net.synapticweb.callrecorder-1/lib;\n" +
-                    "chown -R system:system /data/app/net.synapticweb.callrecorder-1;\n" +
-                    "chown -R system:install /data/app/net.synapticweb.callrecorder-1/oat;\n" +
-                    "chown system:u0_a29999 /data/app/net.synapticweb.callrecorder-1/oat/x86/base.odex;\n" +
-                    "chmod 0755 /data/app/net.synapticweb.callrecorder-1 /data/app/net.synapticweb.callrecorder-1/lib;\n" +
-                    "chmod 0771 /data/app/net.synapticweb.callrecorder-1/oat /data/app/net.synapticweb.callrecorder-1/oat/x86;\n" +
-                    "chmod 0644 /data/app/net.synapticweb.callrecorder-1/*.apk /data/app/net.synapticweb.callrecorder-1/oat/x86/base.odex;\n" +
-                    "rm -rf /system/priv-app/CallRecorder";
-
-            final boolean isRooted = Shell.rootAccess();
-            Log.wtf(TAG, "Rooted: " + isRooted);
-            if(!isRooted)
-                activityReference.get().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        new MaterialDialog.Builder(activityReference.get())
-                                .title("Device not rooted")
-                                .icon(activityReference.get().getResources().getDrawable(R.drawable.error))
-                                .content("This device is not rooted or the su executable is not available.")
-                                .neutralText(android.R.string.ok)
-                                .show();
-                    }
-                });
-            else {
-                String script = (direction.equals(MAKE_NORMAL_APP) ? MAKE_NORMAL_SCRIPT : MAKE_SYSTEM_SCRIPT);
-                List<String> output = Shell.su(script).exec().getOut();
-                for(String s : output)
-                    Log.wtf(TAG, s);
-            }
-
-            return null;
-        }
-
-    }
+//    private static class InstallSystemAsync extends AsyncTask<Void, Void, Void> {
+//        private WeakReference<ContactsListActivityMain> activityReference;
+//        private String direction;
+//
+//        InstallSystemAsync(Context context, String direction) {
+//            activityReference = new WeakReference<>( (ContactsListActivityMain) context);
+//            this.direction = direction;
+//        }
+//
+//        @Override
+//        protected Void doInBackground(Void... voids) {
+//            final String MAKE_SYSTEM_SCRIPT = "mount -o rw,remount /system;\n" +
+//                    "mkdir /system/priv-app/CallRecorder;\n" +
+//                    "cp  /data/app/net.synapticweb.callrecorder-*/base.apk /system/priv-app/CallRecorder/CallRecorder.apk;\n" +
+//                    "cp /data/app/net.synapticweb.callrecorder-*/split_lib*  /system/priv-app/CallRecorder;\n" +
+//                    "cp -r /data/app/net.synapticweb.callrecorder-*/oat /system/priv-app/CallRecorder;\n" +
+//                    "mv /system/priv-app/CallRecorder/oat/x86/base.odex /system/priv-app/CallRecorder/oat/x86/CallRecorder.odex;\n" +
+////                    "mv /system/priv-app/CallRecorder/oat/x86/base.vdex /system/priv-app/CallRecorder/oat/x86/CallRecorder.vdex" +
+//                    "chown -R root:root /system/priv-app/CallRecorder;\n" +
+//                    "chmod 0755 /system/priv-app/CallRecorder /system/priv-app/CallRecorder/oat /system/priv-app/CallRecorder/oat/x86;\n" +
+//                    "chmod 0644 /system/priv-app/CallRecorder/*.apk /system/priv-app/CallRecorder/oat/x86/CallRecorder.odex;\n" +
+//                    "rm -rf  /data/app/net.synapticweb.callrecorder-*\n";
+//            final String MAKE_NORMAL_SCRIPT = "mount -o rw,remount /system;\n" +
+//                    "mkdir /data/app/net.synapticweb.callrecorder-1;\n" +
+//                    "cp /system/priv-app/CallRecorder/CallRecorder.apk /data/app/net.synapticweb.callrecorder-1/base.apk;\n" +
+//                    "cp /system/priv-app/CallRecorder/split_lib* /data/app/net.synapticweb.callrecorder-1;\n" +
+//                    "cp -r /system/priv-app/CallRecorder/oat /data/app/net.synapticweb.callrecorder-1;\n" +
+//                    "mv /data/app/net.synapticweb.callrecorder-1/oat/x86/CallRecorder.odex /data/app/net.synapticweb.callrecorder-1/oat/x86/base.odex;\n" +
+//                    "mkdir /data/app/net.synapticweb.callrecorder-1/lib;\n" +
+//                    "chown -R system:system /data/app/net.synapticweb.callrecorder-1;\n" +
+//                    "chown -R system:install /data/app/net.synapticweb.callrecorder-1/oat;\n" +
+//                    "chown system:u0_a29999 /data/app/net.synapticweb.callrecorder-1/oat/x86/base.odex;\n" +
+//                    "chmod 0755 /data/app/net.synapticweb.callrecorder-1 /data/app/net.synapticweb.callrecorder-1/lib;\n" +
+//                    "chmod 0771 /data/app/net.synapticweb.callrecorder-1/oat /data/app/net.synapticweb.callrecorder-1/oat/x86;\n" +
+//                    "chmod 0644 /data/app/net.synapticweb.callrecorder-1/*.apk /data/app/net.synapticweb.callrecorder-1/oat/x86/base.odex;\n" +
+//                    "rm -rf /system/priv-app/CallRecorder";
+//
+//            final boolean isRooted = Shell.rootAccess();
+//            Log.wtf(TAG, "Rooted: " + isRooted);
+//            if(!isRooted)
+//                activityReference.get().runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        new MaterialDialog.Builder(activityReference.get())
+//                                .title("Device not rooted")
+//                                .icon(activityReference.get().getResources().getDrawable(R.drawable.error))
+//                                .content("This device is not rooted or the su executable is not available.")
+//                                .neutralText(android.R.string.ok)
+//                                .show();
+//                    }
+//                });
+//            else {
+//                String script = (direction.equals(MAKE_NORMAL_APP) ? MAKE_NORMAL_SCRIPT : MAKE_SYSTEM_SCRIPT);
+//                List<String> output = Shell.su(script).exec().getOut();
+//                for(String s : output)
+//                    Log.wtf(TAG, s);
+//            }
+//
+//            return null;
+//        }
+//
+//    }
 
     private void huaweiAlert() {
         final SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);

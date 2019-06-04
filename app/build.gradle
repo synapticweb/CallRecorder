@@ -39,7 +39,7 @@ dependencies {
     implementation 'com.github.codekidX:storage-chooser:2.0.4.4'
     implementation 'com.afollestad.material-dialogs:core:0.9.6.0'
     implementation 'com.googlecode.libphonenumber:libphonenumber:8.9.10'
-    implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'com.github.topjohnwu:libsu:2.0.2'
+//    implementation 'androidx.cardview:cardview:1.0.0'
+//    implementation 'com.github.topjohnwu:libsu:2.0.2'
     implementation 'androidx.preference:preference:1.1.0-alpha05'
 }

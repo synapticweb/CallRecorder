@@ -105,15 +105,13 @@ public class RecorderService extends Service {
         Intent notificationIntent = new Intent(CrApp.getInstance(), ContactsListActivityMain.class);
         PendingIntent tapNotificationPi = PendingIntent.getBroadcast(CrApp.getInstance(), 0, notificationIntent, 0);
         Resources res = CrApp.getInstance().getResources();
-        Bitmap bitmap = BitmapFactory.decodeResource(res, R.drawable.record);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             createChannel();
         NotificationCompat.Builder builder = new NotificationCompat.Builder(CrApp.getInstance(), CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_album_white_24dp)
+                .setSmallIcon(R.drawable.notification_icon)
                 .setContentTitle(callNameOrNumber + (incoming ? " (incoming)" : " (outgoing)"))
-                .setContentIntent(tapNotificationPi)
-                .setLargeIcon(bitmap);
+                .setContentIntent(tapNotificationPi);
 
         String callIdentifier;
         if(privateCall)

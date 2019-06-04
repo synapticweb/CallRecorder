@@ -2,8 +2,6 @@ package net.synapticweb.callrecorder;
 
 import android.app.Application;
 
-import com.topjohnwu.superuser.Shell;
-
 //Oferă context cînd nu este nicio activitate disponibilă. Are nevoie ca să funcționeze de
 // android:name=".CrApp" în AndroidManifest.xml
 public class CrApp extends Application {
@@ -16,8 +14,8 @@ public class CrApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Shell.Config.setFlags(Shell.FLAG_REDIRECT_STDERR);
-        Shell.Config.verboseLogging(BuildConfig.DEBUG);
+//        Shell.Config.setFlags(Shell.FLAG_REDIRECT_STDERR);
+//        Shell.Config.verboseLogging(BuildConfig.DEBUG);
     }
 
     public static CrApp getInstance() {
