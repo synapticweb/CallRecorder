@@ -19,6 +19,7 @@ import android.text.Spanned;
 import android.text.style.RelativeSizeSpan;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -33,6 +34,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.appcompat.widget.Toolbar;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -219,10 +221,15 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
 
     @Override
     public void updateTitle() {
-        if(!isSinglePaneLayout())
-            return ;
         TextView title = parentActivity.findViewById(R.id.actionbar_title);
-        title.setText(selectMode ? String.valueOf(selectedItems.size()) : contact.getContactName());
+        if(!isSinglePaneLayout()) {
+            Toolbar.LayoutParams params = (Toolbar.LayoutParams) title.getLayoutParams();
+            params.gravity = selectMode ? Gravity.START : Gravity.CENTER;
+            title.setLayoutParams(params);
+        }
+
+        title.setText(selectMode ? String.valueOf(selectedItems.size()) : isSinglePaneLayout() ?
+                contact.getContactName() : getString(R.string.app_name));
     }
 
     //Această funcție este apelată în 2 situații: 1: Cînd se intră/iese din selectMode. În acest caz butoanele apar

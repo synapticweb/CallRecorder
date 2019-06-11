@@ -32,4 +32,5 @@
     <color name="slotLight">@color/white</color>
     <color name="slotDarkSelected">#3c3c3c</color>
     <color name="slotLightSelected">#f0f0f0</color>
+    <color name="setupButton">#D94441</color>
 </resources>

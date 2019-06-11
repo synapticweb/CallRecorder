@@ -69,6 +69,17 @@ https://stackoverflow.com/questions/30487616/android-overriding-a-style-per-them
         <item name="android:background">@color/slotAndDetailHeaderDark</item>
     </style>
 
+    <style name="setupButtons" parent="TextAppearance.AppCompat.Button">
+        <item name="android:background">@color/setupButton</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="setupParagraphs">
+        <item name="android:layout_marginTop">10dp</item>
+        <item name="android:layout_marginBottom">10dp</item>
+        <item name="android:lineSpacingMultiplier">1.3</item>
+    </style>
+
 
     <!--Necesar pentru a albi săgeata back a toolbarului -->
     <style name="toolbar_theme" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
@@ -77,6 +88,10 @@ https://stackoverflow.com/questions/30487616/android-overriding-a-style-per-them
     
     <style name="toolbar_font" parent="@style/Base.TextAppearance.AppCompat.Title">
         <item name="android:textSize">15sp</item>
+    </style>
+
+    <style name="toolbar_font_contacts" parent="@style/Base.TextAppearance.AppCompat.Title">
+        <item name="android:textSize">13sp</item>
     </style>
 <!-- Pentru background-ul alb: https://stackoverflow.com/questions/22320663/change-background-popupmenu-in-android -->
 <!--Ca să poată fi folosit cu android:theme, pentru a fi aplicat tuturor copiilor unui View trebuie să moștenească

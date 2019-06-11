@@ -55,6 +55,10 @@
             android:theme="@style/PlayerStyleLight"
            /> <!--Fără screenSize continuă să se restarteze. -->
 
+        <activity android:name=".setup.SetupActivity"
+            android:parentActivityName=".contactslist.ContactsListActivityMain">
+        </activity>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="net.synapticweb.callrecorder.fileprovider"

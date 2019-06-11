@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingTop="50dp"
+    android:paddingBottom="50dp"
+    android:paddingStart="50dp"
+    android:paddingEnd="50dp">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_horizontal">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="28sp"
+            android:text="@string/setup_power_title"
+            android:id="@+id/power_title"
+            android:layout_alignParentTop="true"
+            />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center_vertical"
+            android:layout_below="@id/power_title"
+            android:layout_above="@id/setup_power_finish">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:id="@+id/doze_info"
+                android:layout_marginBottom="20dp"
+                android:visibility="gone"
+                >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/doze_info"
+                    style="@style/setupParagraphs"
+                    android:layout_marginBottom="20dp"/>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/turn_off_doze"
+                    android:text="Turn off optimizations"
+                    style="@style/setupButtons"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/other_power_optimizations"
+                style="@style/setupParagraphs"
+                android:id="@+id/other_power_optimizations"
+                />
+
+        </LinearLayout>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/setup_power_finish"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:text="Finish"
+            style="@style/setupButtons"
+            />
+    </RelativeLayout>
+
+</LinearLayout>

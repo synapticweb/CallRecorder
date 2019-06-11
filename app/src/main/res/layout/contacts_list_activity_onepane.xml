@@ -17,7 +17,7 @@
         android:layout_height="?attr/actionBarSize"
         android:layout_width="match_parent"
         android:background="?attr/colorPrimary"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        android:theme="@style/toolbar_theme"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         android:id="@+id/toolbar_main"
         android:elevation="2dp"
@@ -29,6 +29,13 @@
             android:layout_gravity="start"
             android:background="@drawable/baseline_menu_white_24"
             android:id="@+id/hamburger"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/actionbar_title"
+            android:layout_gravity="center"
+            android:textColor="@color/textOnDark"/>
 
 
     </androidx.appcompat.widget.Toolbar>
@@ -49,6 +56,12 @@
         android:id="@+id/contacts_list_fragment_container">
 
     </FrameLayout>
+
+    <!--<FrameLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:id="@+id/setup_fragment_container">-->
+    <!--</FrameLayout>-->
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/add_numbers"

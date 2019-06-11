@@ -29,7 +29,7 @@
     <string name="exit_app_message">Exit the application?</string>
     <string name="warning_title">Warning</string>
     <string name="information_title">Information</string>
-    <string name="permissions_not_granted">"The app was not granted the necessary permissions for proper functioning. Some or all of the app functionality will be lost."</string>
+    <string name="permissions_not_granted">"The application was not granted the necessary permissions for proper functioning. You should grant these permissions on the next run."</string>
     <string name="huawei_protected_title">Huawei Protected Apps</string>
     <string name="huawei_protected_message">"%s requires to be enabled in 'Protected Apps' to function properly.%n</string>
     <string name="audio_file_missing">Cannot find the audio file</string>
@@ -98,6 +98,25 @@
     <string name="prefs_mode_title">Recording mode</string>
     <string name="prefs_theme_title">Theme</string>
     <string name="prefs_gain_title">Apply volume gain when recording</string>
-    <string name="no_gain">No gain</string>
+    <string name="no_gain">Apply no gain</string>
     <string name="help">Help</string>
+    <string name="legal">In some countries the recording of phone calls is forbiden by law.\nBy clicking the button labeled \"Next\" you confirm that the laws that govern the country where you currently reside allow for the recording of phone calls.\nIf call recording is forbiden or you are unsure, click \"Cancel\" to terminate the application.</string>
+    <string name="legal_title">Legal notice</string>
+    <string name="perms_title">Setup the permissions</string>
+    <string name="permissions">Synaptic Call Recorder needs a couple of permissions:\n
+        The permission to make and manage phone calls is requested because the phone numbers associated with contacts can be dialed from the application and because the application needs to know the phone\'s state in order to start recording the calls.\n
+        The permission to record audio is requested because the applications records phone calls.\n
+        The permission to access contacts is requested because the phone numbers whose calls are recorded are retrieved from the phone\'s contact database.\n
+        The permission to access photos, media and files is requested because the audio records have to be written in the phone\'s storage and read from there and also because the contacts are personalized with photos retrived from the phone\'s storage.\n
+    In the steps that follow you will be asked to grant these permissions.</string>
+    <string name="perms_intro">Synaptic Call Recorder needs the permissions described below:</string>
+    <string name="perms_phone">The permission to <b>make and manage phone calls</b> is requested because the phone numbers associated with contacts can be dialed from the application and because the application needs to know the phone\'s state in order to start recording the calls.</string>
+    <string name="perms_record">The permission to <b>record audio</b> is requested because the applications records phone calls.</string>
+    <string name="perms_contacts">The permission to <b>access contacts</b> is requested because the phone numbers whose calls are recorded are retrieved from the phone\'s contact database.</string>
+    <string name="perms_files">The permission to <b>access photos, media and files</b> is requested because the audio records have to be written in the phone\'s storage and read from there and also because the contacts are personalized with photos retrived from the phone\'s storage.</string>
+    <string name="perms_finish">In the following steps you will be asked to grant these permissions.</string>
+    <string name="no_grant_perms">Synaptic Call Recorder cannot function without granting these permissions.</string>
+    <string name="setup_power_title">Setup power management</string>
+    <string name="doze_info">Synaptic Call Recorder cannot function properly if Android power management optimization is in effect. For proper functioning you will have to manually turn off the power optimization for this application.</string>
+    <string name="other_power_optimizations">Some custom versions of Android operating system have power management methods implemented by their vendors, like \"Protected apps\" on Huawei phones. Proper functioning of Synaptic Call Recorder requires that any power optimization that affects this application be turned off.\nPlease consult your operating system documentation to find if there are such power optimizations.</string>
 </resources>

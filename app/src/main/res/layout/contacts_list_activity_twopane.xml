@@ -52,6 +52,13 @@
                 android:background="@drawable/baseline_menu_white_24"
                 android:id="@+id/hamburger"/>
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/actionbar_title"
+                android:layout_gravity="center"
+                android:textColor="@color/textOnDark"/>
+
 
             <ImageButton
                 android:layout_width="wrap_content"
