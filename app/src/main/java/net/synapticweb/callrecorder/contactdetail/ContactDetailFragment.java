@@ -12,10 +12,8 @@ import android.graphics.PorterDuffColorFilter;
 import android.os.Build;
 import android.os.Bundle;
 
-import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
-import android.text.Spanned;
 import android.text.style.RelativeSizeSpan;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -41,6 +39,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.codekidlabs.storagechooser.Content;
 import com.codekidlabs.storagechooser.StorageChooser;
 
+import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.TemplateActivity;
 import net.synapticweb.callrecorder.data.Contact;
@@ -643,13 +642,6 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         return detailView;
     }
 
-    private Spanned getSpannedText(String text) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            return Html.fromHtml(text, Html.FROM_HTML_MODE_COMPACT);
-        } else
-            return Html.fromHtml(text);
-
-    }
 
     @Override
     public void paintViews(List<Recording> recordings){
@@ -660,9 +652,9 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         // checkIfSelectedRecordingsDeleted(), apelată în toggleSelectModeActionBar, apelat la rîndul lui acum
         // în paintView, adică de fiecare dată cînd rulează onResume).
         toggleSelectModeActionBar(false);
-        typePhoneView.setText(getSpannedText(String.format(getResources().getString(
+        typePhoneView.setText(CrApp.getSpannedText(String.format(getResources().getString(
                 R.string.detail_phonetype), contact.getPhoneTypeName())));
-        phoneNumberView.setText(getSpannedText(String.format(getResources().getString(
+        phoneNumberView.setText(CrApp.getSpannedText(String.format(getResources().getString(
                 R.string.detail_phonenumber), contact.getPhoneNumber())));
 
         if(contact.getPhotoUri() != null) {

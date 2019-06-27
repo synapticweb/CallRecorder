@@ -4,158 +4,127 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import net.synapticweb.callrecorder.AppLibrary;
 import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.TemplateActivity;
 import net.synapticweb.callrecorder.contactdetail.ContactDetailPresenter;
 import net.synapticweb.callrecorder.data.Recording;
 
-import androidx.appcompat.widget.Toolbar;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-
 public class PlayerActivity extends TemplateActivity {
-    ImageButton playPause, stopPlaying, closeBtn;
+    AudioPlayer player;
+    Recording recording;
+    ImageButton playPause, resetPlaying;
     SeekBar playSeekBar;
-    MediaPlayerHolder mediaPlayerHolder = null;
     TextView playedTime, totalTime;
     boolean userIsSeeking = false;
-    private Recording recording;
-    private static final int WINDOW_HEIGHT_DP = 250;
-    private static final String TAG = "CallRecorder";
+
+    public Fragment createFragment() {return null;}
 
     @Override
-    protected Fragment createFragment() {
-        return null;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        Log.wtf(TAG, "onCreate");
-        setTheme();
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.play_activity);
+        setTheme();
+        setContentView(R.layout.player_activity);
 
-        //https://stackoverflow.com/questions/1979369/android-activity-as-a-dialog
-        DisplayMetrics metrics = getResources().getDisplayMetrics();
-        getWindow().setLayout(WindowManager.LayoutParams.WRAP_CONTENT, (int) (WINDOW_HEIGHT_DP * metrics.density));
-
-        Toolbar toolbar = findViewById(R.id.toolbar_play);
         recording = getIntent().getParcelableExtra(ContactDetailPresenter.RECORDING_EXTRA);
-        String title = recording.getName() != null ? recording.getName() : recording.getDate(true) + " " + recording.getTime();
-        toolbar.setTitle(CrApp.getInstance().getResources().getString(R.string.playing) + title);
-        setSupportActionBar(toolbar);
+        player = new AudioPlayer(new PlaybackListener());
 
-        playPause = findViewById(R.id.player_button_play_pause);
-        stopPlaying = findViewById(R.id.player_button_stop);
-        playSeekBar = findViewById(R.id.play_seekbar);
-        playedTime = findViewById(R.id.play_time_played);
-        totalTime = findViewById(R.id.play_total_time);
-        closeBtn = findViewById(R.id.close_player);
-
-        closeBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        playPause = findViewById(R.id.test_player_play_pause);
+        resetPlaying = findViewById(R.id.test_player_reset);
+        playSeekBar = findViewById(R.id.test_play_seekbar);
+        playedTime = findViewById(R.id.test_play_time_played);
+        totalTime = findViewById(R.id.test_play_total_time);
 
         playPause.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                if(mediaPlayerHolder.isPlaying()) {
-                    mediaPlayerHolder.pause();
+            public void onClick(View view) {
+                if(player.isPlaying()) {
+                    player.pause();
                     playPause.setBackground(getResources().getDrawable(R.drawable.player_play));
+                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                 }
                 else {
-                    mediaPlayerHolder.play();
+                    player.play();
                     playPause.setBackground(getResources().getDrawable(R.drawable.player_pause));
+                    getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                 }
             }
         });
 
-        stopPlaying.setOnClickListener(new View.OnClickListener() {
+        resetPlaying.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                if(mediaPlayerHolder.isPlaying())
+            public void onClick(View view) {
+                if(player.isPlaying())
                     playPause.setBackground(getResources().getDrawable(R.drawable.player_play));
-                mediaPlayerHolder.reset();
+                player.reset();
             }
         });
 
         playSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             int userSelectedPosition = 0;
+
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if(fromUser)
                     userSelectedPosition = progress;
-                playedTime.setText(AppLibrary.getDurationHuman(progress, false));
+                playedTime.setText(CrApp.getDurationHuman(progress, false));
             }
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-                userIsSeeking = true;
-            }
+            public void onStartTrackingTouch(SeekBar seekBar) { userIsSeeking = true; }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 userIsSeeking = false;
-                mediaPlayerHolder.seekTo(userSelectedPosition);
+                player.seekTo(userSelectedPosition);
             }
         });
 
-        mediaPlayerHolder = new MediaPlayerHolder(this);
-        mediaPlayerHolder.setPlaybackInfoListener(new PlaybackListener());
     }
 
-
     @Override
-    public void onStart() {
-        Log.wtf(TAG, "onStart");
+    protected void onStart() {
         super.onStart();
-        mediaPlayerHolder.loadMedia(recording.getPath());
-
+        player.loadMedia(recording.getPath());
         playedTime.setText("00:00");
-        totalTime.setText(AppLibrary.getDurationHuman(mediaPlayerHolder.getTotalDuration(), false));
-
+        totalTime.setText(CrApp.getDurationHuman(player.getTotalDuration(), false));
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
         int currentPosition = pref.getInt("player_currentPosition", 0);
         boolean isPlaying = pref.getBoolean("player_isPlaying", true);
-        mediaPlayerHolder.setMediaPosition(currentPosition);
+        player.setMediaPosition(currentPosition);
+
         if(isPlaying) {
             playPause.setBackground(getResources().getDrawable(R.drawable.player_pause));
-            mediaPlayerHolder.play();
+            player.play();
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         }
         else
             playPause.setBackground(getResources().getDrawable(R.drawable.player_play));
     }
 
     @Override
-    public void onStop() {
-        Log.wtf(TAG, "onStop");
+    protected void onStop() {
         super.onStop();
-        if(!(isChangingConfigurations() && mediaPlayerHolder.isPlaying())) {
-            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
-            SharedPreferences.Editor editor = pref.edit();
-            editor.putInt("player_currentPosition", mediaPlayerHolder.getCurrentPosition());
-            editor.putBoolean("player_isPlaying", mediaPlayerHolder.isPlaying());
-            editor.apply();
-            mediaPlayerHolder.release();
-        }
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putInt("player_currentPosition", player.getCurrentPosition());
+        editor.putBoolean("player_isPlaying", player.isPlaying());
+        editor.apply();
+        player.release();
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON); //e necesar?
     }
 
     @Override
     protected void onDestroy() {
-        Log.wtf(TAG, "onDestroy");
         super.onDestroy();
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = pref.edit();
@@ -164,7 +133,7 @@ public class PlayerActivity extends TemplateActivity {
         editor.apply();
     }
 
-    public class PlaybackListener extends PlaybackInfoListener {
+    class PlaybackListener implements PlaybackInfoListener {
         @Override
         public void onDurationChanged(int duration) {
             playSeekBar.setMax(duration);
@@ -178,20 +147,25 @@ public class PlayerActivity extends TemplateActivity {
                 else
                     playSeekBar.setProgress(position);
             }
-            //dacă pun aici codul pentru updatarea textului playedTime, nu se updatează nici textul și se oprește
-            // și updatarea barei. Cauze necunoscute deocamdată. Mutat codul în playSeekBar.onProgressChanged().
-        }
-
-        @Override
-        public void onStateChanged(@State int state) {
-            String stateToString = PlaybackInfoListener.convertStateToString(state);
-            Log.wtf(TAG, String.format("onStateChanged(%s)", stateToString));
         }
 
         @Override
         public void onPlaybackCompleted() {
             playPause.setBackground(getResources().getDrawable(R.drawable.player_play));
-            mediaPlayerHolder.reset();
+            player.reset();
+        }
+
+        @Override
+        public void onInitializationError() {
+            playPause.setEnabled(false);
+            resetPlaying.setEnabled(false);
+            findViewById(R.id.player_error_message).setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        public void onReset() {
+            player = new AudioPlayer(new PlaybackListener());
+            player.loadMedia(recording.getPath());
         }
     }
 }

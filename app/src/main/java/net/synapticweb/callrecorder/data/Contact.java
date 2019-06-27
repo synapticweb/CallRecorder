@@ -14,15 +14,12 @@ import android.provider.MediaStore;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
-import androidx.core.util.Pair;
+
 import android.util.Log;
-import android.util.LongSparseArray;
 
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 
-import net.synapticweb.callrecorder.AppLibrary;
 import net.synapticweb.callrecorder.CrApp;
-import net.synapticweb.callrecorder.PhoneTypeContainer;
 import net.synapticweb.callrecorder.R;
 
 import java.io.File;
@@ -30,15 +27,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 public class Contact implements Comparable<Contact>, Parcelable {
     private Long id;
     private String phoneNumber = null;
-    private int phoneType = AppLibrary.UNKNOWN_TYPE_PHONE_CODE;
+    private int phoneType = CrApp.UNKNOWN_TYPE_PHONE_CODE;
     private String contactName = null;
     private Uri photoUri = null;
     private boolean privateNumber = false;
@@ -75,7 +70,7 @@ public class Contact implements Comparable<Contact>, Parcelable {
             String number = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.COLUMN_NAME_NUMBER));
             String contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.COLUMN_NAME_CONTACT_NAME));
             Boolean shouldRecord = cursor.getInt(cursor.getColumnIndex(ContactsContract.Contacts.COLUMN_NAME_SHOULD_RECORD)) == 1;
-            Contact contact = new Contact(id, number, contactName, null, AppLibrary.UNKNOWN_TYPE_PHONE_CODE);
+            Contact contact = new Contact(id, number, contactName, null, CrApp.UNKNOWN_TYPE_PHONE_CODE);
             contact.setShouldRecord(shouldRecord);
             contacts.add(contact);
         }
@@ -241,7 +236,7 @@ public class Contact implements Comparable<Contact>, Parcelable {
     }
 
     public String getPhoneTypeName(){
-        for(PhoneTypeContainer typeContainer : AppLibrary.PHONE_TYPES)
+        for(CrApp.PhoneTypeContainer typeContainer : CrApp.PHONE_TYPES)
             if(typeContainer.getTypeCode() == this.phoneType)
                 return typeContainer.getTypeName();
 
@@ -250,7 +245,7 @@ public class Contact implements Comparable<Contact>, Parcelable {
 
     public void setPhoneType(String phoneType)
     {
-        for(PhoneTypeContainer typeContainer : AppLibrary.PHONE_TYPES)
+        for(CrApp.PhoneTypeContainer typeContainer : CrApp.PHONE_TYPES)
             if(typeContainer.getTypeName().equals(phoneType)) {
                 this.phoneType = typeContainer.getTypeCode();
                 break;
@@ -259,13 +254,13 @@ public class Contact implements Comparable<Contact>, Parcelable {
     }
 
     public void setPhoneType(int phoneTypeCode) {
-        for(PhoneTypeContainer type : AppLibrary.PHONE_TYPES) {
+        for(CrApp.PhoneTypeContainer type : CrApp.PHONE_TYPES) {
             if (phoneTypeCode == type.getTypeCode()) {
                 this.phoneType = phoneTypeCode;
                 return;
             }
         }
-        this.phoneType = AppLibrary.UNKNOWN_TYPE_PHONE_CODE;
+        this.phoneType = CrApp.UNKNOWN_TYPE_PHONE_CODE;
     }
 
     public String getContactName() {

@@ -27,8 +27,10 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 
+import net.synapticweb.callrecorder.BuildConfig;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.TemplateActivity;
+import net.synapticweb.callrecorder.HelpActivity;
 import net.synapticweb.callrecorder.settings.SettingsActivity;
 import net.synapticweb.callrecorder.setup.SetupActivity;
 
@@ -123,18 +125,30 @@ public class ContactsListActivityMain extends TemplateActivity {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
-                    case R.id.settings:
-                        Intent intent = new Intent(ContactsListActivityMain.this, SettingsActivity.class);
-                        startActivity(intent);
+                    case R.id.settings: startActivity(new Intent(ContactsListActivityMain.this, SettingsActivity.class));
                         break;
-//                    case R.id.make_system:
-//                        toggleSystem();
-//                        break;
+                    case R.id.help: startActivity(new Intent(ContactsListActivityMain.this, HelpActivity.class));
+                        break;
+                    case R.id.about:
+                        showAboutDialog();
+                        break;
                 }
                 drawer.closeDrawers();
                 return true;
             }
         });
+    }
+
+    private void showAboutDialog() {
+        MaterialDialog dialog = new MaterialDialog.Builder(this)
+                .customView(R.layout.about_dialog, false)
+                .positiveText(android.R.string.ok).build();
+
+        TextView aboutAppName = (TextView) dialog.findViewById(R.id.about_appname);
+        aboutAppName.setText(String.format(getResources().getString(R.string.about_appname_version),
+                getResources().getString(R.string.app_name),
+                BuildConfig.VERSION_NAME));
+        dialog.show();
     }
 
     @Override
@@ -169,6 +183,8 @@ public class ContactsListActivityMain extends TemplateActivity {
                 == PackageManager.PERMISSION_GRANTED;
         boolean phoneState = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
                 == PackageManager.PERMISSION_GRANTED;
+        boolean callLog = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALL_LOG)
+                == PackageManager.PERMISSION_GRANTED;
         boolean recordAudio = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
                 == PackageManager.PERMISSION_GRANTED;
         boolean readContacts = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS)
@@ -178,7 +194,7 @@ public class ContactsListActivityMain extends TemplateActivity {
         boolean writeStorage = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 == PackageManager.PERMISSION_GRANTED;
 
-        return outgoingCalls && phoneState && recordAudio && readContacts && readStorage && writeStorage;
+        return outgoingCalls && phoneState && callLog && recordAudio && readContacts && readStorage && writeStorage;
     }
 
 }

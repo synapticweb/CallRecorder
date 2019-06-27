@@ -8,7 +8,7 @@ android {
         minSdkVersion 19
         targetSdkVersion 28
         versionCode 1
-        versionName "1.0"
+        versionName "0.9 beta"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -28,12 +28,12 @@ dependencies {
     androidTestImplementation('androidx.test.espresso:espresso-core:3.1.1-beta01', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    implementation 'androidx.appcompat:appcompat:1.1.0-alpha05'
+    implementation 'androidx.appcompat:appcompat:1.1.0-beta01'
 //    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
-    implementation 'androidx.media:media:1.1.0-beta01'
+    implementation 'androidx.media:media:1.1.0-beta02'
     testImplementation 'junit:junit:4.12'
-    implementation 'com.google.android.material:material:1.1.0-alpha06'
-    implementation 'androidx.recyclerview:recyclerview:1.1.0-alpha05'
+    implementation 'com.google.android.material:material:1.1.0-alpha07'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0-alpha06'
     implementation 'de.hdodenhof:circleimageview:2.2.0'
     implementation 'com.theartofdev.edmodo:android-image-cropper:2.8.0'
     implementation 'com.github.codekidX:storage-chooser:2.0.4.4'
@@ -41,5 +41,5 @@ dependencies {
     implementation 'com.googlecode.libphonenumber:libphonenumber:8.9.10'
 //    implementation 'androidx.cardview:cardview:1.0.0'
 //    implementation 'com.github.topjohnwu:libsu:2.0.2'
-    implementation 'androidx.preference:preference:1.1.0-alpha05'
+    implementation 'androidx.preference:preference:1.1.0-beta01'
 }

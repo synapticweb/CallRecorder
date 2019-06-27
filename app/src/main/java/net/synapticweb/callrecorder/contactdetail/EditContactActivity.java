@@ -30,7 +30,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -43,8 +42,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
-import net.synapticweb.callrecorder.AppLibrary;
-import net.synapticweb.callrecorder.PhoneTypeContainer;
+import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.TemplateActivity;
 import net.synapticweb.callrecorder.data.Contact;
@@ -229,17 +227,17 @@ public class EditContactActivity extends TemplateActivity implements AdapterView
         //Pentru aceeași chestie cu baze de date: https://stackoverflow.com/questions/13413030/using-simplecursoradapter-with-spinner
         phoneType = findViewById(R.id.edit_types);
         phoneType.setOnItemSelectedListener(this);
-        ArrayAdapter<PhoneTypeContainer> adapter =
-                new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, AppLibrary.PHONE_TYPES);
+        ArrayAdapter<CrApp.PhoneTypeContainer> adapter =
+                new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, CrApp.PHONE_TYPES);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         phoneType.setAdapter(adapter);
 
         int position;
-        for(position = 0; position < AppLibrary.PHONE_TYPES.size(); ++position)
-            if(AppLibrary.PHONE_TYPES.get(position).getTypeCode() == contact.getPhoneTypeCode())
+        for(position = 0; position < CrApp.PHONE_TYPES.size(); ++position)
+            if(CrApp.PHONE_TYPES.get(position).getTypeCode() == contact.getPhoneTypeCode())
                 break;
         //https://stackoverflow.com/questions/11072576/set-selected-item-of-spinner-programmatically
-        phoneType.setSelection(adapter.getPosition(AppLibrary.PHONE_TYPES.get(position)));
+        phoneType.setSelection(adapter.getPosition(CrApp.PHONE_TYPES.get(position)));
     }
 
     @Override

@@ -17,6 +17,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
+
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.contactslist.ContactsListActivityMain;
 
@@ -63,7 +66,26 @@ public class SetupPowerFragment extends Fragment{
         finish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                parentActivity.finish();
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    PowerManager pm = (PowerManager) parentActivity.getSystemService(Context.POWER_SERVICE);
+                    if (pm != null && !pm.isIgnoringBatteryOptimizations(parentActivity.getPackageName()))
+                        new MaterialDialog.Builder(parentActivity)
+                                .title(R.string.warning_title)
+                                .content(R.string.optimization_still_active)
+                                .positiveText(android.R.string.ok)
+                                .icon(getResources().getDrawable(R.drawable.warning))
+                                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                    @Override
+                                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                        parentActivity.finish();
+                                    }
+                                })
+                                .show();
+                    else
+                        parentActivity.finish();
+                }
+                else
+                    parentActivity.finish();
             }
         });
     }

@@ -35,12 +35,12 @@ public abstract class TemplateActivity extends AppCompatActivity {
         final SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
         if(settings.getString(SettingsFragment.APP_THEME, LIGHT_THEME).equals(LIGHT_THEME)) {
             settedTheme = LIGHT_THEME;
-            setTheme((this.getClass().getSimpleName().equals("PlayerActivity")) ? R.style.PlayerStyleLight
+            setTheme((this.getClass().getSimpleName().equals("PlayerActivityMP")) ? R.style.PlayerStyleLight
                     : R.style.AppThemeLight);
         }
         else {
             settedTheme = DARK_THEME;
-            setTheme((this.getClass().getSimpleName().equals("PlayerActivity")) ? R.style.PlayerStyleDark
+            setTheme((this.getClass().getSimpleName().equals("PlayerActivityMP")) ? R.style.PlayerStyleDark
                     : R.style.AppThemeDark);
         }
     }

@@ -13,8 +13,6 @@ import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.os.Build;
 import android.os.IBinder;
@@ -28,7 +26,7 @@ import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 
 import java.io.IOException;
-import net.synapticweb.callrecorder.AppLibrary;
+
 import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.contactslist.ContactsListActivityMain;
@@ -37,8 +35,6 @@ import net.synapticweb.callrecorder.data.ContactsContract.*;
 import net.synapticweb.callrecorder.data.RecordingsContract.*;
 import net.synapticweb.callrecorder.data.CallRecorderDbHelper;
 import net.synapticweb.callrecorder.settings.SettingsFragment;
-
-import static net.synapticweb.callrecorder.AppLibrary.*;
 
 
 public class RecorderService extends Service {
@@ -194,7 +190,7 @@ public class RecorderService extends Service {
             }
             else { //în caz de ussd serviciul se oprește
                 PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
-                String countryCode = AppLibrary.getUserCountry(CrApp.getInstance());
+                String countryCode = CrApp.getUserCountry(CrApp.getInstance());
                 if(countryCode == null)
                     countryCode = "US";
                 try {
@@ -314,7 +310,7 @@ public class RecorderService extends Service {
 
         if(privateCall) {
             Cursor cursor = db.query(Contacts.TABLE_NAME, new String[]{Contacts._ID},
-                    Contacts.COLUMN_NAME_PRIVATE_NUMBER + "=" + SQLITE_TRUE, null, null, null, null);
+                    Contacts.COLUMN_NAME_PRIVATE_NUMBER + "=" + CrApp.SQLITE_TRUE, null, null, null, null);
 
             if(cursor.getCount() == 0) { //încă nu a fost înregistrat un apel de pe număr ascuns
                 Contact contact =  new Contact();
@@ -350,7 +346,7 @@ public class RecorderService extends Service {
                 idToInsert = contact.getId();
             }
             else { //numărul nu există nici contactele telefonului. Deci este unknown.
-                contact =  new Contact(null, receivedNumPhone, getResources().getString(R.string.unkown_contact), null, AppLibrary.UNKNOWN_TYPE_PHONE_CODE);
+                contact =  new Contact(null, receivedNumPhone, getResources().getString(R.string.unkown_contact), null, CrApp.UNKNOWN_TYPE_PHONE_CODE);
                 try {
                     contact.insertInDatabase(this); //introducerea în db setează id-ul în obiect
                 }
@@ -363,7 +359,7 @@ public class RecorderService extends Service {
 
         ContentValues values = new ContentValues();
         values.put(Recordings.COLUMN_NAME_PHONE_NUM_ID, idToInsert);
-        values.put(Recordings.COLUMN_NAME_INCOMING, incoming ? SQLITE_TRUE : SQLITE_FALSE);
+        values.put(Recordings.COLUMN_NAME_INCOMING, incoming ? CrApp.SQLITE_TRUE : CrApp.SQLITE_FALSE);
         values.put(Recordings.COLUMN_NAME_PATH, recorder.getAudioFilePath());
         values.put(Recordings.COLUMN_NAME_START_TIMESTAMP, recorder.getStartingTime());
         values.put(Recordings.COLUMN_NAME_END_TIMESTAMP, System.currentTimeMillis());

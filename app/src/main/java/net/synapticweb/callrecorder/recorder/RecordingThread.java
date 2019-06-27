@@ -77,7 +77,7 @@ abstract class RecordingThread {
                         channels == 1 ? AudioFormat.CHANNEL_IN_MONO : AudioFormat.CHANNEL_IN_STEREO,
                         AudioFormat.ENCODING_PCM_16BIT, bufferSize * 10);
                 if (audioRecord.getState() != AudioRecord.STATE_INITIALIZED)
-                    throw new Exception("VOICE_RECOGNITION source unavailable");
+                    throw new Exception("Voice recognition source unavailable");
             } catch (Exception e2) {
                 Log.wtf(TAG, e2.getMessage());
                 try {

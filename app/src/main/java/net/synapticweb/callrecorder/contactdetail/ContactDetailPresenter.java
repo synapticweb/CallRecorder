@@ -15,7 +15,6 @@ import android.widget.TextView;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 
-import net.synapticweb.callrecorder.AppLibrary;
 import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.contactslist.ContactsListFragment;
@@ -62,10 +61,10 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
                 .customView(R.layout.info_storage_dialog, false)
                 .positiveText(android.R.string.ok).build();
         TextView privateStorage = dialog.getView().findViewById(R.id.info_storage_private_data);
-        privateStorage.setText(AppLibrary.getFileSizeHuman(sizePrivate));
+        privateStorage.setText(CrApp.getFileSizeHuman(sizePrivate));
 
         TextView publicStorage = dialog.getView().findViewById(R.id.info_storage_public_data);
-        publicStorage.setText(AppLibrary.getFileSizeHuman(sizePublic));
+        publicStorage.setText(CrApp.getFileSizeHuman(sizePublic));
 
         dialog.show();
     }
@@ -143,7 +142,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
 
             new MaterialDialog.Builder(view.getParentActivity())
                     .title(R.string.recordings_info_title)
-                    .content(String.format(CrApp.getInstance().getResources().getString(R.string.recordings_info_text), AppLibrary.getFileSizeHuman(totalSize)))
+                    .content(String.format(CrApp.getInstance().getResources().getString(R.string.recordings_info_text), CrApp.getFileSizeHuman(totalSize)))
                     .positiveText(android.R.string.ok)
                     .show();
             return ;
@@ -163,12 +162,12 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
         TextView date = dialog.getView().findViewById(R.id.info_date_data);
         date.setText(String.format("%s %s", recording.getDate(false), recording.getTime()));
         TextView size = dialog.getView().findViewById(R.id.info_size_data);
-        size.setText(AppLibrary.getFileSizeHuman(recording.getSize()));
+        size.setText(CrApp.getFileSizeHuman(recording.getSize()));
 
         TextView format = dialog.getView().findViewById(R.id.info_format_data);
         format.setText(recording.getHumanReadingFormat());
         TextView length = dialog.getView().findViewById(R.id.info_length_data);
-        length.setText(AppLibrary.getDurationHuman(recording.getLength(), true));
+        length.setText(CrApp.getDurationHuman(recording.getLength(), true));
         TextView path = dialog.getView().findViewById(R.id.info_path_data);
         path.setText(recording.isSavedInPrivateSpace() ? CrApp.getInstance().getResources().
                 getString(R.string.private_storage) : recording.getPath());

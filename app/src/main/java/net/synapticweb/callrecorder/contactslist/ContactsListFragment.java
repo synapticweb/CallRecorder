@@ -16,7 +16,7 @@ import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import net.synapticweb.callrecorder.AppLibrary;
+import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.TemplateActivity;
 import net.synapticweb.callrecorder.contactdetail.ContactDetailActivity;
 import net.synapticweb.callrecorder.data.Contact;
@@ -232,9 +232,9 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
                 if(contactsColors.containsKey(contact.getId()))
                     color = contactsColors.get(contact.getId());
                 else {
-                    if(colorPointer == AppLibrary.colorList.size() - 1)
+                    if(colorPointer == CrApp.colorList.size() - 1)
                         colorPointer = 0;
-                    color = AppLibrary.colorList.get(colorPointer++);
+                    color = CrApp.colorList.get(colorPointer++);
                     contactsColors.put(contact.getId(), color);
                 }
                 contact.setColor(color);

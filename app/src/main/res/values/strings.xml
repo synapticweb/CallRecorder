@@ -2,6 +2,7 @@
     <string name="app_name">Synaptic Call Recorder</string>
     <string name="unkown_contact">UNKNOWN CONTACT</string>
     <string name="private_number_name">Private number</string>
+    <!-- Fără CDATA tagurile HTML sunt șterse-->
     <string name="detail_phonetype"><![CDATA[<b>Phone type: </b>]]>%s</string>
     <string name="detail_phonenumber"><![CDATA[<b>Phone number: </b>]]>%s</string>
     <string name="delete_phone_number">Delete</string>
@@ -100,7 +101,7 @@
     <string name="prefs_gain_title">Apply volume gain when recording</string>
     <string name="no_gain">Apply no gain</string>
     <string name="help">Help</string>
-    <string name="legal">In some countries the recording of phone calls is forbiden by law.\nBy clicking the button labeled \"Next\" you confirm that the laws that govern the country where you currently reside allow for the recording of phone calls.\nIf call recording is forbiden or you are unsure, click \"Cancel\" to terminate the application.</string>
+    <string name="legal">In some countries the recording of phone calls is forbidden by law.\nBy clicking the button labeled \"Next\" you confirm that the laws that govern the country where you currently reside allow for the recording of phone calls.\nIf call recording is forbiden or you are unsure, click \"Cancel\" to terminate the application.</string>
     <string name="legal_title">Legal notice</string>
     <string name="perms_title">Setup the permissions</string>
     <string name="permissions">Synaptic Call Recorder needs a couple of permissions:\n
@@ -119,4 +120,26 @@
     <string name="setup_power_title">Setup power management</string>
     <string name="doze_info">Synaptic Call Recorder cannot function properly if Android power management optimization is in effect. For proper functioning you will have to manually turn off the power optimization for this application.</string>
     <string name="other_power_optimizations">Some custom versions of Android operating system have power management methods implemented by their vendors, like \"Protected apps\" on Huawei phones. Proper functioning of Synaptic Call Recorder requires that any power optimization that affects this application be turned off.\nPlease consult your operating system documentation to find if there are such power optimizations.</string>
+    <string name="cancel">Cancel</string>
+    <string name="next">Next</string>
+    <string name="turn_off_opt">Turn off optimization</string>
+    <string name="finish">Finish</string>
+    <string name="optimization_still_active">If you don\'t turn off the Android power optimization for this app it won\'t be able to function properly. You can turn off the power optimization at the next run.</string>
+    <string name="about_devname">Developer: Eugen Rădulescu</string>
+    <string name="about_appname_version">%s version %s</string>
+    <string name="about_email"><a href="mailto:radulescu.e@gmail.com">radulescu.e@gmail.com</a></string>
+    <string name="help_overview"><![CDATA[<h2>title2</h2><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec non mi dapibus, laoreet felis vel, pellentesque ipsum. Sed congue congue tincidunt. Integer scelerisque purus ac vestibulum ultrices. Curabitur leo erat, aliquet ultrices nibh at, pharetra ornare libero. Vestibulum consequat metus a enim tempor, eu finibus nibh sagittis.</p><h2>Duis eget tellus</h2><p>Duis eget tellus sit amet magna pretium tempus. Donec nec posuere orci. Fusce in luctus justo. Ut sit amet cursus turpis, vel vulputate dolor. Vivamus at nunc massa. Donec a maximus leo. Vestibulum imperdiet nunc at aliquet interdum.</p>]]></string>
+    <string name="help_recording_calls"><![CDATA[<h2>title2</h2><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec non mi dapibus, laoreet felis vel, pellentesque ipsum. Sed congue congue tincidunt. Integer scelerisque purus ac vestibulum ultrices. Curabitur leo erat, aliquet ultrices nibh at, pharetra ornare libero. Vestibulum consequat metus a enim tempor, eu finibus nibh sagittis.</p><h2>Duis eget tellus</h2><p>Duis eget tellus sit amet magna pretium tempus. Donec nec posuere orci. Fusce in luctus justo. Ut sit amet cursus turpis, vel vulputate dolor. Vivamus at nunc massa. Donec a maximus leo. Vestibulum imperdiet nunc at aliquet interdum.</p>]]></string>
+    <string name="help_play_recordings"><![CDATA[<h2>title3</h2><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec non mi dapibus, laoreet felis vel, pellentesque ipsum. Sed congue congue tincidunt. Integer scelerisque purus ac vestibulum ultrices. Curabitur leo erat, aliquet ultrices nibh at, pharetra ornare libero. Vestibulum consequat metus a enim tempor, eu finibus nibh sagittis.</p><h2>Duis eget tellus</h2><p>Duis eget tellus sit amet magna pretium tempus. Donec nec posuere orci. Fusce in luctus justo. Ut sit amet cursus turpis, vel vulputate dolor. Vivamus at nunc massa. Donec a maximus leo. Vestibulum imperdiet nunc at aliquet interdum.</p>]]></string>
+    <string name="help_manage_recordings"><![CDATA[<h2>title4</h2><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec non mi dapibus, laoreet felis vel, pellentesque ipsum. Sed congue congue tincidunt. Integer scelerisque purus ac vestibulum ultrices. Curabitur leo erat, aliquet ultrices nibh at, pharetra ornare libero. Vestibulum consequat metus a enim tempor, eu finibus nibh sagittis.</p><h2>Duis eget tellus</h2><p>Duis eget tellus sit amet magna pretium tempus. Donec nec posuere orci. Fusce in luctus justo. Ut sit amet cursus turpis, vel vulputate dolor. Vivamus at nunc massa. Donec a maximus leo. Vestibulum imperdiet nunc at aliquet interdum.</p>]]></string>
+    <string name="help_licences"><![CDATA[<h2>title5</h2><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec non mi dapibus, laoreet felis vel, pellentesque ipsum. Sed congue congue tincidunt. Integer scelerisque purus ac vestibulum ultrices. Curabitur leo erat, aliquet ultrices nibh at, pharetra ornare libero. Vestibulum consequat metus a enim tempor, eu finibus nibh sagittis.</p><h2>Duis eget tellus</h2><p>Duis eget tellus sit amet magna pretium tempus. Donec nec posuere orci. Fusce in luctus justo. Ut sit amet cursus turpis, vel vulputate dolor. Vivamus at nunc massa. Donec a maximus leo. Vestibulum imperdiet nunc at aliquet interdum.</p>]]></string>
+    <string name="help_title1">Overview</string>
+    <string name="help_title2">Recording calls</string>
+    <string name="help_title3">Playing recordings</string>
+    <string name="help_title4">Managing recordings</string>
+    <string name="help_title5">Licenses</string>
+    <string name="app_description">A call recording application built for simplicity and speed.</string>
+    <string name="player_error">The audio player could not be initialized. Please restart the application.</string>
 </resources>
+
+

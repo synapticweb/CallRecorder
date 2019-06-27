@@ -7,6 +7,7 @@
 
     <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS"/>
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.READ_CALL_LOG" />
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
@@ -49,15 +50,18 @@
         <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat"/>
 
-        <activity android:name=".player.PlayerActivity"
-            android:parentActivityName=".contactdetail.ContactDetailActivity"
-            android:configChanges="orientation|screenSize"
-            android:theme="@style/PlayerStyleLight"
-           /> <!--Fără screenSize continuă să se restarteze. -->
+        <!--Fără screenSize continuă să se restarteze. -->
 
         <activity android:name=".setup.SetupActivity"
             android:parentActivityName=".contactslist.ContactsListActivityMain">
         </activity>
+
+        <activity android:name=".HelpActivity"
+            android:parentActivityName=".contactslist.ContactsListActivityMain"/>
+
+        <activity android:name=".player.PlayerActivity"
+            android:parentActivityName=".contactdetail.ContactDetailActivity"
+            android:configChanges="orientation|screenSize"/>
 
         <provider
             android:name="androidx.core.content.FileProvider"

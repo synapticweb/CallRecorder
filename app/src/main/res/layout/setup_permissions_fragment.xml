@@ -33,7 +33,7 @@
 
         <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:orientation="vertical"
             >
@@ -92,7 +92,7 @@
             android:id="@+id/setup_perms_next"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
-            android:text="Next"
+            android:text="@string/next"
             style="@style/setupButtons"
             android:layout_marginTop="20dp"/>
 

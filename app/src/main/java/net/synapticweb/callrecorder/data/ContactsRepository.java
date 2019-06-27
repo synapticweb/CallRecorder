@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static net.synapticweb.callrecorder.AppLibrary.SQLITE_TRUE;
+import static net.synapticweb.callrecorder.CrApp.SQLITE_TRUE;
 
 public class ContactsRepository {
     public interface LoadContactsCallback {
