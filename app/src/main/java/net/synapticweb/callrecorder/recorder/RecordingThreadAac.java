@@ -110,7 +110,6 @@ class RecordingThreadAac extends RecordingThread implements Runnable {
             }
         }
 
-        addGain(audioRecordData);
         int codecInputBufferIndex = mediaCodec.dequeueInputBuffer(10 * 1000);
 
         if (codecInputBufferIndex >= 0) {

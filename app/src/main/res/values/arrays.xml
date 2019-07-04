@@ -64,24 +64,4 @@
         <item>mono</item>
         <item>stereo</item>
     </string-array>
-
-    <string-array name="gain_names">
-        <item>50db</item>
-        <item>40db</item>
-        <item>30db</item>
-        <item>20db</item>
-        <item>10db</item>
-        <item>@string/no_gain</item>
-    </string-array>
-
-    <string-array name="gain_values">
-        <item>50</item>
-        <item>40</item>
-        <item>30</item>
-        <item>20</item>
-        <item>10</item>
-        <item>0</item>
-    </string-array>
-
-
 </resources>

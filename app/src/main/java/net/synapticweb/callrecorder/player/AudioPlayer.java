@@ -9,6 +9,9 @@ import android.media.MediaFormat;
 import android.media.MediaMetadataRetriever;
 import android.os.Build;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
+
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
@@ -40,12 +43,48 @@ public class AudioPlayer extends Thread implements PlayerAdapter {
     private RandomAccessFile inputWav; //folosesc RandomAccessFile deoarece, spre deosebire de InputStream,
     //permite operațiuni seek
     private long wavBufferCount = 0;
-    private static final int WAV_BUFFER_SIZE = 4096;
+    private static final int WAV_BUFFER_SIZE = 8092;
     private int maxWavBuffers;
+    private float gainDb = 0;
 
     AudioPlayer(PlaybackInfoListener listener) {
         this.playbackInfoListener = listener;
         state = PlayerAdapter.State.UNINITIALIZED;
+    }
+
+    @Override
+    public void setGain(float gain) {
+        gainDb = gain;
+    }
+
+    //https://stackoverflow.com/questions/26088427/increase-volume-output-of-recorded-audio
+    //Alte topicuri relevante:
+    //https://stackoverflow.com/questions/14485873/audio-change-volume-of-samples-in-byte-array
+    //https://stackoverflow.com/questions/4300995/modify-volume-gain-on-audio-sample-buffer
+    //https://github.com/JorenSix/TarsosDSP
+    //https://stackoverflow.com/questions/10578865/android-audiorecord-apply-gain-with-variation
+    //https://stackoverflow.com/questions/25441166/how-to-adjust-microphone-sensitivity-while-recording-audio-in-android
+    //https://stackoverflow.com/questions/26317772/increase-volume-of-recording-android-audiorecord
+    private void addGain(@NonNull byte[] audioData) {
+        double gainFactor = Math.pow(10, gainDb / 20);
+        for (int i = 0; i < audioData.length; i += 2) {
+            float sample = (float) (audioData[i] & 0xff | audioData[i + 1] << 8);
+            sample *= gainFactor;
+
+            if (sample >= 32767f) {
+                audioData[i] = (byte) 0xff;
+                audioData[i + 1] = 0x7f;
+            }
+            else if ( sample <= -32768f ) {
+                audioData[i] = 0x0;
+                audioData[i + 1] = (byte) 0x80;
+            }
+            else {
+                int s = (int) (0.5f + sample);
+                audioData[i] = (byte)(s & 0xFF);
+                audioData[i + 1] = (byte)(s >> 8 & 0xFF);
+            }
+        }
     }
 
     @Override
@@ -182,7 +221,8 @@ public class AudioPlayer extends Thread implements PlayerAdapter {
         extractor = new MediaExtractor();
         try {
             extractor.setDataSource(mediaPath);
-            format = extractor.getTrackFormat(0);
+            format = extractor.getTrackFormat(0); //TODO Există situații cînd mărimea fișierului e 0 și acest
+            // apel produce InvalidArgumentException
             decoder = MediaCodec.createDecoderByType(format.getString(MediaFormat.KEY_MIME));
             decoder.configure(format, null /* surface */, null /* crypto */, 0 /* flags */);
             channelCount = format.getInteger(MediaFormat.KEY_CHANNEL_COUNT);
@@ -196,9 +236,15 @@ public class AudioPlayer extends Thread implements PlayerAdapter {
 
     //poate fi apelat oricînd
     @Override
-    public void release() {
+    public void stopPlayer() {
+        state = PlayerAdapter.State.STOPPED;
         putStop();
         resumeIfPaused();
+    }
+
+    @Override
+    public void setPlayerState(int state) {
+        this.state = state;
     }
 
     @Override
@@ -218,7 +264,7 @@ public class AudioPlayer extends Thread implements PlayerAdapter {
     //poate fi apelat oricînd. Produce un nou player cu state = UNINITIALIZED.
     @Override
     public void reset() {
-        release();
+        stopPlayer();
         playbackInfoListener.onReset();
     }
 
@@ -233,12 +279,10 @@ public class AudioPlayer extends Thread implements PlayerAdapter {
         state = PlayerAdapter.State.PAUSED;
     }
 
-    //poate fi apelat oricînd
+
     @Override
-    public boolean isPlaying() {
-            if(isAlive())
-                return !isPaused();
-            return false;
+    public int getPlayerState() {
+        return state;
     }
 
     @Override
@@ -259,7 +303,7 @@ public class AudioPlayer extends Thread implements PlayerAdapter {
             seekbarPositionUpdateTask = new Runnable() {
                 @Override
                 public void run() {
-                    if(isPlaying()) {
+                    if(state == PlayerAdapter.State.PLAYING) {
                         int currentPosition = getCurrentPosition();
                         if(playbackInfoListener != null)
                             playbackInfoListener.onPositionChanged(currentPosition);
@@ -281,9 +325,6 @@ public class AudioPlayer extends Thread implements PlayerAdapter {
         }
     }
 
-    private boolean isPaused() { return paused;}
-
-
     private synchronized void resumeIfPaused() {
         //https://docs.oracle.com/javase/8/docs%2Ftechnotes%2Fguides%2Fconcurrency%2FthreadPrimitiveDeprecation.html
         if(paused){
@@ -301,7 +342,9 @@ public class AudioPlayer extends Thread implements PlayerAdapter {
     //https://dpsm.wordpress.com/2012/07/28/android-mediacodec-decoded/
     //https://sohailaziz05.blogspot.com/2014/06/mediacodec-decoding-aac-android.html -- de aici am adaptat
     //https://stackoverflow.com/questions/28701102/how-to-stream-data-from-mediacodec-to-audiotrack-with-xamarin-for-android -- asta nu prea se potrivește :(
-    //TODO: error handling see docs
+    //TODO: error handling see docs. La momentul actual erorile de inițializare produc InitializationErrorException
+    // care este prinsă în loadMedia() și este afișat un mesaj de eroare iar butoanele sunt dezactivate. În timpul
+    // playbackului pot să apară CodecExceptions care sunt unchecked - produc oprirea aplicației. Poate ar trebui gestionate?
     private void playAac() {
         ByteBuffer[] decoderInputBuffers = decoder.getInputBuffers();
         ByteBuffer[] decoderOutputBuffers = decoder.getOutputBuffers();
@@ -365,8 +408,11 @@ public class AudioPlayer extends Thread implements PlayerAdapter {
                 outputBuffer.get(audioData);
                 outputBuffer.clear();
 
-                if (audioData.length > 0)
+                if (audioData.length > 0) {
+                    if(gainDb > 0)
+                        addGain(audioData);
                     audioTrack.write(audioData, 0, audioData.length); //play
+                }
 
                 decoder.releaseOutputBuffer(outputBufId, false);
                 if ((bufInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0)
@@ -375,6 +421,9 @@ public class AudioPlayer extends Thread implements PlayerAdapter {
             else if(outputBufId == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED)
                 decoderOutputBuffers = decoder.getOutputBuffers();
         }
+
+        if(sawOutputEOS)
+            playbackInfoListener.onPlaybackCompleted();
 
         decoder.stop();
         decoder.release();
@@ -405,8 +454,14 @@ public class AudioPlayer extends Thread implements PlayerAdapter {
                 throw new RuntimeException("Error reading from the wav file");
             }
             ++wavBufferCount;
+
+            if(gainDb > 0)
+                addGain(audioBuffer);
             audioTrack.write(audioBuffer, 0, bytesRead);
         }
+
+        if(wavBufferCount >= maxWavBuffers)
+            playbackInfoListener.onPlaybackCompleted();
 
         audioTrack.stop();
         audioTrack.release();
@@ -419,7 +474,6 @@ public class AudioPlayer extends Thread implements PlayerAdapter {
         else
             playWav();
         stopUpdatingPosition(true);
-        playbackInfoListener.onPlaybackCompleted();
     }
 
     class InvalidStateException extends RuntimeException {

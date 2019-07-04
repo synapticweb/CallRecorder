@@ -47,12 +47,6 @@
         android:entryValues="@array/mode_values"
         android:defaultValue="mono" />
 
-    <ListPreference
-        android:title="@string/prefs_gain_title"
-        android:key="gain"
-        android:entries="@array/gain_names"
-        android:entryValues="@array/gain_values"
-        android:defaultValue="0"/>
 
     <ListPreference
         android:title="@string/prefs_theme_title"

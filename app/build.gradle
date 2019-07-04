@@ -30,7 +30,7 @@ dependencies {
     })
     implementation 'androidx.appcompat:appcompat:1.1.0-beta01'
 //    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
-    implementation 'androidx.media:media:1.1.0-beta02'
+    implementation 'androidx.media:media:1.1.0-rc01'
     testImplementation 'junit:junit:4.12'
     implementation 'com.google.android.material:material:1.1.0-alpha07'
     implementation 'androidx.recyclerview:recyclerview:1.1.0-alpha06'
@@ -42,4 +42,6 @@ dependencies {
 //    implementation 'androidx.cardview:cardview:1.0.0'
 //    implementation 'com.github.topjohnwu:libsu:2.0.2'
     implementation 'androidx.preference:preference:1.1.0-beta01'
+    implementation 'com.chibde:audiovisualizer:2.1.0'
+    implementation 'com.sdsmdg.harjot:croller:1.0.7'
 }

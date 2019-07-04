@@ -49,7 +49,7 @@ class RecordingThreadWav extends RecordingThread implements Runnable {
                         continue;
                     }
                 }
-                addGain(data);
+
                 try {
                     outputStream.write(data);
                 } catch (IOException e) {

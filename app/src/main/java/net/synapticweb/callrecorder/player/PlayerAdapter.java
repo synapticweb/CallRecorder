@@ -14,13 +14,16 @@ interface PlayerAdapter {
         int INITIALIZED = 1;
         int PLAYING = 2;
         int PAUSED = 3;
+        int STOPPED = 4;
     }
+
+    void setGain(float gain);
 
     void setMediaPosition(int position);
 
     void loadMedia(String mediaPath);
 
-    void release();
+    void stopPlayer();
 
     void play();
 
@@ -28,7 +31,9 @@ interface PlayerAdapter {
 
     void pause();
 
-    boolean isPlaying();
+    int getPlayerState();
+
+    void setPlayerState(int state);
 
     void seekTo(int position);
 
