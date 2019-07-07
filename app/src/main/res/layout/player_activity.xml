@@ -5,7 +5,18 @@ ascunse pe jumătate în susul ecranului.
 -->
 <RelativeLayout android:layout_height="match_parent"
     android:layout_width="match_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.appcompat.widget.Toolbar
+        android:layout_height="?attr/actionBarSize"
+        android:layout_width="match_parent"
+        android:background="?attr/colorPrimary"
+        android:id="@+id/toolbar_player"
+        android:elevation="2dp"
+        android:theme="@style/toolbar_theme"
+        app:titleTextAppearance="@style/toolbar_font"
+        />
 
 <ScrollView
     android:layout_height="wrap_content"
@@ -15,12 +26,28 @@ ascunse pe jumătate în susul ecranului.
     android:paddingBottom="30dp"
     >
 
-    <LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+    <LinearLayout
         android:id="@+id/player_root"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:layout_marginTop="?attr/actionBarSize"
         >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:id="@+id/recording_info"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="40dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_gravity="center_vertical|center_horizontal"
+            android:textSize="15sp"
+            android:lineSpacingMultiplier="1.2"
+            android:textColor="#828282"
+            />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -31,36 +58,7 @@ ascunse pe jumătate în susul ecranului.
             android:layout_marginBottom="50dp"
             android:orientation="horizontal">
 
-            <com.sdsmdg.harjot.crollerTest.Croller
-                android:id="@+id/volume_control"
-                style="?attr/playerControlStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="150dp"
-                android:layout_marginEnd="15dp"
-                app:back_circle_radius="80"
-                app:indicator_color="@color/colorAccent"
-                app:indicator_width="10"
-                app:is_continuous="true"
-                app:label="Volume"
-                app:main_circle_radius="60"
-                app:min="0"
-                app:progress_primary_color="@color/colorAccent" />
-
-            <com.sdsmdg.harjot.crollerTest.Croller
-                android:id="@+id/gain_control"
-                style="?attr/playerControlStyle"
-                android:layout_width="150dp"
-                android:layout_height="150dp"
-                android:layout_marginStart="15dp"
-                app:back_circle_radius="120"
-                app:indicator_color="@color/colorAccent"
-                app:indicator_width="10"
-                app:is_continuous="true"
-                app:main_circle_radius="100"
-                app:max="50"
-                app:min="0"
-                app:progress_primary_color="@color/colorAccent"
-                app:label="Gain"/>
+            <include layout="@layout/croller_controls" />
 
         </LinearLayout>
 
@@ -102,6 +100,8 @@ ascunse pe jumătate în susul ecranului.
             android:orientation="horizontal"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
+            android:layout_marginBottom="40dp"
+            android:gravity="center_vertical"
             android:weightSum="14">
 
             <TextView
@@ -109,7 +109,6 @@ ascunse pe jumătate în susul ecranului.
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="7dp"
-                android:layout_marginTop="18dp"
                 android:layout_weight="2"
                 android:textAlignment="center"
                 android:textSize="13sp" />
@@ -126,7 +125,6 @@ ascunse pe jumătate în susul ecranului.
                 android:id="@+id/test_play_total_time"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="18dp"
                 android:layout_marginEnd="7dp"
                 android:layout_weight="2"
                 android:textAlignment="center"
@@ -140,7 +138,8 @@ ascunse pe jumătate în susul ecranului.
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginStart="20dp"
-            android:layout_marginTop="30dp"
+            android:layout_marginBottom="35dp"
+            android:layout_marginTop="20dp"
             android:layout_marginEnd="20dp"
             android:padding="20dp"
             android:text="@string/player_error"

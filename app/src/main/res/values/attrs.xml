@@ -4,6 +4,7 @@
     <attr name="separatorStyle" format="reference" />
     <attr name="detailHeaderStyle" format="reference"/>
     <attr name="tabletCurrentSelectionStyle" format="reference"/>
-    <attr name="playerControlStyle" format="reference" />
+    <attr name="playerControlStyleSmall" format="reference" />
+    <attr name="playerControlStyleLarge" format="reference" />
 
 </resources>

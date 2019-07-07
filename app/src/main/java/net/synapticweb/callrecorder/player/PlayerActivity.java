@@ -7,6 +7,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageButton;
@@ -21,6 +22,8 @@ import net.synapticweb.callrecorder.data.Recording;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
 import com.chibde.visualizer.LineBarVisualizer;
@@ -51,6 +54,15 @@ public class PlayerActivity extends TemplateActivity {
         super.onCreate(savedInstanceState);
         setTheme();
         setContentView(R.layout.player_activity);
+
+        Toolbar toolbar = findViewById(R.id.toolbar_player);
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if(actionBar != null) {
+            actionBar.setDisplayShowTitleEnabled(true);
+            actionBar.setTitle(R.string.player_title);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
         recording = getIntent().getParcelableExtra(ContactDetailPresenter.RECORDING_EXTRA);
         visualizer = findViewById(R.id.visualizer);
@@ -133,6 +145,26 @@ public class PlayerActivity extends TemplateActivity {
             }
         });
 
+        TextView recordingInfo = findViewById(R.id.recording_info);
+        recordingInfo.setText(String.format(getResources().getString(R.string.recording_info),
+                recording.getName(), recording.getHumanReadingFormat()));
+
+        Log.wtf(TAG, "Available width: " + getResources().getDisplayMetrics().widthPixels);
+        Log.wtf(TAG, "Density: " + getResources().getDisplayMetrics().density);
+        Log.wtf(TAG, "Density dpi: " + getResources().getDisplayMetrics().densityDpi);
+        Log.wtf(TAG, "Density scaled: " + getResources().getDisplayMetrics().scaledDensity);
+    }
+
+    //necesar pentru că dacă apăs pur și simplu pe săgeata back îmi apelează onCreate al activității contactdetail
+    //fără un obiect Contact valid.
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
+        }
+        else
+            return super.onOptionsItemSelected(item);
     }
 
     @Override

@@ -12,7 +12,8 @@
         <item name="separatorStyle">@style/separatorLight</item>
         <item name="detailHeaderStyle">@style/detailHeader.Light</item>
         <item name="tabletCurrentSelectionStyle">@style/tabletCurrentSelectionLight</item>
-        <item name="playerControlStyle">@style/playerControlStyleLight</item>
+        <item name="playerControlStyleSmall">@style/playerControlStyleSmallLight</item>
+        <item name="playerControlStyleLarge">@style/playerControlStyleLargeLight</item>
     </style>
 
     <style name="AppThemeDark" parent="Theme.AppCompat.NoActionBar">
@@ -28,8 +29,8 @@
         <item name="tabletCurrentSelectionStyle">@style/tabletCurrentSelectionDark</item>
         <!-- Material Dialog -->
         <item name="md_positive_color">@color/white</item>
-        <item name="md_negative_color">@color/white</item>
-        <item name="playerControlStyle">@style/playerControlStyleDark</item>
+        <item name="playerControlStyleSmall">@style/playerControlStyleSmallDark</item>
+        <item name="playerControlStyleLarge">@style/playerControlStyleLargeDark</item>
     </style>
 
 
@@ -82,18 +83,59 @@ https://stackoverflow.com/questions/30487616/android-overriding-a-style-per-them
         <item name="android:lineSpacingMultiplier">1.3</item>
     </style>
 
-    <style name="playerControlStyleLight">
+    <style name="playerControlStyleParentSmall">
+        <item name="indicator_color">@color/colorAccent</item>
+        <item name="indicator_width">10</item>
+        <item name="is_continuous">true</item>
+        <item name="label_size">20</item>
+        <item name="min">0</item>
+        <!--<item name="back_circle_radius">80</item>-->
+        <!--<item name="main_circle_radius">60</item>-->
+        <item name="progress_primary_color">@color/colorAccent</item>
+        <item name="android:layout_width">120dp</item>
+        <item name="android:layout_height">120dp</item>
+        <item name="progress_primary_stroke_width">15</item>
+        <item name="progress_secondary_stroke_width">10</item>
+    </style>
+
+    <style name="playerControlStyleParentLarge">
+        <item name="indicator_color">@color/colorAccent</item>
+        <item name="indicator_width">15</item>
+        <item name="is_continuous">true</item>
+        <item name="label_size">30</item>
+        <item name="min">0</item>
+        <!--<item name="back_circle_radius">130</item>-->
+        <!--<item name="main_circle_radius">110</item>-->
+        <item name="progress_primary_color">@color/colorAccent</item>
+        <item name="android:layout_width">150dp</item>
+        <item name="android:layout_height">150dp</item>
+        <item name="progress_primary_stroke_width">25</item>
+        <item name="progress_secondary_stroke_width">15</item>
+    </style>
+
+    <style name="playerControlStyleSmallLight" parent="playerControlStyleParentSmall">
         <item name="main_circle_color">#ddd</item>
         <item name="progress_secondary_color">#000</item>
         <item name="label_color">@color/text_on_light</item>
     </style>
 
-    <style name="playerControlStyleDark">
+    <style name="playerControlStyleLargeLight" parent="playerControlStyleParentLarge">
+        <item name="main_circle_color">#ddd</item>
+        <item name="progress_secondary_color">#000</item>
+        <item name="label_color">@color/text_on_light</item>
+    </style>
+
+    <style name="playerControlStyleSmallDark" parent="playerControlStyleParentSmall">
         <item name="main_circle_color">#fff</item>
         <item name="progress_secondary_color">#ededed</item>
         <item name="label_color">@color/text_on_dark</item>
     </style>
 
+    <style name="playerControlStyleLargeDark" parent="playerControlStyleParentLarge">
+        <item name="main_circle_color">#fff</item>
+        <item name="progress_secondary_color">#ededed</item>
+        <item name="label_color">@color/text_on_dark</item>
+    </style>
 
     <!--Necesar pentru a albi săgeata back a toolbarului -->
     <style name="toolbar_theme" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
@@ -110,31 +152,6 @@ https://stackoverflow.com/questions/30487616/android-overriding-a-style-per-them
 <!-- Pentru background-ul alb: https://stackoverflow.com/questions/22320663/change-background-popupmenu-in-android -->
 <!--Ca să poată fi folosit cu android:theme, pentru a fi aplicat tuturor copiilor unui View trebuie să moștenească
  dintr-o temă: parent="Theme.AppCompat.Light"-->
-
-
-    <style name="PlayerStyleLight" parent="Theme.AppCompat.Light.Dialog.Alert">
-        <item name="android:windowFrame">@null</item>
-        <item name="android:windowIsFloating">true</item>
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:background">@android:color/transparent</item>
-        <item name="windowNoTitle">true</item>
-        <item name="colorPrimary">@color/primaryColor</item>
-        <item name="colorPrimaryDark">@color/primaryDarkColor</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:textColor">@color/textOnLight</item>
-    </style>
-
-    <style name="PlayerStyleDark" parent="Theme.AppCompat.Dialog.Alert">
-        <item name="android:windowFrame">@null</item>
-        <item name="android:windowIsFloating">true</item>
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:background">@android:color/transparent</item>
-        <item name="windowNoTitle">true</item>
-        <item name="colorPrimary">@color/primaryColor</item>
-        <item name="colorPrimaryDark">@color/primaryDarkColor</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:textColor">@color/textOnDark</item>
-    </style>
 
     <!-- Pentru butoanele din activitatea edit
     https://www.androiddesignpatterns.com/2016/08/coloring-buttons-with-themeoverlays-background-tints.html-->
