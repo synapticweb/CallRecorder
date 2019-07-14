@@ -1,81 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+<RelativeLayout android:layout_height="match_parent"
+    android:layout_width="wrap_content"
     android:paddingTop="50dp"
-    android:paddingBottom="50dp"
+    android:paddingBottom="30dp"
     android:paddingStart="50dp"
-    android:paddingEnd="50dp">
+    android:paddingEnd="50dp"
+    android:layout_gravity="center_horizontal"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="center_horizontal">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="28sp"
-            android:text="@string/setup_power_title"
-            android:id="@+id/power_title"
-            android:layout_alignParentTop="true"
-            />
-
-        <LinearLayout
+        <ScrollView
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:gravity="center_vertical"
-            android:layout_below="@id/power_title"
-            android:layout_above="@id/setup_power_finish">
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true">
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:id="@+id/doze_info"
-                android:layout_marginBottom="20dp"
+                android:orientation="vertical">
 
-                >
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="28sp"
+                    android:text="@string/setup_power_title"
+                    android:id="@+id/power_title"
+
+                    android:layout_marginBottom="30dp"
+
+                    />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="20dp"
+                    android:visibility="gone"
+                    android:id="@+id/doze_info">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/doze_info"
+                        style="@style/setupParagraphs"
+                        android:layout_marginBottom="20dp"
+                        />
+
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/turn_off_doze"
+                        android:text="@string/turn_off_opt"
+                        style="@style/setupButtons"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="10dp"/>
+
+                </LinearLayout>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/doze_info"
+                    android:text="@string/other_power_optimizations"
                     style="@style/setupParagraphs"
-                    android:layout_marginBottom="20dp"/>
+                    android:id="@+id/other_power_optimizations"
+                    />
 
                 <Button
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/turn_off_doze"
-                    android:text="@string/turn_off_opt"
+                    android:id="@+id/setup_power_finish"
+                    android:text="@string/finish"
                     style="@style/setupButtons"
-                    android:paddingStart="10dp"
-                    android:paddingEnd="10dp"/>
+                    android:layout_marginTop="30dp"
+                    android:layout_gravity="end"
+                    />
 
             </LinearLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/other_power_optimizations"
-                style="@style/setupParagraphs"
-                android:id="@+id/other_power_optimizations"
-                />
+        </ScrollView>
 
-        </LinearLayout>
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/setup_power_finish"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"
-            android:text="@string/finish"
-            style="@style/setupButtons"
-            />
     </RelativeLayout>
-
-</LinearLayout>

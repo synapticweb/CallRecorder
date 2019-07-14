@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="recording_height">70dp</dimen>
+    <dimen name="recording_height">80dp</dimen>
     <dimen name="recording_checkbox_visible_start_margin">20dp</dimen>
     <dimen name="recording_checkbox_gone_start_margin">30dp</dimen>
     <dimen name="recording_adorn_selected_margin_start">10dp</dimen>
     <dimen name="recording_adorn_unselected_margin_start">20dp</dimen>
     <dimen name="recording_title_selected_margin_start">10dp</dimen>
     <dimen name="recording_title_unselected_margin_start">20dp</dimen>
-    <dimen name="recording_adorn_side">50dp</dimen>
+    <dimen name="recording_adorn_side">60dp</dimen>
     <dimen name="recording_type_side">20dp</dimen>
     <dimen name="recording_type_margin_end">25dp</dimen>
     <dimen name="recording_nonexistent">25dp</dimen>
-    <dimen name="croller_width">120dp</dimen>
-    <dimen name="croller_height">120dp</dimen>
-    <dimen name="croller_indicator_width">10</dimen>
-    <dimen name="croller_label_size">10sp</dimen>
-    <dimen name="croller_progress_primary_stroke_width">15</dimen>
-    <dimen name="croller_progress_secondary_stroke_width">10</dimen>
-    <dimen name="edit_image_size">140dp</dimen>
-    <dimen name="contact_height">75dp</dimen>
-    <dimen name="contact_img_size">55dp</dimen>
-    <dimen name="contact_detail_img_size">100dp</dimen>
+    <dimen name="croller_width">150dp</dimen>
+    <dimen name="croller_height">150dp</dimen>
+    <dimen name="croller_indicator_width">15</dimen>
+    <dimen name="croller_label_size">13sp</dimen>
+    <dimen name="croller_progress_primary_stroke_width">25</dimen>
+    <dimen name="croller_progress_secondary_stroke_width">15</dimen>
+    <dimen name="edit_image_size">170dp</dimen>
+    <dimen name="contact_height">90dp</dimen>
+    <dimen name="contact_img_size">65dp</dimen>
+    <dimen name="contact_detail_img_size">110dp</dimen>
 </resources>

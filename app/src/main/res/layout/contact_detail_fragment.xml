@@ -14,8 +14,8 @@
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/contact_photo_detail"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="@dimen/contact_detail_img_size"
+        android:layout_height="@dimen/contact_detail_img_size"
         android:paddingTop="7dp"
         android:paddingBottom="7dp"
         android:layout_marginStart="15dp"

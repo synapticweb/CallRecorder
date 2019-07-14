@@ -1,10 +1,19 @@
 package net.synapticweb.callrecorder.recorder;
 
 
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.media.AudioFormat;
+import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.util.Log;
+
+import net.synapticweb.callrecorder.CrApp;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 abstract class RecordingThread {
     protected static final String TAG = "CallRecorder";
@@ -21,57 +30,39 @@ abstract class RecordingThread {
         audioRecord.startRecording();
     }
 
+    @SuppressLint("newApi")
     private AudioRecord createAudioRecord() {
-        AudioRecord audioRecord;
-        try {
-            audioRecord = new AudioRecord(MediaRecorder.AudioSource.VOICE_CALL, SAMPLE_RATE,
-                    channels == 1 ? AudioFormat.CHANNEL_IN_MONO : AudioFormat.CHANNEL_IN_STEREO,
-                    AudioFormat.ENCODING_PCM_16BIT, bufferSize * 10);
-            if(audioRecord.getState() != AudioRecord.STATE_INITIALIZED)
-                throw new Exception("VOICE_CALL source unavailable");
-        }
-        catch (Exception e1) {
-            Log.wtf(TAG, e1.getMessage());
+        AudioRecord audioRecord = null;
+        List<Integer> audioSources = new ArrayList<>(Arrays.asList(
+                MediaRecorder.AudioSource.VOICE_CALL,
+                MediaRecorder.AudioSource.VOICE_RECOGNITION,
+                MediaRecorder.AudioSource.VOICE_COMMUNICATION,
+                MediaRecorder.AudioSource.MIC,
+                MediaRecorder.AudioSource.DEFAULT
+                ));
+
+        AudioManager am = (AudioManager) CrApp.getInstance().getSystemService(Context.AUDIO_SERVICE);
+        if(am != null && am.getProperty("PROPERTY_SUPPORT_AUDIO_SOURCE_UNPROCESSED") != null)
+            audioSources.add(1, MediaRecorder.AudioSource.UNPROCESSED);
+
+        for(int source : audioSources) {
             try {
-                audioRecord = new AudioRecord(MediaRecorder.AudioSource.VOICE_RECOGNITION, SAMPLE_RATE,
+                audioRecord = new AudioRecord(source, SAMPLE_RATE,
                         channels == 1 ? AudioFormat.CHANNEL_IN_MONO : AudioFormat.CHANNEL_IN_STEREO,
                         AudioFormat.ENCODING_PCM_16BIT, bufferSize * 10);
-                if (audioRecord.getState() != AudioRecord.STATE_INITIALIZED)
-                    throw new Exception("Voice recognition source unavailable");
-            } catch (Exception e2) {
-                Log.wtf(TAG, e2.getMessage());
-                try {
-                    audioRecord = new AudioRecord(MediaRecorder.AudioSource.VOICE_COMMUNICATION, SAMPLE_RATE,
-                            channels == 1 ? AudioFormat.CHANNEL_IN_MONO : AudioFormat.CHANNEL_IN_STEREO,
-                            AudioFormat.ENCODING_PCM_16BIT, bufferSize * 10);
-                    if (audioRecord.getState() != AudioRecord.STATE_INITIALIZED)
-                        throw new Exception("VOICE_COMMUNICATION source unavailable");
-                } catch (Exception e3) {
-                    Log.wtf(TAG, e3.getMessage());
-                    audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, SAMPLE_RATE,
-                            channels == 1 ? AudioFormat.CHANNEL_IN_MONO : AudioFormat.CHANNEL_IN_STEREO,
-                            AudioFormat.ENCODING_PCM_16BIT, bufferSize * 10);
-                    if (audioRecord.getState() != AudioRecord.STATE_INITIALIZED)
-                        throw new RuntimeException("Unable to initialize AudioRecord");
-                }
+            } catch (Exception e) { //La VOICE_CALL dă IllegalArgumentException. Aplicația nu se oprește, rămîne
+                //hanging, nu înregistrează nimic.
+                continue;
+            }
+
+            if(audioRecord.getState() == AudioRecord.STATE_INITIALIZED) {
+                Log.wtf(TAG, "Source chosen: " + source);
+                break;
             }
         }
 
-        if (android.media.audiofx.NoiseSuppressor.isAvailable()) {
-            android.media.audiofx.NoiseSuppressor noiseSuppressor = android.media.audiofx.NoiseSuppressor
-                    .create(audioRecord.getAudioSessionId());
-            if (noiseSuppressor != null) {
-                noiseSuppressor.setEnabled(true);
-            }
-        }
-
-        if (android.media.audiofx.AutomaticGainControl.isAvailable()) {
-            android.media.audiofx.AutomaticGainControl automaticGainControl = android.media.audiofx.AutomaticGainControl
-                    .create(audioRecord.getAudioSessionId());
-            if (automaticGainControl != null) {
-                automaticGainControl.setEnabled(true);
-            }
-        }
+        if(audioRecord == null || audioRecord.getState() != AudioRecord.STATE_INITIALIZED)
+            throw new RuntimeException("Unable to initialize AudioRecord");
 
         return audioRecord;
     }

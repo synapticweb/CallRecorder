@@ -32,12 +32,13 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     public static final String SPEAKER_USE = "put_on_speaker";
     public static final String FORMAT = "format";
     public static final String MODE = "mode";
+    private TemplateActivity parentActivity;
 
     @Override
     public void onResume() {
         super.onResume();
         Preference storagePath = findPreference(STORAGE_PATH);
-        ListPreference storage = (ListPreference) findPreference(STORAGE);
+        ListPreference storage = findPreference(STORAGE);
         manageStoragePathSummary(null, storage, storagePath);
     }
 
@@ -70,6 +71,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         RecyclerView recycler = getListView();
         recycler.addItemDecoration(new DividerItemDecoration(getContext(),
                 DividerItemDecoration.VERTICAL));
+        parentActivity = (TemplateActivity) getActivity();
     }
 
     @Override
@@ -89,19 +91,20 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 Content content = new Content();
                 content.setOverviewHeading(CrApp.getInstance().getResources().getString(R.string.choose_recordings_storage));
                 StorageChooser.Theme theme = new StorageChooser.Theme(getActivity());
-                theme.setScheme(getResources().getIntArray(R.array.storage_chooser_theme));
+                theme.setScheme(parentActivity.getSettedTheme().equals(TemplateActivity.LIGHT_THEME) ?
+                        parentActivity.getResources().getIntArray(R.array.storage_chooser_theme_light) :
+                        parentActivity.getResources().getIntArray(R.array.storage_chooser_theme_dark));
 
                 StorageChooser chooser = new StorageChooser.Builder()
                         .withActivity(getActivity())
-                        .withFragmentManager(getActivity().getFragmentManager())
+                        .withFragmentManager(parentActivity.getFragmentManager())
                         .allowCustomPath(true)
                         .setType(StorageChooser.DIRECTORY_CHOOSER)
                         .withMemoryBar(true)
                         .allowAddFolder(true)
                         .showHidden(true)
                         .withContent(content)
-                        .setTheme(((SettingsActivity) getActivity()).getSettedTheme().equals(TemplateActivity.DARK_THEME) ?
-                                theme : null)
+                        .setTheme(theme)
                         .build();
 
                 chooser.show();

@@ -45,22 +45,24 @@ public class SetupPowerFragment extends Fragment{
     }
 
     @Override
-    @SuppressLint("NewApi") //oricum este apelat doar de la 6 în sus.
+    @SuppressLint("NewApi") //pentru a suprima avertismentul aferent pornirii activității de oprire a optimizării.
+    //Dar turnOffDoze primește clicklistener doar dacă android >= 6.
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         parentActivity = (SetupActivity) getActivity();
         LinearLayout dozeInfo = parentActivity.findViewById(R.id.doze_info);
-        if((parentActivity.getCheckResult() & ContactsListActivityMain.POWER_OPTIMIZED) != 0)
+        if((parentActivity.getCheckResult() & ContactsListActivityMain.POWER_OPTIMIZED) != 0) {
             dozeInfo.setVisibility(View.VISIBLE);
-        Button turnOffDoze = parentActivity.findViewById(R.id.turn_off_doze);
+            Button turnOffDoze = parentActivity.findViewById(R.id.turn_off_doze);
 
-        turnOffDoze.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
-                startActivity(intent);
-            }
-        });
+            turnOffDoze.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
+                    startActivity(intent);
+                }
+            });
+        }
 
         Button finish = parentActivity.findViewById(R.id.setup_power_finish);
         finish.setOnClickListener(new View.OnClickListener() {

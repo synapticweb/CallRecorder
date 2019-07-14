@@ -52,10 +52,10 @@
     <string name="move_destination_same">The specified destination directory is the same with the current directory of one of the selected recordings. No recordings were moved.</string>
     <string name="progress_title">Progress</string>
     <string name="progress_text">Moving recordings&#8230;</string>
-    <string name="canceled_move">The export was canceled. Some files might be corrupted or missing.</string>
+    <string name="canceled_move">The move was canceled. Some files might be corrupted or missing.</string>
     <string name="success_move_title">Success</string>
-    <string name="success_move_text">The recording(s) were successfully exported.</string>
-    <string name="error_move">An error occurred while exporting the recording(s). Some files might be corrupted or missing.</string>
+    <string name="success_move_text">The recording(s) were successfully moved.</string>
+    <string name="error_move">An error occurred while moving the recording(s). Some files might be corrupted or missing.</string>
     <string name="playing">Playing </string>
     <string name="recording">Recording&#8230;</string>
     <string name="stop_speaker">Stop speaker</string>
@@ -74,8 +74,8 @@
     <string name="info_dialog_size">Size: </string>
     <string name="info_dialog_format">Format: </string>
     <string name="info_dialog_location">Location: </string>
-    <string name="info_storage_private">Private space: </string>
-    <string name="info_storage_public">Public filesystem: </string>
+    <string name="info_storage_private">Private space:&#160;</string>
+    <string name="info_storage_public">Public filesystem:&#160;</string>
     <string name="settings_name">Settings</string>
     <string name="about_name">About</string>
     <string name="edit_photo_remove">Remove photo</string>

@@ -12,8 +12,7 @@
         <item name="separatorStyle">@style/separatorLight</item>
         <item name="detailHeaderStyle">@style/detailHeader.Light</item>
         <item name="tabletCurrentSelectionStyle">@style/tabletCurrentSelectionLight</item>
-        <item name="playerControlStyleSmall">@style/playerControlStyleSmallLight</item>
-        <item name="playerControlStyleLarge">@style/playerControlStyleLargeLight</item>
+        <item name="playerControlStyle">@style/playerControlStyleLight</item>
     </style>
 
     <style name="AppThemeDark" parent="Theme.AppCompat.NoActionBar">
@@ -27,10 +26,7 @@
         <item name="separatorStyle">@style/separatorDark</item>
         <item name="detailHeaderStyle">@style/detailHeader.Dark</item>
         <item name="tabletCurrentSelectionStyle">@style/tabletCurrentSelectionDark</item>
-        <!-- Material Dialog -->
-        <item name="md_positive_color">@color/white</item>
-        <item name="playerControlStyleSmall">@style/playerControlStyleSmallDark</item>
-        <item name="playerControlStyleLarge">@style/playerControlStyleLargeDark</item>
+        <item name="playerControlStyle">@style/playerControlStyleDark</item>
     </style>
 
 
@@ -83,55 +79,29 @@ https://stackoverflow.com/questions/30487616/android-overriding-a-style-per-them
         <item name="android:lineSpacingMultiplier">1.3</item>
     </style>
 
-    <style name="playerControlStyleParentSmall">
+    <style name="playerControlStyleParent">
         <item name="indicator_color">@color/colorAccent</item>
-        <item name="indicator_width">10</item>
+        <item name="indicator_width">@dimen/croller_indicator_width</item>
         <item name="is_continuous">true</item>
-        <item name="label_size">20</item>
+        <item name="label_size">@dimen/croller_label_size</item>
         <item name="min">0</item>
         <!--<item name="back_circle_radius">80</item>-->
         <!--<item name="main_circle_radius">60</item>-->
         <item name="progress_primary_color">@color/colorAccent</item>
-        <item name="android:layout_width">120dp</item>
-        <item name="android:layout_height">120dp</item>
-        <item name="progress_primary_stroke_width">15</item>
-        <item name="progress_secondary_stroke_width">10</item>
+        <item name="android:layout_width">@dimen/croller_width</item>
+        <item name="android:layout_height">@dimen/croller_height</item>
+        <item name="progress_primary_stroke_width">@dimen/croller_progress_primary_stroke_width</item>
+        <item name="progress_secondary_stroke_width">@dimen/croller_progress_secondary_stroke_width</item>
     </style>
 
-    <style name="playerControlStyleParentLarge">
-        <item name="indicator_color">@color/colorAccent</item>
-        <item name="indicator_width">15</item>
-        <item name="is_continuous">true</item>
-        <item name="label_size">30</item>
-        <item name="min">0</item>
-        <!--<item name="back_circle_radius">130</item>-->
-        <!--<item name="main_circle_radius">110</item>-->
-        <item name="progress_primary_color">@color/colorAccent</item>
-        <item name="android:layout_width">150dp</item>
-        <item name="android:layout_height">150dp</item>
-        <item name="progress_primary_stroke_width">25</item>
-        <item name="progress_secondary_stroke_width">15</item>
-    </style>
-
-    <style name="playerControlStyleSmallLight" parent="playerControlStyleParentSmall">
+    <style name="playerControlStyleLight" parent="playerControlStyleParent">
         <item name="main_circle_color">#ddd</item>
         <item name="progress_secondary_color">#000</item>
         <item name="label_color">@color/text_on_light</item>
     </style>
 
-    <style name="playerControlStyleLargeLight" parent="playerControlStyleParentLarge">
-        <item name="main_circle_color">#ddd</item>
-        <item name="progress_secondary_color">#000</item>
-        <item name="label_color">@color/text_on_light</item>
-    </style>
 
-    <style name="playerControlStyleSmallDark" parent="playerControlStyleParentSmall">
-        <item name="main_circle_color">#fff</item>
-        <item name="progress_secondary_color">#ededed</item>
-        <item name="label_color">@color/text_on_dark</item>
-    </style>
-
-    <style name="playerControlStyleLargeDark" parent="playerControlStyleParentLarge">
+    <style name="playerControlStyleDark" parent="playerControlStyleParent">
         <item name="main_circle_color">#fff</item>
         <item name="progress_secondary_color">#ededed</item>
         <item name="label_color">@color/text_on_dark</item>

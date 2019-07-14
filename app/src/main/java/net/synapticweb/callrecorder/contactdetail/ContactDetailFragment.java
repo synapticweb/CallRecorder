@@ -575,7 +575,9 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
                 Content content = new Content();
                 content.setOverviewHeading(parentActivity.getResources().getString(R.string.move_heading));
                 StorageChooser.Theme theme = new StorageChooser.Theme(parentActivity);
-                theme.setScheme(parentActivity.getResources().getIntArray(R.array.storage_chooser_theme));
+                theme.setScheme(parentActivity.getSettedTheme().equals(TemplateActivity.LIGHT_THEME) ?
+                        parentActivity.getResources().getIntArray(R.array.storage_chooser_theme_light) :
+                        parentActivity.getResources().getIntArray(R.array.storage_chooser_theme_dark));
 
                 StorageChooser chooser = new StorageChooser.Builder()
                         .withActivity(parentActivity)
@@ -586,8 +588,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
                         .allowAddFolder(true)
                         .showHidden(true)
                         .withContent(content)
-                        .setTheme(parentActivity.getSettedTheme().equals(TemplateActivity.DARK_THEME) ?
-                                theme : null)
+                        .setTheme(theme)
                         .build();
 
                 chooser.show();

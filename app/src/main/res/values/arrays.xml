@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <array name="storage_chooser_theme">
+    <array name="storage_chooser_theme_dark">
         <!-- Overview -->
-        <item>@color/colorPrimary</item> <!--  Top Header bg -->
+        <item>@color/primaryDarkColor</item> <!--  Top Header bg -->
         <item>@color/textOnDark</item> <!-- header text   -->
         <item>#252525</item> <!-- list bg  -->
         <item>@android:color/white</item> <!--  storage list name text  -->
@@ -16,6 +16,27 @@
         <item>#151515</item> <!-- address bar tint -->
         <item>@color/chevronBgColor</item> <!-- new folder hint tint-->
         <item>@color/white</item> <!-- select button color -->
+        <item>@color/colorAccentLighter</item> <!-- new folder layour bg -->
+        <item>#2c9633</item> <!-- fab multiselect color -->
+        <item>#151515</item> <!-- address bar bg -->
+    </array>
+
+    <array name="storage_chooser_theme_light">
+        <!-- Overview -->
+        <item>@color/primaryDarkColor</item> <!--  Top Header bg -->
+        <item>@color/textOnDark</item> <!-- header text   -->
+        <item>@color/white</item> <!-- list bg  -->
+        <item>@color/textOnLight</item> <!--  storage list name text  -->
+        <item>@color/textOnLight</item> <!-- free space text  -->
+        <item>@color/colorAccent</item> <!-- memory bar -->
+
+        <!-- secondary dialog colors -->
+        <item>@color/colorAccent</item> <!-- folder tint -->
+        <item>@color/white</item> <!-- list bg -->
+        <item>@color/textOnLight</item> <!-- list text -->
+        <item>#151515</item> <!-- address bar tint -->
+        <item>@color/chevronBgColor</item> <!-- new folder hint tint-->
+        <item>@color/textOnLight</item> <!-- select button color -->
         <item>@color/colorAccentLighter</item> <!-- new folder layour bg -->
         <item>#2c9633</item> <!-- fab multiselect color -->
         <item>#151515</item> <!-- address bar bg -->

@@ -48,8 +48,8 @@
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/edit_phone_number_photo"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
+            android:layout_width="@dimen/edit_image_size"
+            android:layout_height="@dimen/edit_image_size"
             android:paddingTop="7dp"
             android:paddingBottom="7dp"
             android:layout_gravity="center_horizontal"
