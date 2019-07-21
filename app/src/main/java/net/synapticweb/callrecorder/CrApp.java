@@ -117,11 +117,11 @@ public class CrApp extends Application {
         return (int) (dp * context.getResources().getDisplayMetrics().density);
     }
 
-    public static Spanned getSpannedText(String text) {
+    public static Spanned getSpannedText(String text, Html.ImageGetter getter) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            return Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY);
+            return Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY, getter, null);
         } else
-            return Html.fromHtml(text);
+            return Html.fromHtml(text, getter, null);
     }
 
     @Override

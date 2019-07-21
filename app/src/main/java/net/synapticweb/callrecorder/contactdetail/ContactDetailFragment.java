@@ -654,9 +654,9 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         // în paintView, adică de fiecare dată cînd rulează onResume).
         toggleSelectModeActionBar(false);
         typePhoneView.setText(CrApp.getSpannedText(String.format(getResources().getString(
-                R.string.detail_phonetype), contact.getPhoneTypeName())));
+                R.string.detail_phonetype), contact.getPhoneTypeName()), null));
         phoneNumberView.setText(CrApp.getSpannedText(String.format(getResources().getString(
-                R.string.detail_phonenumber), contact.getPhoneNumber())));
+                R.string.detail_phonenumber), contact.getPhoneNumber()), null));
 
         if(contact.getPhotoUri() != null) {
             contactPhotoView.clearColorFilter();
