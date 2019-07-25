@@ -4,17 +4,12 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentManager;
 
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
-import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -22,7 +17,11 @@ import androidx.viewpager.widget.ViewPager;
 import androidx.fragment.app.FragmentPagerAdapter;
 
 import com.google.android.material.tabs.TabLayout;
-import java.lang.reflect.Field;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 
 
 public class HelpActivity extends TemplateActivity {
@@ -33,26 +32,50 @@ public class HelpActivity extends TemplateActivity {
     static final int NUM_PAGES = 5;
     static final String TAG = "CallRecorder";
 
+    //am folosit R.raw pentru posibilitatea traducerii: res/raw-de/ for german
+    private String rawHtmlToString(int fileRes) {
+        StringBuilder sb = new StringBuilder();
+        try {
+            InputStream is = getResources().openRawResource(fileRes);
+            BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+            String str;
+            while ((str = br.readLine()) != null) {
+                sb.append(str);
+            }
+            br.close();
+            is.close();
+        }
+        catch (Exception e) {
+            Log.wtf(TAG, e.getMessage());
+        }
+        return sb.toString();
+    }
+
     @Override
     protected Fragment createFragment() { return null; }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme();
 
-        content[0] = getResources().getString(R.string.help_overview);
-        content[1] = getResources().getString(R.string.help_recording_calls);
-        content[2] = getResources().getString(R.string.help_play_recordings);
-        content[3] = getResources().getString(R.string.help_manage_recordings);
-        content[4] = getResources().getString(R.string.help_licences);
+        content[0] = rawHtmlToString(R.raw.help_recording_calls);
+        content[1] = rawHtmlToString(R.raw.help_playing_recordings);
+        content[2] = rawHtmlToString(R.raw.help_managing_recordings);
+        content[3] = rawHtmlToString(R.raw.help_about);
+        content[4] = rawHtmlToString(R.raw.help_licences);
 
-        contentTitles[0] = getResources().getString(R.string.help_title1);
-        contentTitles[1] = getResources().getString(R.string.help_title2);
-        contentTitles[2] = getResources().getString(R.string.help_title3);
-        contentTitles[3] = getResources().getString(R.string.help_title4);
+        if(getSettedTheme().equals(TemplateActivity.DARK_THEME)) {
+            for(int i = 0; i < content.length; ++i)
+                content[i] = content[i].replace("light", "dark");
+        }
+
+        contentTitles[0] = getResources().getString(R.string.help_title2);
+        contentTitles[1] = getResources().getString(R.string.help_title3);
+        contentTitles[2] = getResources().getString(R.string.help_title4);
+        contentTitles[3] = getResources().getString(R.string.about_name);
         contentTitles[4] = getResources().getString(R.string.help_title5);
 
-        setTheme();
         setContentView(R.layout.help_activity);
         pager = findViewById(R.id.help_pager);
         adapter = new HelpPagerAdapter(getSupportFragmentManager());
@@ -112,43 +135,11 @@ public class HelpActivity extends TemplateActivity {
         @Override
         public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
             View view = inflater.inflate(R.layout.help_fragment, container, false);
-//            WebView htmlText = view.findViewById(R.id.help_fragment_text);
-//            htmlText.getSettings().setJavaScriptEnabled(true);
-//            htmlText.setWebViewClient(new WebViewClient() {
-//                public void onPageFinished(WebView view, String url) {
-//                    view.loadUrl(
-//                            "javascript:document.body.style.setProperty(\"background\", \"black\");"
-//                    );
-//                    view.loadUrl(
-//                            "javascript:document.body.style.setProperty(\"color\", \"white\");"
-//                    );
-//                }
-//            });
-//            htmlText.loadData(content[position], "text/html", null);
-            TextView text = view.findViewById(R.id.help_fragment_text);
-            text.setText(CrApp.getSpannedText(content[position], new ImageGetter()));
+            WebView htmlText = view.findViewById(R.id.help_fragment_text);
+            //am pus imaginile și style-urile în main/assets. Ca urmare am setat base url la file:///android_asset/ și sursele
+            //sunt doar numele fișierelor.
+            htmlText.loadDataWithBaseURL("file:///android_asset/", content[position], "text/html", null, null);
             return view;
-        }
-    }
-
-     static class ImageGetter implements Html.ImageGetter {
-        @Override
-        public Drawable getDrawable(String source) {
-            Field plus;
-            int res;
-            Drawable image = null;
-            try {
-                //source = plus.jpg. NB: trebuie scos .jpg ca să meargă
-//                plus = R.class.getDeclaredField(source);
-//                res = plus.getInt(null); //proprietățile lui R sunt statice
-                image = CrApp.getInstance().getResources().getDrawable(R.drawable.plus);
-                image.setBounds(0, 0, 96, 96);
-            }
-            catch (Exception e) {
-               Log.wtf(TAG, e.getMessage());
-            }
-
-            return image;
         }
     }
 }

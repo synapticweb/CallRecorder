@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Recording calls</title>
+	<!-- <base href="../../assets/"> -->
+	<link rel="stylesheet" type="text/css" href="common_style.css">
+	<link rel="stylesheet" type="text/css" href="light_style.css">
+</head>
+<body>
+
+<h2>Creating contacts</h2>
+<p>In order to record calls you must first create a contact. Creating a contact is very easy - just press the <img class="small-image" src="plus.png"> button in the lower right part of the screen and you will be presented with a list of phone numbers that exist in the phone's contact database. Selecting a phone number will create a  new contact in the application. After the contact is created you will be able to edit the picture, name, phone number and phone type category of the contact. The main screen of the application presents a list of the existing contacts.</p>
+
+<h2>How recording calls works</h2>
+<p>When you make or receive a phone call Synaptic Call recorder looks into its database to see if there is a contact that matches the number of the phone call. If it finds such a contact, it automatically starts recording the phone call. While the recording process is going on, the application shows a notification with this icon: <img class="x-small-image" src="notification_icon_light.png"> The recording stops automatically when the phone call is interrupted - either by you or by your interlocutor. After the call is finished you can access the recording by pressing the contact name in the main screen of the application which will show details about the currently selected contact and a list of recordings associated with the contact.</p>
+
+<p>When they are created, the recordings are given predefined names that consist of the date and the hour of the call. Different icons are used to symbolise ingoing calls <img class="x-small-image" src="ingoing.png"> or outgoing calls <img class="x-small-image" src="outgoing.png"></p>
+
+<p>The behaviour described above can be altered. By selecting "Stop recording calls" from the menu on the upper right of the contact detail screen you instruct the application to skip starting the recording process automatically even if the number of the phone call matches the number of a contact.
+	<img style="display: block;width: 250px;margin-top: 10px" src="stop_rec.jpg"/>
+</p>
+
+<p>If the number of the current phone call cannot be matched against any of the contacts or if matches against a contact configured not to record the phone calls automatically, Synaptic Call Recorder will not start the recording process. However, during the phone call a notification with the icon <img src="notification_icon_light.png" class="x-small-image"> is shown. If you press the notification you will be presented with a button labeled "Start recording" that allows you to start recording the phone call.</p>
+
+<p>If you record a phone call from a number that doesn't exist in the application's contacts, a new contact will be automatically created and the name of the new contact will be UNKNOWN CONTACT and the type of the phone will be "unknown". Of course, you can edit later these fields. </p>
+
+<p>If you turn on the "paranoid mode" in the settings screen, all phone calls will be recorded automatically, ignoring the per contact settings or the fact that there is no contact with a matching number.</p>
+
+<h2>Unknown (private) numbers support</h2>
+<p>If you receive a phone call from a private (unknown) number, the behaviour of the application will vary according to how it is configured. In the settings screen you can chooose to automatically record calls from unknown numbers (This is the default setting). In this case the recording process will start automatically. If this setting is off you will have to press the "Start recording" button from the notification in order to start the recording process. If there are other recordings from unknown numbers, they will all be listed under a common contact called "Private number" that has a distinctive picture: <img class="small-image" src="incognito.png">. This contact cannot be edited. If this is the first call from an unknown number that you receive, the "Private number" contact will be created now.</p>
+
+<h2>Recordings storage</h2>
+<p>The recordings can be stored in two places: 
+	<ol>
+		<li>In the application's private space. This is a storage space on the internal memory of the device that can be accessed only by Synaptic Call Recorder. Other apps don't have access to this space.</li>
+		<li>In the public filesystem. The public filesystem consists of storage space located on the internal memory of the device or on the sdcard. All apps installed on the device have access to this space.</li>
+	</ol>
+	In the settings screen you can choose if you want your recordings stored in the private application space or in the public filesystem. If you choose the second option you can also specify the folder where the recordings will be saved.
+</p>
+
+<h2>Recording format</h2>
+<p>There are four avaiable formats for saving the recordings:
+	<ol>
+		<li>WAV. This is a <em>lossless</em> audio format, the meaning of "lossless" being the fact that no audio compression is made. Thus, the raw audio data that comes from the microphone is saved in a format that can be played or processed by most audio applications. This format has the best audio quality but is also the most expensive in terms of storage consumption (about 6 MB/minute in mono mode)</li>
+		<li>AAC High (128kbps). This is a <em>lossy</em> audio format the meaning of "lossy" being the fact that an algorithm for audio compression is applied to save space. AAC 128kbs takes about 900 KB/minute in mono mode.</li>
+		<li>AAC Medium (64kbps). AAC 64kbs takes about about 500 KB/minute in mono mode. </li>
+		<li>AAC Basic (32kbps). AAC 32kbps takes about 250 KB/minute in mono mode.</li>
+	</ol>
+	Keep in mind that if you choose to record stereo the storage consumptions described above will double.
+</p>
+
+<h2>Speaker use</h2>
+<p>If the microphone of your device is not very sensitive, the audio volume of the voices in the recording might be quite low and the speech might be unrecognizable. To circumvent this problem you can turn on the option "Put device on speaker when recording". If this setting is on, Synaptic Call Recorder will automatically put the device on speaker while the recording takes place.</p>
+
+<h2>Caution</h2>
+<p>There is a considerable amount of variation among the hardware capabilities of phone devices. As a consequence, the quality of the audio recordings may be different from phone to phone and you might have to adjust the application's settings in order to obtain a satisfactory result. Make sure to do a fair amount of experimentation before relying on Synaptic Call Recorder for recording sensitive phone calls.</p>
+
+</body>
+</html>

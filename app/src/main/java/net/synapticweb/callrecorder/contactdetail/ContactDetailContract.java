@@ -10,7 +10,6 @@ import net.synapticweb.callrecorder.data.Recording;
 import java.util.List;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 public interface ContactDetailContract {

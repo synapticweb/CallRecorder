@@ -11,7 +11,4 @@
     android:icon="@drawable/help"
         android:title="@string/help"/>
 
-    <item android:id="@+id/about"
-        android:title="@string/about_name"
-        android:icon="@drawable/baseline_info_black_36"/>
 </menu>

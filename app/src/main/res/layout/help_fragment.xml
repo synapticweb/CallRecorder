@@ -1,20 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView android:layout_width="wrap_content"
+<WebView android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/help_fragment_text">
+</WebView>
 
-    <TextView
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:id="@+id/help_fragment_text"
-        android:paddingTop="10dp"
-     />
-
-<!--<WebView android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--xmlns:android="http://schemas.android.com/apk/res/android"-->
-    <!--android:id="@+id/help_fragment_text">-->
-
-    <!--</WebView>-->
-
-</ScrollView>

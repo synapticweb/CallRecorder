@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Managing recordings</title>
+	<!-- <base href="../../assets/"> -->
+	<link rel="stylesheet" type="text/css" href="common_style.css">
+	<link rel="stylesheet" type="text/css" href="light_style.css">
+</head>
+<body>
+	<h2>Selecting recordings</h2>
+	<p>While tapping a recording opens the audio player, long pressing a recording selects it. When a recording is selected, the contact details screen enters the <em>select mode</em>. When the select mode is on the following things happen:
+		<ol>
+			<li>The recordings are decorated with a checkbox at the left extremity. The selected recordings have this checkbox checked.
+				<img class="block-image" src="selected_rec.jpg">
+			</li>
+			<li>The top bar hides the buttons and the menu for managing the contact and shows instead three buttons and a menu for managing the recording.
+				<img class="block-image" src="top_bar_selected.jpg">
+			</li>
+			<li>While the select mode is on, simply tapping a recordings selects it.</li>
+		</ol>
+		The select mode is cleared when there are no more selected recordings or when one or more recordings are deleted.
+	</p>
+
+	<h2>Select mode actions</h2>
+	<p>While in select mode you can manage the selected recordings in several ways:</p>
+	<p>Tapping the <img class="x-small-image" src="info_light.png"> button will open a dialog which shows some useful information about the currently selected recording, like date and hour of the call, its duration, the file size, the audio format and the location of the audio file. If two or more recordings are selected, this dialog only shows the total file size of the selected recordings.</p>
+	<p>Tapping the <img class="x-small-image" src="select_all_light.png"> button will select all of the recordings.</p>
+	<p>Tapping the <img src="move_light.png"  class="x-small-image"> button will show a menu with 2 options: 
+		<ul>
+			<li>Move to private storage</li>
+			<li>Move to public storage</li>
+		</ul>
+		If at least one of the selected recordings is already located in the private space of the application, the first option will be disabled. If you tap the second option a folder chooser dialog will show up assisting you in choosing the folder where you want to move the selected recordings. If you move the recordings in a public storage location you will be able to copy them to a computer or another mobile device. <br/>
+		After the move finishes, a final dialog will inform you if the move was done successfully or if errors have happened during the file move.
+	</p>
+
+	<p>Tapping the <img src="dots_menu_light.png" class="x-small-image"> button in the right end of the top bar will show a menu with two entries: "Rename" and "Delete". <br/>
+	"Rename" allows you to give a name of your choice to the recordings. If more than one recording is selected this entry will be disabled. <br/>
+	"Delete" will delete the selected recordings. Caution: this action cannot be undone.
+	</p>
+
+	<h2>Unavailable audio files</h2>
+	<p>If a recording is stored in a public storage you can accidentally delete or move the audio file. When this happens the recording will be grayed out and decorated with an exclamation sign: 
+		<img src="deleted_audio.jpg" class="block-image">
+	If you cannot recover the associated audio file you should delete the recording.
+	</p>
+
+</body>
+</html>

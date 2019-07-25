@@ -1,0 +1,27 @@
+body {
+	font-size: 0.85em;
+	line-height: 1.3em;
+}
+
+.small-image {
+	width: 35px; 
+	height: 35px; 
+	vertical-align: middle;
+}
+
+.x-small-image {
+	width: 25px; 
+	height: 25px; 
+	vertical-align: middle;
+}
+
+.block-image {
+	width: 250px;
+	display: block;
+	margin-top:10px;
+	margin-bottom: 10px;
+}
+
+.license-head {
+	text-decoration: underline;
+}

@@ -26,8 +26,6 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
-
-import net.synapticweb.callrecorder.BuildConfig;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.TemplateActivity;
 import net.synapticweb.callrecorder.HelpActivity;
@@ -128,27 +126,11 @@ public class ContactsListActivityMain extends TemplateActivity {
                     case R.id.settings: startActivity(new Intent(ContactsListActivityMain.this, SettingsActivity.class));
                         break;
                     case R.id.help: startActivity(new Intent(ContactsListActivityMain.this, HelpActivity.class));
-                        break;
-                    case R.id.about:
-                        showAboutDialog();
-                        break;
                 }
                 drawer.closeDrawers();
                 return true;
             }
         });
-    }
-
-    private void showAboutDialog() {
-        MaterialDialog dialog = new MaterialDialog.Builder(this)
-                .customView(R.layout.about_dialog, false)
-                .positiveText(android.R.string.ok).build();
-
-        TextView aboutAppName = (TextView) dialog.findViewById(R.id.about_appname);
-        aboutAppName.setText(String.format(getResources().getString(R.string.about_appname_version),
-                getResources().getString(R.string.app_name),
-                BuildConfig.VERSION_NAME));
-        dialog.show();
     }
 
     @Override
