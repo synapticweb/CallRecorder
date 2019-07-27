@@ -162,6 +162,7 @@ public class RecorderService extends Service {
                 nm.notify(NOTIFICATION_ID, buildNotification(RECORD_AUTOMMATICALLY, callIdentifier));
 
             recorder.startRecording(receivedNumPhone);
+
             if(settings.getBoolean(SettingsFragment.SPEAKER_USE, false))
                 putSpeakerOn();
         }
@@ -306,7 +307,7 @@ public class RecorderService extends Service {
 
         CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(getApplicationContext());
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
-        long idToInsert;
+        Long idToInsert;
 
         if(privateCall) {
             Cursor cursor = db.query(Contacts.TABLE_NAME, new String[]{Contacts._ID},
@@ -325,7 +326,7 @@ public class RecorderService extends Service {
             }
             else { //Avem cel puțin un apel de pe nr ascuns. Pentru teste: aici e de așteptat ca întotdeauna cursorul să conțină numai 1 element
                 cursor.moveToFirst();
-                idToInsert = cursor.getInt(cursor.getColumnIndex(Contacts._ID));
+                idToInsert = cursor.getLong(cursor.getColumnIndex(Contacts._ID));
             }
             cursor.close();
         }
@@ -337,10 +338,9 @@ public class RecorderService extends Service {
             Contact contact;
             if((contact = Contact.searchNumberInPhoneContacts(receivedNumPhone, getApplicationContext())) != null) {
                 try {
-                    contact.copyPhotoIfExternal(this);
                     contact.insertInDatabase(this);
                 }
-                catch (SQLException | IOException exception) {
+                catch (SQLException exception) {
                     Log.wtf(TAG, exception.getMessage());
                 }
                 idToInsert = contact.getId();
@@ -355,6 +355,11 @@ public class RecorderService extends Service {
                 }
                 idToInsert = contact.getId();
             }
+        }
+
+        if(idToInsert == null) {
+            resetState();
+            return;
         }
 
         ContentValues values = new ContentValues();

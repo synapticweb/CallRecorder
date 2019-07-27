@@ -33,20 +33,23 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     public static final String FORMAT = "format";
     public static final String MODE = "mode";
     private TemplateActivity parentActivity;
+    private SharedPreferences preferences;
 
     @Override
     public void onResume() {
         super.onResume();
         Preference storagePath = findPreference(STORAGE_PATH);
         ListPreference storage = findPreference(STORAGE);
+        Preference privateCalls = findPreference(AUTOMMATICALLY_RECORD_PRIVATE_CALLS);
         manageStoragePathSummary(null, storage, storagePath);
+        if(preferences.getBoolean(PARANOID_MODE, false) && privateCalls != null)
+            privateCalls.setEnabled(false);
     }
 
     private void manageStoragePathSummary(String newValue, ListPreference storage, Preference storagePath) {
         String storageValue = newValue == null ? storage.getValue() : newValue;
         if(storageValue.equals("public")) {
             storagePath.setEnabled(true);
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
             String path = preferences.getString(STORAGE_PATH, null);
             if(path == null) {
                 File externalDir = getActivity().getExternalFilesDir(null);
@@ -76,6 +79,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
     @Override
     public void onCreatePreferences(@Nullable Bundle savedInstanceState, String rootKey) {
+        preferences = PreferenceManager.getDefaultSharedPreferences(CrApp.getInstance());
         addPreferencesFromResource(R.xml.preferences);
 
         Preference themeOption = findPreference(APP_THEME);

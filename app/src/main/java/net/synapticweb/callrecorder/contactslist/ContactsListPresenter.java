@@ -162,10 +162,9 @@ public class ContactsListPresenter implements ContactsListContract.ContactsListP
 
             Contact contact = new Contact(null, newNumber, contactName, photoUri, phoneType);
             try {
-                contact.copyPhotoIfExternal(view.getParentActivity());
                 contact.insertInDatabase(CrApp.getInstance());
             }
-            catch (SQLException | IOException exc) {
+            catch (SQLException exc) {
                 Log.wtf(TAG, exc.getMessage());
             }
             view.setNewAddedContactId(contact.getId());

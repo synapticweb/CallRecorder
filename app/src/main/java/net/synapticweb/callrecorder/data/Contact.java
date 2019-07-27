@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -110,17 +111,6 @@ public class Contact implements Comparable<Contact>, Parcelable {
         catch (SQLException exception) {
             Log.wtf(TAG, exception.getMessage());
         }
-    }
-
-    public void copyPhotoIfExternal(Context context) throws IOException {
-      if(photoUri != null && !photoUri.getAuthority().equals("net.synapticweb.callrecorder.fileprovider")) {
-          Bitmap originalPhotoBitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), photoUri);
-          //am adăugat System.currentTimeMillis() pentru consistență cu EditContactActivity.setPhotoPath().
-          File copiedPhotoFile = new File(context.getFilesDir(), getPhoneNumber() + System.currentTimeMillis() + ".jpg");
-          OutputStream os = new FileOutputStream(copiedPhotoFile);
-          originalPhotoBitmap.compress(Bitmap.CompressFormat.JPEG, 70, os);
-          setPhotoUri(FileProvider.getUriForFile(context, "net.synapticweb.callrecorder.fileprovider", copiedPhotoFile));
-      }
     }
 
     public void insertInDatabase(Context context) throws SQLException {
@@ -283,18 +273,33 @@ public class Contact implements Comparable<Contact>, Parcelable {
     }
 
     public void setPhotoUri(String photoUriStr) {
-        if(photoUriStr != null)
+        if(photoUriStr != null) {
             this.photoUri = Uri.parse(photoUriStr);
+            String authority = photoUri.getAuthority();
+            if(authority != null && !authority.equals("net.synapticweb.callrecorder.fileprovider")) {
+                Context context = CrApp.getInstance();
+                try {
+                    Bitmap originalPhotoBitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), photoUri);
+                    //am adăugat System.currentTimeMillis() pentru consistență cu EditContactActivity.setPhotoPath().
+                    File copiedPhotoFile = new File(context.getFilesDir(), getPhoneNumber() + System.currentTimeMillis() + ".jpg");
+                    OutputStream os = new FileOutputStream(copiedPhotoFile);
+                    originalPhotoBitmap.compress(Bitmap.CompressFormat.JPEG, 70, os);
+                    setPhotoUri(FileProvider.getUriForFile(context, "net.synapticweb.callrecorder.fileprovider", copiedPhotoFile));
+                }
+                catch(IOException exception) {
+                   this.photoUri = null;
+                }
+            }
+        }
         else
             this.photoUri = null;
     }
 
-    public void setPhotoUri(Uri photoUri)
-    {
+    public void setPhotoUri(Uri photoUri) {
         this.photoUri = photoUri;
     }
 
-    public long getId() {
+    public Long getId() { //Trebuie Long ptr că id poate să fie null
         return id;
     }
 

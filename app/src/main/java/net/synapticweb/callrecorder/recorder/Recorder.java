@@ -41,7 +41,6 @@ public class Recorder {
         return audioFile.getAbsolutePath();
     }
 
-    @SuppressWarnings("ConstantConditions")
     void startRecording(String phoneNumber) {
         if(phoneNumber == null)
             phoneNumber = "PrivateCall";
@@ -51,15 +50,14 @@ public class Recorder {
         String extension = format.equals(WAV_FORMAT) ? ".wav" : ".aac";
         File recordingsDir;
 
-        try {
-           recordingsDir = settings.getString(SettingsFragment.STORAGE, "private").equals("private") ?
-                    CrApp.getInstance().getFilesDir() :
-                    new File(settings.getString(SettingsFragment.STORAGE_PATH, null));
-        }
-        catch (NullPointerException e){
-            Log.wtf(TAG, "Recordings directory is not set.");
-            return ;
-        }
+        if(settings.getString(SettingsFragment.STORAGE, "").equals("private"))
+            recordingsDir = CrApp.getInstance().getFilesDir();
+        else {
+            String filePath = settings.getString(SettingsFragment.STORAGE_PATH, null);
+            recordingsDir = (filePath == null) ? CrApp.getInstance().getExternalFilesDir(null) : new File(filePath);
+            if(recordingsDir == null)
+                recordingsDir = CrApp.getInstance().getFilesDir();
+            }
 
         phoneNumber = phoneNumber.replaceAll("[()/.,* ;+]", "_");
         String fileName = "Recording" + phoneNumber + new SimpleDateFormat("-d-MMM-yyyy-HH-mm-ss", Locale.US).
