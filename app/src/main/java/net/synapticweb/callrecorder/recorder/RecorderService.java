@@ -36,17 +36,17 @@ import net.synapticweb.callrecorder.settings.SettingsFragment;
 
 public class RecorderService extends Service {
     private static final String TAG = "CallRecorder";
-    private static String receivedNumPhone = null;
-    private static Boolean privateCall = null;
-    private static Boolean match = null;
-    private static Boolean incoming = null;
-    public static boolean shouldStartAtHookup = false;
+    private  String receivedNumPhone = null;
+    private  Boolean privateCall = null;
+    private  Boolean match = null;
+    private  Boolean incoming = null;
+    public  boolean shouldStartAtHookup = false;
     private Long idIfMatch = null;
-    private static String contactNameIfMatch = null;
-    private static Recorder recorder;
-    private static SharedPreferences settings;
-    private static Thread speakerOnThread;
-    private static AudioManager audioManager;
+    private  String contactNameIfMatch = null;
+    private  Recorder recorder;
+    private  SharedPreferences settings;
+    private  Thread speakerOnThread;
+    private  AudioManager audioManager;
     private static RecorderService self;
 
     public static final int NOTIFICATION_ID = 1;
@@ -78,7 +78,7 @@ public class RecorderService extends Service {
         return self;
     }
 
-    public static Recorder getRecorder() {
+    public Recorder getRecorder() {
         return recorder;
     }
 
@@ -100,7 +100,7 @@ public class RecorderService extends Service {
         mNotificationManager.createNotificationChannel(mChannel);
     }
 
-    public static Notification buildNotification(int typeOfNotification, String callNameOrNumber) {
+    public Notification buildNotification(int typeOfNotification, String callNameOrNumber) {
         Intent notificationIntent = new Intent(CrApp.getInstance(), ContactsListActivityMain.class);
         PendingIntent tapNotificationPi = PendingIntent.getBroadcast(CrApp.getInstance(), 0, notificationIntent, 0);
         Resources res = CrApp.getInstance().getResources();
@@ -282,7 +282,7 @@ public class RecorderService extends Service {
     }
 
     //de aici: https://stackoverflow.com/questions/39725367/how-to-turn-on-speaker-for-incoming-call-programmatically-in-android-l
-    static void putSpeakerOn() {
+    void putSpeakerOn() {
         speakerOnThread =  new Thread() {
             @Override
             public void run() {
@@ -301,7 +301,7 @@ public class RecorderService extends Service {
         speakerOnThread.start();
     }
 
-     static void putSpeakerOff() {
+    void putSpeakerOff() {
         if(speakerOnThread != null)
             speakerOnThread.interrupt();
         speakerOnThread = null;

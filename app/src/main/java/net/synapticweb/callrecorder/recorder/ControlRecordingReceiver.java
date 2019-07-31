@@ -21,31 +21,30 @@ public class ControlRecordingReceiver extends BroadcastReceiver {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(CrApp.getInstance());
         NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         String callIdentifier =  intent.getExtras().getString(RecorderService.CALL_IDENTIFIER);
+        RecorderService service = RecorderService.getService();
 
         if(intent.getAction().equals(RecorderService.ACTION_START_RECORDING)) {
             String phoneNumber = intent.getExtras().getString(RecorderService.PHONE_NUMBER);
             if(nm != null)
-                nm.notify(RecorderService.NOTIFICATION_ID, RecorderService.buildNotification(RecorderService.RECORD_AUTOMMATICALLY, callIdentifier));
+                nm.notify(RecorderService.NOTIFICATION_ID, service.buildNotification(RecorderService.RECORD_AUTOMMATICALLY, callIdentifier));
 
-            Recorder recorder = RecorderService.getRecorder();
+            Recorder recorder = service.getRecorder();
             if(recorder != null) {
                 try {
                     recorder.startRecording(phoneNumber);
                     if(settings.getBoolean(SettingsFragment.SPEAKER_USE, false))
-                        RecorderService.putSpeakerOn();
+                        service.putSpeakerOn();
                 }
                 catch (RecordingException exc) {
                     Log.wtf(TAG, "Unable to start recorder: "  + exc.getMessage());
-                    RecorderService service = RecorderService.getService();
-                    if(service != null)
-                        service.stopSelf();
+                    service.stopSelf();
                 }
             }
         }
         else if(intent.getAction().equals(RecorderService.ACTION_STOP_SPEAKER)) {
-            RecorderService.putSpeakerOff();
+            service.putSpeakerOff();
             if(nm != null)
-                nm.notify(RecorderService.NOTIFICATION_ID, RecorderService.buildNotification(RecorderService.RECORD_AUTOMMATICALLY_SPEAKER_OFF, callIdentifier));
+                nm.notify(RecorderService.NOTIFICATION_ID, service.buildNotification(RecorderService.RECORD_AUTOMMATICALLY_SPEAKER_OFF, callIdentifier));
         }
     }
 }
