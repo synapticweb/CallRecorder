@@ -41,11 +41,11 @@ public class Recorder {
         return audioFile.getAbsolutePath();
     }
 
-    void startRecording(String phoneNumber) {
+    void startRecording(String phoneNumber) throws RecordingException {
         if(phoneNumber == null)
             phoneNumber = "PrivateCall";
 
-        if(recordingThread != null)
+        if(isRunning())
             stopRecording();
         String extension = format.equals(WAV_FORMAT) ? ".wav" : ".aac";
         File recordingsDir;
@@ -55,7 +55,7 @@ public class Recorder {
         else {
             String filePath = settings.getString(SettingsFragment.STORAGE_PATH, null);
             recordingsDir = (filePath == null) ? CrApp.getInstance().getExternalFilesDir(null) : new File(filePath);
-            if(recordingsDir == null)
+            if(recordingsDir == null) //recordingsDir poate fi null în cazul în care getExternalFilesDir(null) returnează null, adică nu e montat (disponibil) un astfel de spațiu.
                 recordingsDir = CrApp.getInstance().getFilesDir();
             }
 
@@ -63,17 +63,12 @@ public class Recorder {
         String fileName = "Recording" + phoneNumber + new SimpleDateFormat("-d-MMM-yyyy-HH-mm-ss", Locale.US).
                 format(new Date(System.currentTimeMillis())) + extension;
         audioFile = new File(recordingsDir, fileName);
-        try {
-            if(format.equals(WAV_FORMAT))
-                recordingThread = new Thread(new RecordingThreadWav(mode));
-            else
-                recordingThread = new Thread(new RecordingThreadAac(audioFile, format, mode));
-        }
 
-        catch(RuntimeException e) {
-            Log.wtf(TAG, e.getMessage());
-            return ;
-        }
+        if(format.equals(WAV_FORMAT))
+            recordingThread = new Thread(new RecordingThreadWav(mode));
+        else
+            recordingThread = new Thread(new RecordingThreadAac(audioFile, format, mode));
+
         recordingThread.start();
         startingTime = System.currentTimeMillis();
     }
@@ -83,6 +78,8 @@ public class Recorder {
                 recordingThread.interrupt();
             recordingThread = null;
             if(format.equals(WAV_FORMAT)) {
+                //în cazul în care a apărut o eroare în RecordingThreadWav și fișierul temporar nu există, această
+                //condiție va fi detectată în bucla try a CopyPcmToWav.run() și va fi raportată o eroare.
                 Thread copyPcmToWav = new Thread(new RecordingThreadWav.CopyPcmToWav(audioFile, mode));
                 copyPcmToWav.start();
             }
@@ -90,7 +87,7 @@ public class Recorder {
     }
 
     boolean isRunning() {
-        return recordingThread != null;
+        return recordingThread != null && recordingThread.isAlive();
     }
 
     public String getFormat() {

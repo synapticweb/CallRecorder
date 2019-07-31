@@ -132,7 +132,7 @@
     <string name="help_title4">Managing recordings</string>
     <string name="help_title5">Licenses</string>
     <string name="app_description">A call recording application built for simplicity and speed.</string>
-    <string name="player_error">The audio player could not be initialized. Please restart the application.</string>
+    <string name="player_error">Error while playing the audio file. Please restart the application.</string>
     <string name="player_title">Audio player</string>
     <string name="volume">Volume</string>
     <string name="gain">Gain</string>

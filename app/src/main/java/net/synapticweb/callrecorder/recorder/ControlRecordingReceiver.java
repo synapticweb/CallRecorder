@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.settings.SettingsFragment;
@@ -27,10 +28,19 @@ public class ControlRecordingReceiver extends BroadcastReceiver {
                 nm.notify(RecorderService.NOTIFICATION_ID, RecorderService.buildNotification(RecorderService.RECORD_AUTOMMATICALLY, callIdentifier));
 
             Recorder recorder = RecorderService.getRecorder();
-            if(recorder != null)
-                recorder.startRecording(phoneNumber);
-            if(settings.getBoolean(SettingsFragment.SPEAKER_USE, false))
-                RecorderService.putSpeakerOn();
+            if(recorder != null) {
+                try {
+                    recorder.startRecording(phoneNumber);
+                    if(settings.getBoolean(SettingsFragment.SPEAKER_USE, false))
+                        RecorderService.putSpeakerOn();
+                }
+                catch (RecordingException exc) {
+                    Log.wtf(TAG, "Unable to start recorder: "  + exc.getMessage());
+                    RecorderService service = RecorderService.getService();
+                    if(service != null)
+                        service.stopSelf();
+                }
+            }
         }
         else if(intent.getAction().equals(RecorderService.ACTION_STOP_SPEAKER)) {
             RecorderService.putSpeakerOff();

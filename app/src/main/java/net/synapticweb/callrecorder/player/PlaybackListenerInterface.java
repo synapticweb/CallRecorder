@@ -1,6 +1,6 @@
 package net.synapticweb.callrecorder.player;
 
-public interface PlaybackInfoListener {
+public interface PlaybackListenerInterface {
 
     void onDurationChanged(int duration);
 
@@ -8,7 +8,7 @@ public interface PlaybackInfoListener {
 
     void onPlaybackCompleted();
 
-    void onInitializationError();
+    void onError();
 
     void onReset();
 }

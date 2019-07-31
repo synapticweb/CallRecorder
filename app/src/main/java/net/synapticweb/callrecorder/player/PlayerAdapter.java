@@ -2,6 +2,7 @@ package net.synapticweb.callrecorder.player;
 
 import androidx.annotation.IntDef;
 
+import java.io.IOException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
@@ -19,9 +20,9 @@ interface PlayerAdapter {
 
     void setGain(float gain);
 
-    void setMediaPosition(int position);
+    boolean setMediaPosition(int position);
 
-    void loadMedia(String mediaPath);
+    boolean loadMedia(String mediaPath);
 
     void stopPlayer();
 
@@ -35,9 +36,9 @@ interface PlayerAdapter {
 
     void setPlayerState(int state);
 
-    void seekTo(int position);
+    boolean seekTo(int position);
 
     int getCurrentPosition();
 
-    long getTotalDuration();
+    int getTotalDuration();
 }

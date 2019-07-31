@@ -5,9 +5,7 @@ import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
 import android.util.Log;
-
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -21,10 +19,11 @@ class RecordingThreadAac extends RecordingThread implements Runnable {
     private static final int SAMPLE_RATE_INDEX = 4;
     private final int bitRate;
     private final MediaCodec mediaCodec;
-    private final OutputStream outputStream;
+    private File outputFile;
 
-    RecordingThreadAac(File audioFile, String format, String mode) throws RuntimeException {
-        super(mode);
+    RecordingThreadAac(File audioFile, String format, String mode) throws RecordingException {
+        super(mode); //trows exception dacă nu poate inițializa AudioRecord
+        outputFile = audioFile;
         switch (format) {
             case Recorder.AAC_HIGH_FORMAT: bitRate = 128000;
                 break;
@@ -35,13 +34,7 @@ class RecordingThreadAac extends RecordingThread implements Runnable {
             default:bitRate = 64000;
         }
 
-        mediaCodec = createMediaCodec(bufferSize);
-        try {
-            outputStream = new FileOutputStream(audioFile);
-        }
-        catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+        mediaCodec = createMediaCodec(bufferSize); //throws exception
         mediaCodec.start();
     }
 
@@ -51,28 +44,32 @@ class RecordingThreadAac extends RecordingThread implements Runnable {
         ByteBuffer[] codecInputBuffers = mediaCodec.getInputBuffers();
         ByteBuffer[] codecOutputBuffers = mediaCodec.getOutputBuffers();
 
-        try {
+        try (FileOutputStream outputStream = new FileOutputStream(outputFile)){
             while (!Thread.interrupted()) {
                 boolean success = handleCodecInput(audioRecord, mediaCodec, codecInputBuffers, Thread.currentThread().isAlive());
-                if (success)
+                if(success)
                     handleCodecOutput(mediaCodec, codecOutputBuffers, bufferInfo, outputStream);
+                else
+                    throw new RecordingException("Recorder failed. Aborting...");
             }
+        }
+        // De văzut dacă trebuie listener. Singurul avantaj pe care îl văd acum ar fi că apelul stopRecording
+        //ar nulifica obiectul threadului. E necesar?
+        catch (RecordingException | IOException e) {
+            Log.wtf(TAG, "Error while writing aac file: " + e.getMessage());
+            if (!outputFile.delete())
+                Log.wtf(TAG, "Cannot delete incomplete aac file");
         }
         finally {
             disposeAudioRecord();
             mediaCodec.stop();
             mediaCodec.release();
-            try {
-                outputStream.close();
-            } catch (IOException e) {
-               Log.wtf(TAG, "Error while closing the recording filestream: " + e.getMessage());
-            }
         }
     }
 
 
-    private MediaCodec createMediaCodec(int bufferSize)  {
-        MediaCodec mediaCodec = null;
+    private MediaCodec createMediaCodec(int bufferSize) throws RecordingException  {
+        MediaCodec mediaCodec;
         MediaFormat mediaFormat = new MediaFormat();
 
         mediaFormat.setString(MediaFormat.KEY_MIME, "audio/mp4a-latm");
@@ -85,10 +82,8 @@ class RecordingThreadAac extends RecordingThread implements Runnable {
         try {
             mediaCodec = MediaCodec.createEncoderByType("audio/mp4a-latm");
             mediaCodec.configure(mediaFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
-        } catch (Exception e) {
-            if(mediaCodec != null)
-                mediaCodec.release();
-            throw new RuntimeException("Cannot create mediacodec: " + e.getMessage());
+        } catch (IOException e) {
+            throw new RecordingException("Cannot create mediacodec: " + e.getMessage());
         }
         return mediaCodec;
     }
@@ -100,15 +95,9 @@ class RecordingThreadAac extends RecordingThread implements Runnable {
         byte[] audioRecordData = new byte[bufferSize];
         int length = audioRecord.read(audioRecordData, 0, audioRecordData.length);
 
-        if (length == AudioRecord.ERROR_BAD_VALUE ||
-                length == AudioRecord.ERROR_INVALID_OPERATION ||
-                length != bufferSize) {
-
-            if (length != bufferSize) {
-                Log.wtf(TAG, "length != BufferSize");
-                return false;
-            }
-        }
+        if (length < 0)  //ERROR_INVALID_OPERATION, ERROR_BAD_VALUE, ERROR_DEAD_OBJECT și ERROR,
+            //toate sunt < 0. Ar trebui poate length != bufferSize?
+           return false;
 
         int codecInputBufferIndex = mediaCodec.dequeueInputBuffer(10 * 1000);
 
@@ -124,30 +113,23 @@ class RecordingThreadAac extends RecordingThread implements Runnable {
     private void handleCodecOutput(MediaCodec mediaCodec,
                                    ByteBuffer[] codecOutputBuffers,
                                    MediaCodec.BufferInfo bufferInfo,
-                                   OutputStream outputStream)
+                                   OutputStream outputStream) throws IOException
              {
         int codecOutputBufferIndex = mediaCodec.dequeueOutputBuffer(bufferInfo, 0);
 
-        while (codecOutputBufferIndex != MediaCodec.INFO_TRY_AGAIN_LATER) {
+        while (codecOutputBufferIndex != MediaCodec.INFO_TRY_AGAIN_LATER) { //de văzut dacă e nevoie de asta.
             if (codecOutputBufferIndex >= 0) {
-                ByteBuffer encoderOutputBuffer = codecOutputBuffers[codecOutputBufferIndex];
+                ByteBuffer encoderOutputBuffer = codecOutputBuffers[codecOutputBufferIndex]; //de schimbat în fcție de versiune
 
                 encoderOutputBuffer.position(bufferInfo.offset);
                 encoderOutputBuffer.limit(bufferInfo.offset + bufferInfo.size);
 
                 if ((bufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != MediaCodec.BUFFER_FLAG_CODEC_CONFIG) {
                     byte[] header = createAdtsHeader(bufferInfo.size - bufferInfo.offset);
-
-                    try {
-                        outputStream.write(header);
-
-                        byte[] data = new byte[encoderOutputBuffer.remaining()];
-                        encoderOutputBuffer.get(data);
-                        outputStream.write(data);
-                    }
-                    catch (IOException e) {
-                        Log.wtf(TAG, "Error while writing recording file: " + e.getMessage());
-                    }
+                    outputStream.write(header);
+                    byte[] data = new byte[encoderOutputBuffer.remaining()];
+                    encoderOutputBuffer.get(data);
+                    outputStream.write(data);
                 }
 
                 encoderOutputBuffer.clear();

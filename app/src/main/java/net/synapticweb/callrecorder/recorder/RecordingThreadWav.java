@@ -1,16 +1,13 @@
 package net.synapticweb.callrecorder.recorder;
 
-import android.media.AudioRecord;
+
 import android.util.Log;
-
 import net.synapticweb.callrecorder.CrApp;
-
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
+
 
 //bazat pe codul de aici: http://selvaline.blogspot.com/2016/04/record-audio-wav-format-android-how-to.html
 //Conține multe greșeli, în special la producerea headerului. Am reparat codul pe baza info de aici:
@@ -21,52 +18,37 @@ class RecordingThreadWav extends RecordingThread implements Runnable {
     private static final int HEADER_REMAINING = 36; //headerul riff are 44 de octeți. După ce se scrie RIFF se scrie
     //nr de octeți care au mai rămas din tot fișierul, adică totalAudio + 44 - 4(riff) - 4(acest număr) =
     // totalAudio + 36.
-    private static final String TMP_FILE = "recordingtmp.raw";
-    private final OutputStream outputStream;
+    private static final String TMP_FILE_NAME = "recordingtmp.raw";
+    private File tmpFile;
 
-    RecordingThreadWav(String mode) {
-        super(mode);
-        try {
-            outputStream = new FileOutputStream(new File(CrApp.getInstance().getFilesDir(), TMP_FILE));
-        }
-        catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+    RecordingThreadWav(String mode) throws RecordingException {
+        super(mode); //throws exception
+        tmpFile = new File(CrApp.getInstance().getFilesDir(), TMP_FILE_NAME);
     }
 
     @Override
     public void run() {
-        try {
+        try (FileOutputStream outputStream = new
+                FileOutputStream(tmpFile)){
             while (!Thread.interrupted()) {
-                byte data[] = new byte[bufferSize];
+                byte[] data = new byte[bufferSize];
                 int length = audioRecord.read(data, 0, bufferSize);
-                if (length == AudioRecord.ERROR_BAD_VALUE ||
-                        length == AudioRecord.ERROR_INVALID_OPERATION ||
-                        length != bufferSize) {
+                if (length < 0)  //ERROR_INVALID_OPERATION, ERROR_BAD_VALUE, ERROR_DEAD_OBJECT și ERROR,
+                    //toate sunt < 0. Ar trebui poate length != bufferSize?
+                    throw new RecordingException("Recorder failed. Aborting...");
 
-                    if (length != bufferSize) {
-                        Log.wtf(TAG, "length != BufferSize");
-                        continue;
-                    }
-                }
-
-                try {
-                    outputStream.write(data);
-                } catch (IOException e) {
-                    Log.wtf(TAG, "Error while writing recording file: " + e.getMessage());
-                }
+                outputStream.write(data);
             }
+        }
+        catch (RecordingException | IOException e) {
+            Log.wtf(TAG, "Error while writing temp pcm file: " + e.getMessage());
+            if(!tmpFile.delete())
+                Log.wtf(TAG, "Cannot delete incomplete temp pcm file.");
         }
         finally {
             disposeAudioRecord();
-            try {
-                outputStream.close();
-            } catch (IOException e) {
-                Log.wtf(TAG, "Error while closing the recording filestream: " + e.getMessage());
-            }
         }
     }
-
 
     static class CopyPcmToWav implements Runnable {
         private final File wavFile;
@@ -79,16 +61,14 @@ class RecordingThreadWav extends RecordingThread implements Runnable {
 
         @Override
         public void run() {
-            FileInputStream tmpInput;
-            FileOutputStream wavOutput;
             long totalAudioLen, totalDataLen;
             long byteRate = SAMPLE_RATE * channels * BITS_PER_SAMPLE / 8;
             byte[] buffer = new byte[1048576];
-            File tmpFile = new File(CrApp.getInstance().getFilesDir(), TMP_FILE);
+            File tmpFile = new File(CrApp.getInstance().getFilesDir(), TMP_FILE_NAME);
 
-            try {
-                tmpInput = new FileInputStream(tmpFile);
-                wavOutput = new FileOutputStream(wavFile);
+            try (FileInputStream tmpInput = new FileInputStream(tmpFile);
+                 FileOutputStream wavOutput = new FileOutputStream(wavFile)
+            ) {
                 totalAudioLen = tmpInput.getChannel().size();
                 totalDataLen = totalAudioLen + HEADER_REMAINING;
                 writeWaveFileHeader(wavOutput, totalAudioLen, totalDataLen, byteRate);
@@ -96,12 +76,17 @@ class RecordingThreadWav extends RecordingThread implements Runnable {
                 while (tmpInput.read(buffer) != -1) {
                     wavOutput.write(buffer);
                 }
-                tmpInput.close();
-                wavOutput.flush();
-                if(!tmpFile.delete())
-                    Log.wtf(TAG, "Unable to delete temporary file");
+
             } catch (IOException e) {
-                Log.wtf(TAG, e.getMessage());
+                Log.wtf(TAG, "Error while copying temp pcm to wav file: " + e.getMessage());
+                if(!tmpFile.delete() )
+                    Log.wtf(TAG, "Error while deleting temp pcm file on exception.");
+                if(!wavFile.delete())
+                    Log.wtf(TAG, "Error while deleting wav file on exception.");
+            }
+            finally {
+                if(!tmpFile.delete())
+                    Log.wtf(TAG, "Error while deleting temp pcm file on normal exit.");
             }
         }
 

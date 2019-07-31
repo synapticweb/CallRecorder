@@ -22,11 +22,11 @@ import java.util.concurrent.TimeUnit;
 
 //Playerul a fost gîndit pe baza arhitecturii de aici:
 //https://medium.com/google-developers/building-a-simple-audio-app-in-android-part-2-3-a514f6224b83
-public class AudioPlayer extends Thread implements PlayerAdapter {
+class AudioPlayer extends Thread implements PlayerAdapter {
     private final static String TAG = "CallRecorder";
     private int state;
     private String mediaPath;
-    private PlaybackInfoListener playbackInfoListener;
+    private PlaybackListenerInterface playbackListener;
     private ScheduledExecutorService executor;
     private Runnable seekbarPositionUpdateTask;
     private static final int PLAYBACK_POSITION_REFRESH_INTERVAL_MS = 500;
@@ -47,8 +47,8 @@ public class AudioPlayer extends Thread implements PlayerAdapter {
     private int maxWavBuffers;
     private float gainDb = 0;
 
-    AudioPlayer(PlaybackInfoListener listener) {
-        this.playbackInfoListener = listener;
+    AudioPlayer(PlaybackListenerInterface listener) {
+        this.playbackListener = listener;
         state = PlayerAdapter.State.UNINITIALIZED;
     }
 
@@ -88,15 +88,17 @@ public class AudioPlayer extends Thread implements PlayerAdapter {
     }
 
     @Override
-    public void setMediaPosition(int position) {
+    public boolean setMediaPosition(int position) {
         //nu văd probleme cu apelul în INITIALIZED. Există use-case pentru apelul în PLAYING sau în PAUSE: întoarcerea ecranului.
         if(state == PlayerAdapter.State.UNINITIALIZED)
-            throw new InvalidStateException("Attempt to invoke setMediaPosition while in UNINITIALIZED state");
-            seekTo(position);
-            playbackInfoListener.onPositionChanged(position);
-    }
+            Log.w(TAG, "Invoked setMediaPosition() while in UNINITIALIZED state");
 
-    private void putStop() {this.stop = true; }
+        if(seekTo(position)) {
+            playbackListener.onPositionChanged(position);
+            return true;
+        }
+        return false;
+    }
 
     //În cazul WAV:
     //poziția care trebuie raportată este milisecunda la care ne aflăm. Ca să obținem asta trebuie să știm
@@ -105,11 +107,12 @@ public class AudioPlayer extends Thread implements PlayerAdapter {
     //o rotunjire în jos la împărțirea de întregi care produce un bug: după ce mutăm cursorul la un timp nou
     //cursorul se duce puțin în jos - pentru că poziția este raportată incorectă ca fiind mai mică decît
     //ce reală.) Apoi înmulțim cu o mie ca să obținem poziția în milisecunde și convertim la int.
+    //Valoarea maximă a unui int: 2147483647. Suficient pentru ~ 596 de ore.
     @Override
     public int getCurrentPosition() {
         //nu văd probleme cu apelul în INITIALIZED
         if(state == PlayerAdapter.State.UNINITIALIZED)
-            throw new InvalidStateException("Attempt to invoke getCurrentPosition while in UNINITIALIZED state");
+            Log.w(TAG, "Attempt to invoke getCurrentPosition while in UNINITIALIZED state");
         if(formatName.equals(AAC_FORMAT))
             return (int) extractor.getSampleTime() / 1000;
 
@@ -121,52 +124,59 @@ public class AudioPlayer extends Thread implements PlayerAdapter {
 
     //https://stackoverflow.com/questions/21861220/audiotrack-seek-in-android
     @Override
-    public void seekTo(int position) {
+    public boolean seekTo(int position) {
         //nu văd probleme cu apelul în INITIALIZED
         if(state == PlayerAdapter.State.UNINITIALIZED)
-            throw new InvalidStateException("Attempt to invoke seekTo() while in UNINITIALIZED state");
+          Log.w(TAG, "Attempt to invoke seekTo() while in UNINITIALIZED state");
         if(formatName.equals(AAC_FORMAT))
             extractor.seekTo((long) position * 1000, MediaExtractor.SEEK_TO_CLOSEST_SYNC); //MediaExtractor folosește microsecunde, nu milisecunde
         else {
             //44100 samples * 2 channels * 2 bytes per sample = number of bytes per second;
             //number of bytes per second / 1000 = number of bytes per millisecond;
             //number of bytes per millisecond * position = position in milliseconds
-            long newposition = ((SAMPLE_RATE * channelCount * 2) / 1000 ) * position;
+            long newposition = ((SAMPLE_RATE * channelCount * 2) / 1000) * position;
             try {
                 inputWav.seek(newposition);
-                wavBufferCount = newposition / WAV_BUFFER_SIZE; //dacă nu updatăm wavBufferCount cursorul va sări înapoi imediat
             }
-            catch (Exception e) {
+            catch (IOException e) {
                 Log.wtf(TAG, e.getMessage());
+                playbackListener.onError();
+                if(isAlive())
+                    interrupt();
+                return false;
             }
-
+            wavBufferCount = newposition / WAV_BUFFER_SIZE; //dacă nu updatăm wavBufferCount cursorul va sări înapoi imediat
         }
+        return true;
     }
 
     @Override
-    public void loadMedia(String mediaPath) {
+    public boolean loadMedia(String mediaPath) {
         //se apelează în mod obișnuit după construcție, în UNINITIALIZED. Apelarea în INITIALIZED deși inutilă
         //este inofensivă. Apelul în PLAYING sau PAUSE poate crea probleme, de aceea am interzis.
         if(state == PlayerAdapter.State.PLAYING || state == PlayerAdapter.State.PAUSED)
-            throw new InvalidStateException("Attempt to invoke loadMedia() while in PLAYING or PAUSED state");
+            Log.w(TAG, "Attempt to invoke loadMedia() while in PLAYING or PAUSED state");
         this.mediaPath = mediaPath;
         try {
             initialize();
         }
-        catch (InitializationErrorException e){
-            playbackInfoListener.onInitializationError();
+        catch (PlayerException e) {
+            Log.wtf(TAG, e.getMessage());
+            playbackListener.onError();
+            return false;
         }
 
-        playbackInfoListener.onDurationChanged((int) getTotalDuration());
-        playbackInfoListener.onPositionChanged(0);
+        playbackListener.onDurationChanged((int) getTotalDuration());
+        playbackListener.onPositionChanged(0);
+        return true;
     }
 
-   private void initialize() throws InitializationErrorException {
+   private void initialize() throws PlayerException {
         formatName = mediaPath.endsWith(".wav") ? WAV_FORMAT : AAC_FORMAT;
         if(formatName.equals(AAC_FORMAT))
-            initializeForAac(mediaPath);
+            initializeForAac(mediaPath); //exception
         else
-            initializeForWav(mediaPath);
+            initializeForWav(mediaPath); //exception
 
         int channelConfig = channelCount == 1 ? AudioFormat.CHANNEL_OUT_MONO :
                 AudioFormat.CHANNEL_OUT_STEREO;
@@ -181,7 +191,7 @@ public class AudioPlayer extends Thread implements PlayerAdapter {
     //https://thiscouldbebetter.wordpress.com/2011/08/14/reading-and-writing-a-wav-file-in-java/
     //https://stackoverflow.com/questions/3925030/using-audiotrack-in-android-to-play-a-wav-file
     //https://gist.github.com/muetzenflo/3e83975aba6abe63413abd98bb33c401
-    private void initializeForWav(String mediaPath) throws InitializationErrorException {
+    private void initializeForWav(String mediaPath) throws PlayerException {
         final int WAV_HEADER_SIZE = 44;
         final int DATA_SIZE_ADDRESS = 40; //adresa de la care se citește mărimea secțiunii "data" a fișierului
         final int CHANNEL_COUNT_ADDRESS = 22; //adresa de la care se citește nr de canale
@@ -196,10 +206,10 @@ public class AudioPlayer extends Thread implements PlayerAdapter {
             channelCount = (int) inputWav.readByte();
             inputWav.seek(0);
             if(inputWav.skipBytes(WAV_HEADER_SIZE) < WAV_HEADER_SIZE)
-                throw new InitializationErrorException("Wav file corrupted");
+                throw new PlayerException("Initialization error: Wav file corrupted");
         }
-        catch (IOException e) {
-            throw new InitializationErrorException("Initialization error: " + e.getMessage());
+        catch (Exception e) {
+            throw new PlayerException("Initialization error: " + e.getMessage());
         }
 
         //Acest nr este stocat în headerul wav în format little endian, de aceea nu îl pot citi cu
@@ -216,29 +226,29 @@ public class AudioPlayer extends Thread implements PlayerAdapter {
         maxWavBuffers = (int) Math.ceil((double) dataSize / WAV_BUFFER_SIZE);
     }
 
-    private void initializeForAac(String mediaPath) throws InitializationErrorException {
+    private void initializeForAac(String mediaPath) throws PlayerException {
         MediaFormat format;
         extractor = new MediaExtractor();
         try {
             extractor.setDataSource(mediaPath);
-            format = extractor.getTrackFormat(0); //TODO Există situații cînd mărimea fișierului e 0 și acest
+            format = extractor.getTrackFormat(0); //Există situații cînd mărimea fișierului e 0 și acest
             // apel produce InvalidArgumentException
             decoder = MediaCodec.createDecoderByType(format.getString(MediaFormat.KEY_MIME));
             decoder.configure(format, null /* surface */, null /* crypto */, 0 /* flags */);
             channelCount = format.getInteger(MediaFormat.KEY_CHANNEL_COUNT);
+            extractor.selectTrack(0);
+            decoder.start();
         }
-        catch (IOException e) {
-            throw new InitializationErrorException("Initialization error: " + e.getMessage());
+        catch (Exception e) {
+            throw new PlayerException("Initialization error: " + e.getMessage());
         }
-        extractor.selectTrack(0);
-        decoder.start();
     }
 
     //poate fi apelat oricînd
     @Override
     public void stopPlayer() {
         state = PlayerAdapter.State.STOPPED;
-        putStop();
+        stop = true;
         resumeIfPaused();
     }
 
@@ -252,7 +262,7 @@ public class AudioPlayer extends Thread implements PlayerAdapter {
     //normală; în PLAYING nu are niciun efect.
     public void play() {
         if(state == PlayerAdapter.State.UNINITIALIZED)
-            throw new InvalidStateException("Attempt to invoke play while in UNINITIALIZED state");
+            Log.w(TAG, "Attempt to invoke play while in UNINITIALIZED state");
         if(!isAlive())
             start();
         else
@@ -265,7 +275,7 @@ public class AudioPlayer extends Thread implements PlayerAdapter {
     @Override
     public void reset() {
         stopPlayer();
-        playbackInfoListener.onReset();
+        playbackListener.onReset();
     }
 
     @Override
@@ -273,7 +283,7 @@ public class AudioPlayer extends Thread implements PlayerAdapter {
         //pause() nu trebuie chemat în stările UNINITIALIZED sau INITIALIZED pentru că va seta în mod greșit
         //și inutil flagul pause. Apelarea în timpul PAUSED nu are niciun efect.
         if(state == PlayerAdapter.State.UNINITIALIZED || state == PlayerAdapter.State.INITIALIZED)
-            throw new InvalidStateException("Attempt to invoke pause() while in UNINITIALIZED state or INITIALIZED state");
+            Log.w(TAG, "Attempt to invoke pause() while in UNINITIALIZED state or INITIALIZED state");
         pauseIfRunning();
         stopUpdatingPosition(false);
         state = PlayerAdapter.State.PAUSED;
@@ -286,14 +296,14 @@ public class AudioPlayer extends Thread implements PlayerAdapter {
     }
 
     @Override
-    public long getTotalDuration() { //in milliseconds
+    public int getTotalDuration() { //in milliseconds
         //doar UNINITIALIZED e interzis
         if(state == PlayerAdapter.State.UNINITIALIZED)
-            throw new InvalidStateException("Attempt to invoke getTotalDuration() while in UNINITIALIZED state");
+            Log.w(TAG, "Attempt to invoke getTotalDuration() while in UNINITIALIZED state");
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
         retriever.setDataSource(mediaPath);
         String time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-        return Long.parseLong(time);
+        return Integer.parseInt(time);
     }
 
     private void startUpdatingPosition() {
@@ -305,8 +315,8 @@ public class AudioPlayer extends Thread implements PlayerAdapter {
                 public void run() {
                     if(state == PlayerAdapter.State.PLAYING) {
                         int currentPosition = getCurrentPosition();
-                        if(playbackInfoListener != null)
-                            playbackInfoListener.onPositionChanged(currentPosition);
+                        if(playbackListener != null)
+                            playbackListener.onPositionChanged(currentPosition);
                     }
                 }
             };
@@ -320,8 +330,8 @@ public class AudioPlayer extends Thread implements PlayerAdapter {
             executor.shutdownNow();
             executor = null;
             seekbarPositionUpdateTask = null;
-            if(resetPosition && playbackInfoListener != null)
-                playbackInfoListener.onPositionChanged(0);
+            if(resetPosition && playbackListener != null)
+                playbackListener.onPositionChanged(0);
         }
     }
 
@@ -345,7 +355,7 @@ public class AudioPlayer extends Thread implements PlayerAdapter {
     //TODO: error handling see docs. La momentul actual erorile de inițializare produc InitializationErrorException
     // care este prinsă în loadMedia() și este afișat un mesaj de eroare iar butoanele sunt dezactivate. În timpul
     // playbackului pot să apară CodecExceptions care sunt unchecked - produc oprirea aplicației. Poate ar trebui gestionate?
-    private void playAac() {
+    private void playAac() throws PlayerException {
         ByteBuffer[] decoderInputBuffers = decoder.getInputBuffers();
         ByteBuffer[] decoderOutputBuffers = decoder.getOutputBuffers();
         MediaCodec.BufferInfo bufInfo = new MediaCodec.BufferInfo();
@@ -365,7 +375,7 @@ public class AudioPlayer extends Thread implements PlayerAdapter {
                     }
                 }
                 catch (InterruptedException exc) {
-                    Log.wtf(TAG, exc.getMessage());
+                    Log.wtf(TAG, exc.getMessage()); //trebuie gestionată eroarea?
                 }
             }
 
@@ -378,7 +388,7 @@ public class AudioPlayer extends Thread implements PlayerAdapter {
                     else
                         inputBuffer = decoderInputBuffers[inputBufId];
                     if(inputBuffer == null)
-                        throw new RuntimeException("Codec returned null input buffer");
+                        throw new PlayerException("Codec returned null input buffer");
                     int sampleSize = extractor.readSampleData(inputBuffer, 0 /* offset */);
                     long presentationTimeUs = 0;
                     if (sampleSize < 0) {
@@ -403,7 +413,7 @@ public class AudioPlayer extends Thread implements PlayerAdapter {
                 else
                     outputBuffer = decoderOutputBuffers[outputBufId];
                 if(outputBuffer == null)
-                    throw new RuntimeException("Codec returned null output buffer.");
+                    throw new PlayerException("Codec returned null output buffer.");
                 byte[] audioData = new byte[bufInfo.size];
                 outputBuffer.get(audioData);
                 outputBuffer.clear();
@@ -423,7 +433,7 @@ public class AudioPlayer extends Thread implements PlayerAdapter {
         }
 
         if(sawOutputEOS)
-            playbackInfoListener.onPlaybackCompleted();
+            playbackListener.onPlaybackCompleted();
 
         decoder.stop();
         decoder.release();
@@ -432,7 +442,7 @@ public class AudioPlayer extends Thread implements PlayerAdapter {
         audioTrack.release();
     }
 
-    private void playWav() {
+    private void playWav() throws PlayerException {
         int bytesRead;
         byte[] audioBuffer = new byte[WAV_BUFFER_SIZE];
         while(wavBufferCount <= maxWavBuffers && !stop) {
@@ -451,7 +461,7 @@ public class AudioPlayer extends Thread implements PlayerAdapter {
                 bytesRead = inputWav.read(audioBuffer);
             }
             catch (IOException e) {
-                throw new RuntimeException("Error reading from the wav file");
+                throw new PlayerException("Error reading from the wav file");
             }
             ++wavBufferCount;
 
@@ -461,7 +471,7 @@ public class AudioPlayer extends Thread implements PlayerAdapter {
         }
 
         if(wavBufferCount >= maxWavBuffers)
-            playbackInfoListener.onPlaybackCompleted();
+            playbackListener.onPlaybackCompleted();
 
         audioTrack.stop();
         audioTrack.release();
@@ -469,23 +479,16 @@ public class AudioPlayer extends Thread implements PlayerAdapter {
 
     @Override
     public void run() {
-        if(formatName.equals(AAC_FORMAT))
-            playAac();
-        else
-            playWav();
+        try {
+            if (formatName.equals(AAC_FORMAT))
+                playAac();
+            else
+                playWav();
+        }
+        catch (PlayerException e) {
+            playbackListener.onError();
+        }
         stopUpdatingPosition(true);
-    }
-
-    class InvalidStateException extends RuntimeException {
-        InvalidStateException(String message) {
-            super(message);
-        }
-    }
-
-    class InitializationErrorException extends Exception {
-        InitializationErrorException(String message) {
-            super(message);
-        }
     }
 
 }

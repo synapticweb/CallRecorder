@@ -99,7 +99,9 @@ public class CallReceiver extends BroadcastReceiver {
                     // ȘI este diferit de no-incall (a fost modificat într-un nr. obișnuit sau în null), deci este incoming, nu outgoing.
                     if(serviceStarted && !incomingOffhookCalled && (incomingNumber == null || !incomingNumber.equals(NO_INCOMING_NUMBER)) ) {
                         Log.wtf(TAG, "RecorderService.onIncomingOfhook() called");
-                        RecorderService.onIncomingOfhook();
+                        RecorderService service = RecorderService.getService();
+                        if(service != null)
+                            service.onIncomingOfhook();
                         incomingOffhookCalled = true;
                     }
                 }

@@ -22,7 +22,7 @@ abstract class RecordingThread {
     final int bufferSize;
     final AudioRecord audioRecord;
 
-    RecordingThread(String mode) {
+    RecordingThread(String mode) throws RecordingException {
         channels = (mode.equals(Recorder.MONO) ? 1 : 2);
         bufferSize = AudioRecord.getMinBufferSize(SAMPLE_RATE, channels == 1 ? AudioFormat.CHANNEL_IN_MONO : AudioFormat.CHANNEL_IN_STEREO,
                 AudioFormat.ENCODING_PCM_16BIT);
@@ -31,7 +31,7 @@ abstract class RecordingThread {
     }
 
     @SuppressLint("newApi")
-    private AudioRecord createAudioRecord() {
+    private AudioRecord createAudioRecord() throws RecordingException {
         AudioRecord audioRecord = null;
         List<Integer> audioSources = new ArrayList<>(Arrays.asList(
                 MediaRecorder.AudioSource.VOICE_CALL,
@@ -62,7 +62,7 @@ abstract class RecordingThread {
         }
 
         if(audioRecord == null || audioRecord.getState() != AudioRecord.STATE_INITIALIZED)
-            throw new RuntimeException("Unable to initialize AudioRecord");
+            throw new RecordingException("Unable to initialize AudioRecord");
 
         return audioRecord;
     }

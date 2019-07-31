@@ -6,7 +6,6 @@ import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
@@ -34,13 +33,14 @@ public class PlayerActivity extends TemplateActivity {
     AudioPlayer player;
     Recording recording;
     ImageButton playPause, resetPlaying;
+    TextView recordingInfo;
     SeekBar playSeekBar;
     TextView playedTime, totalTime;
     boolean userIsSeeking = false;
     LineBarVisualizer visualizer;
     AudioManager audioManager;
     int phoneVolume;
-    Croller gainControl;
+    Croller gainControl, volumeControl;
     final static int AUDIO_SESSION_ID = 0;
     final static String IS_PLAYING = "is_playing";
     final static String CURRENT_POS = "current_pos";
@@ -132,7 +132,7 @@ public class PlayerActivity extends TemplateActivity {
             }
         });
 
-        Croller volumeControl = findViewById(R.id.volume_control);
+        volumeControl = findViewById(R.id.volume_control);
         if(audioManager != null) {
             volumeControl.setMax(audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC));
             phoneVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
@@ -145,14 +145,14 @@ public class PlayerActivity extends TemplateActivity {
             }
         });
 
-        TextView recordingInfo = findViewById(R.id.recording_info);
+        recordingInfo = findViewById(R.id.recording_info);
         recordingInfo.setText(String.format(getResources().getString(R.string.recording_info),
                 recording.getName(), recording.getHumanReadingFormat()));
 
-        Log.wtf(TAG, "Available width: " + getResources().getDisplayMetrics().widthPixels);
-        Log.wtf(TAG, "Density: " + getResources().getDisplayMetrics().density);
-        Log.wtf(TAG, "Density dpi: " + getResources().getDisplayMetrics().densityDpi);
-        Log.wtf(TAG, "Density scaled: " + getResources().getDisplayMetrics().scaledDensity);
+//        Log.wtf(TAG, "Available width: " + getResources().getDisplayMetrics().widthPixels);
+//        Log.wtf(TAG, "Density: " + getResources().getDisplayMetrics().density);
+//        Log.wtf(TAG, "Density dpi: " + getResources().getDisplayMetrics().densityDpi);
+//        Log.wtf(TAG, "Density scaled: " + getResources().getDisplayMetrics().scaledDensity);
     }
 
     //necesar pentru că dacă apăs pur și simplu pe săgeata back îmi apelează onCreate al activității contactdetail
@@ -182,15 +182,19 @@ public class PlayerActivity extends TemplateActivity {
 //        if(player.getPlayerState() == PlayerAdapter.State.UNINITIALIZED ||
 //                player.getPlayerState() == PlayerAdapter.State.STOPPED) {
         player = new AudioPlayer(new PlaybackListener());
-        player.loadMedia(recording.getPath());
         playedTime.setText("00:00");
+        if(!player.loadMedia(recording.getPath()))
+            return ;
+
         totalTime.setText(CrApp.getDurationHuman(player.getTotalDuration(), false));
         player.setGain(gainControl.getProgress());
 //        }
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
         int currentPosition = pref.getInt(CURRENT_POS, 0);
         boolean isPlaying = pref.getBoolean(IS_PLAYING, true);
-        player.setMediaPosition(currentPosition);
+        if(!player.setMediaPosition(currentPosition)) {
+            return ;
+        }
 
         if(isPlaying) {
             playPause.setBackground(getResources().getDrawable(R.drawable.player_pause));
@@ -228,7 +232,7 @@ public class PlayerActivity extends TemplateActivity {
             audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, phoneVolume, 0);
     }
 
-    class PlaybackListener implements PlaybackInfoListener {
+    class PlaybackListener implements PlaybackListenerInterface {
         @Override
         public void onDurationChanged(int duration) {
             playSeekBar.setMax(duration);
@@ -257,17 +261,23 @@ public class PlayerActivity extends TemplateActivity {
         }
 
         @Override
-        public void onInitializationError() {
+        public void onError() {
+            playPause.setBackground(getResources().getDrawable(R.drawable.player_play));
             playPause.setEnabled(false);
             resetPlaying.setEnabled(false);
-            findViewById(R.id.player_error_message).setVisibility(View.VISIBLE);
+            totalTime.setText("00:00");
+            playSeekBar.setEnabled(false);
+            recordingInfo.setText(getResources().getString(R.string.player_error));
+            recordingInfo.setTextColor(getResources().getColor(R.color.red));
+            volumeControl.setEnabled(false);
+            gainControl.setEnabled(false);
         }
 
         @Override
         public void onReset() {
             player = new AudioPlayer(new PlaybackListener());
-            player.loadMedia(recording.getPath());
-            player.setGain(gainControl.getProgress());
+            if(player.loadMedia(recording.getPath()))
+                player.setGain(gainControl.getProgress());
         }
     }
 }
