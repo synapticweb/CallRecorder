@@ -67,14 +67,13 @@ public class CallReceiver extends BroadcastReceiver {
 
             if((bundle = intent.getExtras()) != null) {
                 state = bundle.getString(TelephonyManager.EXTRA_STATE);
-                Log.wtf(TAG, intent.getAction() + " " + state);
+                Log.d(TAG, intent.getAction() + " " + state);
 
                 //acum serviciul este pornit totdeauna în extra_state_ringing (pentru ca userul să aibă posibilitatea
                 // în cazul nr necunoscute să pornească înregistrarea înainte de începerea convorbirii),
                 if(state != null && state.equals(TelephonyManager.EXTRA_STATE_RINGING)) {
                     incomingNumber = bundle.getString(TelephonyManager.EXTRA_INCOMING_NUMBER);
                     stateRingingCounter++;
-                    Log.wtf(TAG, "Incoming number: " + incomingNumber);
                     //A se citi: dacă serviciul nu a fost încă pornit ȘI (ORI versiunea android e < Pie ORI s-a primit deja de
                     //2 ori starea RINGING). Efectul acestei expresii este că în Pie nu se pornește serviciul decît după ce se
                     //primesc ambele acțiuni RINGING. În versiunile < Pie ori se primește numai o dată RINGING, ori se primește
@@ -90,7 +89,6 @@ public class CallReceiver extends BroadcastReceiver {
 
                         context.startService(intentService);
                         serviceStarted = true;
-                        Log.wtf(TAG, "Service started at incoming call");
                     }
                 }
 
@@ -98,7 +96,6 @@ public class CallReceiver extends BroadcastReceiver {
                     //Citește: dacă serviciul este pornit ȘI nu a fost încă apelat onIncomingOffHook
                     // ȘI este diferit de no-incall (a fost modificat într-un nr. obișnuit sau în null), deci este incoming, nu outgoing.
                     if(serviceStarted && !incomingOffhookCalled && (incomingNumber == null || !incomingNumber.equals(NO_INCOMING_NUMBER)) ) {
-                        Log.wtf(TAG, "RecorderService.onIncomingOfhook() called");
                         RecorderService service = RecorderService.getService();
                         if(service != null)
                             service.onIncomingOfhook();
@@ -112,7 +109,6 @@ public class CallReceiver extends BroadcastReceiver {
                         stopIntent.setComponent(serviceName);
                         context.stopService(stopIntent);
                         serviceStarted = false;
-                        Log.wtf(TAG, "Service stopped by CallReceiver");
                     }
                     incomingNumber = NO_INCOMING_NUMBER;
                     stateRingingCounter = 0;
@@ -122,11 +118,9 @@ public class CallReceiver extends BroadcastReceiver {
             }
         }
         else if(action != null && action.equals(Intent.ACTION_NEW_OUTGOING_CALL)) {
+            Log.d(TAG, intent.getAction());
             String outCall;
-
-            Log.wtf(TAG, intent.getAction());
             outCall = intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER);
-            Log.wtf(TAG, "Outgoing number: " + outCall);
 
             if(!serviceStarted) {
                 Intent intentService = new Intent(context, RecorderService.class);
@@ -136,7 +130,6 @@ public class CallReceiver extends BroadcastReceiver {
 
                 context.startService(intentService);
                 serviceStarted = true;
-                Log.wtf(TAG, "Service started at outgoing call");
             }
 
         }

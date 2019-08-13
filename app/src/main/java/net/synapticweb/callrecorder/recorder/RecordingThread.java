@@ -10,6 +10,7 @@ import android.media.MediaRecorder;
 import android.util.Log;
 
 import net.synapticweb.callrecorder.CrApp;
+import net.synapticweb.callrecorder.CrLog;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -56,7 +57,7 @@ abstract class RecordingThread {
             }
 
             if(audioRecord.getState() == AudioRecord.STATE_INITIALIZED) {
-                Log.wtf(TAG, "Source chosen: " + source);
+                CrLog.log(CrLog.DEBUG, "createAudioRecord(): Audio source chosen: " + source);
                 break;
             }
         }

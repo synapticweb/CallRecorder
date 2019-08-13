@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 
@@ -16,14 +15,13 @@ import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
 
 import net.synapticweb.callrecorder.CrApp;
+import net.synapticweb.callrecorder.CrLog;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.contactdetail.ContactDetailFragment;
 import net.synapticweb.callrecorder.data.Contact;
 import net.synapticweb.callrecorder.data.ContactsRepository;
 import net.synapticweb.callrecorder.data.ContactsContract;
 import net.synapticweb.callrecorder.data.CallRecorderDbHelper;
-
-import java.io.IOException;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -165,7 +163,7 @@ public class ContactsListPresenter implements ContactsListContract.ContactsListP
                 contact.insertInDatabase(CrApp.getInstance());
             }
             catch (SQLException exc) {
-                Log.wtf(TAG, exc.getMessage());
+                CrLog.log(CrLog.ERROR, "Error inserting contact in database: " + exc.getMessage());
             }
             view.setNewAddedContactId(contact.getId());
         }

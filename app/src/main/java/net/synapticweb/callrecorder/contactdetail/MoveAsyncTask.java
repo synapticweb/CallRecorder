@@ -2,10 +2,10 @@ package net.synapticweb.callrecorder.contactdetail;
 
 import android.app.Activity;
 import android.os.AsyncTask;
-import android.util.Log;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 
+import net.synapticweb.callrecorder.CrLog;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.data.Recording;
 
@@ -40,7 +40,6 @@ public class MoveAsyncTask extends AsyncTask<Recording, Integer, Boolean> {
     private long totalSize;
     private MaterialDialog dialog;
     private WeakReference<Activity> activityRef; //http://sohailaziz05.blogspot.com/2014/10/asynctask-and-context-leaking.html
-    private static final String TAG = "CallRecorder";
 
     MoveAsyncTask(String folderPath, long totalSize, Activity activity) {
         this.path = folderPath;
@@ -115,7 +114,7 @@ public class MoveAsyncTask extends AsyncTask<Recording, Integer, Boolean> {
                     break;
             }
             catch (Exception exc) {
-                Log.wtf(TAG, exc.getMessage());
+                CrLog.log(CrLog.ERROR, "Error moving the recording(s): " + exc.getMessage());
                 return false;
             }
         }

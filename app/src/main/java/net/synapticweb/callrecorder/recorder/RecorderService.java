@@ -20,11 +20,10 @@ import android.preference.PreferenceManager;
 
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
-import android.util.Log;
-//import android.support.v4.media.app.NotificationCompat.MediaStyle;device
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import net.synapticweb.callrecorder.CrApp;
+import net.synapticweb.callrecorder.CrLog;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.contactslist.ContactsListActivityMain;
 import net.synapticweb.callrecorder.data.Contact;
@@ -154,6 +153,7 @@ public class RecorderService extends Service {
     }
 
     public void onIncomingOfhook() {
+        CrLog.log(CrLog.DEBUG, "onIncomingOfhook() called");
         if(shouldStartAtHookup) {
             NotificationManager nm = (NotificationManager) CrApp.getInstance().
                     getSystemService(Context.NOTIFICATION_SERVICE);
@@ -171,7 +171,7 @@ public class RecorderService extends Service {
                     putSpeakerOn();
             }
             catch (RecordingException e) {
-                Log.wtf(TAG, "Unable to start recording: " + e.getMessage());
+                CrLog.log(CrLog.ERROR, "onIncomingOfhook: unable to start recording: " + e.getMessage() + " Stoping the service...");
                 stopSelf();
             }
         }
@@ -185,6 +185,7 @@ public class RecorderService extends Service {
 
         receivedNumPhone = intent.getStringExtra(CallReceiver.ARG_NUM_PHONE);
         incoming = intent.getBooleanExtra(CallReceiver.ARG_INCOMING, false);
+        CrLog.log(CrLog.DEBUG, String.format("Recorder service started. Phone number: %s. Incoming: %s", receivedNumPhone, incoming));
 
         //în cazul în care nr primit e null înseamnă că se sună de pe nr privat
         privateCall = (receivedNumPhone == null);
@@ -256,7 +257,7 @@ public class RecorderService extends Service {
                             putSpeakerOn();
                     }
                     catch (RecordingException e) {
-                        Log.wtf(TAG, "Unable to start recorder: " + e.getMessage());
+                        CrLog.log(CrLog.ERROR, "onStartCommand: unable to start recorder: " + e.getMessage() + " Stoping the service...");
                         stopSelf();
                     }
                 }
@@ -270,14 +271,6 @@ public class RecorderService extends Service {
     }
 
     private void resetState() {
-        receivedNumPhone = null;
-        privateCall = null;
-        match = null;
-        incoming = null;
-        shouldStartAtHookup = false;
-        idIfMatch = null;
-        contactNameIfMatch = null;
-        recorder = null;
         self = null;
     }
 
@@ -286,6 +279,7 @@ public class RecorderService extends Service {
         speakerOnThread =  new Thread() {
             @Override
             public void run() {
+                CrLog.log(CrLog.DEBUG, "Speaker has been turned on");
                 try {
                     while(true) {
                         sleep(1000);
@@ -302,8 +296,10 @@ public class RecorderService extends Service {
     }
 
     void putSpeakerOff() {
-        if(speakerOnThread != null)
+        if(speakerOnThread != null) {
             speakerOnThread.interrupt();
+            CrLog.log(CrLog.DEBUG, "Speaker has been turned off");
+        }
         speakerOnThread = null;
         if (audioManager != null && audioManager.isSpeakerphoneOn()) {
             audioManager.setMode(AudioManager.MODE_NORMAL);
@@ -314,6 +310,7 @@ public class RecorderService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        CrLog.log(CrLog.DEBUG, "RecorderService is stoping now...");
 
         putSpeakerOff();
         if(!recorder.isRunning()) {
@@ -338,7 +335,7 @@ public class RecorderService extends Service {
                     contact.insertInDatabase(this);
                 }
                 catch (SQLException  exc) {
-                    Log.wtf(TAG, exc.getMessage());
+                    CrLog.log(CrLog.ERROR, "SQL exception: " + exc.getMessage());
                 }
                 idToInsert = contact.getId();
             }
@@ -359,7 +356,7 @@ public class RecorderService extends Service {
                     contact.insertInDatabase(this);
                 }
                 catch (SQLException exception) {
-                    Log.wtf(TAG, exception.getMessage());
+                    CrLog.log(CrLog.ERROR, "SQL exception: " + exception.getMessage());
                 }
                 idToInsert = contact.getId();
             }
@@ -369,14 +366,14 @@ public class RecorderService extends Service {
                     contact.insertInDatabase(this); //introducerea în db setează id-ul în obiect
                 }
                 catch (SQLException exc) {
-                    Log.wtf(TAG, exc.getMessage());
+                    CrLog.log(CrLog.ERROR, "SQL exception: " + exc.getMessage());
                 }
                 idToInsert = contact.getId();
             }
         }
 
         if(idToInsert == null) {
-            Log.wtf(TAG, "Error at obtaining contact id. No contact inserted. Aborted.");
+            CrLog.log(CrLog.ERROR, "Error at obtaining contact id. No contact inserted. Aborted.");
             resetState();
             return;
         }
@@ -394,7 +391,7 @@ public class RecorderService extends Service {
             db.insert(Recordings.TABLE_NAME, null, values);
         }
         catch(SQLException exc) {
-            Log.wtf(TAG, exc.getMessage());
+            CrLog.log(CrLog.ERROR, "SQL exception: " + exc.getMessage());
         }
 
         resetState();

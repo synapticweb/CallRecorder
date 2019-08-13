@@ -15,7 +15,6 @@ import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.RelativeSizeSpan;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -74,7 +73,6 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
     private static final String ARG_CONTACT = "arg_contact";
     private static final String SELECT_MODE_KEY = "select_mode_key";
     private static final String SELECTED_ITEMS_KEY = "selected_items_key";
-    private static final String TAG = "CallRecorder";
 
     @Override
     public void onAttach(Context context) {
@@ -751,10 +749,8 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         public void onClick(View v) {
             Recording recording = ((RecordingAdapter) recordingsRecycler.getAdapter()).
                     getItem(getAdapterPosition());
-            if(isSelectModeOn()) {
+            if(isSelectModeOn())
                 presenter.selectRecording(v, this.getAdapterPosition(), recording.exists());
-                Log.d(TAG, "");
-            }
             else { //usual short click
                 if(recording.exists())
                     presenter.startPlayerActivity(recording);

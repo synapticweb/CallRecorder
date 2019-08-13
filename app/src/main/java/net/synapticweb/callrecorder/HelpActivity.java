@@ -5,7 +5,6 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentManager;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,7 +45,7 @@ public class HelpActivity extends TemplateActivity {
             is.close();
         }
         catch (Exception e) {
-            Log.wtf(TAG, e.getMessage());
+            CrLog.log(CrLog.ERROR, "Error converting raw html to string: " + e.getMessage());
         }
         return sb.toString();
     }

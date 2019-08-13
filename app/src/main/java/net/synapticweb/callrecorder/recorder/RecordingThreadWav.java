@@ -1,12 +1,14 @@
 package net.synapticweb.callrecorder.recorder;
 
-
-import android.util.Log;
 import net.synapticweb.callrecorder.CrApp;
+import net.synapticweb.callrecorder.CrLog;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+
+import static net.synapticweb.callrecorder.CrLog.ERROR;
 
 
 //bazat pe codul de aici: http://selvaline.blogspot.com/2016/04/record-audio-wav-format-android-how-to.html
@@ -41,9 +43,9 @@ class RecordingThreadWav extends RecordingThread implements Runnable {
             }
         }
         catch (RecordingException | IOException e) {
-            Log.wtf(TAG, "Error while writing temp pcm file: " + e.getMessage());
+            CrLog.log(ERROR, "Error while writing temp pcm file: " + e.getMessage());
             if(!tmpFile.delete())
-                Log.wtf(TAG, "Cannot delete incomplete temp pcm file.");
+                CrLog.log(ERROR, "Cannot delete incomplete temp pcm file.");
         }
         finally {
             disposeAudioRecord();
@@ -78,15 +80,15 @@ class RecordingThreadWav extends RecordingThread implements Runnable {
                 }
 
             } catch (IOException e) {
-                Log.wtf(TAG, "Error while copying temp pcm to wav file: " + e.getMessage());
+                CrLog.log(ERROR, "Error while copying temp pcm to wav file: " + e.getMessage());
                 if(!tmpFile.delete() )
-                    Log.wtf(TAG, "Error while deleting temp pcm file on exception.");
+                    CrLog.log(ERROR, "Error while deleting temp pcm file on exception.");
                 if(!wavFile.delete())
-                    Log.wtf(TAG, "Error while deleting wav file on exception.");
+                    CrLog.log(ERROR, "Error while deleting wav file on exception.");
             }
             finally {
                 if(!tmpFile.delete())
-                    Log.wtf(TAG, "Error while deleting temp pcm file on normal exit.");
+                    CrLog.log(ERROR, "Error while deleting temp pcm file on normal exit.");
             }
         }
 

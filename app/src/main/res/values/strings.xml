@@ -137,6 +137,9 @@
     <string name="volume">Volume</string>
     <string name="gain">Gain</string>
     <string name="recording_info">Playing \"%s\"\n%s</string>
+    <string name="send_devs">Send logs to developer</string>
+    <string name="send_devs_question">Only use this function when requested by the developers.</string>
+    <string name="dev_email">radulescu.e@gmail.com</string>
 </resources>
 
 

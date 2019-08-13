@@ -8,7 +8,6 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import android.text.InputType;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -16,6 +15,7 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 
 import net.synapticweb.callrecorder.CrApp;
+import net.synapticweb.callrecorder.CrLog;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.contactslist.ContactsListFragment;
 import net.synapticweb.callrecorder.data.Contact;
@@ -79,7 +79,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
                     @Override
                     public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
                         if(view.getSelectedItems().size() != 1) {
-                            Log.wtf(TAG, "Calling onRenameClick when multiple recordings are selected");
+                            CrLog.log(CrLog.WARN, "Calling onRenameClick when multiple recordings are selected");
                             return ;
                         }
                         if(Recording.hasIllegalChar(input)) {
@@ -118,7 +118,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
                                 throw new Exception("File.renameTo() has returned false.");
                         }
                         catch (Exception e) {
-                            Log.wtf(TAG, e.getMessage());
+                            CrLog.log(CrLog.ERROR, "Error renaming the recording:" + e.getMessage());
                             new MaterialDialog.Builder(view.getParentActivity())
                                     .title(R.string.error_title)
                                     .content(R.string.rename_error)
@@ -155,7 +155,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
 
         //There should be only one if we are here:
         if(view.getSelectedItems().size() != 1) {
-            Log.wtf(TAG, "Calling onInfoClick when multiple recordings are selected");
+            CrLog.log(CrLog.WARN, "Calling onInfoClick when multiple recordings are selected");
             return ;
         }
         final Recording recording = view.getRecordingsAdapter().getItem(view.getSelectedItems().get(0));
@@ -197,7 +197,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
                             contact.delete(parentActivity);
                         }
                         catch (Exception exc) {
-                            Log.wtf(TAG, exc.getMessage());
+                            CrLog.log(CrLog.ERROR, "Error deleting the contact: " + exc.getMessage());
                         }
                         if(!view.isSinglePaneLayout()) {
                             ContactsListFragment listFragment = (ContactsListFragment)
@@ -310,7 +310,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
                 view.getRecordingsAdapter().removeItem(recording);
             }
             catch (Exception exc) {
-                Log.wtf(TAG, exc.getMessage());
+                CrLog.log(CrLog.ERROR, "Error deleting the selected recording(s): " + exc.getMessage());
             }
         }
 

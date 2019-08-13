@@ -8,9 +8,9 @@ import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.media.MediaMetadataRetriever;
 import android.os.Build;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
+import net.synapticweb.callrecorder.CrLog;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -23,7 +23,6 @@ import java.util.concurrent.TimeUnit;
 //Playerul a fost gîndit pe baza arhitecturii de aici:
 //https://medium.com/google-developers/building-a-simple-audio-app-in-android-part-2-3-a514f6224b83
 class AudioPlayer extends Thread implements PlayerAdapter {
-    private final static String TAG = "CallRecorder";
     private int state;
     private String mediaPath;
     private PlaybackListenerInterface playbackListener;
@@ -91,7 +90,7 @@ class AudioPlayer extends Thread implements PlayerAdapter {
     public boolean setMediaPosition(int position) {
         //nu văd probleme cu apelul în INITIALIZED. Există use-case pentru apelul în PLAYING sau în PAUSE: întoarcerea ecranului.
         if(state == PlayerAdapter.State.UNINITIALIZED)
-            Log.w(TAG, "Invoked setMediaPosition() while in UNINITIALIZED state");
+            CrLog.log(CrLog.WARN, "Invoked setMediaPosition() while in UNINITIALIZED state");
 
         if(seekTo(position)) {
             playbackListener.onPositionChanged(position);
@@ -112,7 +111,7 @@ class AudioPlayer extends Thread implements PlayerAdapter {
     public int getCurrentPosition() {
         //nu văd probleme cu apelul în INITIALIZED
         if(state == PlayerAdapter.State.UNINITIALIZED)
-            Log.w(TAG, "Attempt to invoke getCurrentPosition while in UNINITIALIZED state");
+           CrLog.log(CrLog.WARN, "Attempt to invoke getCurrentPosition while in UNINITIALIZED state");
         if(formatName.equals(AAC_FORMAT))
             return (int) extractor.getSampleTime() / 1000;
 
@@ -127,7 +126,7 @@ class AudioPlayer extends Thread implements PlayerAdapter {
     public boolean seekTo(int position) {
         //nu văd probleme cu apelul în INITIALIZED
         if(state == PlayerAdapter.State.UNINITIALIZED)
-          Log.w(TAG, "Attempt to invoke seekTo() while in UNINITIALIZED state");
+            CrLog.log(CrLog.WARN, "Attempt to invoke seekTo() while in UNINITIALIZED state");
         if(formatName.equals(AAC_FORMAT))
             extractor.seekTo((long) position * 1000, MediaExtractor.SEEK_TO_CLOSEST_SYNC); //MediaExtractor folosește microsecunde, nu milisecunde
         else {
@@ -139,7 +138,7 @@ class AudioPlayer extends Thread implements PlayerAdapter {
                 inputWav.seek(newposition);
             }
             catch (IOException e) {
-                Log.wtf(TAG, e.getMessage());
+                CrLog.log(CrLog.ERROR, "Error while seeking: " + e.getMessage() + " Aborting...");
                 playbackListener.onError();
                 if(isAlive())
                     interrupt();
@@ -155,13 +154,13 @@ class AudioPlayer extends Thread implements PlayerAdapter {
         //se apelează în mod obișnuit după construcție, în UNINITIALIZED. Apelarea în INITIALIZED deși inutilă
         //este inofensivă. Apelul în PLAYING sau PAUSE poate crea probleme, de aceea am interzis.
         if(state == PlayerAdapter.State.PLAYING || state == PlayerAdapter.State.PAUSED)
-            Log.w(TAG, "Attempt to invoke loadMedia() while in PLAYING or PAUSED state");
+            CrLog.log(CrLog.WARN, "Attempt to invoke loadMedia() while in PLAYING or PAUSED state");
         this.mediaPath = mediaPath;
         try {
             initialize();
         }
         catch (PlayerException e) {
-            Log.wtf(TAG, e.getMessage());
+            CrLog.log(CrLog.ERROR, "Error while initializing: " + e.getMessage() + " Aborting...");
             playbackListener.onError();
             return false;
         }
@@ -262,7 +261,7 @@ class AudioPlayer extends Thread implements PlayerAdapter {
     //normală; în PLAYING nu are niciun efect.
     public void play() {
         if(state == PlayerAdapter.State.UNINITIALIZED)
-            Log.w(TAG, "Attempt to invoke play while in UNINITIALIZED state");
+            CrLog.log(CrLog.WARN, "Attempt to invoke play while in UNINITIALIZED state");
         if(!isAlive())
             start();
         else
@@ -283,7 +282,7 @@ class AudioPlayer extends Thread implements PlayerAdapter {
         //pause() nu trebuie chemat în stările UNINITIALIZED sau INITIALIZED pentru că va seta în mod greșit
         //și inutil flagul pause. Apelarea în timpul PAUSED nu are niciun efect.
         if(state == PlayerAdapter.State.UNINITIALIZED || state == PlayerAdapter.State.INITIALIZED)
-            Log.w(TAG, "Attempt to invoke pause() while in UNINITIALIZED state or INITIALIZED state");
+            CrLog.log(CrLog.WARN, "Attempt to invoke pause() while in UNINITIALIZED state or INITIALIZED state");
         pauseIfRunning();
         stopUpdatingPosition(false);
         state = PlayerAdapter.State.PAUSED;
@@ -299,7 +298,7 @@ class AudioPlayer extends Thread implements PlayerAdapter {
     public int getTotalDuration() { //in milliseconds
         //doar UNINITIALIZED e interzis
         if(state == PlayerAdapter.State.UNINITIALIZED)
-            Log.w(TAG, "Attempt to invoke getTotalDuration() while in UNINITIALIZED state");
+            CrLog.log(CrLog.WARN, "Attempt to invoke getTotalDuration() while in UNINITIALIZED state");
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
         retriever.setDataSource(mediaPath);
         String time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
@@ -375,7 +374,7 @@ class AudioPlayer extends Thread implements PlayerAdapter {
                     }
                 }
                 catch (InterruptedException exc) {
-                    Log.wtf(TAG, exc.getMessage()); //trebuie gestionată eroarea?
+                    CrLog.log(CrLog.WARN, "Synchronization error: " + exc.getMessage()); //trebuie gestionată eroarea?
                 }
             }
 
@@ -454,7 +453,7 @@ class AudioPlayer extends Thread implements PlayerAdapter {
                     }
                 }
                 catch (InterruptedException e) {
-                    Log.wtf(TAG, e.getMessage());
+                    CrLog.log(CrLog.WARN, "Synchronization error: " + e.getMessage());
                 }
             }
             try {

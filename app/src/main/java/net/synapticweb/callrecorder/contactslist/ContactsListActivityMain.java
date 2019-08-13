@@ -26,6 +26,8 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
+
+import net.synapticweb.callrecorder.CrLog;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.TemplateActivity;
 import net.synapticweb.callrecorder.HelpActivity;
@@ -52,6 +54,10 @@ public class ContactsListActivityMain extends TemplateActivity {
     protected void onResume() {
         super.onResume();
         checkIfThemeChanged();
+    }
+
+    private TemplateActivity getActivity(){
+        return this;
     }
 
     @Override
@@ -126,6 +132,19 @@ public class ContactsListActivityMain extends TemplateActivity {
                     case R.id.settings: startActivity(new Intent(ContactsListActivityMain.this, SettingsActivity.class));
                         break;
                     case R.id.help: startActivity(new Intent(ContactsListActivityMain.this, HelpActivity.class));
+                        break;
+                    case R.id.send_to_dev: new MaterialDialog.Builder(getActivity())
+                            .content(R.string.send_devs_question)
+                            .positiveText(android.R.string.ok)
+                            .negativeText(android.R.string.cancel)
+                            .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    CrLog.sendLogs(getActivity());
+                                }
+                            })
+                            .show();
+
                 }
                 drawer.closeDrawers();
                 return true;

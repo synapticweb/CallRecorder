@@ -15,18 +15,16 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 
-import android.util.Log;
-
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 
 import net.synapticweb.callrecorder.CrApp;
+import net.synapticweb.callrecorder.CrLog;
 import net.synapticweb.callrecorder.R;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -109,7 +107,7 @@ public class Contact implements Comparable<Contact>, Parcelable {
                         ContactsContract.Contacts._ID + "=" + getId(), null);
         }
         catch (SQLException exception) {
-            Log.wtf(TAG, exception.getMessage());
+            CrLog.log(CrLog.ERROR, "Error updating the contact: " + exception.getMessage());
         }
     }
 

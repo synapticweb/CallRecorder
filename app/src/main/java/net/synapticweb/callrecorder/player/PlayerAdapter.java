@@ -1,8 +1,6 @@
 package net.synapticweb.callrecorder.player;
 
 import androidx.annotation.IntDef;
-
-import java.io.IOException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
@@ -10,7 +8,7 @@ interface PlayerAdapter {
 
     @IntDef({State.UNINITIALIZED, State.INITIALIZED, State.PLAYING, State.PAUSED })
     @Retention(RetentionPolicy.SOURCE)
-    @interface State {
+     @interface State {
         int UNINITIALIZED = 0;
         int INITIALIZED = 1;
         int PLAYING = 2;

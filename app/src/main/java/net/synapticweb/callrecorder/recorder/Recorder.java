@@ -2,9 +2,8 @@ package net.synapticweb.callrecorder.recorder;
 
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.util.Log;
-
 import net.synapticweb.callrecorder.CrApp;
+import net.synapticweb.callrecorder.CrLog;
 import net.synapticweb.callrecorder.settings.SettingsFragment;
 
 import java.io.File;
@@ -13,7 +12,6 @@ import java.util.Date;
 import java.util.Locale;
 
 public class Recorder {
-    private static final String TAG = "CallRecorder";
     private File audioFile;
     private Thread recordingThread;
     private long startingTime;
@@ -63,6 +61,8 @@ public class Recorder {
         String fileName = "Recording" + phoneNumber + new SimpleDateFormat("-d-MMM-yyyy-HH-mm-ss", Locale.US).
                 format(new Date(System.currentTimeMillis())) + extension;
         audioFile = new File(recordingsDir, fileName);
+        CrLog.log(CrLog.DEBUG, String.format("Recording session started. Format: %s. Mode: %s. Save path: %s",
+                format, mode, audioFile.getAbsolutePath()));
 
         if(format.equals(WAV_FORMAT))
             recordingThread = new Thread(new RecordingThreadWav(mode));
@@ -75,6 +75,7 @@ public class Recorder {
 
     void stopRecording() {
         if(recordingThread != null) {
+            CrLog.log(CrLog.DEBUG, "Recording session ended.");
                 recordingThread.interrupt();
             recordingThread = null;
             if(format.equals(WAV_FORMAT)) {

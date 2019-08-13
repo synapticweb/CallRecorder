@@ -7,9 +7,9 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 import net.synapticweb.callrecorder.CrApp;
+import net.synapticweb.callrecorder.CrLog;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.contactdetail.MoveAsyncTask;
 
@@ -80,7 +80,7 @@ public class Recording implements Parcelable {
                     RecordingsContract.Recordings._ID + "=" + id, null);
         }
         catch (SQLException exception) {
-            Log.wtf(TAG, exception.getMessage());
+            CrLog.log(CrLog.ERROR, "Error updating recording: " + exception.getMessage());
         }
     }
 

@@ -23,7 +23,6 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.TextWatcher;
 import android.text.style.RelativeSizeSpan;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -36,6 +35,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -43,6 +43,7 @@ import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
 import net.synapticweb.callrecorder.CrApp;
+import net.synapticweb.callrecorder.CrLog;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.TemplateActivity;
 import net.synapticweb.callrecorder.data.Contact;
@@ -61,7 +62,6 @@ public class EditContactActivity extends TemplateActivity implements AdapterView
     private boolean setInitialPhoneType = false;
     private File savedPhotoPath = null;
     private Uri oldPhotoUri = null;
-    private static final String TAG = "CallRecorder";
     private static final int PICK_IMAGE_REQUEST = 1;
     private static final int TAKE_PICTURE = 2;
     public static final String EDITED_CONTACT = "edited_contact";
@@ -290,10 +290,13 @@ public class EditContactActivity extends TemplateActivity implements AdapterView
     private void takePhoto(){
         setPhotoPath();
         try {
-            savedPhotoPath.createNewFile();
+            if(!savedPhotoPath.createNewFile())
+                throw new IOException("File already exists");
         }
         catch (IOException ioe) {
-            Log.wtf(TAG, ioe.getMessage());
+            CrLog.log(CrLog.ERROR, "Error creating new photo file: " + ioe.getMessage());
+            Toast.makeText(this, "Cannot take new photo.", Toast.LENGTH_SHORT).show();
+            return ;
         }
 
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -311,13 +314,22 @@ public class EditContactActivity extends TemplateActivity implements AdapterView
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         Uri chosenPhotoUri;
-        if (resultCode != Activity.RESULT_OK ) {
-            Log.wtf(TAG, "The result code is error");
+        if (resultCode != Activity.RESULT_OK) {
+            if(requestCode == TAKE_PICTURE) {
+                CrLog.log(CrLog.ERROR, "The take picture activity returned this error code: " + resultCode);
+                Toast.makeText(this, "Cannot take picture", Toast.LENGTH_SHORT).show();
+            }
+            if(requestCode == PICK_IMAGE_REQUEST) {
+                CrLog.log(CrLog.ERROR, "The pick image activity returned this error code: " + resultCode);
+                Toast.makeText(this, "Cannot pick picture", Toast.LENGTH_SHORT).show();
+            }
             if(resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 CropImage.ActivityResult result = CropImage.getActivityResult(data);
                 Exception error = result.getError();
-                Log.wtf(TAG, error.getMessage());
+                CrLog.log(CrLog.ERROR,  "Error cropping the image: " + error.getMessage());
+                Toast.makeText(this, "Cannot crop the image", Toast.LENGTH_SHORT).show();
             }
             return;
         }

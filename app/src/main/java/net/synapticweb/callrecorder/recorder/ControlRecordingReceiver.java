@@ -7,15 +7,14 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 import net.synapticweb.callrecorder.CrApp;
+import net.synapticweb.callrecorder.CrLog;
 import net.synapticweb.callrecorder.settings.SettingsFragment;
 
 
-public class ControlRecordingReceiver extends BroadcastReceiver {
-    private static final String TAG = "CallRecorder";
 
+public class ControlRecordingReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(CrApp.getInstance());
@@ -36,7 +35,7 @@ public class ControlRecordingReceiver extends BroadcastReceiver {
                         service.putSpeakerOn();
                 }
                 catch (RecordingException exc) {
-                    Log.wtf(TAG, "Unable to start recorder: "  + exc.getMessage());
+                    CrLog.log(CrLog.ERROR, "ControlRecordingReceiver: unable to start recorder: "  + exc.getMessage());
                     service.stopSelf();
                 }
             }

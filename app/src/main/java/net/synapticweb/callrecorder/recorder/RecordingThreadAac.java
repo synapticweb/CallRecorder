@@ -4,7 +4,8 @@ import android.media.AudioRecord;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
-import android.util.Log;
+import net.synapticweb.callrecorder.CrLog;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -56,9 +57,9 @@ class RecordingThreadAac extends RecordingThread implements Runnable {
         // De văzut dacă trebuie listener. Singurul avantaj pe care îl văd acum ar fi că apelul stopRecording
         //ar nulifica obiectul threadului. E necesar?
         catch (RecordingException | IOException e) {
-            Log.wtf(TAG, "Error while writing aac file: " + e.getMessage());
+            CrLog.log(CrLog.ERROR, "Error while writing aac file: " + e.getMessage());
             if (!outputFile.delete())
-                Log.wtf(TAG, "Cannot delete incomplete aac file");
+                CrLog.log(CrLog.ERROR, "Cannot delete incomplete aac file");
         }
         finally {
             disposeAudioRecord();
