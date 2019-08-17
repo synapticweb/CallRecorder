@@ -4,6 +4,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentManager;
 
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -57,11 +58,14 @@ public class HelpActivity extends TemplateActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setTheme();
+        Resources res = getResources();
 
         content[0] = rawHtmlToString(R.raw.help_recording_calls);
         content[1] = rawHtmlToString(R.raw.help_playing_recordings);
         content[2] = rawHtmlToString(R.raw.help_managing_recordings);
         content[3] = rawHtmlToString(R.raw.help_about);
+        content[3] = String.format(content[3], res.getString(R.string.app_name), BuildConfig.VERSION_NAME,
+                res.getString(R.string.dev_email), res.getString(R.string.dev_email));
         content[4] = rawHtmlToString(R.raw.help_licences);
 
         if(getSettedTheme().equals(TemplateActivity.DARK_THEME)) {
@@ -69,11 +73,11 @@ public class HelpActivity extends TemplateActivity {
                 content[i] = content[i].replace("light", "dark");
         }
 
-        contentTitles[0] = getResources().getString(R.string.help_title2);
-        contentTitles[1] = getResources().getString(R.string.help_title3);
-        contentTitles[2] = getResources().getString(R.string.help_title4);
-        contentTitles[3] = getResources().getString(R.string.about_name);
-        contentTitles[4] = getResources().getString(R.string.help_title5);
+        contentTitles[0] = res.getString(R.string.help_title2);
+        contentTitles[1] = res.getString(R.string.help_title3);
+        contentTitles[2] = res.getString(R.string.help_title4);
+        contentTitles[3] = res.getString(R.string.about_name);
+        contentTitles[4] = res.getString(R.string.help_title5);
 
         setContentView(R.layout.help_activity);
         pager = findViewById(R.id.help_pager);

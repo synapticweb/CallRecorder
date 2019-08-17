@@ -1,16 +1,34 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'io.fabric'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
     buildToolsVersion "28.0.3"
     defaultConfig {
         applicationId "net.synapticweb.callrecorder"
         minSdkVersion 21
-        targetSdkVersion 28
+        targetSdkVersion 29
         versionCode 1
-        versionName "0.9 beta"
+        versionName "0.9.1beta"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+    flavorDimensions "version"
+
+    productFlavors {
+        eval {
+            dimension "version"
+            applicationIdSuffix ".eval"
+            versionNameSuffix "-eval"
+        }
+
+        full {
+            dimension "version"
+            applicationIdSuffix ".full"
+            versionNameSuffix "-full"
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -22,6 +40,7 @@ android {
         targetCompatibility JavaVersion.VERSION_1_7
     }
 }
+
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
@@ -49,4 +68,9 @@ dependencies {
     // al meu.)
     //https://stackoverflow.com/questions/25610727/adding-external-library-in-android-studio/29791082
     implementation project(':Croller')
+    //https://developers.google.com/analytics/devguides/collection/firebase/android/start
+    //Firebase folosim numai în release, fără debug
+    releaseImplementation 'com.google.firebase:firebase-analytics:17.0.1'
+    releaseImplementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
+
 }

@@ -42,6 +42,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
+import net.synapticweb.callrecorder.Config;
 import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.CrLog;
 import net.synapticweb.callrecorder.R;
@@ -300,12 +301,12 @@ public class EditContactActivity extends TemplateActivity implements AdapterView
         }
 
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(this, "net.synapticweb.callrecorder.fileprovider", savedPhotoPath));
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(this, Config.FILE_PROVIDER, savedPhotoPath));
         //fără chestia de mai jos aplicația foto crapă în kitkat cu java.lang.SecurityException:
         // Permission Denial: opening provider android.support.v4.content.FileProvider
         //https://stackoverflow.com/questions/24467696/android-file-provider-permission-denial
         if ( Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP ) {
-            intent.setClipData(ClipData.newRawUri("", FileProvider.getUriForFile(this, "net.synapticweb.callrecorder.fileprovider", savedPhotoPath)));
+            intent.setClipData(ClipData.newRawUri("", FileProvider.getUriForFile(this, Config.FILE_PROVIDER, savedPhotoPath)));
             intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION|Intent.FLAG_GRANT_READ_URI_PERMISSION);
         }
         if (intent.resolveActivity(getPackageManager()) != null)
@@ -336,7 +337,7 @@ public class EditContactActivity extends TemplateActivity implements AdapterView
 
         if (requestCode == PICK_IMAGE_REQUEST && (chosenPhotoUri = data.getData()) != null) {
             CropImage.activity(chosenPhotoUri).setCropShape(CropImageView.CropShape.OVAL)
-                    .setOutputUri(FileProvider.getUriForFile(this, "net.synapticweb.callrecorder.fileprovider", savedPhotoPath))
+                    .setOutputUri(FileProvider.getUriForFile(this, Config.FILE_PROVIDER, savedPhotoPath))
                     .setAspectRatio(1,1)
                     .setMaxCropResultSize(2000, 2000) //vezi mai jos comentariul
                     .setOutputCompressFormat(Bitmap.CompressFormat.JPEG)
@@ -354,9 +355,9 @@ public class EditContactActivity extends TemplateActivity implements AdapterView
             dataChanged = true;
         }
         else if(requestCode == TAKE_PICTURE) {
-            CropImage.activity(FileProvider.getUriForFile(this, "net.synapticweb.callrecorder.fileprovider", savedPhotoPath))
+            CropImage.activity(FileProvider.getUriForFile(this, Config.FILE_PROVIDER, savedPhotoPath))
                     .setCropShape(CropImageView.CropShape.OVAL)
-                    .setOutputUri(FileProvider.getUriForFile(this, "net.synapticweb.callrecorder.fileprovider", savedPhotoPath))
+                    .setOutputUri(FileProvider.getUriForFile(this, Config.FILE_PROVIDER, savedPhotoPath))
                     .setMaxCropResultSize(2000, 2000) //necesar, pentru că dacă poza e prea mare apare un rotund negru
                     .setOutputCompressFormat(Bitmap.CompressFormat.JPEG) //necesar, pentru că fișierul output are
                     //totdeauna extensia .jpg

@@ -73,6 +73,7 @@ public class CrLog {
 
     private static void writeHeader() throws IOException {
         String header = "";
+        header += "APP VERSION: " + BuildConfig.VERSION_NAME + "\n";
         header += "MODEL: " + Build.MODEL + "\n";
         header += "MANUFACTURER: " + Build.MANUFACTURER + "\n";
         header += "SDK: " + Build.VERSION.SDK_INT + "\n";
@@ -93,12 +94,17 @@ public class CrLog {
     }
 
     public static void log(@levels String level, String message) {
-        switch (level) {
-            case DEBUG: Log.d(TAG, message);
-                break;
-            case WARN: Log.w(TAG, message);
-                break;
-            case ERROR: Log.wtf(TAG, message);
+        if(BuildConfig.DEBUG) {
+            switch (level) {
+                case DEBUG:
+                    Log.d(TAG, message);
+                    break;
+                case WARN:
+                    Log.w(TAG, message);
+                    break;
+                case ERROR:
+                    Log.wtf(TAG, message);
+            }
         }
 
         if(!logFile.exists()) {

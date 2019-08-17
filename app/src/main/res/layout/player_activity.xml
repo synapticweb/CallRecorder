@@ -111,7 +111,7 @@ ascunse pe jumătate în susul ecranului.
             android:orientation="horizontal"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="40dp"
             android:gravity="center_vertical"
             android:weightSum="14">
 

@@ -17,6 +17,7 @@ import androidx.core.content.FileProvider;
 
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 
+import net.synapticweb.callrecorder.Config;
 import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.CrLog;
 import net.synapticweb.callrecorder.R;
@@ -274,7 +275,7 @@ public class Contact implements Comparable<Contact>, Parcelable {
         if(photoUriStr != null) {
             this.photoUri = Uri.parse(photoUriStr);
             String authority = photoUri.getAuthority();
-            if(authority != null && !authority.equals("net.synapticweb.callrecorder.fileprovider")) {
+            if(authority != null && !authority.equals(Config.FILE_PROVIDER)) {
                 Context context = CrApp.getInstance();
                 try {
                     Bitmap originalPhotoBitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), photoUri);
@@ -282,7 +283,7 @@ public class Contact implements Comparable<Contact>, Parcelable {
                     File copiedPhotoFile = new File(context.getFilesDir(), getPhoneNumber() + System.currentTimeMillis() + ".jpg");
                     OutputStream os = new FileOutputStream(copiedPhotoFile);
                     originalPhotoBitmap.compress(Bitmap.CompressFormat.JPEG, 70, os);
-                    setPhotoUri(FileProvider.getUriForFile(context, "net.synapticweb.callrecorder.fileprovider", copiedPhotoFile));
+                    setPhotoUri(FileProvider.getUriForFile(context, Config.FILE_PROVIDER, copiedPhotoFile));
                 }
                 catch(IOException exception) {
                    this.photoUri = null;
