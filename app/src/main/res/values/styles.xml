@@ -1,5 +1,5 @@
 <resources>
-    <style name="AppThemeLight" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="AppThemeLight" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="colorPrimary">@color/primaryColor</item>
         <item name="colorPrimaryDark">@color/primaryDarkColor</item>
         <item name="colorAccent">@color/colorAccent</item>
@@ -13,9 +13,12 @@
         <item name="detailHeaderStyle">@style/detailHeader.Light</item>
         <item name="tabletCurrentSelectionStyle">@style/tabletCurrentSelectionLight</item>
         <item name="playerControlStyle">@style/playerControlStyleLight</item>
+        <item name="drawerStyle">@style/drawerStyleLight</item>
+        <item name="helpTabStyle">@style/helpTabStyleLight</item>
+        <item name="backgroundActivity">@style/backgroundActivityLight</item>
     </style>
 
-    <style name="AppThemeDark" parent="Theme.AppCompat.NoActionBar">
+    <style name="AppThemeDark" parent="Theme.MaterialComponents.NoActionBar">
         <item name="colorPrimary">@color/primaryColor</item>
         <item name="colorPrimaryDark">@color/primaryDarkColor</item>
         <item name="colorAccent">@color/colorAccent</item>
@@ -27,8 +30,10 @@
         <item name="detailHeaderStyle">@style/detailHeader.Dark</item>
         <item name="tabletCurrentSelectionStyle">@style/tabletCurrentSelectionDark</item>
         <item name="playerControlStyle">@style/playerControlStyleDark</item>
+        <item name="drawerStyle">@style/drawerStyleDark</item>
+        <item name="helpTabStyle">@style/helpTabStyleDark</item>
+        <item name="backgroundActivity">@style/backgroundActivityDark</item>
     </style>
-
 
 <!-- Stiluri diferite pentru un element în funcție de tema selectată:
 https://stackoverflow.com/questions/30487616/android-overriding-a-style-per-theme-->
@@ -69,7 +74,7 @@ https://stackoverflow.com/questions/30487616/android-overriding-a-style-per-them
     </style>
 
     <style name="setupButtons" parent="TextAppearance.AppCompat.Button">
-        <item name="android:background">@color/setupButton</item>
+        <item name="android:backgroundTint">@color/setupButton</item>
         <item name="android:textColor">@color/white</item>
     </style>
 
@@ -118,6 +123,32 @@ https://stackoverflow.com/questions/30487616/android-overriding-a-style-per-them
 
     <style name="toolbar_font_contacts" parent="@style/Base.TextAppearance.AppCompat.Title">
         <item name="android:textSize">13sp</item>
+    </style>
+
+    <style name="drawerStyleLight">
+        <item name="itemTextColor">@color/text_on_light</item>
+        <item name="itemIconTint">@color/text_on_light</item>
+    </style>
+
+    <style name="drawerStyleDark">
+        <item name="itemTextColor">@color/text_on_dark</item>
+        <item name="itemIconTint">@color/text_on_dark</item>
+    </style>
+
+    <style name="helpTabStyleLight">
+        <item name="tabTextColor">@color/text_on_light</item>
+    </style>
+
+    <style name="helpTabStyleDark">
+        <item name="tabTextColor">@color/text_on_dark</item>
+    </style>
+
+
+    <style name="backgroundActivityLight">
+    </style>
+
+    <style name="backgroundActivityDark">
+        <item name="android:background">@color/darkBackground</item>
     </style>
 <!-- Pentru background-ul alb: https://stackoverflow.com/questions/22320663/change-background-popupmenu-in-android -->
 <!--Ca să poată fi folosit cu android:theme, pentru a fi aplicat tuturor copiilor unui View trebuie să moștenească

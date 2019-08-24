@@ -10,6 +10,10 @@ import android.text.Spanned;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -167,5 +171,23 @@ public class CrApp extends Application {
         public void setTypeName(String typeName) {
             this.typeName = typeName;
         }
+    }
+
+    public static String rawHtmlToString(int fileRes) {
+        StringBuilder sb = new StringBuilder();
+        try {
+            InputStream is = getInstance().getResources().openRawResource(fileRes);
+            BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+            String str;
+            while ((str = br.readLine()) != null) {
+                sb.append(str);
+            }
+            br.close();
+            is.close();
+        }
+        catch (Exception e) {
+            CrLog.log(CrLog.ERROR, "Error converting raw html to string: " + e.getMessage());
+        }
+        return sb.toString();
     }
 }

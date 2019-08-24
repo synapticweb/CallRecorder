@@ -3,29 +3,23 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    style="?backgroundActivity"
-    >
+    android:layout_height="match_parent">
 
     <androidx.appcompat.widget.Toolbar
         android:layout_height="?attr/actionBarSize"
         android:layout_width="match_parent"
         android:background="?attr/colorPrimary"
-        app:titleTextColor="@color/textOnDark"
-        android:id="@+id/toolbar_settings"
-        app:title="Settings"
-        android:elevation="2dp"
         android:theme="@style/toolbar_theme"
-        app:titleTextAppearance="@style/toolbar_font"
-        >
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        android:id="@+id/toolbar_show_eula"
+        android:elevation="2dp"
+        app:title="@string/eula_title"
+        />
 
-    </androidx.appcompat.widget.Toolbar>
-
-    <FrameLayout
+    <WebView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/settings_container">
-
-    </FrameLayout>
+        android:id="@+id/eula_hmtl">
+    </WebView>
 
 </LinearLayout>

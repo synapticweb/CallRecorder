@@ -130,7 +130,8 @@
     <string name="help_title2">Recording calls</string>
     <string name="help_title3">Playing recordings</string>
     <string name="help_title4">Managing recordings</string>
-    <string name="help_title5">Licenses</string>
+    <string name="help_title5">EULA</string>
+    <string name="help_title6">Third party licenses</string>
     <string name="app_description">A call recording application built for simplicity and speed.</string>
     <string name="player_error">Error while playing the audio file. Please restart the application.</string>
     <string name="player_title">Audio player</string>
@@ -140,6 +141,10 @@
     <string name="send_devs">Send logs to developer</string>
     <string name="send_devs_question">Only use this function when requested by the developers.</string>
     <string name="dev_email">radulescu.e@gmail.com</string>
+    <string name="eula_agree">I have read and I agree with the Terms of use of the application</string>
+    <string name="show_eula_text">Terms of use</string>
+    <string name="eula_title">EULA</string>
+    <string name="version_eula_screen">Version %s</string>
 </resources>
 
 

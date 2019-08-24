@@ -271,7 +271,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         toggleView(menuRightBtn, false, animateAplha ? null : selectMode ? 0f : 1f);
 
         if(!isSinglePaneLayout()) {
-            Button hamburger = parentActivity.findViewById(R.id.hamburger);
+            ImageButton hamburger = parentActivity.findViewById(R.id.hamburger);
             toggleView(hamburger, false, animateAplha ? null : selectMode ? 0f : 1f);
         }
 

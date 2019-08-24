@@ -1,5 +1,6 @@
 package net.synapticweb.callrecorder.setup;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -15,8 +16,8 @@ public class SetupActivity extends TemplateActivity {
 
     @Override
     protected Fragment createFragment() {
-        if((checkResult & ContactsListActivityMain.IS_FIRST_RUN) != 0)
-            return new SetupConfirmationFragment();
+        if((checkResult & ContactsListActivityMain.EULA_NOT_ACCEPTED) != 0)
+            return new SetupEulaFragment();
         else if((checkResult & ContactsListActivityMain.PERMS_NOT_GRANTED) != 0)
             return new SetupPermissionsFragment();
         else if((checkResult & ContactsListActivityMain.POWER_OPTIMIZED) != 0)
@@ -31,7 +32,7 @@ public class SetupActivity extends TemplateActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.setup_activity);
         checkResult = getIntent().getIntExtra(ContactsListActivityMain.SETUP_ARGUMENT,
-                ContactsListActivityMain.IS_FIRST_RUN & ContactsListActivityMain.PERMS_NOT_GRANTED &
+                ContactsListActivityMain.EULA_NOT_ACCEPTED & ContactsListActivityMain.PERMS_NOT_GRANTED &
                         ContactsListActivityMain.POWER_OPTIMIZED);
         insertFragment(R.id.setup_fragment_container);
     }
@@ -40,8 +41,17 @@ public class SetupActivity extends TemplateActivity {
         return checkResult;
     }
 
+    public void cancelSetup() {
+        Intent intent = new Intent();
+        intent.putExtra(SetupActivity.EXIT_APP, true);
+        setResult(RESULT_OK, intent);
+        finish();
+    }
+
     @Override
-    public void onBackPressed() { }
+    public void onBackPressed() {
+        cancelSetup();
+    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {

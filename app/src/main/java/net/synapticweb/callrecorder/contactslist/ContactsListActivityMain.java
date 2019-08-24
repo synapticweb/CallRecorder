@@ -19,7 +19,7 @@ import androidx.preference.PreferenceManager;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.DialogAction;
@@ -36,11 +36,10 @@ import net.synapticweb.callrecorder.setup.SetupActivity;
 
 
 public class ContactsListActivityMain extends TemplateActivity {
-    private static final String TAG = "CallRecorder";
     private static final int REQUEST_PHONE_NUMBER = 1;
     private static final int SETUP_ACTIVITY = 3;
-    public static final String HAS_RUN_ONCE = "has_run_once";
-    public static final int IS_FIRST_RUN = 1;
+    public static final String HAS_ACCEPTED_EULA = "has_accepted_eula";
+    public static final int EULA_NOT_ACCEPTED = 1;
     public static final int PERMS_NOT_GRANTED = 2;
     public static final int POWER_OPTIMIZED = 4;
     public static final String SETUP_ARGUMENT = "setup_arg";
@@ -78,14 +77,14 @@ public class ContactsListActivityMain extends TemplateActivity {
 
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        int isFirstRun = settings.getBoolean(HAS_RUN_ONCE, false) ? 0 : IS_FIRST_RUN;
+        int eulaNotAccepted = settings.getBoolean(HAS_ACCEPTED_EULA, false) ? 0 : EULA_NOT_ACCEPTED;
         int permsNotGranted = 0, powerOptimized = 0;
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             permsNotGranted = checkPermissions() ? 0 : PERMS_NOT_GRANTED;
             if(pm != null)
                 powerOptimized = pm.isIgnoringBatteryOptimizations(getPackageName()) ? 0 : POWER_OPTIMIZED;
         }
-        int checkResult = isFirstRun | permsNotGranted | powerOptimized;
+        int checkResult = eulaNotAccepted | permsNotGranted | powerOptimized;
 
         if(checkResult != 0) {
             Intent setupIntent = new Intent(this, SetupActivity.class);
@@ -105,7 +104,7 @@ public class ContactsListActivityMain extends TemplateActivity {
             }
         });
 
-        Button hamburger = findViewById(R.id.hamburger);
+        ImageButton hamburger = findViewById(R.id.hamburger);
         final DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.navigation_view);
 

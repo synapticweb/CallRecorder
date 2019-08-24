@@ -3,6 +3,16 @@ body {
 	line-height: 1.3em;
 }
 
+h1 {
+	font-size: 1.6em;
+	line-height: 1.1em;
+}
+
+h2 {
+	font-size: 1.2em;
+	line-height: 1.1em;
+}
+
 .small-image {
 	width: 35px; 
 	height: 35px; 

@@ -18,38 +18,14 @@ import androidx.fragment.app.FragmentPagerAdapter;
 
 import com.google.android.material.tabs.TabLayout;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-
-
 public class HelpActivity extends TemplateActivity {
     ViewPager pager;
     HelpPagerAdapter adapter;
-    static String[] content = new String[5];
-    static String[] contentTitles = new String[5];
-    static final int NUM_PAGES = 5;
-    static final String TAG = "CallRecorder";
+    static final int NUM_PAGES = 6;
+    static String[] content = new String[NUM_PAGES];
+    static String[] contentTitles = new String[NUM_PAGES];
 
     //am folosit R.raw pentru posibilitatea traducerii: res/raw-de/ for german
-    private String rawHtmlToString(int fileRes) {
-        StringBuilder sb = new StringBuilder();
-        try {
-            InputStream is = getResources().openRawResource(fileRes);
-            BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
-            String str;
-            while ((str = br.readLine()) != null) {
-                sb.append(str);
-            }
-            br.close();
-            is.close();
-        }
-        catch (Exception e) {
-            CrLog.log(CrLog.ERROR, "Error converting raw html to string: " + e.getMessage());
-        }
-        return sb.toString();
-    }
 
     @Override
     protected Fragment createFragment() { return null; }
@@ -60,13 +36,15 @@ public class HelpActivity extends TemplateActivity {
         setTheme();
         Resources res = getResources();
 
-        content[0] = rawHtmlToString(R.raw.help_recording_calls);
-        content[1] = rawHtmlToString(R.raw.help_playing_recordings);
-        content[2] = rawHtmlToString(R.raw.help_managing_recordings);
-        content[3] = rawHtmlToString(R.raw.help_about);
+        content[0] = CrApp.rawHtmlToString(R.raw.help_recording_calls);
+        content[1] = CrApp.rawHtmlToString(R.raw.help_playing_recordings);
+        content[2] = CrApp.rawHtmlToString(R.raw.help_managing_recordings);
+        content[3] = CrApp.rawHtmlToString(R.raw.help_about);
         content[3] = String.format(content[3], res.getString(R.string.app_name), BuildConfig.VERSION_NAME,
                 res.getString(R.string.dev_email), res.getString(R.string.dev_email));
-        content[4] = rawHtmlToString(R.raw.help_licences);
+        content[4] = CrApp.rawHtmlToString(R.raw.eula);
+        content[4] = String.format(content[4], res.getString(R.string.app_name));
+        content[5] = CrApp.rawHtmlToString(R.raw.help_licences);
 
         if(getSettedTheme().equals(TemplateActivity.DARK_THEME)) {
             for(int i = 0; i < content.length; ++i)
@@ -78,6 +56,7 @@ public class HelpActivity extends TemplateActivity {
         contentTitles[2] = res.getString(R.string.help_title4);
         contentTitles[3] = res.getString(R.string.about_name);
         contentTitles[4] = res.getString(R.string.help_title5);
+        contentTitles[5] = res.getString(R.string.help_title6);
 
         setContentView(R.layout.help_activity);
         pager = findViewById(R.id.help_pager);

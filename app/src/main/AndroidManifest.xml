@@ -65,6 +65,8 @@
             android:parentActivityName=".contactdetail.ContactDetailActivity"
             android:configChanges="orientation|screenSize"/>
 
+        <activity android:name=".setup.ShowEulaActivity"
+            android:parentActivityName=".setup.SetupActivity" />
 
         <receiver android:name=".recorder.CallReceiver">
             <intent-filter>

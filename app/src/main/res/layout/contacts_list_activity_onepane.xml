@@ -23,11 +23,12 @@
         android:elevation="2dp"
         >
 
-        <Button
+        <ImageButton
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_gravity="start"
-            android:background="@drawable/baseline_menu_white_24"
+            android:src="@drawable/menu"
+            android:backgroundTint="@android:color/transparent"
             android:id="@+id/hamburger"/>
 
         <TextView
@@ -57,20 +58,17 @@
 
     </FrameLayout>
 
-    <!--<FrameLayout-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:id="@+id/setup_fragment_container">-->
-    <!--</FrameLayout>-->
-
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/add_numbers"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        android:src="@drawable/ic_plus"
-        android:layout_margin="16dp" />
+        app:srcCompat="@drawable/ic_plus"
+        android:layout_margin="16dp"
+        android:backgroundTint="@color/colorAccent"
+        app:tint="@color/white"
+        />
 </RelativeLayout>
 
     <com.google.android.material.navigation.NavigationView
@@ -80,6 +78,7 @@
         android:fitsSystemWindows="true"
         app:menu="@menu/drawer_view"
         android:id="@+id/navigation_view"
+        style="?drawerStyle"
         >
 
     </com.google.android.material.navigation.NavigationView>

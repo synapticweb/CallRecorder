@@ -7,21 +7,23 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
 
+import net.synapticweb.callrecorder.BuildConfig;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.contactslist.ContactsListActivityMain;
 
-import static android.app.Activity.RESULT_OK;
-
-public class SetupConfirmationFragment extends Fragment {
+public class SetupEulaFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.setup_confirmation_fragment, container, false);
+        return inflater.inflate(R.layout.setup_eula_fragment, container, false);
 
     }
 
@@ -31,14 +33,23 @@ public class SetupConfirmationFragment extends Fragment {
         final SetupActivity parentActivity = (SetupActivity) getActivity();
         final int checkResult = parentActivity.getCheckResult();
 
+        TextView version = parentActivity.findViewById(R.id.app_version);
+        version.setText(String.format(parentActivity.getResources().getString(R.string.version_eula_screen),
+                BuildConfig.VERSION_NAME) );
+
+        Button showEula = parentActivity.findViewById(R.id.show_eula);
+        showEula.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getActivity(), ShowEulaActivity.class));
+            }
+        });
+
         Button cancelButton = parentActivity.findViewById(R.id.setup_confirm_cancel);
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent();
-                intent.putExtra(SetupActivity.EXIT_APP, true);
-                parentActivity.setResult(RESULT_OK, intent);
-                parentActivity.finish();
+                parentActivity.cancelSetup();
             }
         });
 
@@ -46,9 +57,13 @@ public class SetupConfirmationFragment extends Fragment {
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                CheckBox hasAccepted = parentActivity.findViewById(R.id.has_accepted);
+                if(!hasAccepted.isChecked())
+                    return ;
+
                 SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(parentActivity);
                 SharedPreferences.Editor editor = settings.edit();
-                editor.putBoolean(ContactsListActivityMain.HAS_RUN_ONCE, true);
+                editor.putBoolean(ContactsListActivityMain.HAS_ACCEPTED_EULA, true);
                 editor.apply();
 
                 if((checkResult & ContactsListActivityMain.PERMS_NOT_GRANTED) != 0) {

@@ -85,7 +85,7 @@ public class SetupPermissionsFragment extends Fragment {
     private void permissionsNext() {
         int checkResult = parentActivity.getCheckResult();
         //după permisiuni afișăm powersetup dacă suntem la prima rulare sau aplicația este optimizată.
-        if ((checkResult & ContactsListActivityMain.IS_FIRST_RUN) != 0 ||
+        if ((checkResult & ContactsListActivityMain.EULA_NOT_ACCEPTED) != 0 ||
                 (checkResult & ContactsListActivityMain.POWER_OPTIMIZED) != 0) {
             SetupPowerFragment powerFragment = new SetupPowerFragment();
             parentActivity.getSupportFragmentManager().beginTransaction()

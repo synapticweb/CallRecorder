@@ -21,4 +21,9 @@
     <dimen name="contact_height">75dp</dimen>
     <dimen name="contact_img_size">55dp</dimen>
     <dimen name="contact_detail_img_size">100dp</dimen>
+    <dimen name="setup_confirm_icon_size">90dp</dimen>
+    <dimen name="setup_appname_text_size">22sp</dimen>
+    <dimen name="setup_version_text_size">16sp</dimen>
+    <dimen name="setup_confirm_up_margins">50dp</dimen>
+    <dimen name="setup_confirm_lat_margins">20dp</dimen>
 </resources>

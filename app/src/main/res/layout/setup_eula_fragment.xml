@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_marginStart="@dimen/setup_confirm_lat_margins"
+    android:layout_marginEnd="@dimen/setup_confirm_lat_margins"
+    android:layout_marginTop="@dimen/setup_confirm_up_margins"
+    android:layout_marginBottom="@dimen/setup_confirm_up_margins"
+    android:fillViewport="true">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/center_complex"
+        android:minHeight="350dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="top">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/app_name"
+            android:textSize="@dimen/setup_appname_text_size"
+            android:textStyle="bold"
+            android:id="@+id/app_name"
+            />
+
+        <TextView
+            android:layout_marginTop="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/app_version"
+            android:textSize="@dimen/setup_version_text_size" />
+
+        <ImageView
+            android:layout_width="@dimen/setup_confirm_icon_size"
+            android:layout_height="@dimen/setup_confirm_icon_size"
+            android:src="@drawable/launcher"
+            android:id="@+id/launcher_img"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="15dp"
+            />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="bottom"
+            >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:id="@+id/agree_complex"
+            android:layout_marginBottom="15dp"
+            >
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
+                android:id="@+id/has_accepted"
+                />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                >
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/eula_agree"/>
+
+                <!-- Pentru buton cu border, Android official solution:
+                https://stackoverflow.com/questions/7690416/android-border-for-button-->
+                <com.google.android.material.button.MaterialButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/show_eula"
+                    android:text="@string/show_eula_text"
+                    android:textColor="@color/colorAccent"
+                    app:backgroundTint="@android:color/transparent"
+                    app:cornerRadius="8dp"
+                    app:rippleColor="@color/colorAccent"
+                    app:strokeColor="@color/colorAccent"
+                    app:strokeWidth="2dp"
+                    android:textSize="12sp"
+                    />
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:id="@+id/buttons_down"
+            >
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/setup_confirm_cancel"
+                android:text="@string/cancel"
+                android:layout_gravity="start"
+                style="@style/setupButtons"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/setup_confirm_next"
+                android:text="@string/next"
+                style="@style/setupButtons"
+                android:layout_gravity="end"/>
+
+        </FrameLayout>
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+</ScrollView>
