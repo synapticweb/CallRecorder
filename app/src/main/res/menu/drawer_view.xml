@@ -11,9 +11,4 @@
     android:icon="@drawable/help"
         android:title="@string/help"
         />
-
-    <item android:id="@+id/send_to_dev"
-        android:icon="@drawable/email"
-        android:title="@string/send_devs"/>
-
 </menu>

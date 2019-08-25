@@ -1,6 +1,7 @@
 package net.synapticweb.callrecorder;
 
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentManager;
 
@@ -9,6 +10,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,6 +18,8 @@ import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 import androidx.fragment.app.FragmentPagerAdapter;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.android.material.tabs.TabLayout;
 
 public class HelpActivity extends TemplateActivity {
@@ -41,7 +45,8 @@ public class HelpActivity extends TemplateActivity {
         content[2] = CrApp.rawHtmlToString(R.raw.help_managing_recordings);
         content[3] = CrApp.rawHtmlToString(R.raw.help_about);
         content[3] = String.format(content[3], res.getString(R.string.app_name), BuildConfig.VERSION_NAME,
-                res.getString(R.string.dev_email), res.getString(R.string.dev_email));
+                res.getString(R.string.app_name), res.getString(R.string.dev_email), res.getString(R.string.dev_email),
+                res.getString(R.string.send_devs));
         content[4] = CrApp.rawHtmlToString(R.raw.eula);
         content[4] = String.format(content[4], res.getString(R.string.app_name));
         content[5] = CrApp.rawHtmlToString(R.raw.help_licences);
@@ -118,6 +123,24 @@ public class HelpActivity extends TemplateActivity {
         public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
             View view = inflater.inflate(R.layout.help_fragment, container, false);
             WebView htmlText = view.findViewById(R.id.help_fragment_text);
+            htmlText.getSettings().setJavaScriptEnabled(true);
+            htmlText.addJavascriptInterface(new Object() {
+                @JavascriptInterface
+                public void sendLogs() {
+                    new MaterialDialog.Builder(getActivity())
+                            .content(R.string.send_devs_question)
+                            .positiveText(android.R.string.ok)
+                            .negativeText(android.R.string.cancel)
+                            .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    CrLog.sendLogs((AppCompatActivity) getActivity());
+                                }
+                            })
+                            .show();
+
+                }
+            }, "SendLogsWrapper");
             //am pus imaginile și style-urile în main/assets. Ca urmare am setat base url la file:///android_asset/ și sursele
             //sunt doar numele fișierelor.
             htmlText.loadDataWithBaseURL("file:///android_asset/", content[position], "text/html", null, null);

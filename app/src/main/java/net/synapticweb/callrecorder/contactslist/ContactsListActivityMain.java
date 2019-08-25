@@ -131,19 +131,6 @@ public class ContactsListActivityMain extends TemplateActivity {
                     case R.id.settings: startActivity(new Intent(ContactsListActivityMain.this, SettingsActivity.class));
                         break;
                     case R.id.help: startActivity(new Intent(ContactsListActivityMain.this, HelpActivity.class));
-                        break;
-                    case R.id.send_to_dev: new MaterialDialog.Builder(getActivity())
-                            .content(R.string.send_devs_question)
-                            .positiveText(android.R.string.ok)
-                            .negativeText(android.R.string.cancel)
-                            .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                @Override
-                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                    CrLog.sendLogs(getActivity());
-                                }
-                            })
-                            .show();
-
                 }
                 drawer.closeDrawers();
                 return true;
