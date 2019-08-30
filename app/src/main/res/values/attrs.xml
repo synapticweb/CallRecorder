@@ -7,5 +7,4 @@
     <attr name="playerControlStyle" format="reference" />
     <attr name="drawerStyle" format="reference" />
     <attr name="helpTabStyle" format="reference"/>
-    <attr name="backgroundActivity" format="reference"/>
 </resources>

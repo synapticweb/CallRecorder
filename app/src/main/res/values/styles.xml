@@ -15,13 +15,14 @@
         <item name="playerControlStyle">@style/playerControlStyleLight</item>
         <item name="drawerStyle">@style/drawerStyleLight</item>
         <item name="helpTabStyle">@style/helpTabStyleLight</item>
-        <item name="backgroundActivity">@style/backgroundActivityLight</item>
+<!-- https://stackoverflow.com/questions/36261421/how-to-change-android-button-text-color-globally-in-theme -->
+       <item name="materialButtonStyle">@style/SettingsButtonColorLight</item>
     </style>
 
     <style name="AppThemeDark" parent="Theme.MaterialComponents.NoActionBar">
         <item name="colorPrimary">@color/primaryColor</item>
         <item name="colorPrimaryDark">@color/primaryDarkColor</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorAccent">@color/colorAccentLight</item>
 
         <item name="android:textColorPrimary">@color/text_on_dark</item>
         <item name="android:textColor">@color/text_on_dark</item>
@@ -32,7 +33,8 @@
         <item name="playerControlStyle">@style/playerControlStyleDark</item>
         <item name="drawerStyle">@style/drawerStyleDark</item>
         <item name="helpTabStyle">@style/helpTabStyleDark</item>
-        <item name="backgroundActivity">@style/backgroundActivityDark</item>
+        <item name="materialButtonStyle">@style/SettingsButtonColorDark</item>
+        <item name="android:colorBackground">@color/darkBackground</item>
     </style>
 
 <!-- Stiluri diferite pentru un element în funcție de tema selectată:
@@ -143,12 +145,22 @@ https://stackoverflow.com/questions/30487616/android-overriding-a-style-per-them
         <item name="tabTextColor">@color/text_on_dark</item>
     </style>
 
-
-    <style name="backgroundActivityLight">
+    <style name="SettingsButtonColorLight" parent="Widget.MaterialComponents.Button">
+        <item name="materialThemeOverlay">@style/ButtonStyleTextColorLight</item>
     </style>
 
-    <style name="backgroundActivityDark">
-        <item name="android:background">@color/darkBackground</item>
+    <style name="ButtonStyleTextColorLight">
+        <item name="colorPrimary">@color/colorAccent</item>
+        <item name="colorOnPrimary">@color/colorAccent</item>
+    </style>
+
+    <style name="SettingsButtonColorDark" parent="Widget.MaterialComponents.Button">
+        <item name="materialThemeOverlay">@style/ButtonStyleTextColorDark</item>
+    </style>
+
+    <style name="ButtonStyleTextColorDark">
+        <item name="colorPrimary">@color/colorAccentLight</item>
+        <item name="colorOnPrimary">@color/colorAccentLight</item>
     </style>
 <!-- Pentru background-ul alb: https://stackoverflow.com/questions/22320663/change-background-popupmenu-in-android -->
 <!--Ca să poată fi folosit cu android:theme, pentru a fi aplicat tuturor copiilor unui View trebuie să moștenească

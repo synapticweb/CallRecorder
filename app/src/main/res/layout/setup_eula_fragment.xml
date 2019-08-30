@@ -82,19 +82,21 @@
                     android:text="@string/eula_agree"/>
 
                 <!-- Pentru buton cu border, Android official solution:
-                https://stackoverflow.com/questions/7690416/android-border-for-button-->
+                https://stackoverflow.com/questions/7690416/android-border-for-button
+                Pentru button outlined:
+                https://medium.com/@neerajmoudgil/custom-button-using-android-material-design-components-aa0cf1352996
+                backgroundTint=transparent nu merge.-->
                 <com.google.android.material.button.MaterialButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/show_eula"
                     android:text="@string/show_eula_text"
                     android:textColor="@color/colorAccent"
-                    app:backgroundTint="@android:color/transparent"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     app:cornerRadius="8dp"
-                    app:rippleColor="@color/colorAccent"
                     app:strokeColor="@color/colorAccent"
                     app:strokeWidth="2dp"
-                    android:textSize="12sp"
+                    android:textSize="10sp"
                     />
             </LinearLayout>
 

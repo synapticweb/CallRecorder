@@ -5,7 +5,7 @@
     <color name="primaryDarkColor">#597317</color>
     <!--old colorAccent #cb0600-->
     <color name="colorAccent">#D91916</color>
-    <color name="colorAccentLight">#ff5030</color>
+    <color name="colorAccentLight">#FF3633</color>
     <color name="colorAccentLighter">#ff775f</color>
     <color name="primaryTextColor">#ffffff</color>
     <color name="secondaryTextColor">#ffffff</color>
