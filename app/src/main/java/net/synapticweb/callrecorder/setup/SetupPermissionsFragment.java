@@ -2,11 +2,15 @@ package net.synapticweb.callrecorder.setup;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -31,8 +35,15 @@ public class SetupPermissionsFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        Resources res = getResources();
         parentActivity = (SetupActivity) getActivity();
-        Button nextButton = parentActivity.findViewById(R.id.setup_perms_next);
+        TextView permsIntro = parentActivity.findViewById(R.id.perms_intro);
+        permsIntro.setText(String.format(res.getString(R.string.perms_intro), res.getString(R.string.app_name)));
+                Button nextButton = parentActivity.findViewById(R.id.setup_perms_next);
+                if(Build.VERSION.SDK_INT >= 28) {
+                    TextView permsCallLog = parentActivity.findViewById(R.id.perms_call_log);
+                    permsCallLog.setVisibility(View.VISIBLE);
+                }
         //în Android 6 dacă o singură permisiune este revocată le cere din nou pe toate. Nu pare suficient de sever pentru reparație.
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override

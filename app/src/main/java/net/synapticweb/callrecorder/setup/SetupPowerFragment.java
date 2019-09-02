@@ -3,6 +3,7 @@ package net.synapticweb.callrecorder.setup;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -50,6 +52,12 @@ public class SetupPowerFragment extends Fragment{
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         parentActivity = (SetupActivity) getActivity();
+        Resources res = getResources();
+        TextView dozeInfoText = parentActivity.findViewById(R.id.doze_info_text);
+        dozeInfoText.setText(String.format(res.getString(R.string.doze_info), res.getString(R.string.app_name)));
+        TextView otherOptimizations = parentActivity.findViewById(R.id.other_power_optimizations);
+        otherOptimizations.setText(String.format(res.getString(R.string.other_power_optimizations), res.getString(R.string.app_name)));
+
         LinearLayout dozeInfo = parentActivity.findViewById(R.id.doze_info);
         if((parentActivity.getCheckResult() & ContactsListActivityMain.POWER_OPTIMIZED) != 0) {
             dozeInfo.setVisibility(View.VISIBLE);

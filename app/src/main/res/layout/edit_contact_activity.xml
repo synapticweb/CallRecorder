@@ -144,7 +144,7 @@ Soluția a fost să adaug o margine ultimului linealayout orizontal.
         android:layout_marginTop="20dp"
         android:id="@+id/edit_type_parent"
         android:weightSum="6"
-        android:layout_marginBottom="100dp"
+        android:layout_marginBottom="20dp"
         android:baselineAligned="false">
 
         <LinearLayout
