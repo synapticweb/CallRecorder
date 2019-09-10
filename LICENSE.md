@@ -1,6 +1,6 @@
 Copyright 2019 Eugen Rădulescu
 
-1. Definitions
+1\. Definitions
 --------------
 
 **"License"** shall mean the terms and conditions defined by sections 1
@@ -29,7 +29,7 @@ Application and for which the editorial revisions, annotations,
 elaborations, or other modifications represent, as a whole, an original
 work of authorship.
 
-2. Preamble
+2\. Preamble
 -----------
 
 This License is a legal agreement between the User and the Vendor. The
@@ -37,7 +37,7 @@ User agrees that this License is enforceable like any written negotiated
 agreement signed by User. This License applies to User's use of the
 Application.
 
-3. Grant of license
+3\. Grant of license
 -------------------
 
 The Vendor grants to User a non-exclusive, personal, non-transferable
@@ -49,7 +49,7 @@ obtained, however, the use of such upgrades or updates is governed by
 this License and the amendments to it unless other terms accompany the
 upgrades, updates or supplements in which case those terms apply.
 
-4. Restrictions
+4\. Restrictions
 ---------------
 
 The User is not allowed to:
@@ -63,7 +63,7 @@ The Source form of the Application cannot constitute the base for any
 Derivative software product, except for Derivative software products
 authored by the Vendor.
 
-5. Third Party Software Licenses
+5\. Third Party Software Licenses
 --------------------------------
 
 The Application makes use of third party software. Use of some third
@@ -71,7 +71,7 @@ party software included in the Application may be subject to other terms
 and conditions. The User hereby agrees to the terms and conditions for
 such third party software.
 
-6. Limited Warranty
+6\. Limited Warranty
 -------------------
 
 ​a) THE User ACKNOWLEDGES THAT THE Application HAS NOT BEEN DEVELOPED TO
@@ -102,7 +102,7 @@ Application OR OTHERWISE ARISING OUT OF THE USE OF THE Application.
 ALSO, THERE IS NO WARRANTY OR CONDITION OF QUIET ENJOYMENT, QUIET
 POSSESSION, OR NON-INFRINGEMENT WITH REGARD TO THE Application.
 
-7. Limitation of Liability
+7\. Limitation of Liability
 --------------------------
 
 ​a) The Vendor shall not be liable (whether in contract, negligence or
@@ -122,7 +122,7 @@ entire liability of the Vendor arising from or related to this License
 shall be limited to the amount actually paid by User for the
 Application.
 
-8. Informations collected by the Application (Privacy policy)
+8\. Informations collected by the Application (Privacy policy)
 -------------------------------------------------------------
 
 The User is aware that The Application collects the following
@@ -151,7 +151,7 @@ information:
     shared with third parties and are not used for advertisement
     purposes.
 
-9. Termination
+9\. Termination
 --------------
 
 Without prejudice to any other rights, the Vendor may immediately
@@ -163,7 +163,7 @@ without notice, to discontinue update, upgrade and supplement services
 provided to User or made available to User through the use of the
 Application.
 
-10. Third Party Rights
+10\. Third Party Rights
 ----------------------
 
 A party which is not a party to this License has no rights under
@@ -172,7 +172,7 @@ rely upon or enforce any term of this License but that does not affect
 any right or remedy of a third party which exists or is available apart
 from such applicable legislation.
 
-11. Legal provisions concerning the recording of phone calls
+11\. Legal provisions concerning the recording of phone calls
 ------------------------------------------------------------
 
 By using the Application, the User confirms that the laws that govern
@@ -180,7 +180,7 @@ the country where the User currently resides allow for the recording of
 phone calls. The Vendor shall not be held liable of any law violation
 arising from the failure of the User to comply to this point of License.
 
-12. Entire Agreement
+12\. Entire Agreement
 --------------------
 
 This License (including any addendum or amendment to it which may be
