@@ -1,3 +1,6 @@
+Synaptic Call Recorder license
+==============================
+
 1\. Definitions
 --------------
 
