@@ -1,24 +1,21 @@
-Copyright 2019 Eugen Rădulescu
-
 1\. Definitions
 --------------
 
 **"License"** shall mean the terms and conditions defined by sections 1
-through 12 of this document.
+through 10 of this document.
 
-**"Vendor"** shall mean the copyright owner.
+**"Licensor"** shall mean the copyright owner.
+
+**"Application"** shall mean Synaptic Call Recorder mobile application.
 
 **"Source form"** shall mean the preferred form for making
 modifications, including but not limited to software source code,
-documentation source, and configuration files.
+documentation source, and configuration files. Without other qualification, "the Source form" shall mean the Source form of the Application.
 
 **"Object form"** shall mean any form resulting from mechanical
 transformation or translation of a Source form, including but not
 limited to compiled object code, generated documentation, and
-conversions to other media types.
-
-**"Application"** shall mean Synaptic Call Recorder mobile application, whether in Source
-form or Object form.
+conversions to other media types. Without other qualification, "the Object form" shall mean the Object form of the Application.
 
 **"User"** shall mean an individual or organization that agrees to make
 use of the Application under the terms of this License.
@@ -32,38 +29,31 @@ work of authorship.
 2\. Preamble
 -----------
 
-This License is a legal agreement between the User and the Vendor. The
+This License is a legal agreement between the User and the Licensor. The
 User agrees that this License is enforceable like any written negotiated
 agreement signed by User. This License applies to User's use of the
 Application.
 
 3\. Grant of license
 -------------------
+1. The Licensor grants the User a non-exclusive, personal, non-transferable license to use the Object form, provided that the following conditions are met:
+	- The User shall not sell or rent the Object form.
+	- The User shall not make available the Object form to other persons or organizations.
+	- The User shall not modify the Object form.
 
-The Vendor grants to User a non-exclusive, personal, non-transferable
-license to use the Application for User's personal non-commercial use
-subject to the terms of this License. This License does not grant any
-rights to obtaining future upgrades, updates or supplements to the
-Application. If upgrades, updates or supplements to the Application are
-obtained, however, the use of such upgrades or updates is governed by
-this License and the amendments to it unless other terms accompany the
-upgrades, updates or supplements in which case those terms apply.
+2. The Licensor grants the User the following rights in respect with the Source form:
+	- The User may view and study the Source form.
+	- The User may make available the Source form to other persons or organizations, provided that the Source form is offered free of charge and the License and copyright notices stay intact.
+	- The User may use the Source form to create Derivative software products, provided that the following conditions are met: 
+	    - The Source form of the resulted Derivative software product(s) is available free of charge for anyone to download or otherwise obtain.
+	    - The resulted Derivative software product(s) carry a clear notice informing that those programs are based upon modifications of Application by the User.
+	    - The Licensor is notified in writing by the User about the creation of the Derivative software product(s).
+	    - The Derivative software product(s) do not use the same name as the Application or a name that bears a close resemblance with the name of the Application.  
 
-4\. Restrictions
----------------
+Any right not explicitly granted by this License is reserved by the Licensor.	    
 
-The User is not allowed to:
 
--   use the Application commercially (this includes selling or renting
-    it)
--   distribute the Application by any means
--   modify the Application
-
-The Source form of the Application cannot constitute the base for any
-Derivative software product, except for Derivative software products
-authored by the Vendor.
-
-5\. Third Party Software Licenses
+4\. Third Party Software Licenses
 --------------------------------
 
 The Application makes use of third party software. Use of some third
@@ -71,14 +61,14 @@ party software included in the Application may be subject to other terms
 and conditions. The User hereby agrees to the terms and conditions for
 such third party software.
 
-6\. Limited Warranty
+5\. Limited Warranty
 -------------------
 
 ​a) THE User ACKNOWLEDGES THAT THE Application HAS NOT BEEN DEVELOPED TO
 MEET User's INDIVIDUAL REQUIREMENTS AND THAT IT IS THEREFORE User's
 RESPONSIBILITY TO ENSURE THAT THE FACILITIES AND FUNCTIONS OF THE
-Application MEET User's REQUIREMENTS. The Vendor DOES NOT AND CANNOT
-WARRANT THAT the Application OPERATE ERROR-FREE. THE Vendor DOES NOT
+Application MEET User's REQUIREMENTS. The Licensor DOES NOT AND CANNOT
+WARRANT THAT the Application OPERATE ERROR-FREE. THE Licensor DOES NOT
 WARRANT THAT THE Application IS CAPABLE OF INTEROPERATING WITH ANY OTHER
 SYSTEM, DEVICE OR PRODUCT (E.G. SOFTWARE OR HARDWARE). THE USER SHOULD
 BE PARTICULARLY AWARE THAT THERE IS A CONSIDERABLE AMOUNT OF VARIATION
@@ -89,7 +79,7 @@ OBTAIN A SATISFACTORY RESULT. ALSO, THE User SHOULD DO A FAIR AMOUNT OF
 EXPERIMENTATION BEFORE RELYING ON THE Application FOR RECORDING
 SENSITIVE PHONE CALLS.
 
-​b) TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE Vendor
+​b) TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE Licensor
 PROVIDES THE Application “AS IS AND WITH ALL FAULTS”, AND HEREBY
 DISCLAIMS ALL OTHER WARRANTIES AND CONDITIONS, WHETHER EXPRESS, IMPLIED
 OR STATUTORY, INCLUDING, BUT NOT LIMITED TO, ANY (IF ANY) IMPLIED
@@ -102,27 +92,27 @@ Application OR OTHERWISE ARISING OUT OF THE USE OF THE Application.
 ALSO, THERE IS NO WARRANTY OR CONDITION OF QUIET ENJOYMENT, QUIET
 POSSESSION, OR NON-INFRINGEMENT WITH REGARD TO THE Application.
 
-7\. Limitation of Liability
+6\. Limitation of Liability
 --------------------------
 
-​a) The Vendor shall not be liable (whether in contract, negligence or
+​a) The Licensor shall not be liable (whether in contract, negligence or
 anything else) to User or to any third party; (i) for any inability to
 use any third party equipment or access data, loss of or corruption to
 data, loss of business, loss of profits, loss of revenue and anticipated
 savings, business interruption or the like (whether such loss or damage
 is direct or indirect); or (ii) for any indirect, incidental,
 consequential loss or damage whatsoever, in each case, arising out of
-the use of or inability to use the Application even if the Vendor has
+the use of or inability to use the Application even if the Licensor has
 been advised of the possibility of such loss or damages.
 
 ​b) Notwithstanding any damages that the User might incur for any reason
 whatsoever (including, without limitation, all damages referenced herein
 and all direct or general damages in contract or anything else), the
-entire liability of the Vendor arising from or related to this License
+entire liability of the Licensor arising from or related to this License
 shall be limited to the amount actually paid by User for the
 Application.
 
-8\. Informations collected by the Application (Privacy policy)
+7\. Informations collected by the Application
 -------------------------------------------------------------
 
 The User is aware that The Application collects the following
@@ -143,53 +133,44 @@ information:
     version of the Application, the date and time of the phone calls,
     the type of the call (incoming or outgoing), the phone numbers
     involved in calls, the behavior of the Application while recording
-    phone calls. Please keep in mind that unless the User decides to
-    send their logs to the developer, the developer has no possibility
+    phone calls. Unless the User decides to send their logs to the developer, the developer has no possibility
     to access the application's logs. The information obtained by
     analyzing the application's logs are used solely for the purpose of
     debugging and improving the Application. This information are not
     shared with third parties and are not used for advertisement
     purposes.
 
-9\. Termination
+8\. Termination
 --------------
 
-Without prejudice to any other rights, the Vendor may immediately
+Without prejudice to any other rights, the Licensor may immediately
 terminate this License if the User fails to comply with any of its terms
 and conditions. The provisions of this Agreement, which by their nature
 are intended to survive termination, will remain in effect after
-termination of this License. The Vendor reserves the right, with or
+termination of this License. The Licensor reserves the right, with or
 without notice, to discontinue update, upgrade and supplement services
 provided to User or made available to User through the use of the
 Application.
 
-10\. Third Party Rights
-----------------------
 
-A party which is not a party to this License has no rights under
-applicable legislation in relation to the rights of third parties to
-rely upon or enforce any term of this License but that does not affect
-any right or remedy of a third party which exists or is available apart
-from such applicable legislation.
-
-11\. Legal provisions concerning the recording of phone calls
+9\. Legal provisions concerning the recording of phone calls
 ------------------------------------------------------------
 
 By using the Application, the User confirms that the laws that govern
 the country where the User currently resides allow for the recording of
-phone calls. The Vendor shall not be held liable of any law violation
-arising from the failure of the User to comply to this point of License.
+phone calls. The Licensor shall not be held liable of any law violation
+arising from the failure of the User to comply to this point of the License.
 
-12\. Entire Agreement
+10\. Entire Agreement
 --------------------
 
 This License (including any addendum or amendment to it which may be
-supplied with the Application and any other terms and conditions, if
-applicable, is the entire agreement between User and the Vendor relating
+supplied with the Application) and any other terms and conditions, if
+applicable, is the entire agreement between User and the Licensor relating
 to the Application and they supersede all prior or contemporaneous oral
 or written communications, proposals and representations with respect to
 the Application or any other subject matter covered by this License. To
-the extent that the terms of any Vendor policies conflict with the terms
+the extent that the terms of any Licensor policies conflict with the terms
 of this License, the terms of this License shall govern. If any
 provision of this License is held to be void, invalid, unenforceable or
 illegal, the other provisions shall continue in full force and effect.
