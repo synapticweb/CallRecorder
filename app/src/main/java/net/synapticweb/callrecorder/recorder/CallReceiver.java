@@ -81,6 +81,7 @@ public class CallReceiver extends BroadcastReceiver {
                 // în cazul nr necunoscute să pornească înregistrarea înainte de începerea convorbirii),
                 if(state != null && state.equals(TelephonyManager.EXTRA_STATE_RINGING)) {
                     incomingNumber = bundle.getString(TelephonyManager.EXTRA_INCOMING_NUMBER);
+                    Log.d(TAG, "Incoming number: " + incomingNumber);
                     stateRingingCounter++;
                     //A se citi: dacă serviciul nu a fost încă pornit ȘI (ORI versiunea android e < Pie ORI s-a primit deja de
                     //2 ori starea RINGING). Efectul acestei expresii este că în Pie nu se pornește serviciul decît după ce se
@@ -88,6 +89,8 @@ public class CallReceiver extends BroadcastReceiver {
                     //de ori (lolipop) dar nr este setat din prima. Deci e ok să-i dăm drumul orice ar fi, fără să mai verificăm
                     //stateRingingCounter. În Pie și mai sus nr apare de abia la al doilea RINGING (după docs nu se poate ști
                     //în care, eu am observat că totdeauna în al doilea).
+                    //De asemenea, în Pie dacă nu avem permisiunea READ_CALL_LOG starea RINGING se primește o singură dată
+                    //și EXTRA_INCOMING_NUMBER este null.
                     if(!serviceStarted && (Build.VERSION.SDK_INT < Build.VERSION_CODES.P ||
                             stateRingingCounter == PIE_NUM_STATE_RINGING) ) {
                         Intent intentService = new Intent(context, RecorderService.class);

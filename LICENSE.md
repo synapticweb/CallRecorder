@@ -48,10 +48,10 @@ Application.
 	- The User may view and study the Source form.
 	- The User may make available the Source form to other persons or organizations, provided that the Source form is offered free of charge and the License and copyright notices stay intact.
 	- The User may use the Source form to create Derivative software products, provided that the following conditions are met: 
-	    - The Source form of the resulted Derivative software product(s) is available free of charge for anyone to download or otherwise obtain.
-	    - The resulted Derivative software product(s) carry a clear notice informing that those programs are based upon modifications of Application by the User.
-	    - The Licensor is notified in writing by the User about the creation of the Derivative software product(s).
-	    - The Derivative software product(s) do not use the same name as the Application or a name that bears a close resemblance with the name of the Application.  
+	    - The Source form of the Derivative software product is available free of charge for anyone to download or otherwise obtain.
+	    - The Derivative software product includes an attribution notice explicitly stating that the software is based on modifications of Application made by the User. The attribution notice must be included in every source file of the Derivative software product.
+	    - The Licensor is notified in writing by the User about the creation of the Derivative software product.
+	    - The Derivative software product does not use the same name as the Application or a name that bears a close resemblance with the name of the Application.  
 
 Any right not explicitly granted by this License is reserved by the Licensor.	    
 
@@ -98,7 +98,7 @@ POSSESSION, OR NON-INFRINGEMENT WITH REGARD TO THE Application.
 6\. Limitation of Liability
 --------------------------
 
-​a) The Licensor shall not be liable (whether in contract, negligence or
+​The Licensor shall not be liable (whether in contract, negligence or
 anything else) to User or to any third party; (i) for any inability to
 use any third party equipment or access data, loss of or corruption to
 data, loss of business, loss of profits, loss of revenue and anticipated
@@ -108,12 +108,6 @@ consequential loss or damage whatsoever, in each case, arising out of
 the use of or inability to use the Application even if the Licensor has
 been advised of the possibility of such loss or damages.
 
-​b) Notwithstanding any damages that the User might incur for any reason
-whatsoever (including, without limitation, all damages referenced herein
-and all direct or general damages in contract or anything else), the
-entire liability of the Licensor arising from or related to this License
-shall be limited to the amount actually paid by User for the
-Application.
 
 7\. Informations collected by the Application
 -------------------------------------------------------------
@@ -150,11 +144,7 @@ Without prejudice to any other rights, the Licensor may immediately
 terminate this License if the User fails to comply with any of its terms
 and conditions. The provisions of this Agreement, which by their nature
 are intended to survive termination, will remain in effect after
-termination of this License. The Licensor reserves the right, with or
-without notice, to discontinue update, upgrade and supplement services
-provided to User or made available to User through the use of the
-Application.
-
+termination of this License.
 
 9\. Legal provisions concerning the recording of phone calls
 ------------------------------------------------------------
