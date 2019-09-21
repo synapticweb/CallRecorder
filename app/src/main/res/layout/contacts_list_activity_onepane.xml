@@ -41,16 +41,6 @@
 
     </androidx.appcompat.widget.Toolbar>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/no_content"
-        android:text="@string/no_contacts"
-        android:textAlignment="center"
-        android:layout_marginTop="25dp"
-        android:layout_below="@id/toolbar_main"
-        android:visibility="gone"/>
-
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"

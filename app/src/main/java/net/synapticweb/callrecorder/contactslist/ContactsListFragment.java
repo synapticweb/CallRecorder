@@ -187,7 +187,8 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        contactsRecycler = (RecyclerView) inflater.inflate(R.layout.list_contacts_fragment, container, false);
+        View fragmentRoot = inflater.inflate(R.layout.list_contacts_fragment, container, false);
+        contactsRecycler = fragmentRoot.findViewById(R.id.listened_phones);
         contactsRecycler.setLayoutManager(new LinearLayoutManager(parentActivity));
 
         if(parentActivity != null) {
@@ -199,7 +200,7 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
                 }
             });
         }
-        return contactsRecycler;
+        return fragmentRoot;
     }
 
     @Override
