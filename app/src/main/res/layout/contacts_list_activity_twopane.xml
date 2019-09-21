@@ -7,7 +7,7 @@
     android:id="@+id/drawer_layout"
     android:fitsSystemWindows="true">
 
-    <FrameLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         >
@@ -140,12 +140,12 @@
 
         </androidx.appcompat.widget.Toolbar>
 
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            android:orientation="horizontal"
+        <LinearLayout android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:baselineAligned="false"
             android:weightSum="10"
+            android:id="@+id/tab_fragment_container"
             >
 
             <FrameLayout
@@ -186,16 +186,18 @@
 
         </LinearLayout>
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/add_numbers"
-            android:layout_width="wrap_content"
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            app:srcCompat="@drawable/ic_plus"
-            android:layout_margin="16dp"
-            android:backgroundTint="@color/colorAccent"
-            app:tint="@color/white" />
-    </FrameLayout>
+            android:id="@+id/bottom_tab_nav"
+            android:layout_alignParentBottom="true"
+            android:background="@color/primaryColor"
+            app:menu="@menu/bottom_nav"
+            app:itemIconTint="@color/nav_item_state_list"
+            app:itemTextColor="@color/nav_item_state_list"
+            />
+
+    </RelativeLayout>
 
     <com.google.android.material.navigation.NavigationView
         android:layout_width="320dp"

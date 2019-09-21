@@ -134,4 +134,7 @@
     <string name="show_eula_text">Terms of use</string>
     <string name="eula_title">EULA</string>
     <string name="version_eula_screen">Version %s</string>
+    <string name="bottom_nav_contacts">Contacts</string>
+    <string name="bottom_nav_recordings">Unassigned recordings</string>
+    <string name="no_unassigned">There are no unassigned recordings.</string>
 </resources>

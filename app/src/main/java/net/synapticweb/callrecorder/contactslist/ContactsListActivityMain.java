@@ -23,6 +23,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.preference.PreferenceManager;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -32,6 +33,7 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import net.synapticweb.callrecorder.R;
@@ -49,10 +51,15 @@ public class ContactsListActivityMain extends TemplateActivity {
     public static final int PERMS_NOT_GRANTED = 2;
     public static final int POWER_OPTIMIZED = 4;
     public static final String SETUP_ARGUMENT = "setup_arg";
+    private BottomNavigationView bottomNav;
+
+    private boolean isSinglePaneLayout() {
+        return findViewById(R.id.contact_detail_fragment_container) == null;
+    }
 
     @Override
     protected Fragment createFragment() {
-            return new ContactsListFragment();
+        return new ContactsListFragment();
     }
 
     @Override
@@ -98,17 +105,44 @@ public class ContactsListActivityMain extends TemplateActivity {
             startActivityForResult(setupIntent, SETUP_ACTIVITY);
         }
 
-        insertFragment(R.id.contacts_list_fragment_container);
-
-        FloatingActionButton fab = findViewById(R.id.add_numbers);
-        fab.setOnClickListener(new View.OnClickListener(){
+        bottomNav = findViewById(R.id.bottom_tab_nav);
+        bottomNav.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
-            public void onClick(View v)
-            {
-                Intent pickNumber = new Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
-                startActivityForResult(pickNumber, REQUEST_PHONE_NUMBER);
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                FragmentManager fm = getSupportFragmentManager();
+                switch (item.getItemId()) {
+                    case R.id.bottom_nav_contacts:
+                        Fragment listContacts = createFragment();
+                        if(!isSinglePaneLayout()) {
+                            Fragment unassigned = fm.findFragmentById(R.id.tab_fragment_container);
+                            if (unassigned != null)
+                                fm.beginTransaction().remove(unassigned).commit();
+                        }
+                        fm.beginTransaction().replace(R.id.contacts_list_fragment_container, listContacts)
+                                    .commit();
+                        break;
+
+                    case R.id.bottom_nav_recordings:
+                        Fragment unassigned = new UnassignedRecordingsFragment();
+                        if(isSinglePaneLayout())
+                            fm.beginTransaction().replace(R.id.contacts_list_fragment_container, unassigned)
+                                    .commit();
+                        else {
+                            Fragment contactsList = fm.findFragmentById(R.id.contacts_list_fragment_container);
+                            Fragment contactDetail = fm.findFragmentById(R.id.contact_detail_fragment_container);
+                            if (contactsList != null)
+                                fm.beginTransaction().remove(contactsList).commit();
+                            if (contactDetail != null)
+                                fm.beginTransaction().remove(contactDetail).commit();
+                            fm.beginTransaction().add(R.id.tab_fragment_container, unassigned)
+                                    .commit();
+                        }
+                }
+                return true;
             }
         });
+
+        insertFragment(R.id.contacts_list_fragment_container);
 
         ImageButton hamburger = findViewById(R.id.hamburger);
         final DrawerLayout drawer = findViewById(R.id.drawer_layout);

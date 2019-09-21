@@ -190,15 +190,6 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
         contactsRecycler = (RecyclerView) inflater.inflate(R.layout.list_contacts_fragment, container, false);
         contactsRecycler.setLayoutManager(new LinearLayoutManager(parentActivity));
 
-        if(parentActivity != null) {
-            FloatingActionButton fab = parentActivity.findViewById(R.id.add_numbers);
-            fab.setOnClickListener(new View.OnClickListener(){
-                @Override
-                public void onClick(View v) {
-                    presenter.addNewContact();
-                }
-            });
-        }
         return contactsRecycler;
     }
 

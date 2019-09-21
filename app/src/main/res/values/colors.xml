@@ -18,6 +18,7 @@
 
     <color name="textOnDark">#FFFFFF</color>
     <color name="white">#FFF</color>
+    <color name="white_trans">#99ffffff</color>
     <color name="darkRecordingNotSelected">#ff424242</color>
     <color name="darkRecordingSelected">#ff000000</color>
     <color name="lightRecordingNotSelected">#fff</color>
