@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/bottom_nav_contacts"
-        android:title="@string/bottom_nav_contacts"/>
+        android:title="@string/bottom_nav_contacts"
+        android:icon="@drawable/user_bottom"/>
 
     <item android:id="@+id/bottom_nav_recordings"
-        android:title="@string/bottom_nav_recordings" />
+        android:title="@string/bottom_nav_recordings"
+        android:icon="@drawable/sound_bottom"/>
 </menu>
