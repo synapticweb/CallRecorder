@@ -32,14 +32,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class SettingsFragment extends PreferenceFragmentCompat {
     //aceste valori vor fi dublate în res/xml/preferences.xml
-    public static final String AUTOMMATICALLY_RECORD_PRIVATE_CALLS = "auth_record_priv";
-    public static final String PARANOID_MODE = "paranoid";
     public static final String APP_THEME = "theme";
     public static final String STORAGE = "storage";
     public static final String STORAGE_PATH = "public_storage_path";
     public static final String SPEAKER_USE = "put_on_speaker";
     public static final String FORMAT = "format";
     public static final String MODE = "mode";
+    public static final String ENABLED = "enabled";
     private TemplateActivity parentActivity;
     private SharedPreferences preferences;
 
@@ -48,10 +47,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         super.onResume();
         Preference storagePath = findPreference(STORAGE_PATH);
         ListPreference storage = findPreference(STORAGE);
-        Preference privateCalls = findPreference(AUTOMMATICALLY_RECORD_PRIVATE_CALLS);
         manageStoragePathSummary(null, storage, storagePath);
-        if(preferences.getBoolean(PARANOID_MODE, false) && privateCalls != null)
-            privateCalls.setEnabled(false);
     }
 
     private void manageStoragePathSummary(String newValue, ListPreference storage, Preference storagePath) {
@@ -91,7 +87,6 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         addPreferencesFromResource(R.xml.preferences);
 
         Preference themeOption = findPreference(APP_THEME);
-        Preference paranoidMode = findPreference(PARANOID_MODE);
         Preference format = findPreference(FORMAT);
         Preference mode = findPreference(MODE);
         Preference storage = findPreference(STORAGE);
@@ -150,14 +145,6 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             }
         });
 
-        paranoidMode.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue) {
-                Preference autoPrivCalls = findPreference(AUTOMMATICALLY_RECORD_PRIVATE_CALLS);
-                autoPrivCalls.setEnabled(!autoPrivCalls.isEnabled());
-                return true;
-            }
-        });
 
         themeOption.setSummaryProvider(new Preference.SummaryProvider<ListPreference>() {
             @Override

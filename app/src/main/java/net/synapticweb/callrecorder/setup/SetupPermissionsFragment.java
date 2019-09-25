@@ -57,9 +57,7 @@ public class SetupPermissionsFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 requestPermissions(new String[]{
-                        Manifest.permission.PROCESS_OUTGOING_CALLS,
                         Manifest.permission.READ_PHONE_STATE,
-                        Manifest.permission.READ_CALL_LOG,
                         Manifest.permission.RECORD_AUDIO,
                         Manifest.permission.READ_CONTACTS,
                         Manifest.permission.READ_EXTERNAL_STORAGE,

@@ -15,7 +15,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.PowerManager;
-import android.provider.ContactsContract;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
@@ -34,7 +33,6 @@ import android.widget.TextView;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.TemplateActivity;
@@ -44,7 +42,6 @@ import net.synapticweb.callrecorder.setup.SetupActivity;
 
 
 public class ContactsListActivityMain extends TemplateActivity {
-    private static final int REQUEST_PHONE_NUMBER = 1;
     private static final int SETUP_ACTIVITY = 3;
     public static final String HAS_ACCEPTED_EULA = "has_accepted_eula";
     public static final int EULA_NOT_ACCEPTED = 1;
@@ -66,10 +63,6 @@ public class ContactsListActivityMain extends TemplateActivity {
     protected void onResume() {
         super.onResume();
         checkIfThemeChanged();
-    }
-
-    private TemplateActivity getActivity(){
-        return this;
     }
 
     @Override
@@ -104,7 +97,8 @@ public class ContactsListActivityMain extends TemplateActivity {
             setupIntent.putExtra(SETUP_ARGUMENT, checkResult);
             startActivityForResult(setupIntent, SETUP_ACTIVITY);
         }
-
+        //https://www.truiton.com/2017/01/android-bottom-navigation-bar-example/
+        //https://guides.codepath.com/android/Bottom-Navigation-Views
         bottomNav = findViewById(R.id.bottom_tab_nav);
         bottomNav.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -206,11 +200,7 @@ public class ContactsListActivityMain extends TemplateActivity {
     }
 
     private boolean checkPermissions() {
-        boolean outgoingCalls = ContextCompat.checkSelfPermission(this, Manifest.permission.PROCESS_OUTGOING_CALLS)
-                == PackageManager.PERMISSION_GRANTED;
         boolean phoneState = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
-                == PackageManager.PERMISSION_GRANTED;
-        boolean callLog = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALL_LOG)
                 == PackageManager.PERMISSION_GRANTED;
         boolean recordAudio = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
                 == PackageManager.PERMISSION_GRANTED;
@@ -220,8 +210,7 @@ public class ContactsListActivityMain extends TemplateActivity {
                 == PackageManager.PERMISSION_GRANTED;
         boolean writeStorage = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 == PackageManager.PERMISSION_GRANTED;
-
-        return outgoingCalls && phoneState && callLog && recordAudio && readContacts && readStorage && writeStorage;
+        return phoneState && recordAudio && readContacts && readStorage && writeStorage;
     }
 
 }

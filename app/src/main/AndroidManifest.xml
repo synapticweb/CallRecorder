@@ -8,12 +8,7 @@
         android:required="true"/>
     <uses-feature android:name="android.hardware.microphone" android:required="true" />
 
-    <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS"/>
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
-    <!-- Fără read_call_log în android 9+ nu mai pornește serviciul la incoming calls.
-    https://stackoverflow.com/questions/52009874/getting-the-caller-id-in-android-9
-    https://stackoverflow.com/questions/51739395/read-numbers-from-the-phone-state-intent-action-android-9-not-working-->
-    <uses-permission android:name="android.permission.READ_CALL_LOG" />
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>

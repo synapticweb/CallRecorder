@@ -1,18 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.preference.PreferenceScreen xmlns:app="http://schemas.app.com/apk/res/app"
     xmlns:android="http://schemas.android.com/apk/res/android">
-    <SwitchPreference
-        android:key="auth_record_priv"
-        android:title="@string/auth_record_priv_title"
-        android:summary="@string/auth_record_priv_sum"
-        android:defaultValue="true"
-        android:singleLine="false"/>
 
     <SwitchPreference
-        android:key="paranoid"
-        android:title="@string/paranoid_title"
-        android:summary="@string/paranoid_sum"
-        android:defaultValue="false"/>
+        android:key="enabled"
+        android:title="@string/enabled_title"
+        android:summary="@string/enabled_sum"
+        android:defaultValue="true"/>
 
     <ListPreference
         android:key="storage"

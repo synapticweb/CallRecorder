@@ -86,8 +86,8 @@
     <string name="settings_theme_light">Light</string>
     <string name="auth_record_priv_title">Private numbers calls</string>
     <string name="auth_record_priv_sum">Automatically record calls from private numbers</string>
-    <string name="paranoid_title">Paranoid mode</string>
-    <string name="paranoid_sum">Record all calls</string>
+    <string name="enabled_title">Record calls</string>
+    <string name="enabled_sum">Call recording enabled</string>
     <string name="prefs_storage_title">Recordings storage</string>
     <string name="prefs_storage_path_title">Where to store recordings</string>
     <string name="prefs_speaker_title">Speaker use</string>

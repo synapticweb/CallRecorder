@@ -42,7 +42,6 @@ import net.synapticweb.callrecorder.settings.SettingsFragment;
 
 
 public class RecorderService extends Service {
-    private static final String TAG = "CallRecorder";
     private  String receivedNumPhone = null;
     private  Boolean privateCall = null;
     private  Boolean match = null;
@@ -124,7 +123,7 @@ public class RecorderService extends Service {
             callIdentifier = CrApp.getInstance().getResources().getString(R.string.private_number_name);
         else
             callIdentifier = match ? contactNameIfMatch : receivedNumPhone;
-
+        
         switch(typeOfNotification) {
             case RECORD_AUTOMMATICALLY_SPEAKER_OFF:
                 builder.setContentText(res.getString(R.string.recording));
@@ -191,7 +190,8 @@ public class RecorderService extends Service {
 
         boolean shouldRecord = true;
 
-        receivedNumPhone = intent.getStringExtra(CallReceiver.ARG_NUM_PHONE);
+        if(intent.hasExtra(CallReceiver.ARG_NUM_PHONE))
+            receivedNumPhone = intent.getStringExtra(CallReceiver.ARG_NUM_PHONE);
         incoming = intent.getBooleanExtra(CallReceiver.ARG_INCOMING, false);
         CrLog.log(CrLog.DEBUG, String.format("Recorder service started. Phone number: %s. Incoming: %s", receivedNumPhone, incoming));
 
