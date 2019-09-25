@@ -45,18 +45,18 @@ public class ControlRecordingReceiver extends BroadcastReceiver {
                 }
             }
             if(nm != null)
-                nm.notify(RecorderService.NOTIFICATION_ID, service.buildNotification(RecorderService.RECORD_AUTOMMATICALLY, callIdentifier));
+                nm.notify(RecorderService.NOTIFICATION_ID, service.buildNotification(callIdentifier));
         }
         else if(intent.getAction().equals(RecorderService.ACTION_STOP_SPEAKER)) {
             service.putSpeakerOff();
             if(nm != null)
-                nm.notify(RecorderService.NOTIFICATION_ID, service.buildNotification(RecorderService.RECORD_AUTOMMATICALLY, callIdentifier));
+                nm.notify(RecorderService.NOTIFICATION_ID, service.buildNotification(callIdentifier));
         }
 
         else if(intent.getAction().equals(RecorderService.ACTION_START_SPEAKER)) {
             service.putSpeakerOn();
             if(nm != null)
-                nm.notify(RecorderService.NOTIFICATION_ID, service.buildNotification(RecorderService.RECORD_AUTOMMATICALLY, callIdentifier));
+                nm.notify(RecorderService.NOTIFICATION_ID, service.buildNotification(callIdentifier));
         }
     }
 }
