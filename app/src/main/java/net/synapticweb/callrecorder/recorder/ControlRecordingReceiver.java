@@ -32,9 +32,6 @@ public class ControlRecordingReceiver extends BroadcastReceiver {
 
         if(intent.getAction().equals(RecorderService.ACTION_START_RECORDING)) {
             String phoneNumber = intent.getExtras().getString(RecorderService.PHONE_NUMBER);
-            if(nm != null)
-                nm.notify(RecorderService.NOTIFICATION_ID, service.buildNotification(RecorderService.RECORD_AUTOMMATICALLY, callIdentifier));
-
             Recorder recorder = service.getRecorder();
             if(recorder != null) {
                 try {
@@ -47,11 +44,19 @@ public class ControlRecordingReceiver extends BroadcastReceiver {
                     service.stopSelf();
                 }
             }
+            if(nm != null)
+                nm.notify(RecorderService.NOTIFICATION_ID, service.buildNotification(RecorderService.RECORD_AUTOMMATICALLY, callIdentifier));
         }
         else if(intent.getAction().equals(RecorderService.ACTION_STOP_SPEAKER)) {
             service.putSpeakerOff();
             if(nm != null)
-                nm.notify(RecorderService.NOTIFICATION_ID, service.buildNotification(RecorderService.RECORD_AUTOMMATICALLY_SPEAKER_OFF, callIdentifier));
+                nm.notify(RecorderService.NOTIFICATION_ID, service.buildNotification(RecorderService.RECORD_AUTOMMATICALLY, callIdentifier));
+        }
+
+        else if(intent.getAction().equals(RecorderService.ACTION_START_SPEAKER)) {
+            service.putSpeakerOn();
+            if(nm != null)
+                nm.notify(RecorderService.NOTIFICATION_ID, service.buildNotification(RecorderService.RECORD_AUTOMMATICALLY, callIdentifier));
         }
     }
 }
