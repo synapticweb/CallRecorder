@@ -75,12 +75,12 @@
 
         </receiver>
 
-        <receiver android:name=".recorder.ControlRecordingReceiver">
+        <receiver android:name=".recorder.ControlRecordingReceiver"
+            android:exported="false">
             <intent-filter>
-                <action android:name="net.synapticweb.callrecorder.STOP_RECORDING"/>
                 <action android:name="net.synapticweb.callrecorder.START_RECORDING" />
-                <action android:name="net.synapticweb.callrecorder.PAUSE_RECORDING" />
-                <action android:name="net.synapticweb.callrecorder.RESUME_RECORDING" />
+                <action android:name="net.synapticweb.callrecorder.STOP_SPEAKER" />
+                <action android:name="net.synapticweb.callrecorder.START_SPEAKER" />
             </intent-filter>
         </receiver>
 

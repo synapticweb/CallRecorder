@@ -54,6 +54,7 @@ public class RecorderService extends Service {
     private  Thread speakerOnThread;
     private  AudioManager audioManager;
     private static RecorderService self;
+    private boolean speakerOn = false;
 
     public static final int NOTIFICATION_ID = 1;
     private static final String CHANNEL_ID = "call_recorder_channel";
@@ -63,9 +64,9 @@ public class RecorderService extends Service {
     public static final int RECORD_AUTOMMATICALLY = 1;
     public static final int RECORD_ON_HOOKUP = 2;
     public static final int RECORD_ON_REQUEST = 3;
-    public static final int RECORD_AUTOMMATICALLY_SPEAKER_OFF = 4;
     static final String ACTION_START_RECORDING = "net.synapticweb.callrecorder.START_RECORDING";
     static final String ACTION_STOP_SPEAKER = "net.synapticweb.callrecorder.STOP_SPEAKER";
+    static final String ACTION_START_SPEAKER = "net.synapticweb.callrecorder.START_SPEAKER";
 
     @Override
     public IBinder onBind(Intent i){
@@ -125,22 +126,25 @@ public class RecorderService extends Service {
             callIdentifier = match ? contactNameIfMatch : receivedNumPhone;
         
         switch(typeOfNotification) {
-            case RECORD_AUTOMMATICALLY_SPEAKER_OFF:
-                builder.setContentText(res.getString(R.string.recording));
-                break;
             case RECORD_AUTOMMATICALLY:
-                if(settings.getBoolean(SettingsFragment.SPEAKER_USE, false)) {
+                if(isSpeakerOn()) {
                     notificationIntent = new Intent(CrApp.getInstance(), ControlRecordingReceiver.class);
                     notificationIntent.setAction(ACTION_STOP_SPEAKER);
                     notificationIntent.putExtra(CALL_IDENTIFIER, callIdentifier);
                     PendingIntent stopSpeakerPi = PendingIntent.getBroadcast(CrApp.getInstance(), 0, notificationIntent, 0);
-                    //de schimbat icoana!!!
-                    builder.addAction(new NotificationCompat.Action.Builder(R.drawable.ic_play_grey600_24dp,
+                    builder.addAction(new NotificationCompat.Action.Builder(R.drawable.speaker_phone_off,
                             res.getString(R.string.stop_speaker), stopSpeakerPi).build() )
                     .setContentText(res.getString(R.string.recording_speaker_on));
                 }
-                else
-                    builder.setContentText(res.getString(R.string.recording));
+                else {
+                    notificationIntent = new Intent(CrApp.getInstance(), ControlRecordingReceiver.class);
+                    notificationIntent.setAction(ACTION_START_SPEAKER);
+                    notificationIntent.putExtra(CALL_IDENTIFIER, callIdentifier);
+                    PendingIntent startSpeakerPi = PendingIntent.getBroadcast(CrApp.getInstance(), 0, notificationIntent, 0);
+                    builder.addAction(new NotificationCompat.Action.Builder(R.drawable.speaker_phone_on,
+                            res.getString(R.string.start_speaker), startSpeakerPi).build() )
+                            .setContentText(res.getString(R.string.recording_speaker_off));
+                }
                 break;
             case RECORD_ON_HOOKUP:
                 builder.setContentText(res.getString(R.string.recording_answer_call));
@@ -151,7 +155,7 @@ public class RecorderService extends Service {
                 notificationIntent.putExtra(CALL_IDENTIFIER, callIdentifier);
                 notificationIntent.putExtra(PHONE_NUMBER, receivedNumPhone != null ? receivedNumPhone : "private_phone");
                 PendingIntent startRecordingPi = PendingIntent.getBroadcast(CrApp.getInstance(), 0, notificationIntent, 0);
-                builder.addAction(new NotificationCompat.Action.Builder(R.drawable.ic_play_grey600_24dp,
+                builder.addAction(new NotificationCompat.Action.Builder(R.drawable.recorder,
                                 res.getString(R.string.start_recording_notification), startRecordingPi).build() )
                         .setContentText(res.getString(R.string.start_recording_notification_text));
         }
@@ -289,8 +293,8 @@ public class RecorderService extends Service {
             public void run() {
                 CrLog.log(CrLog.DEBUG, "Speaker has been turned on");
                 try {
-                    while(true) {
-                        sleep(1000);
+                    while(!Thread.interrupted()) {
+                        sleep(500);
                         audioManager.setMode(AudioManager.MODE_IN_CALL);
                         if (!audioManager.isSpeakerphoneOn())
                             audioManager.setSpeakerphoneOn(true);
@@ -301,6 +305,7 @@ public class RecorderService extends Service {
             }
         };
         speakerOnThread.start();
+        speakerOn = true;
     }
 
     void putSpeakerOff() {
@@ -313,7 +318,10 @@ public class RecorderService extends Service {
             audioManager.setMode(AudioManager.MODE_NORMAL);
             audioManager.setSpeakerphoneOn(false);
         }
+        speakerOn = false;
     }
+
+    boolean isSpeakerOn() { return speakerOn;}
 
     @Override
     public void onDestroy() {

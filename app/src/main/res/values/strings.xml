@@ -54,7 +54,8 @@
     <string name="success_move_text">The recording(s) were successfully moved.</string>
     <string name="error_move">An error occurred while moving the recording(s). Some files might be corrupted or missing.</string>
     <string name="playing">Playing </string>
-    <string name="recording">Recording&#8230;</string>
+    <string name="recording_speaker_off">Recording&#8230; (speaker off)</string>
+    <string name="start_speaker">Start speaker</string>
     <string name="stop_speaker">Stop speaker</string>
     <string name="recording_speaker_on">Recording&#8230; (speaker on)</string>
     <string name="recording_answer_call">Recording will begin when you answer the call.</string>
