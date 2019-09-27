@@ -138,4 +138,5 @@
     <string name="bottom_nav_contacts">Contacts</string>
     <string name="bottom_nav_recordings">Unassigned recordings</string>
     <string name="no_unassigned">There are no unassigned recordings.</string>
+    <string name="unknown_number">Unknown phone number</string>
 </resources>

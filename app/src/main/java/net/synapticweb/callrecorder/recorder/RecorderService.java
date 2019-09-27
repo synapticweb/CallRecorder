@@ -194,8 +194,10 @@ public class RecorderService extends Service {
             callIdentifier = name.equals(getResources().getString(R.string.unkown_contact)) ?
                    receivedNumPhone : name;
         }
+        else if(privateCall)
+            callIdentifier = getResources().getString(R.string.private_number_name);
         else
-            callIdentifier = receivedNumPhone;
+            callIdentifier = getResources().getString(R.string.unknown_number);
 
         if(incoming)
             startForeground(NOTIFICATION_ID, buildNotification(RECORD_ON_HOOKUP));
