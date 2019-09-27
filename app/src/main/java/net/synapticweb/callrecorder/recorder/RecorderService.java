@@ -28,8 +28,6 @@ import android.preference.PreferenceManager;
 
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
-import com.google.i18n.phonenumbers.NumberParseException;
-import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.CrLog;
 import net.synapticweb.callrecorder.R;
@@ -51,11 +49,15 @@ public class RecorderService extends Service {
     private static RecorderService self;
     private boolean speakerOn = false;
     private Contact contact = null;
+    private String callIdentifier;
+    private SharedPreferences settings;
 
     public static final int NOTIFICATION_ID = 1;
     private static final String CHANNEL_ID = "call_recorder_channel";
-    public static final String CALL_IDENTIFIER = "call_identifier";
     public static final String PHONE_NUMBER = "phone_number";
+
+    public static final int RECORD_AUTOMMATICALLY = 1;
+    public static final int RECORD_ON_HOOKUP = 2;
 
     static final String ACTION_START_RECORDING = "net.synapticweb.callrecorder.START_RECORDING";
     static final String ACTION_STOP_SPEAKER = "net.synapticweb.callrecorder.STOP_SPEAKER";
@@ -70,6 +72,7 @@ public class RecorderService extends Service {
         super.onCreate();
         recorder = new Recorder();
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        settings = PreferenceManager.getDefaultSharedPreferences(CrApp.getInstance());
         self = this;
     }
 
@@ -99,7 +102,7 @@ public class RecorderService extends Service {
         mNotificationManager.createNotificationChannel(mChannel);
     }
 
-    public Notification buildNotification(String callNameOrNumber) {
+    public Notification buildNotification(int typeOfNotification) {
         Intent notificationIntent = new Intent(CrApp.getInstance(), ContactsListActivityMain.class);
         PendingIntent tapNotificationPi = PendingIntent.getBroadcast(CrApp.getInstance(), 0, notificationIntent, 0);
         Resources res = CrApp.getInstance().getResources();
@@ -108,31 +111,52 @@ public class RecorderService extends Service {
             createChannel();
         NotificationCompat.Builder builder = new NotificationCompat.Builder(CrApp.getInstance(), CHANNEL_ID)
                 .setSmallIcon(R.drawable.notification_icon)
-                .setContentTitle(callNameOrNumber + (incoming ? " (incoming)" : " (outgoing)"))
+                .setContentTitle(callIdentifier + (incoming ? " (incoming)" : " (outgoing)"))
                 .setContentIntent(tapNotificationPi);
 
-        if(isSpeakerOn()) {
-            notificationIntent = new Intent(CrApp.getInstance(), ControlRecordingReceiver.class);
-            notificationIntent.setAction(ACTION_STOP_SPEAKER);
-            notificationIntent.putExtra(CALL_IDENTIFIER, callNameOrNumber);
-            PendingIntent stopSpeakerPi = PendingIntent.getBroadcast(CrApp.getInstance(), 0, notificationIntent, 0);
-            builder.addAction(new NotificationCompat.Action.Builder(R.drawable.speaker_phone_off,
-                    res.getString(R.string.stop_speaker), stopSpeakerPi).build() )
-                    .setContentText(res.getString(R.string.recording_speaker_on));
-        }
-        else {
-            notificationIntent = new Intent(CrApp.getInstance(), ControlRecordingReceiver.class);
-            notificationIntent.setAction(ACTION_START_SPEAKER);
-            notificationIntent.putExtra(CALL_IDENTIFIER, callNameOrNumber);
-            PendingIntent startSpeakerPi = PendingIntent.getBroadcast(CrApp.getInstance(), 0, notificationIntent, 0);
-            builder.addAction(new NotificationCompat.Action.Builder(R.drawable.speaker_phone_on,
-                    res.getString(R.string.start_speaker), startSpeakerPi).build() )
-                    .setContentText(res.getString(R.string.recording_speaker_off));
+        switch (typeOfNotification) {
+            case RECORD_AUTOMMATICALLY:
+                if (isSpeakerOn()) {
+                    notificationIntent = new Intent(CrApp.getInstance(), ControlRecordingReceiver.class);
+                    notificationIntent.setAction(ACTION_STOP_SPEAKER);
+                    PendingIntent stopSpeakerPi = PendingIntent.getBroadcast(CrApp.getInstance(), 0, notificationIntent, 0);
+                    builder.addAction(new NotificationCompat.Action.Builder(R.drawable.speaker_phone_off,
+                            res.getString(R.string.stop_speaker), stopSpeakerPi).build())
+                            .setContentText(res.getString(R.string.recording_speaker_on));
+                } else {
+                    notificationIntent = new Intent(CrApp.getInstance(), ControlRecordingReceiver.class);
+                    notificationIntent.setAction(ACTION_START_SPEAKER);
+                    PendingIntent startSpeakerPi = PendingIntent.getBroadcast(CrApp.getInstance(), 0, notificationIntent, 0);
+                    builder.addAction(new NotificationCompat.Action.Builder(R.drawable.speaker_phone_on,
+                            res.getString(R.string.start_speaker), startSpeakerPi).build())
+                            .setContentText(res.getString(R.string.recording_speaker_off));
+                }
+                break;
+            case RECORD_ON_HOOKUP:
+                builder.setContentText(res.getString(R.string.recording_answer_call));
         }
 
         return builder.build();
     }
 
+    public void onIncomingOffhook() {
+        CrLog.log(CrLog.DEBUG, "onIncomingOfhook() called");
+        //aici nu vom folosi shouldStartAtHookup pentru că nu avem record_at_request.
+        NotificationManager nm = (NotificationManager) CrApp.getInstance().
+                getSystemService(Context.NOTIFICATION_SERVICE);
+        if(nm != null)
+            nm.notify(NOTIFICATION_ID, buildNotification(RECORD_AUTOMMATICALLY));
+
+        try {
+            recorder.startRecording(receivedNumPhone);
+            if(settings.getBoolean(SettingsFragment.SPEAKER_USE, false))
+                putSpeakerOn();
+        }
+        catch (RecordingException e) {
+            CrLog.log(CrLog.ERROR, "onIncomingOfhook: unable to start recording: " + e.getMessage() + " Stoping the service...");
+            stopSelf();
+        }
+    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -165,7 +189,6 @@ public class RecorderService extends Service {
             }
         }
 
-        String callIdentifier;
         if(contact != null) {
             String name = contact.getContactName();
             callIdentifier = name.equals(getResources().getString(R.string.unkown_contact)) ?
@@ -173,7 +196,22 @@ public class RecorderService extends Service {
         }
         else
             callIdentifier = receivedNumPhone;
-        startForeground(NOTIFICATION_ID, buildNotification(callIdentifier));
+
+        if(incoming)
+            startForeground(NOTIFICATION_ID, buildNotification(RECORD_ON_HOOKUP));
+        else
+            startForeground(NOTIFICATION_ID, buildNotification(RECORD_AUTOMMATICALLY));
+
+        try {
+            recorder.startRecording(receivedNumPhone);
+            if(settings.getBoolean(SettingsFragment.SPEAKER_USE, false))
+                putSpeakerOn();
+        }
+        catch (RecordingException e) {
+            CrLog.log(CrLog.ERROR, "onStartCommand: unable to start recorder: " + e.getMessage() + " Stoping the service...");
+            stopSelf();
+        }
+
         return START_NOT_STICKY;
     }
 

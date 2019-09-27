@@ -33,6 +33,7 @@ public class CallReceiver extends BroadcastReceiver {
     //rămînă pornit fără posibilitate de oprire.
     private static ComponentName serviceName = null;
     private SharedPreferences settings;
+    private static boolean incomingOffhookCalled = false;
 
     public CallReceiver() {
         super();
@@ -73,12 +74,18 @@ public class CallReceiver extends BroadcastReceiver {
                 else if(state != null && state.equals(TelephonyManager.EXTRA_STATE_OFFHOOK)) {
                     boolean isEnabled = settings.getBoolean(SettingsFragment.ENABLED, true);
                     //dacă serviciul nu e pornit înseamnă că e un apel outgoing.
-                    if(!serviceStarted && isEnabled) {
+                    if(!serviceStarted && isEnabled) { //outgoing
                         Intent intentService = new Intent(context, RecorderService.class);
                         serviceName = intentService.getComponent();
                         intentService.putExtra(ARG_INCOMING, false);
                         context.startService(intentService);
                         serviceStarted = true;
+                    }
+                    else if(serviceStarted && !incomingOffhookCalled) {  //incoming
+                        RecorderService service = RecorderService.getService();
+                        if(service != null)
+                            service.onIncomingOffhook();
+                        incomingOffhookCalled = true;
                     }
                 }
 
@@ -90,6 +97,7 @@ public class CallReceiver extends BroadcastReceiver {
                         serviceStarted = false;
                     }
                     serviceName = null;
+                    incomingOffhookCalled = false;
                 }
             }
         }
