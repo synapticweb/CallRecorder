@@ -27,7 +27,6 @@ public class ControlRecordingReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(CrApp.getInstance());
         NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        String callIdentifier =  intent.getExtras().getString(RecorderService.CALL_IDENTIFIER);
         RecorderService service = RecorderService.getService();
 
         if(intent.getAction().equals(RecorderService.ACTION_START_RECORDING)) {
@@ -45,18 +44,18 @@ public class ControlRecordingReceiver extends BroadcastReceiver {
                 }
             }
             if(nm != null)
-                nm.notify(RecorderService.NOTIFICATION_ID, service.buildNotification(RecorderService.RECORD_AUTOMMATICALLY, callIdentifier));
+                nm.notify(RecorderService.NOTIFICATION_ID, service.buildNotification(RecorderService.RECORD_AUTOMMATICALLY));
         }
         else if(intent.getAction().equals(RecorderService.ACTION_STOP_SPEAKER)) {
             service.putSpeakerOff();
             if(nm != null)
-                nm.notify(RecorderService.NOTIFICATION_ID, service.buildNotification(RecorderService.RECORD_AUTOMMATICALLY, callIdentifier));
+                nm.notify(RecorderService.NOTIFICATION_ID, service.buildNotification(RecorderService.RECORD_AUTOMMATICALLY));
         }
 
         else if(intent.getAction().equals(RecorderService.ACTION_START_SPEAKER)) {
             service.putSpeakerOn();
             if(nm != null)
-                nm.notify(RecorderService.NOTIFICATION_ID, service.buildNotification(RecorderService.RECORD_AUTOMMATICALLY, callIdentifier));
+                nm.notify(RecorderService.NOTIFICATION_ID, service.buildNotification(RecorderService.RECORD_AUTOMMATICALLY));
         }
     }
 }

@@ -49,6 +49,7 @@ public class RecorderService extends Service {
     public  boolean shouldStartAtHookup = false;
     private Long idIfMatch = null;
     private  String contactNameIfMatch = null;
+    private String callIdentifier;
     private  Recorder recorder;
     private  SharedPreferences settings;
     private  Thread speakerOnThread;
@@ -107,7 +108,7 @@ public class RecorderService extends Service {
         mNotificationManager.createNotificationChannel(mChannel);
     }
 
-    public Notification buildNotification(int typeOfNotification, String callNameOrNumber) {
+    public Notification buildNotification(int typeOfNotification) {
         Intent notificationIntent = new Intent(CrApp.getInstance(), ContactsListActivityMain.class);
         PendingIntent tapNotificationPi = PendingIntent.getBroadcast(CrApp.getInstance(), 0, notificationIntent, 0);
         Resources res = CrApp.getInstance().getResources();
@@ -116,7 +117,7 @@ public class RecorderService extends Service {
             createChannel();
         NotificationCompat.Builder builder = new NotificationCompat.Builder(CrApp.getInstance(), CHANNEL_ID)
                 .setSmallIcon(R.drawable.notification_icon)
-                .setContentTitle(callNameOrNumber + (incoming ? " (incoming)" : " (outgoing)"))
+                .setContentTitle(callIdentifier + (incoming ? " (incoming)" : " (outgoing)"))
                 .setContentIntent(tapNotificationPi);
 
 
@@ -125,7 +126,6 @@ public class RecorderService extends Service {
                 if(isSpeakerOn()) {
                     notificationIntent = new Intent(CrApp.getInstance(), ControlRecordingReceiver.class);
                     notificationIntent.setAction(ACTION_STOP_SPEAKER);
-                    notificationIntent.putExtra(CALL_IDENTIFIER, callNameOrNumber);
                     PendingIntent stopSpeakerPi = PendingIntent.getBroadcast(CrApp.getInstance(), 0, notificationIntent, 0);
                     builder.addAction(new NotificationCompat.Action.Builder(R.drawable.speaker_phone_off,
                             res.getString(R.string.stop_speaker), stopSpeakerPi).build() )
@@ -134,7 +134,6 @@ public class RecorderService extends Service {
                 else {
                     notificationIntent = new Intent(CrApp.getInstance(), ControlRecordingReceiver.class);
                     notificationIntent.setAction(ACTION_START_SPEAKER);
-                    notificationIntent.putExtra(CALL_IDENTIFIER, callNameOrNumber);
                     PendingIntent startSpeakerPi = PendingIntent.getBroadcast(CrApp.getInstance(), 0, notificationIntent, 0);
                     builder.addAction(new NotificationCompat.Action.Builder(R.drawable.speaker_phone_on,
                             res.getString(R.string.start_speaker), startSpeakerPi).build() )
@@ -147,7 +146,6 @@ public class RecorderService extends Service {
             case RECORD_ON_REQUEST:
                 notificationIntent = new Intent(CrApp.getInstance(), ControlRecordingReceiver.class);
                 notificationIntent.setAction(ACTION_START_RECORDING);
-                notificationIntent.putExtra(CALL_IDENTIFIER, callNameOrNumber);
                 notificationIntent.putExtra(PHONE_NUMBER, receivedNumPhone != null ? receivedNumPhone : "private_phone");
                 PendingIntent startRecordingPi = PendingIntent.getBroadcast(CrApp.getInstance(), 0, notificationIntent, 0);
                 builder.addAction(new NotificationCompat.Action.Builder(R.drawable.recorder,
@@ -163,14 +161,8 @@ public class RecorderService extends Service {
         if(shouldStartAtHookup) {
             NotificationManager nm = (NotificationManager) CrApp.getInstance().
                     getSystemService(Context.NOTIFICATION_SERVICE);
-            String callIdentifier;
-            if(privateCall)
-                callIdentifier = CrApp.getInstance().getResources().getString(R.string.private_number_name);
-            else
-                callIdentifier = match ? contactNameIfMatch : receivedNumPhone;
             if(nm != null)
-                nm.notify(NOTIFICATION_ID, buildNotification(RECORD_AUTOMMATICALLY, callIdentifier));
-
+                nm.notify(NOTIFICATION_ID, buildNotification(RECORD_AUTOMMATICALLY));
             try {
                 recorder.startRecording(receivedNumPhone);
                 if(settings.getBoolean(SettingsFragment.SPEAKER_USE, false))
@@ -202,10 +194,11 @@ public class RecorderService extends Service {
             match = ((contact = Contact.queryNumberInAppContacts(receivedNumPhone, CrApp.getInstance())) != null);
             if(match) {
                 idIfMatch = contact.getId(); //pentru teste: idIfMatch nu trebuie să fie niciodată null dacă match == true
-                contactNameIfMatch = contact.getContactName(); //posibil subiect pentru un test.
+                callIdentifier = contact.getContactName(); //posibil subiect pentru un test.
                 shouldRecord = contact.shouldRecord();
             }
             else { //în caz de ussd serviciul se oprește
+                callIdentifier = receivedNumPhone;
                 PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
                 String countryCode = CrApp.getUserCountry(CrApp.getInstance());
                 if(countryCode == null)
@@ -218,35 +211,35 @@ public class RecorderService extends Service {
                 }
             }
         }
+        else
+            callIdentifier = getResources().getString(R.string.private_number_name);
+
         boolean recordAutoPrivCalls = settings.getBoolean(SettingsFragment.AUTOMMATICALLY_RECORD_PRIVATE_CALLS, false);
         boolean paranoidMode = settings.getBoolean(SettingsFragment.PARANOID_MODE, false);
 
         if(incoming) {
             if(privateCall) {
                 if(recordAutoPrivCalls || paranoidMode){
-                    startForeground(NOTIFICATION_ID, buildNotification(RECORD_ON_HOOKUP,
-                            getResources().getString(R.string.private_number_name)));
+                    startForeground(NOTIFICATION_ID, buildNotification(RECORD_ON_HOOKUP));
                     shouldStartAtHookup = true;
                 }
                 else
-                    startForeground(NOTIFICATION_ID, buildNotification(RECORD_ON_REQUEST,
-                            getResources().getString(R.string.private_number_name)));
+                    startForeground(NOTIFICATION_ID, buildNotification(RECORD_ON_REQUEST));
             }
             else { //normal call, number present.
                 if(match || paranoidMode) {
                     if(paranoidMode)
                         shouldRecord = true;
                     if(shouldRecord) {
-                        startForeground(NOTIFICATION_ID, buildNotification(RECORD_ON_HOOKUP, contactNameIfMatch
-                                != null ? contactNameIfMatch : receivedNumPhone));
+                        startForeground(NOTIFICATION_ID, buildNotification(RECORD_ON_HOOKUP));
                         shouldStartAtHookup = true;
                     }
                     else // shouldRecord este false. Deci nu este paranoid mode, deci este match. Tertium non datur.
                     //Dacă este match, contactNameIfMatch != null:
-                        startForeground(NOTIFICATION_ID, buildNotification(RECORD_ON_REQUEST, contactNameIfMatch));
+                        startForeground(NOTIFICATION_ID, buildNotification(RECORD_ON_REQUEST));
                 }
                 else //nu este nici match nici paranoid mode.
-                    startForeground(NOTIFICATION_ID, buildNotification(RECORD_ON_REQUEST, receivedNumPhone));
+                    startForeground(NOTIFICATION_ID, buildNotification(RECORD_ON_REQUEST));
             }
         }
         else { //outgoing call
@@ -254,9 +247,7 @@ public class RecorderService extends Service {
                 if(paranoidMode)
                     shouldRecord = true;
                 if(shouldRecord) {
-                    String callIdentifier = contactNameIfMatch != null ? contactNameIfMatch : receivedNumPhone;
-                    startForeground(NOTIFICATION_ID, buildNotification(RECORD_AUTOMMATICALLY, callIdentifier));
-
+                    startForeground(NOTIFICATION_ID, buildNotification(RECORD_AUTOMMATICALLY));
                     try {
                         recorder.startRecording(receivedNumPhone);
                         if(settings.getBoolean(SettingsFragment.SPEAKER_USE, false))
@@ -268,10 +259,10 @@ public class RecorderService extends Service {
                     }
                 }
                 else //ca mai sus
-                    startForeground(NOTIFICATION_ID, buildNotification(RECORD_ON_REQUEST, contactNameIfMatch));
+                    startForeground(NOTIFICATION_ID, buildNotification(RECORD_ON_REQUEST));
             }
             else //nici match nici paranoid mode
-                startForeground(NOTIFICATION_ID, buildNotification(RECORD_ON_REQUEST, receivedNumPhone));
+                startForeground(NOTIFICATION_ID, buildNotification(RECORD_ON_REQUEST));
         }
         return START_NOT_STICKY;
     }
