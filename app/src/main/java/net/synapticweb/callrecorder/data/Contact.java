@@ -60,7 +60,7 @@ public class Contact implements Comparable<Contact>, Parcelable {
         setPhoneType(phoneTypeCode);
     }
 
-    public static Contact getContactIfNumberInDb(String receivedPhoneNumber, Context context) {
+    public static Contact queryNumberInAppContacts(String receivedPhoneNumber, Context context) {
         CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(context);
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
@@ -162,35 +162,31 @@ public class Contact implements Comparable<Contact>, Parcelable {
     }
 
   @Nullable
-  static public Contact searchNumberInPhoneContacts(final String number, @NonNull final Context context) {
-        Contact contact = null;
+  static public Contact queryNumberInPhoneContacts(final String number, @NonNull final Context context) {
+        //implementare probabil mai eficientă decît ce aveam eu:
+      //https://stackoverflow.com/questions/3505865/android-check-phone-number-present-in-contact-list-phone-number-retrieve-fr
+      Uri lookupUri = Uri.withAppendedPath(
+              //e atît de lung pentru că am și eu ContactsContract.
+              android.provider.ContactsContract.PhoneLookup.CONTENT_FILTER_URI,
+              Uri.encode(number));
+      String[] projection = {android.provider.ContactsContract.PhoneLookup.NUMBER,
+              android.provider.ContactsContract.PhoneLookup.TYPE,
+              android.provider.ContactsContract.PhoneLookup.DISPLAY_NAME,
+              android.provider.ContactsContract.PhoneLookup.PHOTO_URI };
       Cursor cursor = context.getContentResolver()
-              .query(android.provider.ContactsContract.CommonDataKinds.Phone.CONTENT_URI, new String[]{
-                              android.provider.ContactsContract.CommonDataKinds.Phone.NUMBER,
-                              android.provider.ContactsContract.CommonDataKinds.Phone.TYPE,
-                              android.provider.ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
-                              android.provider.ContactsContract.CommonDataKinds.Phone.PHOTO_URI},
-                      null, null, null);
+              .query(lookupUri, projection, null, null, null);
 
-      if(cursor != null) {
-          PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
-          while (cursor.moveToNext()) {
-              String numberContacts = cursor.getString(
-                      cursor.getColumnIndex(android.provider.ContactsContract.CommonDataKinds.Phone.NUMBER));
-              PhoneNumberUtil.MatchType matchType = phoneUtil.isNumberMatch(numberContacts, number);
-              if(matchType != PhoneNumberUtil.MatchType.NO_MATCH && matchType != PhoneNumberUtil.MatchType.NOT_A_NUMBER) {
-                  contact = new Contact();
-                  contact.setPhoneType(cursor.getInt(cursor.getColumnIndex(android.provider.ContactsContract.CommonDataKinds.Phone.TYPE)));
-                  contact.setContactName(cursor.getString(cursor.getColumnIndex(android.provider.ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)));
-                  contact.setPhotoUri(cursor.getString(cursor.getColumnIndex(android.provider.ContactsContract.CommonDataKinds.Phone.PHOTO_URI)));
-                  contact.setPhoneNumber(cursor.getString(cursor.getColumnIndex(android.provider.ContactsContract.CommonDataKinds.Phone.NUMBER)));
-                  break;
-              }
+          if(cursor != null && cursor.moveToFirst()) {
+              Contact contact = new Contact();
+              contact.setPhoneType(cursor.getInt(cursor.getColumnIndex(android.provider.ContactsContract.PhoneLookup.TYPE)));
+              contact.setContactName(cursor.getString(cursor.getColumnIndex(android.provider.ContactsContract.PhoneLookup.DISPLAY_NAME)));
+              contact.setPhotoUri(cursor.getString(cursor.getColumnIndex(android.provider.ContactsContract.PhoneLookup.PHOTO_URI)));
+              contact.setPhoneNumber(cursor.getString(cursor.getColumnIndex(android.provider.ContactsContract.PhoneLookup.NUMBER)));
+
+              cursor.close();
+              return contact;
           }
-          cursor.close();
-          return contact;
-      }
-        return null;
+      return null;
     }
 
     public boolean shouldRecord() {

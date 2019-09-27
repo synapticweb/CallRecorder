@@ -119,18 +119,13 @@ public class RecorderService extends Service {
                 .setContentTitle(callNameOrNumber + (incoming ? " (incoming)" : " (outgoing)"))
                 .setContentIntent(tapNotificationPi);
 
-        String callIdentifier;
-        if(privateCall)
-            callIdentifier = CrApp.getInstance().getResources().getString(R.string.private_number_name);
-        else
-            callIdentifier = match ? contactNameIfMatch : receivedNumPhone;
 
         switch(typeOfNotification) {
             case RECORD_AUTOMMATICALLY:
                 if(isSpeakerOn()) {
                     notificationIntent = new Intent(CrApp.getInstance(), ControlRecordingReceiver.class);
                     notificationIntent.setAction(ACTION_STOP_SPEAKER);
-                    notificationIntent.putExtra(CALL_IDENTIFIER, callIdentifier);
+                    notificationIntent.putExtra(CALL_IDENTIFIER, callNameOrNumber);
                     PendingIntent stopSpeakerPi = PendingIntent.getBroadcast(CrApp.getInstance(), 0, notificationIntent, 0);
                     builder.addAction(new NotificationCompat.Action.Builder(R.drawable.speaker_phone_off,
                             res.getString(R.string.stop_speaker), stopSpeakerPi).build() )
@@ -139,7 +134,7 @@ public class RecorderService extends Service {
                 else {
                     notificationIntent = new Intent(CrApp.getInstance(), ControlRecordingReceiver.class);
                     notificationIntent.setAction(ACTION_START_SPEAKER);
-                    notificationIntent.putExtra(CALL_IDENTIFIER, callIdentifier);
+                    notificationIntent.putExtra(CALL_IDENTIFIER, callNameOrNumber);
                     PendingIntent startSpeakerPi = PendingIntent.getBroadcast(CrApp.getInstance(), 0, notificationIntent, 0);
                     builder.addAction(new NotificationCompat.Action.Builder(R.drawable.speaker_phone_on,
                             res.getString(R.string.start_speaker), startSpeakerPi).build() )
@@ -152,7 +147,7 @@ public class RecorderService extends Service {
             case RECORD_ON_REQUEST:
                 notificationIntent = new Intent(CrApp.getInstance(), ControlRecordingReceiver.class);
                 notificationIntent.setAction(ACTION_START_RECORDING);
-                notificationIntent.putExtra(CALL_IDENTIFIER, callIdentifier);
+                notificationIntent.putExtra(CALL_IDENTIFIER, callNameOrNumber);
                 notificationIntent.putExtra(PHONE_NUMBER, receivedNumPhone != null ? receivedNumPhone : "private_phone");
                 PendingIntent startRecordingPi = PendingIntent.getBroadcast(CrApp.getInstance(), 0, notificationIntent, 0);
                 builder.addAction(new NotificationCompat.Action.Builder(R.drawable.recorder,
@@ -204,7 +199,7 @@ public class RecorderService extends Service {
         if(!privateCall) {//și nu trebuie să mai verificăm dacă nr este în baza de date sau, dacă nu
             // este în baza de date, dacă este în contacte.
             Contact contact;
-            match = ((contact = Contact.getContactIfNumberInDb(receivedNumPhone, CrApp.getInstance())) != null);
+            match = ((contact = Contact.queryNumberInAppContacts(receivedNumPhone, CrApp.getInstance())) != null);
             if(match) {
                 idIfMatch = contact.getId(); //pentru teste: idIfMatch nu trebuie să fie niciodată null dacă match == true
                 contactNameIfMatch = contact.getContactName(); //posibil subiect pentru un test.
@@ -366,7 +361,7 @@ public class RecorderService extends Service {
 
         else { //dacă nu e nici match nici private atunci trebuie mai întîi verificat dacă nu cumva nr există totuși în contactele telefonului.
             Contact contact;
-            if((contact = Contact.searchNumberInPhoneContacts(receivedNumPhone, getApplicationContext())) != null) {
+            if((contact = Contact.queryNumberInPhoneContacts(receivedNumPhone, getApplicationContext())) != null) {
                 try {
                     contact.insertInDatabase(this);
                 }
