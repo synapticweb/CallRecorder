@@ -149,9 +149,9 @@ public class RecorderService extends Service {
 
         //se întîmplă numai la incoming, la outgoing totdeauna nr e null.
         if(receivedNumPhone != null) {
-            contact = Contact.getContactIfNumberInDb(receivedNumPhone, CrApp.getInstance());
+            contact = Contact.queryNumberInAppContacts(receivedNumPhone, CrApp.getInstance());
             if(contact == null) {
-                contact = Contact.searchNumberInPhoneContacts(receivedNumPhone, CrApp.getInstance());
+                contact = Contact.queryNumberInPhoneContacts(receivedNumPhone, CrApp.getInstance());
                 if(contact == null) {
                     contact = new Contact(null, receivedNumPhone, getResources().getString(R.string.unkown_contact), null, CrApp.UNKNOWN_TYPE_PHONE_CODE);
                 }
