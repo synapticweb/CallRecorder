@@ -49,7 +49,7 @@ public class Recorder {
 
     void startRecording(String phoneNumber) throws RecordingException {
         if(phoneNumber == null)
-            phoneNumber = "PrivateCall";
+            phoneNumber = "";
 
         if(isRunning())
             stopRecording();

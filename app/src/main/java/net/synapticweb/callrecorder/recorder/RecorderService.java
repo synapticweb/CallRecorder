@@ -148,6 +148,7 @@ public class RecorderService extends Service {
             nm.notify(NOTIFICATION_ID, buildNotification(RECORD_AUTOMMATICALLY));
 
         try {
+            CrLog.log(CrLog.DEBUG, "Recorder started in onIncomingOffhook()");
             recorder.startRecording(receivedNumPhone);
             if(settings.getBoolean(SettingsFragment.SPEAKER_USE, false))
                 putSpeakerOn();
@@ -201,17 +202,18 @@ public class RecorderService extends Service {
 
         if(incoming)
             startForeground(NOTIFICATION_ID, buildNotification(RECORD_ON_HOOKUP));
-        else
+        else {
             startForeground(NOTIFICATION_ID, buildNotification(RECORD_AUTOMMATICALLY));
 
-        try {
-            recorder.startRecording(receivedNumPhone);
-            if(settings.getBoolean(SettingsFragment.SPEAKER_USE, false))
-                putSpeakerOn();
-        }
-        catch (RecordingException e) {
-            CrLog.log(CrLog.ERROR, "onStartCommand: unable to start recorder: " + e.getMessage() + " Stoping the service...");
-            stopSelf();
+            try {
+                CrLog.log(CrLog.DEBUG, "Recorder started in onStartCommand()");
+                recorder.startRecording(receivedNumPhone);
+                if (settings.getBoolean(SettingsFragment.SPEAKER_USE, false))
+                    putSpeakerOn();
+            } catch (RecordingException e) {
+                CrLog.log(CrLog.ERROR, "onStartCommand: unable to start recorder: " + e.getMessage() + " Stoping the service...");
+                stopSelf();
+            }
         }
 
         return START_NOT_STICKY;

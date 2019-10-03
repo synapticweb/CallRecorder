@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/rename_recording"
+        android:title="@string/rename_recording_popup_text">
+    </item>
+    <item
+        android:id="@+id/delete_recording"
+        android:title="@string/delete_recording_popup_text">
+    </item>
+    <item android:id="@+id/assign_to_contact"
+        android:title="@string/assign_contact_popup_text" />
+
+    <item android:id="@+id/assign_private"
+        android:title="@string/assign_private_popup_text" />
+</menu>

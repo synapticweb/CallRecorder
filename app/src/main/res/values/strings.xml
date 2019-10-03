@@ -139,4 +139,6 @@
     <string name="bottom_nav_recordings">Unassigned recordings</string>
     <string name="no_unassigned">There are no unassigned recordings.</string>
     <string name="unknown_number">Unknown phone number</string>
+    <string name="assign_contact_popup_text">Assign to phone contact</string>
+    <string name="assign_private_popup_text">Assign to private phone number</string>
 </resources>

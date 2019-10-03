@@ -21,9 +21,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
 import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.TemplateActivity;
 import net.synapticweb.callrecorder.contactdetail.ContactDetailActivity;

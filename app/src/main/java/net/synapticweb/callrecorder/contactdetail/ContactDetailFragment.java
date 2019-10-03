@@ -67,20 +67,22 @@ import androidx.recyclerview.widget.RecyclerView;
 
 
 public class ContactDetailFragment extends Fragment implements ContactDetailContract.View{
-    private ContactDetailPresenter presenter;
-    private RecordingAdapter adapter;
+    protected ContactDetailPresenter presenter;
+    protected RecordingAdapter adapter;
     private TextView typePhoneView, phoneNumberView, recordingStatusView;
     private ImageView contactPhotoView;
-    private RecyclerView recordingsRecycler;
+    protected RecyclerView recordingsRecycler;
     private RelativeLayout detailView;
-    private Contact contact;
-    private boolean selectMode = false;
-    private List<Integer> selectedItems = new ArrayList<>();
-    private TemplateActivity parentActivity;
+    protected Contact contact;
+    protected boolean selectMode = false;
+    protected List<Integer> selectedItems = new ArrayList<>();
+    protected TemplateActivity parentActivity;
     private int selectedItemsDeleted = 0;
     private static final String ARG_CONTACT = "arg_contact";
     private static final String SELECT_MODE_KEY = "select_mode_key";
     private static final String SELECTED_ITEMS_KEY = "selected_items_key";
+
+    protected ContactDetailFragment() {}
 
     @Override
     public void onAttach(Context context) {
@@ -191,7 +193,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         presenter.loadRecordings(contact);
     }
 
-    private void toggleView(final View view, final boolean selectModeOn, Float alpha) {
+    protected void toggleView(final View view, final boolean selectModeOn, Float alpha) {
         if(alpha == null) {
             view.animate()
                     .alpha(view.getAlpha() == 0.0f ? 1.0f : 0.0f)
@@ -285,7 +287,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
 
     }
 
-    private boolean checkIfSelectedRecordingsDeleted() {
+    protected boolean checkIfSelectedRecordingsDeleted() {
         selectedItemsDeleted = 0;
         for(Recording recording : adapter.getRecordings())
             if(!recording.exists()) {
@@ -396,7 +398,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         return fragment;
     }
 
-    private void setDetailsButtonsListeners() {
+    protected void setDetailsButtonsListeners() {
         ImageButton navigateBack = parentActivity.findViewById(R.id.navigate_back);
         navigateBack.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -768,14 +770,16 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         }
     }
 
-    class RecordingAdapter extends RecyclerView.Adapter<RecordingHolder> {
+    //A devenit public pentru a funcționa adapter.replaceData() în UnassignedRecordingsFragment
+    public class RecordingAdapter extends RecyclerView.Adapter<RecordingHolder> {
         private List<Recording> recordings;
 
         List<Recording> getRecordings() {
             return recordings;
         }
 
-        void replaceData(List<Recording> recordings) {
+        //A devenit public pentru a funcționa adapter.replaceData() în UnassignedRecordingsFragment
+        public void replaceData(List<Recording> recordings) {
             this.recordings = recordings;
             notifyDataSetChanged();
         }
@@ -797,7 +801,8 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
             return new RecordingHolder(layoutInflater, parent);
         }
 
-        Recording getItem(int position) {
+        //A devenit public pentru a funcționa UnassignedRecordingsFragment
+        public Recording getItem(int position) {
             return recordings.get(position);
         }
 

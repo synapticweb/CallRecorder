@@ -24,6 +24,18 @@
         >
 
         <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/close"
+            android:layout_marginEnd="20dp"
+            android:id="@+id/close_select_mode"
+            android:layout_gravity="start"
+            android:background="@android:color/transparent"
+            android:visibility="gone"
+            android:alpha="0"
+            />
+
+        <ImageButton
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_gravity="start"
@@ -38,6 +50,53 @@
             android:layout_gravity="center"
             android:textColor="@color/textOnDark"/>
 
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/baseline_more_vert_white_24"
+            android:layout_marginEnd="10dp"
+            android:background="@android:color/transparent"
+            android:id="@+id/contact_detail_selected_menu"
+            android:layout_gravity="end"
+            android:visibility="gone"
+            />
+
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/select_export"
+            android:background="@android:color/transparent"
+            android:id="@+id/actionbar_select_move"
+            android:layout_gravity="end"
+            android:layout_marginEnd="20dp"
+            android:visibility="gone"
+            android:alpha="0"
+            />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/select_all"
+            android:background="@android:color/transparent"
+            android:id="@+id/actionbar_select_all"
+            android:layout_gravity="end"
+            android:layout_marginEnd="20dp"
+            android:visibility="gone"
+            android:alpha="0"
+            />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/info"
+            android:background="@android:color/transparent"
+            android:id="@+id/actionbar_info"
+            android:layout_gravity="end"
+            android:layout_marginEnd="20dp"
+            android:visibility="gone"
+            android:alpha="0"
+            />
 
     </androidx.appcompat.widget.Toolbar>
 

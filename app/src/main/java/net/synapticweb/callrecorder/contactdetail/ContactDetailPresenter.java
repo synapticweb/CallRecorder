@@ -47,7 +47,6 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
     static final int EDIT_REQUEST_CODE = 1;
     static final String EDIT_EXTRA_CONTACT = "edit_extra_contact";
     public static final String RECORDING_EXTRA = "recording_extra";
-    private static final String TAG = "CallRecorder";
 
      ContactDetailPresenter(ContactDetailContract.View view) {
         this.view = view;
