@@ -108,6 +108,7 @@ public class ContactsListActivityMain extends TemplateActivity {
                     case R.id.bottom_nav_contacts:
                         Fragment listContacts = createFragment();
                         if(!isSinglePaneLayout()) {
+                            toggleEditCallBtns(true);
                             Fragment unassigned = fm.findFragmentById(R.id.tab_fragment_container);
                             if (unassigned != null)
                                 fm.beginTransaction().remove(unassigned).commit();
@@ -122,6 +123,7 @@ public class ContactsListActivityMain extends TemplateActivity {
                             fm.beginTransaction().replace(R.id.contacts_list_fragment_container, unassigned)
                                     .commit();
                         else {
+                            toggleEditCallBtns(false);
                             Fragment contactsList = fm.findFragmentById(R.id.contacts_list_fragment_container);
                             Fragment contactDetail = fm.findFragmentById(R.id.contact_detail_fragment_container);
                             if (contactsList != null)
@@ -170,6 +172,23 @@ public class ContactsListActivityMain extends TemplateActivity {
                 return true;
             }
         });
+    }
+
+    private void toggleEditCallBtns(boolean visible) {
+        ImageButton editBtn = findViewById(R.id.edit_contact);
+        ImageButton callBtn = findViewById(R.id.call_contact);
+        ImageButton menuRightBtn = findViewById(R.id.contact_detail_menu);
+
+        if(visible) {
+            editBtn.setVisibility(View.VISIBLE);
+            callBtn.setVisibility(View.VISIBLE);
+            menuRightBtn.setVisibility(View.VISIBLE);
+        }
+        else {
+            editBtn.setVisibility(View.GONE);
+            callBtn.setVisibility(View.GONE);
+            menuRightBtn.setVisibility(View.GONE);
+        }
     }
 
     @Override
