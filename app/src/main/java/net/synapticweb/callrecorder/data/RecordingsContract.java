@@ -16,7 +16,7 @@ public class RecordingsContract {
     public static class Recordings implements BaseColumns {
         public static final String TABLE_NAME = "recordings";
 
-        public static final String COLUMN_NAME_PHONE_NUM_ID = "phone_num_id";
+        public static final String COLUMN_NAME_CONTACT_ID = "contact_id";
         public static final String COLUMN_NAME_INCOMING = "incoming";
         public static final String COLUMN_NAME_PATH = "path";
         public static final String COLUMN_NAME_START_TIMESTAMP = "start_timestamp";

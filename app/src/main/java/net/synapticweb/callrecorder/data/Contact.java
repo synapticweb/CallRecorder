@@ -142,11 +142,11 @@ public class Contact implements Comparable<Contact>, Parcelable {
 
         Cursor cursor = db.query(RecordingsContract.Recordings.TABLE_NAME,
                 new String[]{RecordingsContract.Recordings._ID, RecordingsContract.Recordings.COLUMN_NAME_PATH},
-                RecordingsContract.Recordings.COLUMN_NAME_PHONE_NUM_ID + "=" + getId(), null, null, null, null);
+                RecordingsContract.Recordings.COLUMN_NAME_CONTACT_ID + "=" + getId(), null, null, null, null);
 
         while(cursor.moveToNext()) {
            Recording recording =
-                    new Recording(cursor.getLong(cursor.getColumnIndex(RecordingsContract.Recordings._ID)),
+                    new Recording(cursor.getLong(cursor.getColumnIndex(RecordingsContract.Recordings._ID)), null,
                             cursor.getString(cursor.getColumnIndex(RecordingsContract.Recordings.COLUMN_NAME_PATH)),
                             null, null, null, null, null, null);
            recording.delete(context);

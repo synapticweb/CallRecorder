@@ -1,5 +1,8 @@
 package net.synapticweb.callrecorder.contactslist;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -27,6 +30,7 @@ import java.util.List;
 
 public class UnassignedRecordingsFragment extends ContactDetailFragment {
     private View rootView;
+    private static final int REQUEST_PICK_NUMBER = 1;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -118,6 +122,13 @@ public class UnassignedRecordingsFragment extends ContactDetailFragment {
                                         })
                                         .show();
                                 return true;
+                            case R.id.assign_to_contact:
+                                Intent pickNumber = new Intent(Intent.ACTION_PICK,
+                                        android.provider.ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
+                                startActivityForResult(pickNumber, REQUEST_PICK_NUMBER);
+                                return true;
+                            case R.id.assign_private: presenter.assignToPrivate(getSelectedRecordings());
+                                return true;
                             default:
                                 return false;
                         }
@@ -159,5 +170,15 @@ public class UnassignedRecordingsFragment extends ContactDetailFragment {
                 presenter.onInfoClick();
             }
         });
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+        if(resultCode == Activity.RESULT_OK && requestCode == REQUEST_PICK_NUMBER) {
+            Uri numberUri = intent.getData();
+            if(numberUri != null)
+                presenter.assignToContact(numberUri, getSelectedRecordings());
+        }
     }
 }

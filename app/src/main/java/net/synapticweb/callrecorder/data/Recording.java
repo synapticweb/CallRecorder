@@ -36,18 +36,18 @@ import java.util.regex.Pattern;
 
 public class Recording implements Parcelable {
     private long id;
+    private Long contactId;
     private String path;
     private Boolean incoming;
     private Long startTimestamp, endTimestamp;
     private Boolean isNameSet;
     private String format;
     private String mode;
-    private static final String TAG = "CallRecorder";
 
-
-    public Recording(long id, String path, Boolean incoming, Long startTimestamp, Long endTimestamp,
+    public Recording(long id, Long contactId, String path, Boolean incoming, Long startTimestamp, Long endTimestamp,
                      String format, Boolean isNameSet, String mode) {
         this.id = id;
+        this.contactId = contactId;
         this.path = path;
         this.incoming = incoming;
         this.startTimestamp = startTimestamp;
@@ -75,6 +75,7 @@ public class Recording implements Parcelable {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(RecordingsContract.Recordings._ID, id);
+        values.put(RecordingsContract.Recordings.COLUMN_NAME_CONTACT_ID, contactId);
         values.put(RecordingsContract.Recordings.COLUMN_NAME_PATH, path);
         values.put(RecordingsContract.Recordings.COLUMN_NAME_INCOMING, incoming);
         values.put(RecordingsContract.Recordings.COLUMN_NAME_START_TIMESTAMP, startTimestamp);
@@ -188,6 +189,8 @@ public class Recording implements Parcelable {
         this.id = id;
     }
 
+    public void setContactId(long contactId) { this.contactId = contactId; }
+
     public String getPath() {
         return path;
     }
@@ -216,6 +219,7 @@ public class Recording implements Parcelable {
 
     public void setIsNameSet(Boolean isNameSet) { this.isNameSet = isNameSet; }
 
+
     @Override
     public int describeContents() {
         return 0;
@@ -224,6 +228,7 @@ public class Recording implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(this.id);
+        dest.writeValue(this.contactId);
         dest.writeString(this.path);
         dest.writeValue(this.incoming);
         dest.writeValue(this.startTimestamp);
@@ -235,6 +240,7 @@ public class Recording implements Parcelable {
 
     protected Recording(Parcel in) {
         this.id = in.readLong();
+        this.contactId = (Long) in.readValue(Long.class.getClassLoader());
         this.path = in.readString();
         this.incoming = (Boolean) in.readValue(Boolean.class.getClassLoader());
         this.startTimestamp = (Long) in.readValue(Long.class.getClassLoader());

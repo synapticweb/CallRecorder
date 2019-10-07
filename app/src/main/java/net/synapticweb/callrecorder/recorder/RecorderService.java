@@ -306,7 +306,7 @@ public class RecorderService extends Service {
             idToInsert = null;
 
         ContentValues values = new ContentValues();
-        values.put(Recordings.COLUMN_NAME_PHONE_NUM_ID, idToInsert);
+        values.put(Recordings.COLUMN_NAME_CONTACT_ID, idToInsert);
         values.put(Recordings.COLUMN_NAME_INCOMING, incoming ? CrApp.SQLITE_TRUE : CrApp.SQLITE_FALSE);
         values.put(Recordings.COLUMN_NAME_PATH, recorder.getAudioFilePath());
         values.put(Recordings.COLUMN_NAME_START_TIMESTAMP, recorder.getStartingTime());

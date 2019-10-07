@@ -27,11 +27,12 @@ public class RecordingsRepository {
         List<Recording> list =  new ArrayList<>();
 
         Cursor cursor = db.query(RecordingsContract.Recordings.TABLE_NAME,
-                null, RecordingsContract.Recordings.COLUMN_NAME_PHONE_NUM_ID + " is " + (contact == null ? "null" : contact.getId()), null, null, null, null);
+                null, RecordingsContract.Recordings.COLUMN_NAME_CONTACT_ID + " is " + (contact == null ? "null" : contact.getId()), null, null, null, null);
 
         while(cursor.moveToNext())
         {
             Recording recording = new Recording(cursor.getLong(cursor.getColumnIndex(RecordingsContract.Recordings._ID)),
+                    cursor.getLong(cursor.getColumnIndex(RecordingsContract.Recordings.COLUMN_NAME_CONTACT_ID)),
                     cursor.getString(cursor.getColumnIndex(RecordingsContract.Recordings.COLUMN_NAME_PATH)),
                     cursor.getInt(cursor.getColumnIndex(RecordingsContract.Recordings.COLUMN_NAME_INCOMING)) == 1,
                     cursor.getLong(cursor.getColumnIndex(RecordingsContract.Recordings.COLUMN_NAME_START_TIMESTAMP)),

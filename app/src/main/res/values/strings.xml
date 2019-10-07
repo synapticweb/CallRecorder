@@ -141,4 +141,6 @@
     <string name="unknown_number">Unknown phone number</string>
     <string name="assign_contact_popup_text">Assign to phone contact</string>
     <string name="assign_private_popup_text">Assign to private phone number</string>
+    <string name="assign_to_contact_ok">The recording(s) were successfully assigned to contact.</string>
+    <string name="assign_to_contact_err">An error occurred while assigning the recording(s) to contact.</string>
 </resources>

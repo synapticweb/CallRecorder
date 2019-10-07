@@ -11,6 +11,8 @@ package net.synapticweb.callrecorder.contactdetail;
 
 import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
@@ -18,9 +20,13 @@ import android.os.Bundle;
 import android.text.InputType;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.google.i18n.phonenumbers.NumberParseException;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.Phonenumber;
 
 import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.CrLog;
@@ -389,5 +395,101 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
                view.selectRecording(selectedRecording);
         }
         view.updateTitle();
+    }
+
+    public void assignToContact(Uri numberUri, List<Recording> recordings) {
+        PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
+        Phonenumber.PhoneNumber phoneNumberWrapper;
+        Cursor cursor;
+        String phoneNumber = null, contactName = null, photoUri = null;
+        int phoneType = CrApp.UNKNOWN_TYPE_PHONE_CODE;
+
+        cursor = view.getParentActivity().getContentResolver().
+                query(numberUri, new String[]{android.provider.ContactsContract.CommonDataKinds.Phone.NUMBER,
+                                android.provider.ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
+                                android.provider.ContactsContract.CommonDataKinds.Phone.PHOTO_URI,
+                                android.provider.ContactsContract.CommonDataKinds.Phone.TYPE},
+                        null, null, null);
+
+        if(cursor != null && cursor.moveToFirst()) {
+            phoneNumber = cursor.getString(cursor.getColumnIndex(android.provider.ContactsContract.CommonDataKinds.Phone.NUMBER));
+            contactName = cursor.getString(cursor.getColumnIndex(android.provider.ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+            photoUri = cursor.getString(cursor.getColumnIndex(android.provider.ContactsContract.CommonDataKinds.Phone.PHOTO_URI));
+            phoneType = cursor.getInt(cursor.getColumnIndex(android.provider.ContactsContract.CommonDataKinds.Phone.TYPE));
+            cursor.close();
+        }
+
+        String countryCode = CrApp.getUserCountry(CrApp.getInstance());
+        if(countryCode == null)
+            countryCode = "US";
+        try {
+            phoneNumberWrapper = phoneUtil.parse(phoneNumber, countryCode);
+        }
+        catch (NumberParseException exc) {
+            MaterialDialog.Builder builder = new MaterialDialog.Builder(view.getParentActivity())
+                    .title(R.string.information_title)
+                    .content(R.string.number_invalid_message)
+                    .positiveText(android.R.string.ok)
+                    .icon(CrApp.getInstance().getResources().getDrawable(R.drawable.warning));
+            builder.show();
+            return ;
+        }
+
+        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(CrApp.getInstance());
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        cursor = db.query(ContactsContract.Contacts.TABLE_NAME,
+                new String[]{ContactsContract.Contacts._ID, ContactsContract.Contacts.COLUMN_NAME_NUMBER},
+                null, null, null, null, null);
+
+
+        boolean contactFound = false;
+        while(cursor.moveToNext()) {
+            String number = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.COLUMN_NAME_NUMBER));
+            long id = cursor.getLong(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+            PhoneNumberUtil.MatchType matchType = phoneUtil.isNumberMatch(phoneNumberWrapper, number);
+            if(matchType != PhoneNumberUtil.MatchType.NO_MATCH && matchType != PhoneNumberUtil.MatchType.NOT_A_NUMBER) {
+                for(Recording recording : recordings) {
+                    recording.setContactId(id);
+                    try {
+                        recording.updateRecording(CrApp.getInstance());
+                        view.getRecordingsAdapter().removeItem(recording);
+                    }
+                    catch (SQLException exc) {
+                        CrLog.log(CrLog.ERROR,  exc.getMessage());
+                        Toast.makeText(view.getParentActivity(), CrApp.getInstance().getResources().
+                                getString(R.string.assign_to_contact_err), Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                }
+                contactFound = true;
+                break;
+            }
+        }
+        cursor.close();
+        if(!contactFound) {
+                Contact contact = new Contact(null, phoneNumber, contactName, photoUri, phoneType);
+                try {
+                    contact.insertInDatabase(CrApp.getInstance());
+                    long id = contact.getId();
+                    for(Recording recording : recordings) {
+                        recording.setContactId(id);
+                        recording.updateRecording(CrApp.getInstance());
+                        view.getRecordingsAdapter().removeItem(recording);
+                    }
+                }
+                catch (SQLException exc) {
+                    CrLog.log(CrLog.ERROR,  exc.getMessage());
+                    Toast.makeText(view.getParentActivity(), CrApp.getInstance().getResources().
+                            getString(R.string.assign_to_contact_err), Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            }
+        view.clearSelectedMode();
+        Toast.makeText(view.getParentActivity(), CrApp.getInstance().getResources().
+                getString(R.string.assign_to_contact_ok), Toast.LENGTH_SHORT).show();
+    }
+
+    public void assignToPrivate(List<Recording> recordings) {
+
     }
 }
