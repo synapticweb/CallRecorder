@@ -397,12 +397,13 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
         view.updateTitle();
     }
 
-    public void assignToContact(Uri numberUri, List<Recording> recordings) {
+    void assignToContact(Uri numberUri, List<Recording> recordings, Contact contact) {
         PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
         Phonenumber.PhoneNumber phoneNumberWrapper;
         Cursor cursor;
         String phoneNumber = null, contactName = null, photoUri = null;
         int phoneType = CrApp.UNKNOWN_TYPE_PHONE_CODE;
+        PhoneNumberUtil.MatchType matchType;
 
         cursor = view.getParentActivity().getContentResolver().
                 query(numberUri, new String[]{android.provider.ContactsContract.CommonDataKinds.Phone.NUMBER,
@@ -435,6 +436,15 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
             return ;
         }
 
+        if(contact != null) {
+            matchType = phoneUtil.isNumberMatch(phoneNumberWrapper, contact.getPhoneNumber());
+            if (matchType != PhoneNumberUtil.MatchType.NO_MATCH && matchType != PhoneNumberUtil.MatchType.NOT_A_NUMBER) {
+                Toast.makeText(view.getParentActivity(), CrApp.getInstance().getResources().
+                        getString(R.string.assign_to_same_contact), Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
+
         CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(CrApp.getInstance());
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
         cursor = db.query(ContactsContract.Contacts.TABLE_NAME,
@@ -446,7 +456,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
         while(cursor.moveToNext()) {
             String number = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.COLUMN_NAME_NUMBER));
             long id = cursor.getLong(cursor.getColumnIndex(ContactsContract.Contacts._ID));
-            PhoneNumberUtil.MatchType matchType = phoneUtil.isNumberMatch(phoneNumberWrapper, number);
+            matchType = phoneUtil.isNumberMatch(phoneNumberWrapper, number);
             if(matchType != PhoneNumberUtil.MatchType.NO_MATCH && matchType != PhoneNumberUtil.MatchType.NOT_A_NUMBER) {
                 for(Recording recording : recordings) {
                     recording.setContactId(id);
@@ -467,10 +477,10 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
         }
         cursor.close();
         if(!contactFound) {
-                Contact contact = new Contact(null, phoneNumber, contactName, photoUri, phoneType);
+                Contact newContact = new Contact(null, phoneNumber, contactName, photoUri, phoneType);
                 try {
-                    contact.insertInDatabase(CrApp.getInstance());
-                    long id = contact.getId();
+                    newContact.insertInDatabase(CrApp.getInstance());
+                    long id = newContact.getId();
                     for(Recording recording : recordings) {
                         recording.setContactId(id);
                         recording.updateRecording(CrApp.getInstance());

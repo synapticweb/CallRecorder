@@ -143,4 +143,5 @@
     <string name="assign_private_popup_text">Assign to private phone number</string>
     <string name="assign_to_contact_ok">The recording(s) were successfully assigned to contact.</string>
     <string name="assign_to_contact_err">An error occurred while assigning the recording(s) to contact.</string>
+    <string name="assign_to_same_contact">You cannot assign the recording to the same contact.</string>
 </resources>

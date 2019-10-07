@@ -30,7 +30,6 @@ import java.util.List;
 
 public class UnassignedRecordingsFragment extends ContactDetailFragment {
     private View rootView;
-    private static final int REQUEST_PICK_NUMBER = 1;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -136,7 +135,7 @@ public class UnassignedRecordingsFragment extends ContactDetailFragment {
                 });
 
                 MenuInflater inflater = popupMenu.getMenuInflater();
-                inflater.inflate(R.menu.unassigned_recordings_popup, popupMenu.getMenu());
+                inflater.inflate(R.menu.recording_selected_popup, popupMenu.getMenu());
                 MenuItem renameMenuItem = popupMenu.getMenu().findItem(R.id.rename_recording);
                 Recording recording = ((RecordingAdapter) recordingsRecycler.getAdapter()).
                         getItem(selectedItems.get(0));
@@ -170,15 +169,5 @@ public class UnassignedRecordingsFragment extends ContactDetailFragment {
                 presenter.onInfoClick();
             }
         });
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        super.onActivityResult(requestCode, resultCode, intent);
-        if(resultCode == Activity.RESULT_OK && requestCode == REQUEST_PICK_NUMBER) {
-            Uri numberUri = intent.getData();
-            if(numberUri != null)
-                presenter.assignToContact(numberUri, getSelectedRecordings());
-        }
     }
 }

@@ -17,6 +17,7 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -32,7 +33,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -81,6 +81,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
     private static final String ARG_CONTACT = "arg_contact";
     private static final String SELECT_MODE_KEY = "select_mode_key";
     private static final String SELECTED_ITEMS_KEY = "selected_items_key";
+    protected static final int REQUEST_PICK_NUMBER = 2;
 
     protected ContactDetailFragment() {}
 
@@ -505,6 +506,13 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
                                         })
                                         .show();
                                 return true;
+                            case R.id.assign_to_contact:
+                                Intent pickNumber = new Intent(Intent.ACTION_PICK,
+                                        android.provider.ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
+                                startActivityForResult(pickNumber, REQUEST_PICK_NUMBER);
+                                return true;
+                            case R.id.assign_private: presenter.assignToPrivate(getSelectedRecordings());
+                                return true;
                             default:
                                 return false;
                         }
@@ -512,7 +520,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
                 });
 
                 MenuInflater inflater = popupMenu.getMenuInflater();
-                inflater.inflate(R.menu.contact_selected_popup, popupMenu.getMenu());
+                inflater.inflate(R.menu.recording_selected_popup, popupMenu.getMenu());
                 MenuItem renameMenuItem = popupMenu.getMenu().findItem(R.id.rename_recording);
                 Recording recording = ((RecordingAdapter) recordingsRecycler.getAdapter()).
                         getItem(selectedItems.get(0));
@@ -711,8 +719,15 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent intent){
-        if(resultCode == Activity.RESULT_OK && requestCode == ContactDetailPresenter.EDIT_REQUEST_CODE) {
-            presenter.onEditActivityResult(intent.getExtras());
+        if(resultCode == Activity.RESULT_OK) {
+            if (requestCode == ContactDetailPresenter.EDIT_REQUEST_CODE) {
+                presenter.onEditActivityResult(intent.getExtras());
+            }
+            else if (requestCode == REQUEST_PICK_NUMBER) {
+                Uri numberUri = intent.getData();
+                if (numberUri != null)
+                    presenter.assignToContact(numberUri, getSelectedRecordings(), contact);
+            }
         }
     }
 
