@@ -36,6 +36,7 @@ import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.contactslist.ContactsListActivityMain;
 import net.synapticweb.callrecorder.data.Contact;
 import net.synapticweb.callrecorder.data.ContactsContract.*;
+import net.synapticweb.callrecorder.data.Recording;
 import net.synapticweb.callrecorder.data.RecordingsContract.*;
 import net.synapticweb.callrecorder.data.CallRecorderDbHelper;
 import net.synapticweb.callrecorder.settings.SettingsFragment;
@@ -48,7 +49,6 @@ public class RecorderService extends Service {
     private  Boolean incoming = null;
     public  boolean shouldStartAtHookup = false;
     private Long idIfMatch = null;
-    private  String contactNameIfMatch = null;
     private String callIdentifier;
     private  Recorder recorder;
     private  SharedPreferences settings;
@@ -59,7 +59,6 @@ public class RecorderService extends Service {
 
     public static final int NOTIFICATION_ID = 1;
     private static final String CHANNEL_ID = "call_recorder_channel";
-    public static final String CALL_IDENTIFIER = "call_identifier";
     public static final String PHONE_NUMBER = "phone_number";
 
     public static final int RECORD_AUTOMMATICALLY = 1;
@@ -323,7 +322,7 @@ public class RecorderService extends Service {
 
         CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(getApplicationContext());
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
-        Long idToInsert;
+        Long contactId;
 
         if(privateCall) {
             Cursor cursor = db.query(Contacts.TABLE_NAME, new String[]{Contacts._ID},
@@ -338,17 +337,17 @@ public class RecorderService extends Service {
                 catch (SQLException  exc) {
                     CrLog.log(CrLog.ERROR, "SQL exception: " + exc.getMessage());
                 }
-                idToInsert = contact.getId();
+                contactId = contact.getId();
             }
             else { //Avem cel puțin un apel de pe nr ascuns. Pentru teste: aici e de așteptat ca întotdeauna cursorul să conțină numai 1 element
                 cursor.moveToFirst();
-                idToInsert = cursor.getLong(cursor.getColumnIndex(Contacts._ID));
+                contactId = cursor.getLong(cursor.getColumnIndex(Contacts._ID));
             }
             cursor.close();
         }
 
         else if(match)
-            idToInsert = idIfMatch;
+            contactId = idIfMatch;
 
         else { //dacă nu e nici match nici private atunci trebuie mai întîi verificat dacă nu cumva nr există totuși în contactele telefonului.
             Contact contact;
@@ -359,7 +358,7 @@ public class RecorderService extends Service {
                 catch (SQLException exception) {
                     CrLog.log(CrLog.ERROR, "SQL exception: " + exception.getMessage());
                 }
-                idToInsert = contact.getId();
+                contactId = contact.getId();
             }
             else { //numărul nu există nici contactele telefonului. Deci este unknown.
                 contact =  new Contact(null, receivedNumPhone, getResources().getString(R.string.unkown_contact), null, CrApp.UNKNOWN_TYPE_PHONE_CODE);
@@ -369,27 +368,21 @@ public class RecorderService extends Service {
                 catch (SQLException exc) {
                     CrLog.log(CrLog.ERROR, "SQL exception: " + exc.getMessage());
                 }
-                idToInsert = contact.getId();
+                contactId = contact.getId();
             }
         }
 
-        if(idToInsert == null) {
+        if(contactId == null) {
             CrLog.log(CrLog.ERROR, "Error at obtaining contact id. No contact inserted. Aborted.");
             resetState();
             return;
         }
 
-        ContentValues values = new ContentValues();
-        values.put(Recordings.COLUMN_NAME_PHONE_NUM_ID, idToInsert);
-        values.put(Recordings.COLUMN_NAME_INCOMING, incoming ? CrApp.SQLITE_TRUE : CrApp.SQLITE_FALSE);
-        values.put(Recordings.COLUMN_NAME_PATH, recorder.getAudioFilePath());
-        values.put(Recordings.COLUMN_NAME_START_TIMESTAMP, recorder.getStartingTime());
-        values.put(Recordings.COLUMN_NAME_END_TIMESTAMP, System.currentTimeMillis());
-        values.put(Recordings.COLUMN_NAME_FORMAT, recorder.getFormat());
-        values.put(Recordings.COLUMN_NAME_MODE, recorder.getMode());
+        Recording recording = new Recording(null, contactId, recorder.getAudioFilePath(), incoming,
+                recorder.getStartingTime(), System.currentTimeMillis(), recorder.getFormat(), false, recorder.getMode());
 
         try {
-            db.insert(Recordings.TABLE_NAME, null, values);
+            recording.insertInDatabase(CrApp.getInstance());
         }
         catch(SQLException exc) {
             CrLog.log(CrLog.ERROR, "SQL exception: " + exc.getMessage());

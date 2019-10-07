@@ -18,7 +18,8 @@ import net.synapticweb.callrecorder.data.ContactsContract.*;
 public class CallRecorderDbHelper extends SQLiteOpenHelper {
     private static final String SQL_CREATE_RECORDINGS = "CREATE TABLE " +
             Recordings.TABLE_NAME + " (" + Recordings._ID +
-            " INTEGER NOT NULL PRIMARY KEY, " + Recordings.COLUMN_NAME_PHONE_NUM_ID + " INTEGER NOT NULL, "
+            " INTEGER NOT NULL PRIMARY KEY, " +
+            Recordings.COLUMN_NAME_CONTACT_ID + " INTEGER NOT NULL, "
             + Recordings.COLUMN_NAME_INCOMING + " INTEGER NOT NULL, " +
             Recordings.COLUMN_NAME_PATH + " TEXT NOT NULL, " +
             Recordings.COLUMN_NAME_START_TIMESTAMP + " INTEGER NOT NULL, " +

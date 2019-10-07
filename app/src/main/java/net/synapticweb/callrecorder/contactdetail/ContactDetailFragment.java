@@ -32,7 +32,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -510,7 +509,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
                 });
 
                 MenuInflater inflater = popupMenu.getMenuInflater();
-                inflater.inflate(R.menu.contact_selected_popup, popupMenu.getMenu());
+                inflater.inflate(R.menu.recorder_selected_popup, popupMenu.getMenu());
                 MenuItem renameMenuItem = popupMenu.getMenu().findItem(R.id.rename_recording);
                 Recording recording = ((RecordingAdapter) recordingsRecycler.getAdapter()).
                         getItem(selectedItems.get(0));

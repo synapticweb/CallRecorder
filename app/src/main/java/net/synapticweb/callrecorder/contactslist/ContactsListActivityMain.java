@@ -99,17 +99,7 @@ public class ContactsListActivityMain extends TemplateActivity {
         }
 
         insertFragment(R.id.contacts_list_fragment_container);
-
-        FloatingActionButton fab = findViewById(R.id.add_numbers);
-        fab.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v)
-            {
-                Intent pickNumber = new Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
-                startActivityForResult(pickNumber, REQUEST_PHONE_NUMBER);
-            }
-        });
-
+        
         ImageButton hamburger = findViewById(R.id.hamburger);
         final DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.navigation_view);
