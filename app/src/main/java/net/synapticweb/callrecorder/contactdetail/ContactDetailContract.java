@@ -37,7 +37,6 @@ public interface ContactDetailContract {
         void clearSelectedMode();
         List<Recording> getSelectedRecordings();
         AppCompatActivity getParentActivity();
-        void displayRecordingStatus();
         boolean isSinglePaneLayout();
         void setActionBarTitleIfActivityDetail();
         RecyclerView getRecordingsRecycler();
@@ -59,7 +58,6 @@ public interface ContactDetailContract {
         void startPlayerActivity(Recording recording);
         void deleteSelectedRecordings();
         void moveSelectedRecordings(String path);
-        void toggleShouldRecord(Contact contact);
         void callContact(Contact contact);
         void toggleSelectAll();
         void onInfoClick();

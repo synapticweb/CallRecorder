@@ -5,10 +5,6 @@
         android:title="@string/delete_phone_number"
         />
     <item
-        android:id="@+id/should_record"
-        android:title="@string/stop_recording">
-    </item>
-    <item
         android:id="@+id/storage_info"
         android:title="@string/storage_info">
     </item>

@@ -41,16 +41,6 @@
         android:layout_below="@id/phone_number_detail"
         />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/recording_status"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="10dp"
-        android:layout_below="@id/phone_type_detail"
-        android:layout_toEndOf="@+id/contact_photo_detail"/>
-
     </RelativeLayout>
 
     <TextView

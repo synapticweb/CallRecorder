@@ -9,25 +9,20 @@
 package net.synapticweb.callrecorder.contactdetail;
 
 
-import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
-
 import android.text.InputType;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
-
 import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.CrLog;
 import net.synapticweb.callrecorder.R;
@@ -351,20 +346,6 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
 
         new MoveAsyncTask(path, totalSize, view.getParentActivity()).
                 execute(recordings.toArray(recordingsArray));
-    }
-
-    @Override
-    public void toggleShouldRecord(Contact contact) {
-        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(CrApp.getInstance());
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
-        ContentValues values = new ContentValues();
-
-        values.put(ContactsContract.Contacts.COLUMN_NAME_SHOULD_RECORD, !contact.shouldRecord());
-        db.update(ContactsContract.Contacts.TABLE_NAME, values,
-                ContactsContract.Contacts._ID + '=' + contact.getId(), null);
-        contact.setShouldRecord(!contact.shouldRecord());
-        view.setContact(contact);
-        view.displayRecordingStatus();
     }
 
     @Override

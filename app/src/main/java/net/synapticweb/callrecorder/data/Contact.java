@@ -45,9 +45,7 @@ public class Contact implements Comparable<Contact>, Parcelable {
     private String contactName = null;
     private Uri photoUri = null;
     private boolean privateNumber = false;
-    private boolean shouldRecord = true;
     private Integer color = null;
-    private static final String TAG = "CallRecorder";
 
     public Contact(){
     }
@@ -67,8 +65,7 @@ public class Contact implements Comparable<Contact>, Parcelable {
         List<Contact> contacts = new ArrayList<>();
         String[] projection = {ContactsContract.Contacts._ID,
                 ContactsContract.Contacts.COLUMN_NAME_NUMBER,
-                ContactsContract.Contacts.COLUMN_NAME_CONTACT_NAME,
-                ContactsContract.Contacts.COLUMN_NAME_SHOULD_RECORD};
+                ContactsContract.Contacts.COLUMN_NAME_CONTACT_NAME };
         Cursor cursor = db.query(
                 ContactsContract.Contacts.TABLE_NAME, projection, null, null, null, null, null);
 
@@ -77,9 +74,7 @@ public class Contact implements Comparable<Contact>, Parcelable {
             Long id = cursor.getLong(cursor.getColumnIndex(ContactsContract.Contacts._ID));
             String number = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.COLUMN_NAME_NUMBER));
             String contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.COLUMN_NAME_CONTACT_NAME));
-            Boolean shouldRecord = cursor.getInt(cursor.getColumnIndex(ContactsContract.Contacts.COLUMN_NAME_SHOULD_RECORD)) == 1;
             Contact contact = new Contact(id, number, contactName, null, CrApp.UNKNOWN_TYPE_PHONE_CODE);
-            contact.setShouldRecord(shouldRecord);
             contacts.add(contact);
         }
         cursor.close();
@@ -104,7 +99,6 @@ public class Contact implements Comparable<Contact>, Parcelable {
         values.put(ContactsContract.Contacts.COLUMN_NAME_PHONE_TYPE, getPhoneTypeCode());
         values.put(ContactsContract.Contacts.COLUMN_NAME_PHOTO_URI,
                 (getPhotoUri() == null) ? null : getPhotoUri().toString());
-        values.put(ContactsContract.Contacts.COLUMN_NAME_SHOULD_RECORD, shouldRecord());
         values.put(ContactsContract.Contacts.COLUMN_NAME_PRIVATE_NUMBER, isPrivateNumber());
 
         try {
@@ -130,7 +124,6 @@ public class Contact implements Comparable<Contact>, Parcelable {
         values.put(ContactsContract.Contacts.COLUMN_NAME_CONTACT_NAME, contactName);
         values.put(ContactsContract.Contacts.COLUMN_NAME_PHOTO_URI, photoUri == null ? null : photoUri.toString());
         values.put(ContactsContract.Contacts.COLUMN_NAME_PHONE_TYPE, phoneType);
-        values.put(ContactsContract.Contacts.COLUMN_NAME_SHOULD_RECORD, shouldRecord);
         values.put(ContactsContract.Contacts.COLUMN_NAME_PRIVATE_NUMBER, privateNumber);
 
         setId(db.insertOrThrow(ContactsContract.Contacts.TABLE_NAME, null, values));
@@ -189,13 +182,6 @@ public class Contact implements Comparable<Contact>, Parcelable {
       return null;
     }
 
-    public boolean shouldRecord() {
-        return shouldRecord;
-    }
-
-    public void setShouldRecord(boolean shouldRecord) {
-        this.shouldRecord = shouldRecord;
-    }
 
     public boolean isPrivateNumber() {
         return privateNumber;
@@ -331,7 +317,6 @@ public class Contact implements Comparable<Contact>, Parcelable {
         dest.writeString(this.contactName);
         dest.writeParcelable(this.photoUri, flags);
         dest.writeByte(this.privateNumber ? (byte) 1 : (byte) 0);
-        dest.writeByte(this.shouldRecord ? (byte) 1 : (byte) 0);
         dest.writeValue(this.color);
     }
 
@@ -342,7 +327,6 @@ public class Contact implements Comparable<Contact>, Parcelable {
         this.contactName = in.readString();
         this.photoUri = in.readParcelable(Uri.class.getClassLoader());
         this.privateNumber = in.readByte() != 0;
-        this.shouldRecord = in.readByte() != 0;
         this.color = (Integer) in.readValue(Integer.class.getClassLoader());
     }
 

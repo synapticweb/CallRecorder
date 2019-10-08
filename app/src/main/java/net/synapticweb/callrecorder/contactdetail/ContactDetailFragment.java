@@ -423,9 +423,6 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
                             case R.id.delete_phone_number:
                                 presenter.deleteContact(contact);
                                 return true;
-                            case R.id.should_record:
-                                presenter.toggleShouldRecord(contact);
-                                return true;
                             case R.id.storage_info:
                                 presenter.storageInfo();
                             default:
@@ -435,13 +432,6 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
                 });
                 MenuInflater inflater = popupMenu.getMenuInflater();
                 inflater.inflate(R.menu.contact_popup, popupMenu.getMenu());
-                MenuItem shouldRecordMenuItem = popupMenu.getMenu().findItem(R.id.should_record);
-                if(contact.shouldRecord())
-                    shouldRecordMenuItem.setTitle(R.string.stop_recording);
-                else
-                    shouldRecordMenuItem.setTitle(R.string.start_recording);
-                if(contact.isPrivateNumber())
-                    shouldRecordMenuItem.setEnabled(false);
                 popupMenu.show();
             }
         });
@@ -644,7 +634,6 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         typePhoneView = detailView.findViewById(R.id.phone_type_detail);
         phoneNumberView = detailView.findViewById(R.id.phone_number_detail);
         contactPhotoView = detailView.findViewById(R.id.contact_photo_detail);
-        recordingStatusView = detailView.findViewById(R.id.recording_status);
         recordingsRecycler = detailView.findViewById(R.id.recordings);
         //workaround necesar pentru că, dacă recyclerul cu recordinguri conține imagini poza asta devine neagră.
         // Se pare că numai pe lolipop, de verificat. https://github.com/hdodenhof/CircleImageView/issues/31
@@ -688,7 +677,6 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
                         PorterDuffColorFilter(contact.getColor(), PorterDuff.Mode.LIGHTEN));
             }
         }
-        displayRecordingStatus();
 
         TextView noContent = detailView.findViewById(R.id.no_content);
         adapter.replaceData(recordings);
@@ -697,24 +685,6 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
             noContent.setVisibility(View.GONE);
         else
             noContent.setVisibility(View.VISIBLE);
-    }
-
-
-    public void displayRecordingStatus(){
-        if(contact.isPrivateNumber()) {
-            recordingStatusView.setVisibility(View.INVISIBLE);
-            return;
-        }
-        if(contact.shouldRecord()) {
-            recordingStatusView.setText(R.string.rec_status_recording);
-            recordingStatusView.setTextColor(getResources().getColor(
-                    getParentActivity().getSettedTheme().equals(TemplateActivity.LIGHT_THEME) ?
-                            R.color.green_light : R.color.green_dark));
-        }
-        else {
-            recordingStatusView.setText(R.string.rec_status_not_recording);
-            recordingStatusView.setTextColor(getResources().getColor(R.color.red));
-        }
     }
 
     @Override
