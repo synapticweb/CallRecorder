@@ -22,24 +22,28 @@
         android:layout_marginTop="15dp"
         />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toEndOf="@+id/contact_photo_detail"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="30dp"
-        android:id="@+id/phone_number_detail"
-        />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_toEndOf="@+id/contact_photo_detail"
+            android:layout_centerVertical="true">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toEndOf="@+id/contact_photo_detail"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="10dp"
-        android:id="@+id/phone_type_detail"
-        android:layout_below="@id/phone_number_detail"
-        />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:id="@+id/phone_number_detail"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="10dp"
+                android:id="@+id/phone_type_detail"
+                />
+        </LinearLayout>
 
     </RelativeLayout>
 
