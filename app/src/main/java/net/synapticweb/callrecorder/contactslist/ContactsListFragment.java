@@ -190,12 +190,6 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
         return fragmentRoot;
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        if(resultCode == Activity.RESULT_OK && requestCode == ContactsListPresenter.REQUEST_ADD_CONTACT)
-            presenter.onAddContactResult(intent);
-    }
-
     public class ContactHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         ImageView contactPhoto;
         TextView mContactName;

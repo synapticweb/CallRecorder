@@ -13,7 +13,6 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -34,7 +33,7 @@ import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.contactslist.ContactsListActivityMain;
 import net.synapticweb.callrecorder.data.Contact;
 import net.synapticweb.callrecorder.data.ContactsContract.*;
-import net.synapticweb.callrecorder.data.RecordingsContract.*;
+import net.synapticweb.callrecorder.data.Recording;
 import net.synapticweb.callrecorder.data.CallRecorderDbHelper;
 import net.synapticweb.callrecorder.settings.SettingsFragment;
 
@@ -275,7 +274,7 @@ public class RecorderService extends Service {
 
         CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(getApplicationContext());
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
-        Long idToInsert;
+        Long contactId;
 
         if(privateCall) {
             Cursor cursor = db.query(Contacts.TABLE_NAME, new String[]{Contacts._ID},
@@ -290,36 +289,31 @@ public class RecorderService extends Service {
                 catch (SQLException  exc) {
                     CrLog.log(CrLog.ERROR, "SQL exception: " + exc.getMessage());
                 }
-                idToInsert = contact.getId();
+                contactId = contact.getId();
             }
             else { //Avem cel puțin un apel de pe nr ascuns. Pentru teste: aici e de așteptat ca întotdeauna cursorul să conțină numai 1 element
                 cursor.moveToFirst();
-                idToInsert = cursor.getLong(cursor.getColumnIndex(Contacts._ID));
+                contactId = cursor.getLong(cursor.getColumnIndex(Contacts._ID));
             }
             cursor.close();
         }
 
         else if(contact != null)
-            idToInsert = contact.getId();
+            contactId = contact.getId();
 
         else  //dacă nu e privat și contactul este null atunci nr e indisponibil.
-            idToInsert = null;
+            contactId = null;
 
-        ContentValues values = new ContentValues();
-        values.put(Recordings.COLUMN_NAME_CONTACT_ID, idToInsert);
-        values.put(Recordings.COLUMN_NAME_INCOMING, incoming ? CrApp.SQLITE_TRUE : CrApp.SQLITE_FALSE);
-        values.put(Recordings.COLUMN_NAME_PATH, recorder.getAudioFilePath());
-        values.put(Recordings.COLUMN_NAME_START_TIMESTAMP, recorder.getStartingTime());
-        values.put(Recordings.COLUMN_NAME_END_TIMESTAMP, System.currentTimeMillis());
-        values.put(Recordings.COLUMN_NAME_FORMAT, recorder.getFormat());
-        values.put(Recordings.COLUMN_NAME_MODE, recorder.getMode());
+        Recording recording = new Recording(null, contactId, recorder.getAudioFilePath(), incoming,
+                recorder.getStartingTime(), System.currentTimeMillis(), recorder.getFormat(), false, recorder.getMode());
 
         try {
-            db.insert(Recordings.TABLE_NAME, null, values);
+            recording.insertInDatabase(CrApp.getInstance());
         }
         catch(SQLException exc) {
             CrLog.log(CrLog.ERROR, "SQL exception: " + exc.getMessage());
         }
+
         resetState();
     }
 }

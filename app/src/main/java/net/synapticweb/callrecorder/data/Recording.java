@@ -17,7 +17,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import net.synapticweb.callrecorder.CrApp;
-import net.synapticweb.callrecorder.CrLog;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.contactdetail.MoveAsyncTask;
 
@@ -35,7 +34,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Recording implements Parcelable {
-    private long id;
+    private Long id;
     private Long contactId;
     private String path;
     private Boolean incoming;
@@ -44,7 +43,7 @@ public class Recording implements Parcelable {
     private String format;
     private String mode;
 
-    public Recording(long id, Long contactId, String path, Boolean incoming, Long startTimestamp, Long endTimestamp,
+    public Recording(Long id, Long contactId, String path, Boolean incoming, Long startTimestamp, Long endTimestamp,
                      String format, Boolean isNameSet, String mode) {
         this.id = id;
         this.contactId = contactId;
@@ -70,7 +69,7 @@ public class Recording implements Parcelable {
         return endTimestamp - startTimestamp;
     }
 
-    public void updateRecording(Context context) {
+    public void updateRecording(Context context) throws SQLException {
         CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(context);
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -84,13 +83,25 @@ public class Recording implements Parcelable {
         values.put(RecordingsContract.Recordings.COLUMN_NAME_FORMAT, format);
         values.put(RecordingsContract.Recordings.COLUMN_NAME_MODE, mode);
 
-        try {
-            db.update(RecordingsContract.Recordings.TABLE_NAME, values,
-                    RecordingsContract.Recordings._ID + "=" + id, null);
-        }
-        catch (SQLException exception) {
-            CrLog.log(CrLog.ERROR, "Error updating recording: " + exception.getMessage());
-        }
+        db.update(RecordingsContract.Recordings.TABLE_NAME, values,
+                RecordingsContract.Recordings._ID + "=" + id, null);
+    }
+
+    public void insertInDatabase(Context context) throws SQLException {
+        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(context);
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(RecordingsContract.Recordings.COLUMN_NAME_CONTACT_ID, contactId);
+        values.put(RecordingsContract.Recordings.COLUMN_NAME_PATH, path);
+        values.put(RecordingsContract.Recordings.COLUMN_NAME_INCOMING, incoming);
+        values.put(RecordingsContract.Recordings.COLUMN_NAME_START_TIMESTAMP, startTimestamp);
+        values.put(RecordingsContract.Recordings.COLUMN_NAME_END_TIMESTAMP, endTimestamp);
+        values.put(RecordingsContract.Recordings.COLUMN_NAME_IS_NAME_SET, isNameSet);
+        values.put(RecordingsContract.Recordings.COLUMN_NAME_FORMAT, format);
+        values.put(RecordingsContract.Recordings.COLUMN_NAME_MODE, mode);
+
+        setId(db.insertOrThrow(RecordingsContract.Recordings.TABLE_NAME, null, values));
     }
 
     public String getName() {
@@ -219,6 +230,9 @@ public class Recording implements Parcelable {
 
     public void setIsNameSet(Boolean isNameSet) { this.isNameSet = isNameSet; }
 
+    public Long getContactId() { return contactId; }
+
+    public void setContactId(Long contactId) { this.contactId = contactId; }
 
     @Override
     public int describeContents() {
