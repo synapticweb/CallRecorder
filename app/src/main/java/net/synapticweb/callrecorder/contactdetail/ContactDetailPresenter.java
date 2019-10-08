@@ -516,6 +516,56 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
      }
 
     public void assignToPrivate(List<Recording> recordings) {
+        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(CrApp.getInstance());
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        long id;
 
+        Cursor cursor = db.query(ContactsContract.Contacts.TABLE_NAME, new String[]{ContactsContract.Contacts._ID},
+                ContactsContract.Contacts.COLUMN_NAME_PRIVATE_NUMBER + "=" + CrApp.SQLITE_TRUE, null, null, null, null);
+
+        if (cursor.moveToFirst())
+            id = cursor.getLong(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+        else {
+            Contact contact = new Contact();
+            contact.setPrivateNumber(true);
+            try {
+                contact.insertInDatabase(CrApp.getInstance());
+            } catch (SQLException exc) {
+                CrLog.log(CrLog.ERROR, "SQL exception: " + exc.getMessage());
+                MaterialDialog.Builder builder = new MaterialDialog.Builder(view.getParentActivity())
+                        .title(R.string.error_title)
+                        .content(R.string.assign_to_contact_err)
+                        .positiveText(android.R.string.ok)
+                        .icon(CrApp.getInstance().getResources().getDrawable(R.drawable.error));
+                builder.show();
+                return;
+            }
+            id = contact.getId();
+        }
+        cursor.close();
+
+        for (Recording recording : recordings) {
+            try {
+                recording.setContactId(id);
+                recording.updateRecording(CrApp.getInstance());
+                view.getRecordingsAdapter().removeItem(recording);
+            } catch (SQLException exc) {
+                CrLog.log(CrLog.ERROR, exc.getMessage());
+                MaterialDialog.Builder builder = new MaterialDialog.Builder(view.getParentActivity())
+                        .title(R.string.error_title)
+                        .content(R.string.assign_to_contact_err)
+                        .positiveText(android.R.string.ok)
+                        .icon(CrApp.getInstance().getResources().getDrawable(R.drawable.error));
+                builder.show();
+                return;
+            }
+        }
+        view.clearSelectedMode();
+        MaterialDialog.Builder builder = new MaterialDialog.Builder(view.getParentActivity())
+                .title(R.string.information_title)
+                .content(R.string.assign_to_contact_ok)
+                .positiveText(android.R.string.ok)
+                .icon(CrApp.getInstance().getResources().getDrawable(R.drawable.success));
+        builder.show();
     }
 }
