@@ -439,8 +439,12 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
         if(contact != null) {
             matchType = phoneUtil.isNumberMatch(phoneNumberWrapper, contact.getPhoneNumber());
             if (matchType != PhoneNumberUtil.MatchType.NO_MATCH && matchType != PhoneNumberUtil.MatchType.NOT_A_NUMBER) {
-                Toast.makeText(view.getParentActivity(), CrApp.getInstance().getResources().
-                        getString(R.string.assign_to_same_contact), Toast.LENGTH_SHORT).show();
+                MaterialDialog.Builder builder = new MaterialDialog.Builder(view.getParentActivity())
+                        .title(R.string.information_title)
+                        .content(R.string.assign_to_same_contact)
+                        .positiveText(android.R.string.ok)
+                        .icon(CrApp.getInstance().getResources().getDrawable(R.drawable.warning));
+                builder.show();
                 return;
             }
         }
@@ -466,8 +470,12 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
                     }
                     catch (SQLException exc) {
                         CrLog.log(CrLog.ERROR,  exc.getMessage());
-                        Toast.makeText(view.getParentActivity(), CrApp.getInstance().getResources().
-                                getString(R.string.assign_to_contact_err), Toast.LENGTH_SHORT).show();
+                        MaterialDialog.Builder builder = new MaterialDialog.Builder(view.getParentActivity())
+                                .title(R.string.error_title)
+                                .content(R.string.assign_to_contact_err)
+                                .positiveText(android.R.string.ok)
+                                .icon(CrApp.getInstance().getResources().getDrawable(R.drawable.error));
+                        builder.show();
                         return;
                     }
                 }
@@ -489,15 +497,23 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
                 }
                 catch (SQLException exc) {
                     CrLog.log(CrLog.ERROR,  exc.getMessage());
-                    Toast.makeText(view.getParentActivity(), CrApp.getInstance().getResources().
-                            getString(R.string.assign_to_contact_err), Toast.LENGTH_SHORT).show();
+                    MaterialDialog.Builder builder = new MaterialDialog.Builder(view.getParentActivity())
+                            .title(R.string.error_title)
+                            .content(R.string.assign_to_contact_err)
+                            .positiveText(android.R.string.ok)
+                            .icon(CrApp.getInstance().getResources().getDrawable(R.drawable.error));
+                    builder.show();
                     return;
                 }
             }
         view.clearSelectedMode();
-        Toast.makeText(view.getParentActivity(), CrApp.getInstance().getResources().
-                getString(R.string.assign_to_contact_ok), Toast.LENGTH_SHORT).show();
-    }
+        MaterialDialog.Builder builder = new MaterialDialog.Builder(view.getParentActivity())
+                .title(R.string.information_title)
+                .content(R.string.assign_to_contact_ok)
+                .positiveText(android.R.string.ok)
+                .icon(CrApp.getInstance().getResources().getDrawable(R.drawable.success));
+        builder.show();
+     }
 
     public void assignToPrivate(List<Recording> recordings) {
 
