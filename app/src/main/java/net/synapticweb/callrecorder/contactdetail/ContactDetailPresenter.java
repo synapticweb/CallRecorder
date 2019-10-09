@@ -210,7 +210,8 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
                         if(!view.isSinglePaneLayout()) {
                             ContactsListFragment listFragment = (ContactsListFragment)
                                     parentActivity.getSupportFragmentManager().findFragmentById(R.id.contacts_list_fragment_container);
-                            listFragment.resetDetailFragment();
+                            listFragment.resetCurrentPosition();
+                            listFragment.setContactDeleted(true);
                             listFragment.onResume();
                         }
                         else
