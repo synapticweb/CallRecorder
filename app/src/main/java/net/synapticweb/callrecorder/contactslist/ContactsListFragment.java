@@ -48,6 +48,7 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
     private RecyclerView contactsRecycler;
     private int currentPos = 0;
     private Long newAddedContactId = null;
+    private boolean contactDeleted = false;
     private AppCompatActivity parentActivity;
     private int colorPointer = 0;
     @SuppressLint("UseSparseArrays")
@@ -73,6 +74,11 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
     }
 
     @Override
+    public void setContactDeleted(boolean contactDeleted) {
+        this.contactDeleted = contactDeleted;
+    }
+
+    @Override
     public RecyclerView getContactsRecycler() {
         return contactsRecycler;
     }
@@ -87,7 +93,7 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
         newAddedContactId = id;
     }
 
-    public void resetDetailFragment() {
+    public void resetCurrentPosition() {
         currentPos = 0;
     }
 
@@ -125,7 +131,6 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
                     currentPos = adapter.getData().indexOf(contact);
                     break;
                 }
-            newAddedContactId = null;
         }
         //înainte de asta aveam un adapter.replaceData() care înlocuia lista din adapter și apela notifyData
         //setChanged(). Performanța era mai bună dar problema era că la adăugarea unui contact nou rămînea
@@ -136,10 +141,16 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
             // datorat rotirii sau după reluarea activității la venirea din background, nu trebuie să mai înlocuim
             // fragmentul detaliu, el este deja acolo. Dacă îl înlocuim onResume() al fragmnetului detaliu va fi
             // apelat de 2 ori: prima dată din cauza restartului fragmentului detaliu - cu datele de stare,
-            // a doua oară datorită înlocuirii - fără datele de stare.
+            // a doua oară datorită înlocuirii - fără datele de stare. Vom face deci înlocuirea fragmentului
+            //detaliu doar dacă: a. încă nu s-a încărcat niciun contact b. un contact a fost adăugat c. un contact
+            //a fost șters.
             Fragment detailFragment = parentActivity.getSupportFragmentManager().findFragmentById(R.id.contact_detail_fragment_container);
-            if(adapter.getItemCount() > 0 && detailFragment == null)
+            if(adapter.getItemCount() > 0 && (detailFragment == null || contactDeleted ||
+                    newAddedContactId != null)) {
                 presenter.setCurrentDetail(adapter.getItem(currentPos));
+                contactDeleted = false;
+                newAddedContactId = null;
+            }
             else if(adapter.getItemCount() == 0)
                     presenter.setCurrentDetail(null);
         }

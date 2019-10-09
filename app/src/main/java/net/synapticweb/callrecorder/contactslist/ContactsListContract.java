@@ -26,7 +26,7 @@ public interface ContactsListContract {
         void deselectContact(android.view.View contactSlot);
         RecyclerView getContactsRecycler();
         ContactsListFragment.ContactsAdapter getContactsAdapter();
-
+        void setContactDeleted(boolean deleted);
     }
 
     interface ContactsListPresenter {
