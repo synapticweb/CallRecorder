@@ -322,7 +322,8 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
                 CrLog.log(CrLog.ERROR, "Error deleting the selected recording(s): " + exc.getMessage());
             }
         }
-
+        if(view.getRecordingsAdapter().getItemCount() == 0)
+            view.getParentActivity().findViewById(R.id.no_content_detail).setVisibility(View.VISIBLE);
         view.clearSelectedMode();
     }
 

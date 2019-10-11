@@ -154,7 +154,7 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
             else if(adapter.getItemCount() == 0)
                     presenter.setCurrentDetail(null);
         }
-        TextView noContent = parentActivity.findViewById(R.id.no_content);
+        TextView noContent = parentActivity.findViewById(R.id.no_content_list);
         if(adapter.getItemCount() > 0)
             noContent.setVisibility(View.GONE);
         else
