@@ -322,6 +322,8 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
                 CrLog.log(CrLog.ERROR, "Error deleting the selected recording(s): " + exc.getMessage());
             }
         }
+        if(view.getRecordingsAdapter().getItemCount() == 0)
+            view.getParentActivity().findViewById(R.id.no_content).setVisibility(View.VISIBLE);
 
         view.clearSelectedMode();
     }
@@ -374,7 +376,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
             if(selectedRecording != null) //dacă recordingul nu este încă afișat pe ecran
                 // (sunt multe recordinguri și se scrolează) atunci selectedRecording va fi null. Dar mai înainte am
                 //notificat adapterul că s-a schimbat, ca să îl reconstruiască.
-               view.selectRecording(selectedRecording);
+                view.selectRecording(selectedRecording);
         }
         view.updateTitle();
     }
@@ -386,6 +388,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
         String phoneNumber = null, contactName = null, photoUri = null;
         int phoneType = CrApp.UNKNOWN_TYPE_PHONE_CODE;
         PhoneNumberUtil.MatchType matchType;
+        long contactId = 0;
 
         cursor = view.getParentActivity().getContentResolver().
                 query(numberUri, new String[]{android.provider.ContactsContract.CommonDataKinds.Phone.NUMBER,
@@ -437,57 +440,52 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
                 new String[]{ContactsContract.Contacts._ID, ContactsContract.Contacts.COLUMN_NAME_NUMBER},
                 null, null, null, null, null);
 
-
-        boolean contactFound = false;
         while(cursor.moveToNext()) {
             String number = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.COLUMN_NAME_NUMBER));
             long id = cursor.getLong(cursor.getColumnIndex(ContactsContract.Contacts._ID));
             matchType = phoneUtil.isNumberMatch(phoneNumberWrapper, number);
             if(matchType != PhoneNumberUtil.MatchType.NO_MATCH && matchType != PhoneNumberUtil.MatchType.NOT_A_NUMBER) {
-                for(Recording recording : recordings) {
-                    recording.setContactId(id);
-                    try {
-                        recording.updateRecording(CrApp.getInstance());
-                        view.getRecordingsAdapter().removeItem(recording);
-                    }
-                    catch (SQLException exc) {
-                        CrLog.log(CrLog.ERROR,  exc.getMessage());
-                        MaterialDialog.Builder builder = new MaterialDialog.Builder(view.getParentActivity())
-                                .title(R.string.error_title)
-                                .content(R.string.assign_to_contact_err)
-                                .positiveText(android.R.string.ok)
-                                .icon(CrApp.getInstance().getResources().getDrawable(R.drawable.error));
-                        builder.show();
-                        return;
-                    }
-                }
-                contactFound = true;
+                contactId = id;
                 break;
             }
         }
         cursor.close();
-        if(!contactFound) {
-                Contact newContact = new Contact(null, phoneNumber, contactName, photoUri, phoneType);
-                try {
-                    newContact.insertInDatabase(CrApp.getInstance());
-                    long id = newContact.getId();
-                    for(Recording recording : recordings) {
-                        recording.setContactId(id);
-                        recording.updateRecording(CrApp.getInstance());
-                        view.getRecordingsAdapter().removeItem(recording);
-                    }
-                }
-                catch (SQLException exc) {
-                    CrLog.log(CrLog.ERROR,  exc.getMessage());
-                    MaterialDialog.Builder builder = new MaterialDialog.Builder(view.getParentActivity())
-                            .title(R.string.error_title)
-                            .content(R.string.assign_to_contact_err)
-                            .positiveText(android.R.string.ok)
-                            .icon(CrApp.getInstance().getResources().getDrawable(R.drawable.error));
-                    builder.show();
-                    return;
-                }
+        if(contactId == 0) {
+            Contact newContact = new Contact(null, phoneNumber, contactName, photoUri, phoneType);
+            try {
+                newContact.insertInDatabase(CrApp.getInstance());
+            } catch (SQLException exc) {
+                CrLog.log(CrLog.ERROR, exc.getMessage());
+                MaterialDialog.Builder builder = new MaterialDialog.Builder(view.getParentActivity())
+                        .title(R.string.error_title)
+                        .content(R.string.assign_to_contact_err)
+                        .positiveText(android.R.string.ok)
+                        .icon(CrApp.getInstance().getResources().getDrawable(R.drawable.error));
+                builder.show();
+                return;
             }
+            contactId = newContact.getId();
+        }
+
+        for(Recording recording : recordings) {
+            recording.setContactId(contactId);
+            try {
+                recording.updateRecording(CrApp.getInstance());
+            } catch (SQLException exc) {
+                CrLog.log(CrLog.ERROR, exc.getMessage());
+                MaterialDialog.Builder builder = new MaterialDialog.Builder(view.getParentActivity())
+                        .title(R.string.error_title)
+                        .content(R.string.assign_to_contact_err)
+                        .positiveText(android.R.string.ok)
+                        .icon(CrApp.getInstance().getResources().getDrawable(R.drawable.error));
+                builder.show();
+                return;
+            }
+            view.getRecordingsAdapter().removeItem(recording);
+            if(view.getRecordingsAdapter().getItemCount() == 0)
+                view.getParentActivity().findViewById(R.id.no_content).setVisibility(View.VISIBLE);
+        }
+
         view.clearSelectedMode();
         MaterialDialog.Builder builder = new MaterialDialog.Builder(view.getParentActivity())
                 .title(R.string.information_title)
@@ -495,7 +493,16 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
                 .positiveText(android.R.string.ok)
                 .icon(CrApp.getInstance().getResources().getDrawable(R.drawable.success));
         builder.show();
-     }
+
+        if(!view.isSinglePaneLayout()) {
+            ContactsListFragment listFragment = (ContactsListFragment)
+                    view.getParentActivity().getSupportFragmentManager().findFragmentById(R.id.contacts_list_fragment_container);
+            if(listFragment != null) {
+                listFragment.setNewAddedContactId(contactId);
+                listFragment.onResume();
+            }
+        }
+    }
 
     public void assignToPrivate(List<Recording> recordings) {
         CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(CrApp.getInstance());
@@ -527,10 +534,9 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
         cursor.close();
 
         for (Recording recording : recordings) {
+            recording.setContactId(id);
             try {
-                recording.setContactId(id);
                 recording.updateRecording(CrApp.getInstance());
-                view.getRecordingsAdapter().removeItem(recording);
             } catch (SQLException exc) {
                 CrLog.log(CrLog.ERROR, exc.getMessage());
                 MaterialDialog.Builder builder = new MaterialDialog.Builder(view.getParentActivity())
@@ -541,6 +547,9 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
                 builder.show();
                 return;
             }
+            view.getRecordingsAdapter().removeItem(recording);
+            if(view.getRecordingsAdapter().getItemCount() == 0)
+                view.getParentActivity().findViewById(R.id.no_content).setVisibility(View.VISIBLE);
         }
         view.clearSelectedMode();
         MaterialDialog.Builder builder = new MaterialDialog.Builder(view.getParentActivity())
@@ -549,5 +558,15 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
                 .positiveText(android.R.string.ok)
                 .icon(CrApp.getInstance().getResources().getDrawable(R.drawable.success));
         builder.show();
+
+        if(!view.isSinglePaneLayout()) {
+            ContactsListFragment listFragment = (ContactsListFragment)
+                    view.getParentActivity().getSupportFragmentManager().findFragmentById(R.id.contacts_list_fragment_container);
+            if(listFragment != null) {  //e null dacă e apelat din unassigned
+//                listFragment.setNewAddedContactId(id);
+                //Instrucțiunea de mai sus are rolul să
+                listFragment.onResume();
+            }
+        }
     }
 }
