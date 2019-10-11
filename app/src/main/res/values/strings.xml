@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Synaptic Call Recorder</string>
     <string name="unkown_contact">UNKNOWN CONTACT</string>
-    <string name="private_number_name">Private number</string>
+    <string name="private_number_name">Hidden number</string>
     <!-- Fără CDATA tagurile HTML sunt șterse-->
     <string name="detail_phonetype"><![CDATA[<b>Phone type: </b>]]>%s</string>
     <string name="detail_phonenumber"><![CDATA[<b>Phone number: </b>]]>%s</string>
@@ -85,8 +85,8 @@
     <string name="settings_storage_names_public">Public (files are visible to all apps)</string>
     <string name="settings_theme_dark">Dark</string>
     <string name="settings_theme_light">Light</string>
-    <string name="auth_record_priv_title">Private numbers calls</string>
-    <string name="auth_record_priv_sum">Automatically record calls from private numbers</string>
+    <string name="auth_record_priv_title">Hidden numbers calls</string>
+    <string name="auth_record_priv_sum">Automatically record calls from hidden numbers</string>
     <string name="enabled_title">Record calls</string>
     <string name="enabled_sum">Call recording enabled</string>
     <string name="prefs_storage_title">Recordings storage</string>
@@ -140,7 +140,7 @@
     <string name="no_unassigned">There are no unassigned recordings.</string>
     <string name="unknown_number">Unknown phone number</string>
     <string name="assign_contact_popup_text">Assign to phone contact</string>
-    <string name="assign_private_popup_text">Assign to private phone number</string>
+    <string name="assign_private_popup_text">Assign to hidden phone number</string>
     <string name="assign_to_contact_ok">The recording(s) were successfully assigned to contact.</string>
     <string name="assign_to_contact_err">An error occurred while assigning the recording(s) to contact.</string>
     <string name="assign_to_same_contact">You cannot assign the recording to the same contact.</string>
