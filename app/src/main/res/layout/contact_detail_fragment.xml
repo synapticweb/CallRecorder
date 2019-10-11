@@ -50,7 +50,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/no_content"
+        android:id="@+id/no_content_detail"
         android:visibility="gone"
         android:text="@string/no_recordings"
         android:textAlignment="center"

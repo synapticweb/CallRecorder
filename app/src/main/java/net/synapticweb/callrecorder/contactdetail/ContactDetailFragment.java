@@ -678,7 +678,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
             }
         }
 
-        TextView noContent = detailView.findViewById(R.id.no_content);
+        TextView noContent = detailView.findViewById(R.id.no_content_detail);
         adapter.replaceData(recordings);
 
         if(recordings.size() > 0)

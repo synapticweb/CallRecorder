@@ -11,7 +11,7 @@
         android:textAlignment="center"
         android:layout_marginTop="25dp"
         android:text="@string/no_unassigned"
-        android:id="@+id/no_content"
+        android:id="@+id/no_content_detail"
         android:visibility="gone"/>
 
     <androidx.recyclerview.widget.RecyclerView

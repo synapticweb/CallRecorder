@@ -322,9 +322,11 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
                 CrLog.log(CrLog.ERROR, "Error deleting the selected recording(s): " + exc.getMessage());
             }
         }
-        if(view.getRecordingsAdapter().getItemCount() == 0)
-            view.getParentActivity().findViewById(R.id.no_content).setVisibility(View.VISIBLE);
-
+        if(view.getRecordingsAdapter().getItemCount() == 0) {
+            View noContent  = view.getParentActivity().findViewById(R.id.no_content_detail);
+            if(noContent != null)
+                noContent.setVisibility(View.VISIBLE);
+        }
         view.clearSelectedMode();
     }
 
@@ -482,8 +484,11 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
                 return;
             }
             view.getRecordingsAdapter().removeItem(recording);
-            if(view.getRecordingsAdapter().getItemCount() == 0)
-                view.getParentActivity().findViewById(R.id.no_content).setVisibility(View.VISIBLE);
+            if(view.getRecordingsAdapter().getItemCount() == 0) {
+                View noContent  = view.getParentActivity().findViewById(R.id.no_content_detail);
+                if(noContent != null)
+                    noContent.setVisibility(View.VISIBLE);
+            }
         }
 
         view.clearSelectedMode();
@@ -548,8 +553,11 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
                 return;
             }
             view.getRecordingsAdapter().removeItem(recording);
-            if(view.getRecordingsAdapter().getItemCount() == 0)
-                view.getParentActivity().findViewById(R.id.no_content).setVisibility(View.VISIBLE);
+            if(view.getRecordingsAdapter().getItemCount() == 0) {
+                View noContent  = view.getParentActivity().findViewById(R.id.no_content_detail);
+                if(noContent != null)
+                    noContent.setVisibility(View.VISIBLE);
+            }
         }
         view.clearSelectedMode();
         MaterialDialog.Builder builder = new MaterialDialog.Builder(view.getParentActivity())

@@ -76,7 +76,7 @@ public class UnassignedRecordingsFragment extends ContactDetailFragment {
     @Override
     public void paintViews(List<Recording> recordings) {
         toggleSelectModeActionBar(false);
-        TextView noContent = rootView.findViewById(R.id.no_content);
+        TextView noContent = rootView.findViewById(R.id.no_content_detail);
         adapter.replaceData(recordings);
         noContent.setVisibility(recordings.size() > 0 ? View.GONE : View.VISIBLE);
     }
