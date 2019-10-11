@@ -76,9 +76,8 @@ public class ContactsListPresenter implements ContactsListContract.ContactsListP
             View currentSelectedView = view.getContactsRecycler().getLayoutManager().findViewByPosition(currentSelectedPosition);
             View previousSelectedView = view.getContactsRecycler().getLayoutManager().findViewByPosition(previousSelectedPosition);
             view.selectContact(currentSelectedView);
-            view.getContactsAdapter().notifyItemChanged(currentSelectedPosition);
             view.deselectContact(previousSelectedView);
-            view.getContactsAdapter().notifyItemChanged(previousSelectedPosition);
+            view.getContactsAdapter().notifyDataSetChanged();
         }
     }
 

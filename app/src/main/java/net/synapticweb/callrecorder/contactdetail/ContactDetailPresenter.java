@@ -572,7 +572,12 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
                     view.getParentActivity().getSupportFragmentManager().findFragmentById(R.id.contacts_list_fragment_container);
             if(listFragment != null) {  //e null dacă e apelat din unassigned
 //                listFragment.setNewAddedContactId(id);
-                //Instrucțiunea de mai sus are rolul să
+                //Instrucțiunea de mai sus are rolul să seteze contactul activ, al cărui detaliu va fi încărcat.
+                //Am fost nevoit să renunț la această funcționalitate cînd se asignează un recording contactului
+                //privat deoarece după setarea detaliului, în mod inexplicabil, butoanele call și edit rămîn vizibile
+                //și dacă se apasă pe ele aplicația crapă. Dacă se selectează un recording devin vizibile toate
+                // 6 butoane. Bugul se manifestă numai aici. Cînd se clichează pe contactul privat nu se întîmplă
+                // chestia asta. Nu am putut repara acest bug.
                 listFragment.onResume();
             }
         }
