@@ -126,7 +126,7 @@ public class UnassignedRecordingsFragment extends ContactDetailFragment {
                                         android.provider.ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
                                 startActivityForResult(pickNumber, REQUEST_PICK_NUMBER);
                                 return true;
-                            case R.id.assign_private: presenter.assignToPrivate(getSelectedRecordings());
+                            case R.id.assign_private: presenter.assignToPrivate(getSelectedRecordings(), contact);
                                 return true;
                             default:
                                 return false;

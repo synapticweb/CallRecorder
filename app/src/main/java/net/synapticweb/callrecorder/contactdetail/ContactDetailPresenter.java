@@ -509,7 +509,17 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
         }
     }
 
-    public void assignToPrivate(List<Recording> recordings) {
+    public void assignToPrivate(List<Recording> recordings, Contact contact) {
+         if(contact != null && contact.isPrivateNumber()) {
+             MaterialDialog.Builder builder = new MaterialDialog.Builder(view.getParentActivity())
+                     .title(R.string.information_title)
+                     .content(R.string.assign_to_same_contact)
+                     .positiveText(android.R.string.ok)
+                     .icon(CrApp.getInstance().getResources().getDrawable(R.drawable.warning));
+             builder.show();
+             return;
+         }
+
         CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(CrApp.getInstance());
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
         long id;
@@ -520,10 +530,10 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
         if (cursor.moveToFirst())
             id = cursor.getLong(cursor.getColumnIndex(ContactsContract.Contacts._ID));
         else {
-            Contact contact = new Contact();
-            contact.setPrivateNumber(true);
+            Contact newContact = new Contact();
+            newContact.setPrivateNumber(true);
             try {
-                contact.insertInDatabase(CrApp.getInstance());
+                newContact.insertInDatabase(CrApp.getInstance());
             } catch (SQLException exc) {
                 CrLog.log(CrLog.ERROR, "SQL exception: " + exc.getMessage());
                 MaterialDialog.Builder builder = new MaterialDialog.Builder(view.getParentActivity())
@@ -534,7 +544,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
                 builder.show();
                 return;
             }
-            id = contact.getId();
+            id = newContact.getId();
         }
         cursor.close();
 
