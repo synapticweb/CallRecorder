@@ -49,8 +49,7 @@ public class UnassignedRecordingsFragment extends ContactDetailFragment {
         Toolbar.LayoutParams params = (Toolbar.LayoutParams) title.getLayoutParams();
         params.gravity = selectMode ? Gravity.START : Gravity.CENTER;
         title.setLayoutParams(params);
-        title.setText(selectMode ? String.valueOf(selectedItems.size()) : isSinglePaneLayout() ?
-                contact.getContactName() : getString(R.string.app_name));
+        title.setText(selectMode ? String.valueOf(selectedItems.size()) : getString(R.string.app_name));
     }
 
     @Override

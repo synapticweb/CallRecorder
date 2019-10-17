@@ -175,7 +175,9 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
     @Override
     public boolean isSinglePaneLayout() {
         return (parentActivity != null &&
-                parentActivity.findViewById(R.id.contacts_list_fragment_container) == null);
+                parentActivity.findViewById(R.id.tab_fragment_container) == null);
+        //fiind apelat și din UnassignedFragment care e găzduit în contacts_list_fragment_container
+        //în phone view nu mai merge să verific după R.id.tab.contacts_list_fragment_container.
     }
 
     @Override
