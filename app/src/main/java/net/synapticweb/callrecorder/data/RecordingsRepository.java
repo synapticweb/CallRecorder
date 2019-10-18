@@ -31,8 +31,9 @@ public class RecordingsRepository {
 
         while(cursor.moveToNext())
         {
+            long contactId = cursor.getLong(cursor.getColumnIndex(RecordingsContract.Recordings.COLUMN_NAME_CONTACT_ID));
             Recording recording = new Recording(cursor.getLong(cursor.getColumnIndex(RecordingsContract.Recordings._ID)),
-                    cursor.getLong(cursor.getColumnIndex(RecordingsContract.Recordings.COLUMN_NAME_CONTACT_ID)),
+                    contactId == 0 ? null : contactId,
                     cursor.getString(cursor.getColumnIndex(RecordingsContract.Recordings.COLUMN_NAME_PATH)),
                     cursor.getInt(cursor.getColumnIndex(RecordingsContract.Recordings.COLUMN_NAME_INCOMING)) == 1,
                     cursor.getLong(cursor.getColumnIndex(RecordingsContract.Recordings.COLUMN_NAME_START_TIMESTAMP)),
