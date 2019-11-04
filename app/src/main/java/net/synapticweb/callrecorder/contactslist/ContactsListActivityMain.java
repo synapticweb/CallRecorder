@@ -147,7 +147,13 @@ public class ContactsListActivityMain extends TemplateActivity {
             }
         });
 
-        insertFragment(R.id.contacts_list_fragment_container);
+        //În tablet view, unassigned tab, dacă erau recordinguri selectate și se răsturna ecranul în actionbar
+        //apăreau butoanele din tabul Contacts. Se întîmpla asta pentru că metoda toggleSelectModeActionBar
+        //era apelată de 2 ori: prima dată din UnassignedRecordingsFragment, a doua oară din
+        //ContactDetailFragment. Problema este că la restartarea activității se apelează totdeauna insertFragment
+        //Condiția de mai jos repară (cumva) acest bug.
+        if(savedInstanceState == null)
+            insertFragment(R.id.contacts_list_fragment_container);
 
         ImageButton hamburger = findViewById(R.id.hamburger);
         final DrawerLayout drawer = findViewById(R.id.drawer_layout);

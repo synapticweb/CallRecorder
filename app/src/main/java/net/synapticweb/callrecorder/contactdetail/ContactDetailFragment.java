@@ -83,8 +83,6 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
     private static final String SELECTED_ITEMS_KEY = "selected_items_key";
     protected static final int REQUEST_PICK_NUMBER = 2;
 
-    protected ContactDetailFragment() {}
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);

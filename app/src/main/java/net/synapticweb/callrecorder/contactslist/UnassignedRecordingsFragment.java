@@ -62,6 +62,19 @@ public class UnassignedRecordingsFragment extends ContactDetailFragment {
         ImageButton hamburger = parentActivity.findViewById(R.id.hamburger);
         updateTitle();
 
+        //După repararea bugului descris în ContactsListActivityMain linia 150, după restartarea activității
+        //apar toate butoanele în actiobar, și cele din Contacts și cele din Unassigned recording selected.
+        //Codul de mai jos (care se execută numai în tablet view și dacă este un recroding selectat)
+        //repară acest bug.
+        if(!isSinglePaneLayout() && selectMode) {
+            ImageButton editBtn = parentActivity.findViewById(R.id.edit_contact);
+            ImageButton callBtn = parentActivity.findViewById(R.id.call_contact);
+            ImageButton menuRightBtn = parentActivity.findViewById(R.id.contact_detail_menu);
+            toggleView(editBtn, false, animateAplha ? null : 0f);
+            toggleView(callBtn, false, animateAplha ? null : 0f);
+            toggleView(menuRightBtn, false, animateAplha ? null : 0f);
+        }
+
         toggleView(closeBtn, true, animateAplha ? null : selectMode ? 1f : 0f);
         toggleView(moveBtn, true, animateAplha ? null : selectMode ? 1f : 0f);
         if(selectMode && checkIfSelectedRecordingsDeleted())

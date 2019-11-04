@@ -76,7 +76,7 @@ ascunse pe jumătate în susul ecranului.
         <com.chibde.visualizer.LineBarVisualizer
             android:id="@+id/visualizer"
             android:layout_width="wrap_content"
-            android:layout_height="192dp"
+            android:layout_height="@dimen/player_visualiser_height"
             android:layout_marginStart="50dp"
             android:layout_marginEnd="50dp"
             android:layout_marginBottom="30dp"
