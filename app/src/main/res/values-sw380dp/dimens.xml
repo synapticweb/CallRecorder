@@ -26,5 +26,4 @@
     <dimen name="setup_appname_text_size">26sp</dimen>
     <dimen name="setup_version_text_size">18sp</dimen>
     <dimen name="setup_confirm_lat_margins">40dp</dimen>
-    <dimen name="player_visualiser_height">192dp</dimen>
 </resources>
