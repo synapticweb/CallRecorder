@@ -48,10 +48,6 @@ public class SetupPermissionsFragment extends Fragment {
         TextView permsIntro = parentActivity.findViewById(R.id.perms_intro);
         permsIntro.setText(String.format(res.getString(R.string.perms_intro), res.getString(R.string.app_name)));
                 Button nextButton = parentActivity.findViewById(R.id.setup_perms_next);
-                if(Build.VERSION.SDK_INT >= 28) {
-                    TextView permsCallLog = parentActivity.findViewById(R.id.perms_call_log);
-                    permsCallLog.setVisibility(View.VISIBLE);
-                }
         //în Android 6 dacă o singură permisiune este revocată le cere din nou pe toate. Nu pare suficient de sever pentru reparație.
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override

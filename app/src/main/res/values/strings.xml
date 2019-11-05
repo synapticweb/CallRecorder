@@ -100,7 +100,6 @@
     <string name="perms_title">Setup the permissions</string>
     <string name="perms_intro">%s needs the permissions described below:</string>
     <string name="perms_phone">The permission to <b>make and manage phone calls</b> is requested because recording phone calls requires that the app knows when the device is making or receiving a phone call.</string>
-    <string name="perms_call_log">In Android versions 9 and above the application needs the permission to <b>read the call log</b> in order to determine the phone number associated with an incoming phone call.</string>
     <string name="perms_record">The permission to <b>record audio</b> is requested because the applications records phone calls.</string>
     <string name="perms_contacts">The permission to <b>access contacts</b> is requested because assigning the recordings to a phone number requires reading the device\'s contacts database.</string>
     <string name="perms_files">The permission to <b>access photos, media and files</b> is requested because the recordings are written and read from the device\'s storage and also because the app contacts are personalized with photos.</string>
