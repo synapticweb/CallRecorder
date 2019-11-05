@@ -8,11 +8,23 @@
     android:paddingEnd="50dp"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-        <ScrollView
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="28sp"
+        android:text="@string/perms_title"
+        android:id="@+id/perms_title"
+        android:layout_alignParentTop="true"
+        />
+
+    <ScrollView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:layout_marginBottom="20dp">
+            android:layout_below="@id/perms_title"
+            android:layout_above="@id/setup_perms_next"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            >
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -20,15 +32,6 @@
             android:gravity="center_vertical"
             android:orientation="vertical"
             >
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="28sp"
-                android:text="@string/perms_title"
-                android:id="@+id/perms_title"
-                android:layout_marginBottom="20dp"
-                />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -73,23 +76,18 @@
                 style="@style/setupParagraphs"
                 />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/perms_finish"
-                style="@style/setupParagraphs"/>
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/setup_perms_next"
-                android:text="@string/next"
-                style="@style/setupButtons"
-                android:layout_gravity="end"
-                android:layout_marginTop="20dp"/>
-
         </LinearLayout>
 
         </ScrollView>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/setup_perms_next"
+        android:text="@string/next"
+        style="@style/setupButtons"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        />
 
     </RelativeLayout>
