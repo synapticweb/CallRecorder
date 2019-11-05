@@ -8,26 +8,27 @@
     android:layout_gravity="center_horizontal"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="28sp"
+        android:text="@string/setup_power_title"
+        android:id="@+id/power_title"
+        android:layout_alignParentTop="true"
+        />
+
         <ScrollView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true">
+            android:layout_below="@id/power_title"
+            android:layout_above="@id/setup_power_finish"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp">
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textSize="28sp"
-                    android:text="@string/setup_power_title"
-                    android:id="@+id/power_title"
-
-                    android:layout_marginBottom="30dp"
-
-                    />
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -63,19 +64,18 @@
                     android:id="@+id/other_power_optimizations"
                     />
 
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/setup_power_finish"
-                    android:text="@string/finish"
-                    style="@style/setupButtons"
-                    android:layout_marginTop="30dp"
-                    android:layout_gravity="end"
-                    />
-
             </LinearLayout>
 
         </ScrollView>
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/setup_power_finish"
+        android:text="@string/finish"
+        style="@style/setupButtons"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        />
 
     </RelativeLayout>
