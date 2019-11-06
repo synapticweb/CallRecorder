@@ -33,7 +33,7 @@ import com.google.android.material.tabs.TabLayout;
 public class HelpActivity extends TemplateActivity {
     ViewPager pager;
     HelpPagerAdapter adapter;
-    static final int NUM_PAGES = 7;
+    static final int NUM_PAGES = 6;
     static String[] content = new String[NUM_PAGES];
     static String[] contentTitles = new String[NUM_PAGES];
 
@@ -48,7 +48,7 @@ public class HelpActivity extends TemplateActivity {
         setTheme();
         Resources res = getResources();
 
-        content[0] = CrApp.rawHtmlToString(R.raw.help_recording_calls);
+        content[0] = CrApp.rawHtmlToString(R.raw.help_recording_calls_gpc);
         content[1] = CrApp.rawHtmlToString(R.raw.help_playing_recordings);
         content[2] = CrApp.rawHtmlToString(R.raw.help_managing_recordings);
         content[3] = CrApp.rawHtmlToString(R.raw.help_about);
@@ -57,9 +57,7 @@ public class HelpActivity extends TemplateActivity {
                 res.getString(R.string.send_devs));
         content[4] = CrApp.rawHtmlToString(R.raw.eula);
         content[4] = String.format(content[4], res.getString(R.string.app_name));
-        content[5] = CrApp.rawHtmlToString(R.raw.privacy_policy);
-        content[5] = String.format(content[5], res.getString(R.string.app_name));
-        content[6] = CrApp.rawHtmlToString(R.raw.help_licences);
+        content[5] = CrApp.rawHtmlToString(R.raw.help_licences);
 
         if(getSettedTheme().equals(TemplateActivity.DARK_THEME)) {
             for(int i = 0; i < content.length; ++i)
@@ -71,8 +69,7 @@ public class HelpActivity extends TemplateActivity {
         contentTitles[2] = res.getString(R.string.help_title4);
         contentTitles[3] = res.getString(R.string.about_name);
         contentTitles[4] = res.getString(R.string.help_title5);
-        contentTitles[5] = res.getString(R.string.help_title6);
-        contentTitles[6] = res.getString(R.string.help_title7);
+        contentTitles[5] = res.getString(R.string.help_title7);
 
         setContentView(R.layout.help_activity);
         pager = findViewById(R.id.help_pager);
