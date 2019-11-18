@@ -13,7 +13,6 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -37,7 +36,6 @@ import net.synapticweb.callrecorder.contactslist.ContactsListActivityMain;
 import net.synapticweb.callrecorder.data.Contact;
 import net.synapticweb.callrecorder.data.ContactsContract.*;
 import net.synapticweb.callrecorder.data.Recording;
-import net.synapticweb.callrecorder.data.RecordingsContract.*;
 import net.synapticweb.callrecorder.data.CallRecorderDbHelper;
 import net.synapticweb.callrecorder.settings.SettingsFragment;
 
@@ -122,7 +120,10 @@ public class RecorderService extends Service {
 
         switch(typeOfNotification) {
             case RECORD_AUTOMMATICALLY:
-                if(isSpeakerOn()) {
+                //Acum nu se mai bazează pe speakerOn, recunoaște dacă difuzorul era deja pornit. speakerOn
+                //a fost menținut deoarece în unele situații notificarea porneste prea devreme și isSpeakerphoneOn()
+                //returnează false.
+                if (audioManager.isSpeakerphoneOn() || speakerOn) {
                     notificationIntent = new Intent(CrApp.getInstance(), ControlRecordingReceiver.class);
                     notificationIntent.setAction(ACTION_STOP_SPEAKER);
                     PendingIntent stopSpeakerPi = PendingIntent.getBroadcast(CrApp.getInstance(), 0, notificationIntent, 0);
@@ -160,9 +161,8 @@ public class RecorderService extends Service {
         if(shouldStartAtHookup) {
             NotificationManager nm = (NotificationManager) CrApp.getInstance().
                     getSystemService(Context.NOTIFICATION_SERVICE);
-            if(nm != null)
-                nm.notify(NOTIFICATION_ID, buildNotification(RECORD_AUTOMMATICALLY));
             try {
+                CrLog.log(CrLog.DEBUG, "Recorder started in onIncomingOffhook()");
                 recorder.startRecording(receivedNumPhone);
                 if(settings.getBoolean(SettingsFragment.SPEAKER_USE, false))
                     putSpeakerOn();
@@ -171,6 +171,8 @@ public class RecorderService extends Service {
                 CrLog.log(CrLog.ERROR, "onIncomingOfhook: unable to start recording: " + e.getMessage() + " Stoping the service...");
                 stopSelf();
             }
+            if(nm != null)
+                nm.notify(NOTIFICATION_ID, buildNotification(RECORD_AUTOMMATICALLY));
         }
     }
 
@@ -246,7 +248,6 @@ public class RecorderService extends Service {
                 if(paranoidMode)
                     shouldRecord = true;
                 if(shouldRecord) {
-                    startForeground(NOTIFICATION_ID, buildNotification(RECORD_AUTOMMATICALLY));
                     try {
                         recorder.startRecording(receivedNumPhone);
                         if(settings.getBoolean(SettingsFragment.SPEAKER_USE, false))
@@ -256,6 +257,7 @@ public class RecorderService extends Service {
                         CrLog.log(CrLog.ERROR, "onStartCommand: unable to start recorder: " + e.getMessage() + " Stoping the service...");
                         stopSelf();
                     }
+                    startForeground(NOTIFICATION_ID, buildNotification(RECORD_AUTOMMATICALLY));
                 }
                 else //ca mai sus
                     startForeground(NOTIFICATION_ID, buildNotification(RECORD_ON_REQUEST));
@@ -278,10 +280,10 @@ public class RecorderService extends Service {
                 CrLog.log(CrLog.DEBUG, "Speaker has been turned on");
                 try {
                     while(!Thread.interrupted()) {
-                        sleep(500);
                         audioManager.setMode(AudioManager.MODE_IN_CALL);
                         if (!audioManager.isSpeakerphoneOn())
                             audioManager.setSpeakerphoneOn(true);
+                        sleep(500);
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -304,8 +306,6 @@ public class RecorderService extends Service {
         }
         speakerOn = false;
     }
-
-    boolean isSpeakerOn() { return speakerOn;}
 
     @Override
     public void onDestroy() {
