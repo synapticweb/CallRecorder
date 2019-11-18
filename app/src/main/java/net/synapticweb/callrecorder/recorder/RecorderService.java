@@ -115,7 +115,10 @@ public class RecorderService extends Service {
 
         switch (typeOfNotification) {
             case RECORD_AUTOMMATICALLY:
-                if (isSpeakerOn()) {
+                //Acum nu se mai bazează pe speakerOn, recunoaște dacă difuzorul era deja pornit. speakerOn
+                //a fost menținut deoarece în unele situații notificarea porneste prea devreme și isSpeakerphoneOn()
+                //returnează false.
+                if (audioManager.isSpeakerphoneOn() || speakerOn) {
                     notificationIntent = new Intent(CrApp.getInstance(), ControlRecordingReceiver.class);
                     notificationIntent.setAction(ACTION_STOP_SPEAKER);
                     PendingIntent stopSpeakerPi = PendingIntent.getBroadcast(CrApp.getInstance(), 0, notificationIntent, 0);
@@ -143,9 +146,6 @@ public class RecorderService extends Service {
         //aici nu vom folosi shouldStartAtHookup pentru că nu avem record_at_request.
         NotificationManager nm = (NotificationManager) CrApp.getInstance().
                 getSystemService(Context.NOTIFICATION_SERVICE);
-        if(nm != null)
-            nm.notify(NOTIFICATION_ID, buildNotification(RECORD_AUTOMMATICALLY));
-
         try {
             CrLog.log(CrLog.DEBUG, "Recorder started in onIncomingOffhook()");
             recorder.startRecording(receivedNumPhone);
@@ -156,6 +156,8 @@ public class RecorderService extends Service {
             CrLog.log(CrLog.ERROR, "onIncomingOfhook: unable to start recording: " + e.getMessage() + " Stoping the service...");
             stopSelf();
         }
+        if(nm != null)
+            nm.notify(NOTIFICATION_ID, buildNotification(RECORD_AUTOMMATICALLY));
     }
 
     @Override
@@ -202,8 +204,6 @@ public class RecorderService extends Service {
         if(incoming)
             startForeground(NOTIFICATION_ID, buildNotification(RECORD_ON_HOOKUP));
         else {
-            startForeground(NOTIFICATION_ID, buildNotification(RECORD_AUTOMMATICALLY));
-
             try {
                 CrLog.log(CrLog.DEBUG, "Recorder started in onStartCommand()");
                 recorder.startRecording(receivedNumPhone);
@@ -213,6 +213,7 @@ public class RecorderService extends Service {
                 CrLog.log(CrLog.ERROR, "onStartCommand: unable to start recorder: " + e.getMessage() + " Stoping the service...");
                 stopSelf();
             }
+            startForeground(NOTIFICATION_ID, buildNotification(RECORD_AUTOMMATICALLY));
         }
 
         return START_NOT_STICKY;
@@ -230,10 +231,10 @@ public class RecorderService extends Service {
                 CrLog.log(CrLog.DEBUG, "Speaker has been turned on");
                 try {
                     while(!Thread.interrupted()) {
-                        sleep(500);
                         audioManager.setMode(AudioManager.MODE_IN_CALL);
                         if (!audioManager.isSpeakerphoneOn())
                             audioManager.setSpeakerphoneOn(true);
+                        sleep(500);
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -256,8 +257,6 @@ public class RecorderService extends Service {
         }
         speakerOn = false;
     }
-
-    boolean isSpeakerOn() { return speakerOn;}
 
     @Override
     public void onDestroy() {

@@ -34,7 +34,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:layout_marginBottom="20dp"
+                    android:layout_marginBottom="10dp"
                     android:visibility="gone"
                     android:id="@+id/doze_info">
 
@@ -43,7 +43,7 @@
                         android:layout_height="wrap_content"
                         android:id="@+id/doze_info_text"
                         style="@style/setupParagraphs"
-                        android:layout_marginBottom="20dp"
+                        android:layout_marginBottom="15dp"
                         />
 
                     <Button
