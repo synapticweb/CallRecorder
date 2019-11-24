@@ -53,7 +53,7 @@
 </p>
 
 <h2>Recording format</h2>
-<p>There are four avaiable formats for saving the recordings:
+<p>There are four available formats for saving the recordings:
 	<ol>
 		<li>WAV. This is a <em>lossless</em> audio format, the meaning of "lossless" being the fact that no audio compression is made. Thus, the raw audio data that comes from the microphone is saved in a format that can be played or processed by most audio applications. This format has the best audio quality but is also the most expensive in terms of storage consumption (about 6 MB/minute in mono mode)</li>
 		<li>AAC High (128kbps). This is a <em>lossy</em> audio format the meaning of "lossy" being the fact that an algorithm for audio compression is applied to save space. AAC 128kbs takes about 900 KB/minute in mono mode.</li>
@@ -65,6 +65,17 @@
 
 <h2>Speaker use</h2>
 <p>If the microphone of your device is not very sensitive, the audio volume of the voices in the recording might be quite low and the speech might be unrecognizable. To circumvent this problem you can turn on the option "Put device on speaker when recording". If this setting is on, Synaptic Call Recorder will automatically put the device on speaker while the recording takes place. If this preference is off, you can still turn the speaker on by using a button in the notification. </p>
+
+<h2>A word about audio sources</h2>
+<p>Android call recording apps can use a variety of audio sources when recording calls. The best audio source is <em>VOICE_CALL</em>. When using <em>VOICE_CALL</em>, Synaptic Call Recorder has access to the native uplink and downlink audio streams of the call. This provides the best audio quality, recording at high volume both the incoming and outgoing audio streams, regardless of the use of the device speaker (which is unnecessary when recording with <em>VOICE_CALL</em>). Unfortunately, the <em>VOICE_CALL</em> audio source is only available on some devices that run the 5.0 and 5.1 Android versions (Lollipop). From Android 6.0 (Marshmallow) onward, Google has restricted the use of the <em>VOICE_CALL</em> audio source to system applications. This means that third party apps like Synaptic Call Recorder have to use audio sources that employ the device's microphone for making recordings. Depending on the quality of the device, the audio quality of the resulting recordings may or may not require the use of the device speaker.</p>
+<p>Synaptic Call Recorder always tries to use the <em>VOICE_CALL</em> audio source in the first place. If this source is not available, the app tries to use the following audio sources (in this order):
+	<ol>
+		<li>VOICE_RECOGNITION</li>
+		<li>VOICE_COMMUNICATION</li>
+		<li>MIC</li>
+		<li>DEFAULT</li>
+	</ol>
+</p>
 
 <h2>Caution</h2>
 <p>There is a considerable amount of variation among the hardware capabilities of phone devices. As a consequence, the quality of the audio recordings may be different from phone to phone and you might have to adjust the application's settings in order to obtain a satisfactory result. Make sure to do a fair amount of experimentation before relying on Synaptic Call Recorder for recording sensitive phone calls.</p>
