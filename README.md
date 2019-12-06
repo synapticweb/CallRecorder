@@ -16,4 +16,6 @@ It has the following main features:
 - The audio player can apply a gain to the audio signal to further control how loud the sound is played.
 - The application has 2 themes: light and dark.
 
-<a href="https://synaptic-call-recorder.en.aptoide.com/"><img width="135px" alt="Android app on Aptoide" src="https://cdn6.aptoide.com/includes/themes/2014/images/aptoide_badge.svg?timestamp=timestamp=20190529"></a>
+<!--<a href="https://synaptic-call-recorder.en.aptoide.com/"><img width="135px" alt="Android app on Aptoide" src="https://cdn6.aptoide.com/includes/themes/2014/images/aptoide_badge.svg?timestamp=timestamp=20190529"></a>-->
+
+<a href='https://play.google.com/store/apps/details?id=net.synapticweb.callrecorder.gpcompliant.full&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img width="135px" alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png'/></a>

@@ -1,6 +1,6 @@
 apply plugin: 'com.android.application'
-//apply plugin: 'com.google.gms.google-services'
-//apply plugin: 'io.fabric'
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'io.fabric'
 
 android {
     compileSdkVersion 29
@@ -9,8 +9,8 @@ android {
         applicationId "net.synapticweb.callrecorder.gpcompliant"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 4
-        versionName "0.9.1beta-gpcompliant"
+        versionCode 6
+        versionName "0.9.2-gpcompliant"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     flavorDimensions "version"
@@ -70,7 +70,7 @@ dependencies {
     implementation project(':Croller')
     //https://developers.google.com/analytics/devguides/collection/firebase/android/start
     //Firebase folosim numai în release, fără debug
-//    releaseImplementation 'com.google.firebase:firebase-analytics:17.1.0'
-//    releaseImplementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
+    releaseImplementation 'com.google.firebase:firebase-analytics:17.1.0'
+    releaseImplementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
 
 }
