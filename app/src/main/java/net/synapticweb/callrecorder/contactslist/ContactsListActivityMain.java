@@ -9,10 +9,12 @@
 package net.synapticweb.callrecorder.contactslist;
 
 import android.Manifest;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.PowerManager;
 import androidx.annotation.NonNull;
@@ -181,7 +183,22 @@ public class ContactsListActivityMain extends TemplateActivity {
                 switch (item.getItemId()) {
                     case R.id.settings: startActivity(new Intent(ContactsListActivityMain.this, SettingsActivity.class));
                         break;
-                    case R.id.help: startActivity(new Intent(ContactsListActivityMain.this, HelpActivity.class));
+                    case R.id.help: /*Crashlytics.getInstance().crash();*/ startActivity(new Intent(ContactsListActivityMain.this, HelpActivity.class));
+                        break;
+                    case R.id.rate_app:
+                        //https://stackoverflow.com/questions/10816757/rate-this-app-link-in-google-play-store-app-on-the-phone
+                      //String packageName = "net.synapticweb.callrecorder.gpcompliant.full";
+                        Uri uri = Uri.parse("market://details?id=" + getPackageName());
+                        Intent goToMarket = new Intent(Intent.ACTION_VIEW, uri);
+                        goToMarket.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY |
+                                Intent.FLAG_ACTIVITY_NEW_DOCUMENT |
+                                Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+                        try {
+                            startActivity(goToMarket);
+                        } catch (ActivityNotFoundException e) {
+                            startActivity(new Intent(Intent.ACTION_VIEW,
+                                    Uri.parse("http://play.google.com/store/apps/details?id=" + getPackageName())));
+                        }
                 }
                 drawer.closeDrawers();
                 return true;
