@@ -97,8 +97,12 @@ public class CallReceiver extends BroadcastReceiver {
                         serviceName = intentService.getComponent();
                         intentService.putExtra(ARG_NUM_PHONE, incomingNumber);
                         intentService.putExtra(ARG_INCOMING, true);
-
-                        context.startService(intentService);
+                        //https://stackoverflow.com/questions/46445265/android-8-0-java-lang-illegalstateexception-not-allowed-to-start-service-inten
+                        //Bugul a fost detectat cu ACRA, nu apare pe dispozitivele mele
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                            context.startForegroundService(intentService);
+                        else
+                            context.startService(intentService);
                         serviceStarted = true;
                     }
                 }
@@ -139,7 +143,10 @@ public class CallReceiver extends BroadcastReceiver {
                 intentService.putExtra(ARG_NUM_PHONE, outCall);
                 intentService.putExtra(ARG_INCOMING, false);
 
-                context.startService(intentService);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                    context.startForegroundService(intentService);
+                else
+                    context.startService(intentService);
                 serviceStarted = true;
             }
 
