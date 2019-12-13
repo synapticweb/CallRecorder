@@ -13,6 +13,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
@@ -66,8 +67,12 @@ public class CallReceiver extends BroadcastReceiver {
                         serviceName = intentService.getComponent();
                         intentService.putExtra(ARG_NUM_PHONE, incomingNumber);
                         intentService.putExtra(ARG_INCOMING, true);
-
-                        context.startService(intentService);
+                        //https://stackoverflow.com/questions/46445265/android-8-0-java-lang-illegalstateexception-not-allowed-to-start-service-inten
+                        //Bugul a fost detectat cu ACRA, nu apare pe dispozitivele mele
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                            context.startForegroundService(intentService);
+                        else
+                            context.startService(intentService);
                         serviceStarted = true;
                     }
                 }
@@ -79,7 +84,10 @@ public class CallReceiver extends BroadcastReceiver {
                         Intent intentService = new Intent(context, RecorderService.class);
                         serviceName = intentService.getComponent();
                         intentService.putExtra(ARG_INCOMING, false);
-                        context.startService(intentService);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                            context.startForegroundService(intentService);
+                        else
+                            context.startService(intentService);
                         serviceStarted = true;
                         outgoingProcessed = true;
                     }

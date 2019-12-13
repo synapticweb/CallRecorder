@@ -9,7 +9,7 @@ android {
         applicationId "net.synapticweb.callrecorder.gpcompliant"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 8
+        versionCode 9
         versionName "0.9.2-gpcompliant"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
