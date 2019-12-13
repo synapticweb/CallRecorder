@@ -18,6 +18,12 @@ import android.text.Spanned;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import org.acra.ACRA;
+import org.acra.annotation.AcraCore;
+import org.acra.annotation.AcraHttpSender;
+import org.acra.data.StringFormat;
+import org.acra.sender.HttpSender;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -32,7 +38,15 @@ import java.util.concurrent.TimeUnit;
 //Oferă context cînd nu este nicio activitate disponibilă. Are nevoie ca să funcționeze de
 // android:name=".CrApp" în AndroidManifest.xml
 //Servește și ca bibliotecă a aplicației.
+@AcraCore(reportFormat = StringFormat.KEY_VALUE_LIST)
+@AcraHttpSender(uri = "http://crashes.infopsihologia.ro",
+        httpMethod = HttpSender.Method.POST )
 public class CrApp extends Application {
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        ACRA.init(this);
+    }
 
     public static final int SQLITE_TRUE = 1;
     public static final int SQLITE_FALSE = 0;

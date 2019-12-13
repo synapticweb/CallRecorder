@@ -14,6 +14,8 @@ import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.CrLog;
 import net.synapticweb.callrecorder.settings.SettingsFragment;
 
+import org.acra.ACRA;
+
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -31,6 +33,10 @@ public class Recorder {
     public static final String AAC_MEDIUM_FORMAT = "aac_med";
     public static final String AAC_BASIC_FORMAT = "aac_bas";
     static final String MONO = "mono";
+
+    private static final String ACRA_FORMAT = "format";
+    private static final String ACRA_MODE = "mode";
+    private static final String ACRA_SAVE_PATH = "save_path";
 
      Recorder() {
         settings = PreferenceManager.getDefaultSharedPreferences(CrApp.getInstance());
@@ -71,6 +77,10 @@ public class Recorder {
         audioFile = new File(recordingsDir, fileName);
         CrLog.log(CrLog.DEBUG, String.format("Recording session started. Format: %s. Mode: %s. Save path: %s",
                 format, mode, audioFile.getAbsolutePath()));
+        //This data is cleared in RecorderService::onDestroy().
+        ACRA.getErrorReporter().putCustomData(ACRA_FORMAT, format);
+        ACRA.getErrorReporter().putCustomData(ACRA_MODE, mode);
+        ACRA.getErrorReporter().putCustomData(ACRA_SAVE_PATH, audioFile.getAbsolutePath());
 
         if(format.equals(WAV_FORMAT))
             recordingThread = new Thread(new RecordingThreadWav(mode));
