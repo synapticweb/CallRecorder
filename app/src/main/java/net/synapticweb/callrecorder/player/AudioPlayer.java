@@ -20,6 +20,9 @@ import android.os.Build;
 import androidx.annotation.NonNull;
 import net.synapticweb.callrecorder.CrLog;
 
+import org.acra.ACRA;
+
+import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
@@ -53,6 +56,11 @@ class AudioPlayer extends Thread implements PlayerAdapter {
     private static final int WAV_BUFFER_SIZE = 8092;
     private int maxWavBuffers;
     private float gainDb = 0;
+
+    private final static String ACRA_MODE = "mode";
+    private final static String ACRA_SIZE = "file_size";
+    private final static String ACRA_FORMAT = "format";
+
 
     AudioPlayer(PlaybackListenerInterface listener) {
         this.playbackListener = listener;
@@ -173,7 +181,7 @@ class AudioPlayer extends Thread implements PlayerAdapter {
             return false;
         }
 
-        playbackListener.onDurationChanged((int) getTotalDuration());
+        playbackListener.onDurationChanged(getTotalDuration());
         playbackListener.onPositionChanged(0);
         return true;
     }
@@ -191,6 +199,10 @@ class AudioPlayer extends Thread implements PlayerAdapter {
                 channelConfig, AudioFormat.ENCODING_PCM_16BIT, AudioTrack.getMinBufferSize(SAMPLE_RATE,
                 channelConfig, AudioFormat.ENCODING_PCM_16BIT), AudioTrack.MODE_STREAM);
         audioTrack.play();
+        ACRA.getErrorReporter().putCustomData(ACRA_FORMAT, formatName);
+        ACRA.getErrorReporter().putCustomData(ACRA_MODE, channelCount == 1 ? "mono" : "stereo");
+        File audioFile = new File(mediaPath);
+        ACRA.getErrorReporter().putCustomData(ACRA_SIZE, (audioFile.length() / 1024) + "KB");
         state = PlayerAdapter.State.INITIALIZED;
     }
 
@@ -496,6 +508,7 @@ class AudioPlayer extends Thread implements PlayerAdapter {
             playbackListener.onError();
         }
         stopUpdatingPosition(true);
+        ACRA.getErrorReporter().clearCustomData();
     }
 
 }

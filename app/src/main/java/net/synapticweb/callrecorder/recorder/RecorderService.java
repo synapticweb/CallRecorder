@@ -39,6 +39,8 @@ import net.synapticweb.callrecorder.data.Recording;
 import net.synapticweb.callrecorder.data.CallRecorderDbHelper;
 import net.synapticweb.callrecorder.settings.SettingsFragment;
 
+import org.acra.ACRA;
+
 
 public class RecorderService extends Service {
     private  String receivedNumPhone = null;
@@ -65,6 +67,9 @@ public class RecorderService extends Service {
     static final String ACTION_START_RECORDING = "net.synapticweb.callrecorder.START_RECORDING";
     static final String ACTION_STOP_SPEAKER = "net.synapticweb.callrecorder.STOP_SPEAKER";
     static final String ACTION_START_SPEAKER = "net.synapticweb.callrecorder.START_SPEAKER";
+
+    static final String ACRA_PHONE_NUMBER = "phone_number";
+    static final String ACRA_INCOMING = "incoming";
 
     @Override
     public IBinder onBind(Intent i){
@@ -185,6 +190,8 @@ public class RecorderService extends Service {
         receivedNumPhone = intent.getStringExtra(CallReceiver.ARG_NUM_PHONE);
         incoming = intent.getBooleanExtra(CallReceiver.ARG_INCOMING, false);
         CrLog.log(CrLog.DEBUG, String.format("Recorder service started. Phone number: %s. Incoming: %s", receivedNumPhone, incoming));
+        ACRA.getErrorReporter().putCustomData(ACRA_PHONE_NUMBER, receivedNumPhone);
+        ACRA.getErrorReporter().putCustomData(ACRA_INCOMING, incoming.toString());
 
         //în cazul în care nr primit e null înseamnă că se sună de pe nr privat
         privateCall = (receivedNumPhone == null);
@@ -389,5 +396,6 @@ public class RecorderService extends Service {
         }
 
         resetState();
+        ACRA.getErrorReporter().clearCustomData();
     }
 }

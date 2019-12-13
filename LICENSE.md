@@ -136,6 +136,7 @@ information:
     debugging and improving the Application. This information are not
     shared with third parties and are not used for advertisement
     purposes.
+3. Technical information collected by ACRA library (https://github.com/ACRA/acra) in the (unlikely) event of an application crash. This information refer the hardware capabilities of the User's device, their operating system version, the installed version of the Application, the stacktrace of the crash. This information is compiled in a crash report that is sent anonymously to the developer of the Application. This information is only used for improving the functioning of the Application, is not shared with third parties and is not used for advertisement purposes.
 
 8\. Termination
 --------------
