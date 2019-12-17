@@ -21,6 +21,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+@SuppressWarnings("CatchMayIgnoreException")
 public class Recorder {
     private File audioFile;
     private Thread recordingThread;
@@ -78,9 +79,13 @@ public class Recorder {
         CrLog.log(CrLog.DEBUG, String.format("Recording session started. Format: %s. Mode: %s. Save path: %s",
                 format, mode, audioFile.getAbsolutePath()));
         //This data is cleared in RecorderService::onDestroy().
-        ACRA.getErrorReporter().putCustomData(ACRA_FORMAT, format);
-        ACRA.getErrorReporter().putCustomData(ACRA_MODE, mode);
-        ACRA.getErrorReporter().putCustomData(ACRA_SAVE_PATH, audioFile.getAbsolutePath());
+        try {
+            ACRA.getErrorReporter().putCustomData(ACRA_FORMAT, format);
+            ACRA.getErrorReporter().putCustomData(ACRA_MODE, mode);
+            ACRA.getErrorReporter().putCustomData(ACRA_SAVE_PATH, audioFile.getAbsolutePath());
+        }
+        catch (IllegalStateException exc) {
+        }
 
         if(format.equals(WAV_FORMAT))
             recordingThread = new Thread(new RecordingThreadWav(mode));

@@ -18,6 +18,8 @@ import android.media.MediaMetadataRetriever;
 import android.os.Build;
 
 import androidx.annotation.NonNull;
+
+import net.synapticweb.callrecorder.BuildConfig;
 import net.synapticweb.callrecorder.CrLog;
 
 import org.acra.ACRA;
@@ -33,6 +35,7 @@ import java.util.concurrent.TimeUnit;
 
 //Playerul a fost gîndit pe baza arhitecturii de aici:
 //https://medium.com/google-developers/building-a-simple-audio-app-in-android-part-2-3-a514f6224b83
+@SuppressWarnings("CatchMayIgnoreException")
 class AudioPlayer extends Thread implements PlayerAdapter {
     private int state;
     private String mediaPath;
@@ -199,10 +202,16 @@ class AudioPlayer extends Thread implements PlayerAdapter {
                 channelConfig, AudioFormat.ENCODING_PCM_16BIT, AudioTrack.getMinBufferSize(SAMPLE_RATE,
                 channelConfig, AudioFormat.ENCODING_PCM_16BIT), AudioTrack.MODE_STREAM);
         audioTrack.play();
-        ACRA.getErrorReporter().putCustomData(ACRA_FORMAT, formatName);
-        ACRA.getErrorReporter().putCustomData(ACRA_MODE, channelCount == 1 ? "mono" : "stereo");
         File audioFile = new File(mediaPath);
-        ACRA.getErrorReporter().putCustomData(ACRA_SIZE, (audioFile.length() / 1024) + "KB");
+
+       //noinspection CatchMayIgnoreException
+       try {
+           ACRA.getErrorReporter().putCustomData(ACRA_FORMAT, formatName);
+           ACRA.getErrorReporter().putCustomData(ACRA_MODE, channelCount == 1 ? "mono" : "stereo");
+           ACRA.getErrorReporter().putCustomData(ACRA_SIZE, (audioFile.length() / 1024) + "KB");
+       }
+       catch (IllegalStateException exc) {
+       }
         state = PlayerAdapter.State.INITIALIZED;
     }
 
@@ -508,7 +517,10 @@ class AudioPlayer extends Thread implements PlayerAdapter {
             playbackListener.onError();
         }
         stopUpdatingPosition(true);
-        ACRA.getErrorReporter().clearCustomData();
+       try {
+           ACRA.getErrorReporter().clearCustomData();
+       }
+       catch (IllegalStateException ignored) {}
     }
 
 }
