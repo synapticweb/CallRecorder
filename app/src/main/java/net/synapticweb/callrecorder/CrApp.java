@@ -45,7 +45,8 @@ public class CrApp extends Application {
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
-        ACRA.init(this);
+        if(!BuildConfig.DEBUG)
+            ACRA.init(this);
     }
 
     public static final int SQLITE_TRUE = 1;

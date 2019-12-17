@@ -173,8 +173,12 @@ public class RecorderService extends Service {
             receivedNumPhone = intent.getStringExtra(CallReceiver.ARG_NUM_PHONE);
         incoming = intent.getBooleanExtra(CallReceiver.ARG_INCOMING, false);
         CrLog.log(CrLog.DEBUG, String.format("Recorder service started. Phone number: %s. Incoming: %s", receivedNumPhone, incoming));
-        ACRA.getErrorReporter().putCustomData(ACRA_PHONE_NUMBER, receivedNumPhone);
-        ACRA.getErrorReporter().putCustomData(ACRA_INCOMING, incoming.toString());
+        try {
+            ACRA.getErrorReporter().putCustomData(ACRA_PHONE_NUMBER, receivedNumPhone);
+            ACRA.getErrorReporter().putCustomData(ACRA_INCOMING, incoming.toString());
+        }
+        catch (IllegalStateException ignored) {
+        }
         //de văzut dacă formarea ussd-urilor trimite ofhook dacă nu mai primim new_outgoing_call
 
         if(receivedNumPhone == null && incoming && Build.VERSION.SDK_INT < Build.VERSION_CODES.P)
@@ -321,6 +325,10 @@ public class RecorderService extends Service {
         }
 
         resetState();
-        ACRA.getErrorReporter().clearCustomData();
+        try {
+            ACRA.getErrorReporter().clearCustomData();
+        }
+        catch (IllegalStateException ignored) {
+        }
     }
 }
