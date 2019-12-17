@@ -81,6 +81,7 @@ public class CrLog {
 
     private static void writeHeader() throws IOException {
         String header = "";
+        header += "APP VERSION CODE: " + BuildConfig.VERSION_CODE + "\n";
         header += "APP VERSION: " + BuildConfig.VERSION_NAME + "\n";
         header += "MODEL: " + Build.MODEL + "\n";
         header += "MANUFACTURER: " + Build.MANUFACTURER + "\n";
