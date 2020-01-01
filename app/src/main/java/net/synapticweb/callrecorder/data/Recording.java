@@ -107,7 +107,7 @@ public class Recording implements Parcelable {
 
     public String getName() {
         if(!isNameSet)
-            return "Recording " + getDate(true) + " " + getTime();
+            return getDate(false) + " " + getTime();
         String fileName = new File(path).getName();
         return fileName.substring(0, fileName.length() - 4);
     }
