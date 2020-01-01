@@ -823,7 +823,8 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
             }
 
             holder.title.setText(recording.getName());
-            holder.recordingType.setImageResource(recording.isIncoming() ? R.drawable.incoming :
+            if(contact == null || !contact.isPrivateNumber())
+                holder.recordingType.setImageResource(recording.isIncoming() ? R.drawable.incoming :
                     getParentActivity().getSettedTheme().equals(TemplateActivity.LIGHT_THEME) ?
                             R.drawable.outgoing_light : R.drawable.outgoing_dark);
             holder.recordingAdorn.setImageResource(adornRes);
