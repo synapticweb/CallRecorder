@@ -27,7 +27,7 @@ public class RecordingsRepository {
         List<Recording> list =  new ArrayList<>();
 
         Cursor cursor = db.query(RecordingsContract.Recordings.TABLE_NAME,
-                null, RecordingsContract.Recordings.COLUMN_NAME_CONTACT_ID + "=" + contact.getId(), null, null, null, RecordingsContract.Recordings.COLUMN_NAME_END_TIMESTAMP + " DESC");
+                null, RecordingsContract.Recordings.COLUMN_NAME_CONTACT_ID + " is " + (contact == null ? "null" : contact.getId()), null, null, null, RecordingsContract.Recordings.COLUMN_NAME_END_TIMESTAMP + " DESC");
 
         while(cursor.moveToNext())
         {
