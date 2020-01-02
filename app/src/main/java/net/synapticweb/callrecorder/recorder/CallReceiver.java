@@ -107,17 +107,6 @@ public class CallReceiver extends BroadcastReceiver {
                     }
                 }
 
-                else if(state != null && state.equals(TelephonyManager.EXTRA_STATE_OFFHOOK)) {
-                    //Citește: dacă serviciul este pornit ȘI nu a fost încă apelat onIncomingOffHook
-                    // ȘI este diferit de no-incall (a fost modificat într-un nr. obișnuit sau în null), deci este incoming, nu outgoing.
-                    if(serviceStarted && !incomingOffhookCalled && (incomingNumber == null || !incomingNumber.equals(NO_INCOMING_NUMBER)) ) {
-                        RecorderService service = RecorderService.getService();
-                        if(service != null)
-                            service.onIncomingOfhook();
-                        incomingOffhookCalled = true;
-                    }
-                }
-
                 else if(state != null && state.equals(TelephonyManager.EXTRA_STATE_IDLE)) {
                     if(serviceStarted) {
                         Intent stopIntent = new Intent(context, RecorderService.class);

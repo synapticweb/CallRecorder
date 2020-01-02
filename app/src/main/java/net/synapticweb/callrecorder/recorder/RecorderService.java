@@ -47,7 +47,6 @@ public class RecorderService extends Service {
     private  Boolean privateCall = null;
     private  Boolean match = null;
     private  Boolean incoming = null;
-    public  boolean shouldStartAtHookup = false;
     private Long idIfMatch = null;
     private String callIdentifier;
     private  Recorder recorder;
@@ -62,7 +61,6 @@ public class RecorderService extends Service {
     public static final String PHONE_NUMBER = "phone_number";
 
     public static final int RECORD_AUTOMMATICALLY = 1;
-    public static final int RECORD_ON_HOOKUP = 2;
     public static final int RECORD_ON_REQUEST = 3;
     static final String ACTION_START_RECORDING = "net.synapticweb.callrecorder.START_RECORDING";
     static final String ACTION_STOP_SPEAKER = "net.synapticweb.callrecorder.STOP_SPEAKER";
@@ -145,9 +143,6 @@ public class RecorderService extends Service {
                             .setContentText(res.getString(R.string.recording_speaker_off));
                 }
                 break;
-            case RECORD_ON_HOOKUP:
-                builder.setContentText(res.getString(R.string.recording_answer_call));
-                break;
             case RECORD_ON_REQUEST:
                 notificationIntent = new Intent(CrApp.getInstance(), ControlRecordingReceiver.class);
                 notificationIntent.setAction(ACTION_START_RECORDING);
@@ -161,23 +156,16 @@ public class RecorderService extends Service {
         return builder.build();
     }
 
-    public void onIncomingOfhook() {
-        CrLog.log(CrLog.DEBUG, "onIncomingOfhook() called");
-        if(shouldStartAtHookup) {
-            NotificationManager nm = (NotificationManager) CrApp.getInstance().
-                    getSystemService(Context.NOTIFICATION_SERVICE);
-            try {
-                CrLog.log(CrLog.DEBUG, "Recorder started in onIncomingOffhook()");
-                recorder.startRecording(receivedNumPhone);
-                if(settings.getBoolean(SettingsFragment.SPEAKER_USE, false))
-                    putSpeakerOn();
-            }
-            catch (RecordingException e) {
-                CrLog.log(CrLog.ERROR, "onIncomingOfhook: unable to start recording: " + e.getMessage() + " Stoping the service...");
-                stopSelf();
-            }
-            if(nm != null)
-                nm.notify(NOTIFICATION_ID, buildNotification(RECORD_AUTOMMATICALLY));
+    private void startRecording() {
+        try {
+            CrLog.log(CrLog.DEBUG, "Recorder started in onStartCommand()");
+            recorder.startRecording(receivedNumPhone);
+            if(settings.getBoolean(SettingsFragment.SPEAKER_USE, false))
+                putSpeakerOn();
+        }
+        catch (RecordingException e) {
+            CrLog.log(CrLog.ERROR, "onStartCommand: unable to start recorder: " + e.getMessage() + " Stoping the service...");
+            stopSelf();
         }
     }
 
@@ -232,8 +220,8 @@ public class RecorderService extends Service {
         if(incoming) {
             if(privateCall) {
                 if(recordAutoPrivCalls || paranoidMode){
-                    startForeground(NOTIFICATION_ID, buildNotification(RECORD_ON_HOOKUP));
-                    shouldStartAtHookup = true;
+                    startRecording();
+                    startForeground(NOTIFICATION_ID, buildNotification(RECORD_AUTOMMATICALLY));
                 }
                 else
                     startForeground(NOTIFICATION_ID, buildNotification(RECORD_ON_REQUEST));
@@ -243,8 +231,8 @@ public class RecorderService extends Service {
                     if(paranoidMode)
                         shouldRecord = true;
                     if(shouldRecord) {
-                        startForeground(NOTIFICATION_ID, buildNotification(RECORD_ON_HOOKUP));
-                        shouldStartAtHookup = true;
+                        startRecording();
+                        startForeground(NOTIFICATION_ID, buildNotification(RECORD_AUTOMMATICALLY));
                     }
                     else // shouldRecord este false. Deci nu este paranoid mode, deci este match. Tertium non datur.
                     //Dacă este match, contactNameIfMatch != null:
@@ -259,15 +247,7 @@ public class RecorderService extends Service {
                 if(paranoidMode)
                     shouldRecord = true;
                 if(shouldRecord) {
-                    try {
-                        recorder.startRecording(receivedNumPhone);
-                        if(settings.getBoolean(SettingsFragment.SPEAKER_USE, false))
-                            putSpeakerOn();
-                    }
-                    catch (RecordingException e) {
-                        CrLog.log(CrLog.ERROR, "onStartCommand: unable to start recorder: " + e.getMessage() + " Stoping the service...");
-                        stopSelf();
-                    }
+                    startRecording();
                     startForeground(NOTIFICATION_ID, buildNotification(RECORD_AUTOMMATICALLY));
                 }
                 else //ca mai sus
