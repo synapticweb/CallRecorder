@@ -34,8 +34,6 @@ public class CallReceiver extends BroadcastReceiver {
     //rămînă pornit fără posibilitate de oprire.
     private static ComponentName serviceName = null;
     private SharedPreferences settings;
-    private static boolean incomingOffhookCalled = false;
-    private static boolean outgoingProcessed = false;
 
     public CallReceiver() {
         super();
@@ -89,18 +87,6 @@ public class CallReceiver extends BroadcastReceiver {
                         else
                             context.startService(intentService);
                         serviceStarted = true;
-                        outgoingProcessed = true;
-                    }
-                    //Din cauză că în lolipop și pie receiverul este apelat de 2 ori, codul de mai jos
-                    //era apelat și la outgoing, ceea ce făcea (între altele) să se pornească un thread
-                    //suplimentar speakerOn. Rezultatul era că oprirea manuală a difuzorului dura numai
-                    //500ms, după care era pornit din nou. outgoingProcessed împiedică să mai survină
-                    //acest comportament.
-                    else if(serviceStarted && !incomingOffhookCalled && !outgoingProcessed) {  //incoming
-                        RecorderService service = RecorderService.getService();
-                        if(service != null)
-                            service.onIncomingOffhook();
-                        incomingOffhookCalled = true;
                     }
                 }
 
@@ -112,8 +98,6 @@ public class CallReceiver extends BroadcastReceiver {
                         serviceStarted = false;
                     }
                     serviceName = null;
-                    incomingOffhookCalled = false;
-                    outgoingProcessed = false;
                 }
             }
         }
