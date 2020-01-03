@@ -33,6 +33,15 @@
         android:defaultValue="false"/>
 
     <ListPreference
+        android:title="@string/pref_audio_src_title"
+        android:key="source"
+        app:useSimpleSummaryProvider="true"
+        android:defaultValue="6"
+        android:entries="@array/source_names"
+        android:entryValues="@array/source_values"
+        />
+
+    <ListPreference
         android:title="@string/prefs_format_title"
         android:key="format"
         android:entries="@array/format_names"

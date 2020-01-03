@@ -134,4 +134,8 @@
     <string name="show_eula_text">Terms of use</string>
     <string name="eula_title">EULA</string>
     <string name="version_eula_screen">Version %s</string>
+    <string name="pref_audio_src_title">Audio source for recordings</string>
+    <string name="error_recorder_fail">Cannot start recorder. Maybe change audio source for recording?</string>
+    <string name="error_recorder_notif">The call is not recorded.</string>
+    <string name="info_source_label">Audio source:</string>
 </resources>

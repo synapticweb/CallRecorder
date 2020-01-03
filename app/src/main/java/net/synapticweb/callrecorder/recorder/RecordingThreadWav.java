@@ -31,8 +31,8 @@ class RecordingThreadWav extends RecordingThread implements Runnable {
     private static final String TMP_FILE_NAME = "recordingtmp.raw";
     private File tmpFile;
 
-    RecordingThreadWav(String mode) throws RecordingException {
-        super(mode); //throws exception
+    RecordingThreadWav(String mode, Recorder recorder) throws RecordingException {
+        super(mode, recorder); //throws exception
         tmpFile = new File(CrApp.getInstance().getFilesDir(), TMP_FILE_NAME);
     }
 

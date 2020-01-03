@@ -43,9 +43,10 @@ public class Recording implements Parcelable {
     private Boolean isNameSet;
     private String format;
     private String mode;
+    private String source;
 
     public Recording(Long id, Long contactId, String path, Boolean incoming, Long startTimestamp, Long endTimestamp,
-                     String format, Boolean isNameSet, String mode) {
+                     String format, Boolean isNameSet, String mode, String source) {
         this.id = id;
         this.contactId = contactId;
         this.path = path;
@@ -55,6 +56,7 @@ public class Recording implements Parcelable {
         this.isNameSet = isNameSet;
         this.format = format;
         this.mode = mode;
+        this.source = source;
     }
 
     public boolean exists() {
@@ -83,6 +85,7 @@ public class Recording implements Parcelable {
         values.put(RecordingsContract.Recordings.COLUMN_NAME_IS_NAME_SET, isNameSet);
         values.put(RecordingsContract.Recordings.COLUMN_NAME_FORMAT, format);
         values.put(RecordingsContract.Recordings.COLUMN_NAME_MODE, mode);
+        values.put(RecordingsContract.Recordings.COLUMN_NAME_SOURCE, source);
 
         db.update(RecordingsContract.Recordings.TABLE_NAME, values,
                     RecordingsContract.Recordings._ID + "=" + id, null);
@@ -101,6 +104,7 @@ public class Recording implements Parcelable {
         values.put(RecordingsContract.Recordings.COLUMN_NAME_IS_NAME_SET, isNameSet);
         values.put(RecordingsContract.Recordings.COLUMN_NAME_FORMAT, format);
         values.put(RecordingsContract.Recordings.COLUMN_NAME_MODE, mode);
+        values.put(RecordingsContract.Recordings.COLUMN_NAME_SOURCE, source);
 
         setId(db.insertOrThrow(RecordingsContract.Recordings.TABLE_NAME, null, values));
     }
@@ -233,6 +237,10 @@ public class Recording implements Parcelable {
 
     public void setContactId(Long contactId) { this.contactId = contactId; }
 
+    public String getSource() { return source; }
+
+    public void setSource(String source) { this.source = source; }
+
     @Override
     public int describeContents() {
         return 0;
@@ -240,7 +248,7 @@ public class Recording implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeLong(this.id);
+        dest.writeValue(this.id);
         dest.writeValue(this.contactId);
         dest.writeString(this.path);
         dest.writeValue(this.incoming);
@@ -249,10 +257,11 @@ public class Recording implements Parcelable {
         dest.writeValue(this.isNameSet);
         dest.writeString(this.format);
         dest.writeString(this.mode);
+        dest.writeString(this.source);
     }
 
     protected Recording(Parcel in) {
-        this.id = in.readLong();
+        this.id = (Long) in.readValue(Long.class.getClassLoader());
         this.contactId = (Long) in.readValue(Long.class.getClassLoader());
         this.path = in.readString();
         this.incoming = (Boolean) in.readValue(Boolean.class.getClassLoader());
@@ -261,6 +270,7 @@ public class Recording implements Parcelable {
         this.isNameSet = (Boolean) in.readValue(Boolean.class.getClassLoader());
         this.format = in.readString();
         this.mode = in.readString();
+        this.source = in.readString();
     }
 
     public static final Creator<Recording> CREATOR = new Creator<Recording>() {

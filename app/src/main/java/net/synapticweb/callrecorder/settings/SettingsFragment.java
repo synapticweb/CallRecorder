@@ -19,8 +19,6 @@ import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.TemplateActivity;
 
 import java.io.File;
-import java.util.List;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.preference.ListPreference;
@@ -40,6 +38,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     public static final String SPEAKER_USE = "put_on_speaker";
     public static final String FORMAT = "format";
     public static final String MODE = "mode";
+    public static final String SOURCE = "source";
     private TemplateActivity parentActivity;
     private SharedPreferences preferences;
 
@@ -96,6 +95,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         Preference mode = findPreference(MODE);
         Preference storage = findPreference(STORAGE);
         final Preference storagePath = findPreference(STORAGE_PATH);
+        Preference source = findPreference(SOURCE);
 
         storagePath.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
@@ -172,6 +172,13 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             public boolean onPreferenceChange(Preference preference, Object newValue) {
                 getActivity().recreate();
                 return true;
+            }
+        });
+
+        source.setSummaryProvider(new Preference.SummaryProvider<ListPreference>() {
+            @Override
+            public CharSequence provideSummary(ListPreference preference) {
+                return preference.getEntry();
             }
         });
 

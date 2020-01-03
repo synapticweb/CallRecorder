@@ -85,4 +85,18 @@
         <item>mono</item>
         <item>stereo</item>
     </string-array>
+
+    <string-array name="source_names">
+        <item>VOICE_CALL</item>
+        <item>VOICE_RECOGNITION</item>
+        <item>VOICE_COMMUNICATION</item>
+        <item>Microphone</item>
+    </string-array>
+
+    <string-array name="source_values">
+        <item>4</item>
+        <item>6</item>
+        <item>7</item>
+        <item>1</item>
+    </string-array>
 </resources>

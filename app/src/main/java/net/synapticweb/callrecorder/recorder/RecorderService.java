@@ -22,8 +22,11 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.media.AudioManager;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.preference.PreferenceManager;
+import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
@@ -62,6 +65,7 @@ public class RecorderService extends Service {
 
     public static final int RECORD_AUTOMMATICALLY = 1;
     public static final int RECORD_ON_REQUEST = 3;
+    public static final int RECORD_ERROR = 4;
     static final String ACTION_START_RECORDING = "net.synapticweb.callrecorder.START_RECORDING";
     static final String ACTION_STOP_SPEAKER = "net.synapticweb.callrecorder.STOP_SPEAKER";
     static final String ACTION_START_SPEAKER = "net.synapticweb.callrecorder.START_SPEAKER";
@@ -151,12 +155,14 @@ public class RecorderService extends Service {
                 builder.addAction(new NotificationCompat.Action.Builder(R.drawable.recorder,
                                 res.getString(R.string.start_recording_notification), startRecordingPi).build() )
                         .setContentText(res.getString(R.string.start_recording_notification_text));
+                break;
+            case RECORD_ERROR: builder.setContentText(res.getString(R.string.error_recorder_notif));
         }
 
         return builder.build();
     }
 
-    private void startRecording() {
+    private boolean startRecording() {
         try {
             CrLog.log(CrLog.DEBUG, "Recorder started in onStartCommand()");
             recorder.startRecording(receivedNumPhone);
@@ -165,8 +171,10 @@ public class RecorderService extends Service {
         }
         catch (RecordingException e) {
             CrLog.log(CrLog.ERROR, "onStartCommand: unable to start recorder: " + e.getMessage() + " Stoping the service...");
-            stopSelf();
+            Toast.makeText(getApplicationContext(), getResources().getString(R.string.error_recorder_fail), Toast.LENGTH_LONG).show();
+            return false;
         }
+        return true;
     }
 
     @Override
@@ -220,8 +228,10 @@ public class RecorderService extends Service {
         if(incoming) {
             if(privateCall) {
                 if(recordAutoPrivCalls || paranoidMode){
-                    startRecording();
-                    startForeground(NOTIFICATION_ID, buildNotification(RECORD_AUTOMMATICALLY));
+                    if(startRecording())
+                        startForeground(NOTIFICATION_ID, buildNotification(RECORD_AUTOMMATICALLY));
+                    else
+                        startForeground(NOTIFICATION_ID, buildNotification(RECORD_ERROR));
                 }
                 else
                     startForeground(NOTIFICATION_ID, buildNotification(RECORD_ON_REQUEST));
@@ -231,8 +241,10 @@ public class RecorderService extends Service {
                     if(paranoidMode)
                         shouldRecord = true;
                     if(shouldRecord) {
-                        startRecording();
-                        startForeground(NOTIFICATION_ID, buildNotification(RECORD_AUTOMMATICALLY));
+                        if(startRecording())
+                            startForeground(NOTIFICATION_ID, buildNotification(RECORD_AUTOMMATICALLY));
+                        else
+                            startForeground(NOTIFICATION_ID, buildNotification(RECORD_ERROR));
                     }
                     else // shouldRecord este false. Deci nu este paranoid mode, deci este match. Tertium non datur.
                     //Dacă este match, contactNameIfMatch != null:
@@ -247,8 +259,10 @@ public class RecorderService extends Service {
                 if(paranoidMode)
                     shouldRecord = true;
                 if(shouldRecord) {
-                    startRecording();
-                    startForeground(NOTIFICATION_ID, buildNotification(RECORD_AUTOMMATICALLY));
+                    if(startRecording())
+                        startForeground(NOTIFICATION_ID, buildNotification(RECORD_AUTOMMATICALLY));
+                    else
+                        startForeground(NOTIFICATION_ID, buildNotification(RECORD_ERROR));
                 }
                 else //ca mai sus
                     startForeground(NOTIFICATION_ID, buildNotification(RECORD_ON_REQUEST));
@@ -370,7 +384,8 @@ public class RecorderService extends Service {
         }
 
         Recording recording = new Recording(null, contactId, recorder.getAudioFilePath(), incoming,
-                recorder.getStartingTime(), System.currentTimeMillis(), recorder.getFormat(), false, recorder.getMode());
+                recorder.getStartingTime(), System.currentTimeMillis(), recorder.getFormat(), false, recorder.getMode(),
+                recorder.getSource());
 
         try {
             recording.insertInDatabase(CrApp.getInstance());
