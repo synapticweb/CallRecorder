@@ -141,7 +141,7 @@ public class Contact implements Comparable<Contact>, Parcelable {
            Recording recording =
                     new Recording(cursor.getLong(cursor.getColumnIndex(RecordingsContract.Recordings._ID)), null,
                             cursor.getString(cursor.getColumnIndex(RecordingsContract.Recordings.COLUMN_NAME_PATH)),
-                            null, null, null, null, null, null);
+                            null, null, null, null, null, null, null);
            recording.delete(context);
         }
 

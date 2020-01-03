@@ -20,6 +20,7 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import static android.media.MediaRecorder.AudioSource.*;
 
 @SuppressWarnings("CatchMayIgnoreException")
 public class Recorder {
@@ -34,6 +35,7 @@ public class Recorder {
     public static final String AAC_MEDIUM_FORMAT = "aac_med";
     public static final String AAC_BASIC_FORMAT = "aac_bas";
     static final String MONO = "mono";
+    private int source;
 
     private static final String ACRA_FORMAT = "format";
     private static final String ACRA_MODE = "mode";
@@ -44,7 +46,6 @@ public class Recorder {
         format = settings.getString(SettingsFragment.FORMAT, "");
         mode = settings.getString(SettingsFragment.MODE, "");
     }
-
 
     long getStartingTime() {
         return startingTime;
@@ -88,9 +89,9 @@ public class Recorder {
         }
 
         if(format.equals(WAV_FORMAT))
-            recordingThread = new Thread(new RecordingThreadWav(mode));
+            recordingThread = new Thread(new RecordingThreadWav(mode, this));
         else
-            recordingThread = new Thread(new RecordingThreadAac(audioFile, format, mode));
+            recordingThread = new Thread(new RecordingThreadAac(audioFile, format, mode, this));
 
         recordingThread.start();
         startingTime = System.currentTimeMillis();
@@ -121,5 +122,17 @@ public class Recorder {
     public String getMode() {
         return mode;
     }
+
+    public String getSource() {
+        switch (source) {
+            case VOICE_RECOGNITION: return "VOICE_RECOGNITION";
+            case VOICE_COMMUNICATION: return "VOICE_COMMUNICATION";
+            case VOICE_CALL: return "VOICE_CALL";
+            case MIC:return "Microphone";
+            default:return "Source unrecognized";
+        }
+    }
+
+    public void setSource(int source) { this.source = source; }
 
 }

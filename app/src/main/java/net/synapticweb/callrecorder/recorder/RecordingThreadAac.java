@@ -30,8 +30,8 @@ class RecordingThreadAac extends RecordingThread implements Runnable {
     private final MediaCodec mediaCodec;
     private File outputFile;
 
-    RecordingThreadAac(File audioFile, String format, String mode) throws RecordingException {
-        super(mode); //trows exception dacă nu poate inițializa AudioRecord
+    RecordingThreadAac(File audioFile, String format, String mode, Recorder recorder) throws RecordingException {
+        super(mode, recorder); //trows exception dacă nu poate inițializa AudioRecord
         outputFile = audioFile;
         switch (format) {
             case Recorder.AAC_HIGH_FORMAT: bitRate = 128000;

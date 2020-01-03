@@ -24,6 +24,7 @@ import android.media.AudioManager;
 import android.os.Build;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
@@ -56,9 +57,8 @@ public class RecorderService extends Service {
     public static final int NOTIFICATION_ID = 1;
     private static final String CHANNEL_ID = "call_recorder_channel";
     public static final String PHONE_NUMBER = "phone_number";
-
     public static final int RECORD_AUTOMMATICALLY = 1;
-    public static final int RECORD_ON_HOOKUP = 2;
+    public static final int RECORD_ERROR = 4;
 
     static final String ACTION_START_RECORDING = "net.synapticweb.callrecorder.START_RECORDING";
     static final String ACTION_STOP_SPEAKER = "net.synapticweb.callrecorder.STOP_SPEAKER";
@@ -106,7 +106,7 @@ public class RecorderService extends Service {
         mNotificationManager.createNotificationChannel(mChannel);
     }
 
-    public Notification buildNotification() {
+    public Notification buildNotification(int typeOfNotification) {
         Intent notificationIntent = new Intent(CrApp.getInstance(), ContactsListActivityMain.class);
         PendingIntent tapNotificationPi = PendingIntent.getBroadcast(CrApp.getInstance(), 0, notificationIntent, 0);
         Resources res = CrApp.getInstance().getResources();
@@ -118,23 +118,29 @@ public class RecorderService extends Service {
                 .setContentTitle(callIdentifier + (incoming ? " (incoming)" : " (outgoing)"))
                 .setContentIntent(tapNotificationPi);
 
-        //Acum nu se mai bazează pe speakerOn, recunoaște dacă difuzorul era deja pornit. speakerOn
-        //a fost menținut deoarece în unele situații notificarea porneste prea devreme și isSpeakerphoneOn()
-        //returnează false.
-        if (audioManager.isSpeakerphoneOn() || speakerOn) {
-            notificationIntent = new Intent(CrApp.getInstance(), ControlRecordingReceiver.class);
-            notificationIntent.setAction(ACTION_STOP_SPEAKER);
-            PendingIntent stopSpeakerPi = PendingIntent.getBroadcast(CrApp.getInstance(), 0, notificationIntent, 0);
-            builder.addAction(new NotificationCompat.Action.Builder(R.drawable.speaker_phone_off,
-                    res.getString(R.string.stop_speaker), stopSpeakerPi).build())
-                    .setContentText(res.getString(R.string.recording_speaker_on));
-        } else {
-            notificationIntent = new Intent(CrApp.getInstance(), ControlRecordingReceiver.class);
-            notificationIntent.setAction(ACTION_START_SPEAKER);
-            PendingIntent startSpeakerPi = PendingIntent.getBroadcast(CrApp.getInstance(), 0, notificationIntent, 0);
-            builder.addAction(new NotificationCompat.Action.Builder(R.drawable.speaker_phone_on,
-                    res.getString(R.string.start_speaker), startSpeakerPi).build())
-                    .setContentText(res.getString(R.string.recording_speaker_off));
+        switch (typeOfNotification) {
+                //Acum nu se mai bazează pe speakerOn, recunoaște dacă difuzorul era deja pornit. speakerOn
+                //a fost menținut deoarece în unele situații notificarea porneste prea devreme și isSpeakerphoneOn()
+                //returnează false.
+            case RECORD_AUTOMMATICALLY:
+                if (audioManager.isSpeakerphoneOn() || speakerOn) {
+                    notificationIntent = new Intent(CrApp.getInstance(), ControlRecordingReceiver.class);
+                    notificationIntent.setAction(ACTION_STOP_SPEAKER);
+                    PendingIntent stopSpeakerPi = PendingIntent.getBroadcast(CrApp.getInstance(), 0, notificationIntent, 0);
+                    builder.addAction(new NotificationCompat.Action.Builder(R.drawable.speaker_phone_off,
+                            res.getString(R.string.stop_speaker), stopSpeakerPi).build())
+                            .setContentText(res.getString(R.string.recording_speaker_on));
+                } else {
+                    notificationIntent = new Intent(CrApp.getInstance(), ControlRecordingReceiver.class);
+                    notificationIntent.setAction(ACTION_START_SPEAKER);
+                    PendingIntent startSpeakerPi = PendingIntent.getBroadcast(CrApp.getInstance(), 0, notificationIntent, 0);
+                    builder.addAction(new NotificationCompat.Action.Builder(R.drawable.speaker_phone_on,
+                            res.getString(R.string.start_speaker), startSpeakerPi).build())
+                            .setContentText(res.getString(R.string.recording_speaker_off));
+                }
+                break;
+
+            case RECORD_ERROR: builder.setContentText(res.getString(R.string.error_recorder_notif));
         }
 
         return builder.build();
@@ -187,16 +193,18 @@ public class RecorderService extends Service {
         else
             callIdentifier = getResources().getString(R.string.unknown_number);
 
-            try {
-                CrLog.log(CrLog.DEBUG, "Recorder started in onStartCommand()");
-                recorder.startRecording(receivedNumPhone);
-                if (settings.getBoolean(SettingsFragment.SPEAKER_USE, false))
-                    putSpeakerOn();
-            } catch (RecordingException e) {
-                CrLog.log(CrLog.ERROR, "onStartCommand: unable to start recorder: " + e.getMessage() + " Stoping the service...");
-                stopSelf();
-            }
-            startForeground(NOTIFICATION_ID, buildNotification());
+        try {
+            CrLog.log(CrLog.DEBUG, "Recorder started in onStartCommand()");
+            recorder.startRecording(receivedNumPhone);
+            if (settings.getBoolean(SettingsFragment.SPEAKER_USE, false))
+                putSpeakerOn();
+            startForeground(NOTIFICATION_ID, buildNotification(RECORD_AUTOMMATICALLY));
+        }
+         catch (RecordingException e) {
+             CrLog.log(CrLog.ERROR, "onStartCommand: unable to start recorder: " + e.getMessage() + " Stoping the service...");
+             Toast.makeText(getApplicationContext(), getResources().getString(R.string.error_recorder_fail), Toast.LENGTH_LONG).show();
+             startForeground(NOTIFICATION_ID, buildNotification(RECORD_ERROR));
+         }
 
         return START_NOT_STICKY;
     }
@@ -286,7 +294,8 @@ public class RecorderService extends Service {
             contactId = null;
 
         Recording recording = new Recording(null, contactId, recorder.getAudioFilePath(), incoming,
-                recorder.getStartingTime(), System.currentTimeMillis(), recorder.getFormat(), false, recorder.getMode());
+                recorder.getStartingTime(), System.currentTimeMillis(), recorder.getFormat(), false, recorder.getMode(),
+                recorder.getSource());
 
         try {
             recording.insertInDatabase(CrApp.getInstance());

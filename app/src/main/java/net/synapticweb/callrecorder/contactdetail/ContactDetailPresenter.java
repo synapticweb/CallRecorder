@@ -171,6 +171,8 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
         date.setText(String.format("%s %s", recording.getDate(false), recording.getTime()));
         TextView size = dialog.getView().findViewById(R.id.info_size_data);
         size.setText(CrApp.getFileSizeHuman(recording.getSize()));
+        TextView source = dialog.getView().findViewById(R.id.info_source_data);
+        source.setText(recording.getSource());
 
         TextView format = dialog.getView().findViewById(R.id.info_format_data);
         format.setText(recording.getHumanReadingFormat());

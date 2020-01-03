@@ -143,4 +143,8 @@
     <string name="assign_to_contact_err">An error occurred while assigning the recording(s) to contact.</string>
     <string name="assign_to_same_contact">You cannot assign the recording to the same contact.</string>
     <string name="rate_app">Rate this app</string>
+    <string name="pref_audio_src_title">Audio source for recordings</string>
+    <string name="error_recorder_fail">Cannot start recorder. Maybe change audio source for recording?</string>
+    <string name="error_recorder_notif">The call is not recorded.</string>
+    <string name="info_source_label">Audio source:</string>
 </resources>
