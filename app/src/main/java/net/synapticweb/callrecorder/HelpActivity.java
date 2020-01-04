@@ -48,7 +48,7 @@ public class HelpActivity extends TemplateActivity {
         setTheme();
         Resources res = getResources();
 
-        content[0] = CrApp.rawHtmlToString(R.raw.help_recording_calls_gpc);
+        content[0] = CrApp.rawHtmlToString(R.raw.help_recording_calls);
         content[1] = CrApp.rawHtmlToString(R.raw.help_playing_recordings);
         content[2] = CrApp.rawHtmlToString(R.raw.help_managing_recordings);
         content[3] = CrApp.rawHtmlToString(R.raw.help_about);
