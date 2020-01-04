@@ -41,7 +41,7 @@
 <h2>Recording format</h2>
 <p>There are four avaiable formats for saving the recordings:
 	<ol>
-		<li>WAV. This is a <em>lossless</em> audio format, the meaning of "lossless" being the fact that no audio compression is made. Thus, the raw audio data that comes from the microphone is saved in a format that can be played or processed by most audio applications. This format has the best audio quality but is also the most expensive in terms of storage consumption (about 6 MB/minute in mono mode)</li>
+		<li>WAV. This is a <em>lossless</em> audio format, the meaning of "lossless" being the fact that no audio compression is made. Thus, the raw audio data that comes from the device is saved in a format that can be played or processed by most audio applications. This format has the best audio quality but is also the most expensive in terms of storage consumption (about 6 MB/minute in mono mode)</li>
 		<li>AAC High (128kbps). This is a <em>lossy</em> audio format the meaning of "lossy" being the fact that an algorithm for audio compression is applied to save space. AAC 128kbs takes about 900 KB/minute in mono mode.</li>
 		<li>AAC Medium (64kbps). AAC 64kbs takes about about 500 KB/minute in mono mode. </li>
 		<li>AAC Basic (32kbps). AAC 32kbps takes about 250 KB/minute in mono mode.</li>
@@ -50,7 +50,17 @@
 </p>
 
 <h2>Speaker use</h2>
-<p>If the microphone of your device is not very sensitive, the audio volume of the voices in the recording might be quite low and the speech might be unrecognizable. To circumvent this problem you can turn on the option "Put device on speaker when recording". If this setting is on, Synaptic Call Recorder will automatically put the device on speaker while the recording takes place.</p>
+<p>If the microphone of your device is not very sensitive, the audio volume of the voices in the recording might be quite low and the speech might be unrecognizable. To circumvent this problem, you can turn on the option "Put device on speaker when recording". If this setting is on, Synaptic Call Recorder will automatically put the device on speaker while the recording takes place.</p>
+<p>The speaker may also be turned on manually using a control in the notification that appears during the recording of the call.</p>
+
+<h2>About audio sources</h2>
+<p>You are able to select the audio source for the recordings using the menu "Audio source for recordings" in the preferences screen. There are four possible audio sources:</p>
+	<ol>
+		<li><strong>Voice call</strong> - This audio source offers the best audio quality because the recorder has access to the uplink and downlink audio streams of the call (i.e. the sound is not recorded using the microphone, but comes from the device's internal hardware). As such, recording with Voice call guarantees that both your voice and the voice of your interlocutor will be recorded at high volume without making use of the speaker and even if you wear a headset. Unfortunately, Voice call audio source is only available on some devices that run the 5.0 and 5.1 Android versions (Lollipop). From Android 6.0 (Marshmallow) onward, Google has restricted the use of the Voice call audio source to system applications.</li>
+		<li><strong>Microphone</strong> - When using this audio source the sound is recorded using the microphone of the device. The consequence of recording with the microphone is that your voice will be recorded at higher volume than the voice of your interlocutor (If you wear a headset, the voice of your interlocutor might not be recorded at all). Depending on the sensitivity of the microphone, this might yield satisfactory results or not. If the volume of your interlocutor's voice is too low, you might try to record with the device's speaker turned on.</li>
+		<li><strong>Voice recognition</strong> - This is  the microphone audio source tuned for voice recognition if available.</li>
+		<li><strong>Voice communication</strong> - This is the microphone audio source tuned for voice communications such as VoIP. It will for instance take advantage of echo cancellation or automatic gain control if available.</li>
+	</ol>
 
 <h2>Caution</h2>
 <p>There is a considerable amount of variation among the hardware capabilities of phone devices. As a consequence, the quality of the audio recordings may be different from phone to phone and you might have to adjust the application's settings in order to obtain a satisfactory result. Make sure to do a fair amount of experimentation before relying on Synaptic Call Recorder for recording sensitive phone calls.</p>
