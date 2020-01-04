@@ -87,9 +87,9 @@
     </string-array>
 
     <string-array name="source_names">
-        <item>VOICE_CALL</item>
-        <item>VOICE_RECOGNITION</item>
-        <item>VOICE_COMMUNICATION</item>
+        <item>Voice call</item>
+        <item>Voice recognition</item>
+        <item>Voice communication</item>
         <item>Microphone</item>
     </string-array>
 

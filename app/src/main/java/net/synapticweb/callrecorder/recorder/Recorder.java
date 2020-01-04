@@ -125,9 +125,9 @@ public class Recorder {
 
     public String getSource() {
         switch (source) {
-            case VOICE_RECOGNITION: return "VOICE_RECOGNITION";
-            case VOICE_COMMUNICATION: return "VOICE_COMMUNICATION";
-            case VOICE_CALL: return "VOICE_CALL";
+            case VOICE_RECOGNITION: return "Voice recognition";
+            case VOICE_COMMUNICATION: return "Voice communication";
+            case VOICE_CALL: return "Voice call";
             case MIC:return "Microphone";
             default:return "Source unrecognized";
         }
