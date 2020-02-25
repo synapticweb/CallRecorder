@@ -8,29 +8,18 @@
 
 package net.synapticweb.callrecorder.recorder;
 
-
-import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.media.AudioFormat;
-import android.media.AudioManager;
 import android.media.AudioRecord;
-import android.media.MediaRecorder;
 import android.preference.PreferenceManager;
-import android.util.Log;
-
 import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.CrLog;
 import net.synapticweb.callrecorder.settings.SettingsFragment;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import static android.media.MediaRecorder.AudioSource.VOICE_RECOGNITION;
 
 abstract class RecordingThread {
-    protected static final String TAG = "CallRecorder";
     static final int SAMPLE_RATE = 44100;
     final int channels;
     final int bufferSize;
