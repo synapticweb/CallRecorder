@@ -401,24 +401,17 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
 
     protected void setDetailsButtonsListeners() {
         ImageButton navigateBack = parentActivity.findViewById(R.id.navigate_back);
-        navigateBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                NavUtils.navigateUpFromSameTask(parentActivity);
-            }
-        });
+        navigateBack.setOnClickListener((view) ->
+                NavUtils.navigateUpFromSameTask(parentActivity)
+        );
         final ImageButton menuButton = parentActivity.findViewById(R.id.contact_detail_menu);
-        menuButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        menuButton.setOnClickListener((view) -> {
 //pentru micșorarea fontului se folosește constructorul PopupMenu(ContextThemeWrapper, v). E necesar un wrapper
 // în jurul unui stil din styles.xml. Stilul trebuie să moștenească din Theme.AppCompat.Light.NoActionBar
 // pentru temele light și din Theme.AppCompat.NoActionBar pentru cele dark, altfel background-ul
 // va avea culoarea greșită.
-                PopupMenu popupMenu = new PopupMenu(parentActivity,v);
-                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
+                PopupMenu popupMenu = new PopupMenu(parentActivity,view);
+                popupMenu.setOnMenuItemClickListener((item) -> {
                         switch (item.getItemId()) {
                             case R.id.delete_phone_number:
                                 presenter.deleteContact(contact);
@@ -428,13 +421,11 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
                             default:
                                 return false;
                         }
-                    }
                 });
                 MenuInflater inflater = popupMenu.getMenuInflater();
                 inflater.inflate(R.menu.contact_popup, popupMenu.getMenu());
                 popupMenu.show();
-            }
-        });
+            });
 
         ImageButton editContact = parentActivity.findViewById(R.id.edit_contact);
         ImageButton callContact = parentActivity.findViewById(R.id.call_contact);

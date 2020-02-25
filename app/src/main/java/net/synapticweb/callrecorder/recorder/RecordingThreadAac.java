@@ -71,7 +71,12 @@ class RecordingThreadAac extends RecordingThread implements Runnable {
         }
         finally {
             disposeAudioRecord();
-            mediaCodec.stop();
+            //în unele situații după o eroare codecul se duce (din motive pe care nu le știu) direct în
+            // starea "released". Dacă apelez stop() îmi dă un IllegalStateException.
+            try {
+                mediaCodec.stop();
+            }
+            catch (IllegalStateException ignored) {}
             mediaCodec.release();
         }
     }

@@ -37,7 +37,6 @@ import com.chibde.visualizer.LineBarVisualizer;
 import com.sdsmdg.harjot.crollerTest.Croller;
 
 public class PlayerActivity extends TemplateActivity {
-    final static String TAG = "CallRecorder";
     AudioPlayer player;
     Recording recording;
     ImageButton playPause, resetPlaying;
@@ -86,9 +85,7 @@ public class PlayerActivity extends TemplateActivity {
         playedTime = findViewById(R.id.test_play_time_played);
         totalTime = findViewById(R.id.test_play_total_time);
 
-        playPause.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        playPause.setOnClickListener((view) -> {
                 if(player.getPlayerState() == PlayerAdapter.State.PLAYING) {
                     player.pause();
                     playPause.setBackground(getResources().getDrawable(R.drawable.player_play));
@@ -100,16 +97,12 @@ public class PlayerActivity extends TemplateActivity {
                     playPause.setBackground(getResources().getDrawable(R.drawable.player_pause));
                     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                 }
-            }
         });
 
-        resetPlaying.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        resetPlaying.setOnClickListener((view) -> {
                 if(player.getPlayerState() == PlayerAdapter.State.PLAYING)
                     playPause.setBackground(getResources().getDrawable(R.drawable.player_play));
                 player.reset();
-            }
         });
 
         playSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -133,12 +126,9 @@ public class PlayerActivity extends TemplateActivity {
         });
 
         gainControl = findViewById(R.id.gain_control);
-        gainControl.setOnProgressChangedListener(new Croller.onProgressChangedListener() {
-            @Override
-            public void onProgressChanged(int progress) {
-                player.setGain((float) progress);
-            }
-        });
+        gainControl.setOnProgressChangedListener((progress) ->
+                player.setGain((float) progress)
+        );
 
         volumeControl = findViewById(R.id.volume_control);
         if(audioManager != null) {
@@ -146,12 +136,9 @@ public class PlayerActivity extends TemplateActivity {
             phoneVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
             volumeControl.setProgress(phoneVolume);
         }
-        volumeControl.setOnProgressChangedListener(new Croller.onProgressChangedListener() {
-            @Override
-            public void onProgressChanged(int progress) {
-                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, progress, 0);
-            }
-        });
+        volumeControl.setOnProgressChangedListener( (progress) ->
+                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, progress, 0)
+        );
 
         recordingInfo = findViewById(R.id.recording_info);
         recordingInfo.setText(String.format(getResources().getString(R.string.recording_info),
@@ -259,12 +246,9 @@ public class PlayerActivity extends TemplateActivity {
         @Override
         public void onPlaybackCompleted() {
             //a trebuit să folosesc asta pentru că în lolipop crăpa zicînd că nu am voie să updatez UI din thread secundar.
-            playPause.post(new Runnable() {
-                @Override
-                public void run() {
-                    playPause.setBackground(getResources().getDrawable(R.drawable.player_play));
-                }
-            });
+            playPause.post(() ->
+                    playPause.setBackground(getResources().getDrawable(R.drawable.player_play))
+            );
             player.reset();
         }
 
