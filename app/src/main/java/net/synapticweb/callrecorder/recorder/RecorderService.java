@@ -108,6 +108,7 @@ public class RecorderService extends Service {
     public Notification buildNotification(int typeOfNotification, int message) {
         Intent goToActivity = new Intent(CrApp.getInstance(), ContactsListActivityMain.class);
         PendingIntent tapNotificationPi = PendingIntent.getActivity(CrApp.getInstance(), 0, goToActivity, 0);
+        Intent sendBroadcast = new Intent(CrApp.getInstance(), ControlRecordingReceiver.class);
         Resources res = CrApp.getInstance().getResources();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
@@ -122,7 +123,6 @@ public class RecorderService extends Service {
                 //a fost menținut deoarece în unele situații notificarea porneste prea devreme și isSpeakerphoneOn()
                 //returnează false.
             case RECORD_AUTOMMATICALLY:
-                Intent sendBroadcast = new Intent(CrApp.getInstance(), ControlRecordingReceiver.class);
                 if (audioManager.isSpeakerphoneOn() || speakerOn) {
                     sendBroadcast.setAction(ACTION_STOP_SPEAKER);
                     PendingIntent stopSpeakerPi = PendingIntent.getBroadcast(CrApp.getInstance(), 0, sendBroadcast, 0);
