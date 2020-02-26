@@ -54,6 +54,8 @@ class RecordingThreadWav extends RecordingThread implements Runnable {
             CrLog.log(ERROR, "Error while writing temp pcm file: " + e.getMessage());
             if(!tmpFile.delete())
                 CrLog.log(ERROR, "Cannot delete incomplete temp pcm file.");
+            recorder.setHasError();
+            notifyOnError();
         }
         finally {
             disposeAudioRecord();
@@ -63,9 +65,11 @@ class RecordingThreadWav extends RecordingThread implements Runnable {
     static class CopyPcmToWav implements Runnable {
         private final File wavFile;
         private final int channels;
+        private Recorder recorder;
 
-        CopyPcmToWav(File wavFile, String mode) {
+        CopyPcmToWav(File wavFile, String mode, Recorder recorder) {
             this.wavFile = wavFile;
+            this.recorder = recorder;
             channels = mode.equals(Recorder.MONO) ? 1 : 2;
         }
 
@@ -93,6 +97,8 @@ class RecordingThreadWav extends RecordingThread implements Runnable {
                     CrLog.log(ERROR, "Error while deleting temp pcm file on exception.");
                 if(!wavFile.delete())
                     CrLog.log(ERROR, "Error while deleting wav file on exception.");
+                recorder.setHasError();
+                RecordingThread.notifyOnError();
             }
             finally {
                 if(!tmpFile.delete())

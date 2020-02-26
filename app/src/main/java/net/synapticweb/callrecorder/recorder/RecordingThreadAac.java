@@ -68,6 +68,8 @@ class RecordingThreadAac extends RecordingThread implements Runnable {
             CrLog.log(CrLog.ERROR, "Error while writing aac file: " + e.getMessage());
             if (!outputFile.delete())
                 CrLog.log(CrLog.ERROR, "Cannot delete incomplete aac file");
+            recorder.setHasError();
+            notifyOnError();
         }
         finally {
             disposeAudioRecord();

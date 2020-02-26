@@ -20,13 +20,11 @@ import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.media.AudioManager;
 import android.os.Build;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
 import android.preference.PreferenceManager;
-import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
@@ -56,6 +54,7 @@ public class RecorderService extends Service {
     private  SharedPreferences settings;
     private  Thread speakerOnThread;
     private  AudioManager audioManager;
+    private NotificationManager nm;
     private static RecorderService self;
     private boolean speakerOn = false;
 
@@ -81,8 +80,9 @@ public class RecorderService extends Service {
     public void onCreate(){
         super.onCreate();
         recorder = new Recorder();
-        settings = PreferenceManager.getDefaultSharedPreferences(CrApp.getInstance());
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        nm = (NotificationManager) CrApp.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
+        settings = PreferenceManager.getDefaultSharedPreferences(CrApp.getInstance());
         self = this;
     }
 
@@ -95,10 +95,7 @@ public class RecorderService extends Service {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private static void createChannel() {
-        NotificationManager mNotificationManager =
-                (NotificationManager) CrApp.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
-
+    private void createChannel() {
         // The user-visible name of the channel.
         CharSequence name = "Call recorder";
         // The user-visible description of the channel.
@@ -109,12 +106,13 @@ public class RecorderService extends Service {
         mChannel.setDescription(description);
         mChannel.setShowBadge(false);
         mChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
-        mNotificationManager.createNotificationChannel(mChannel);
+        nm.createNotificationChannel(mChannel);
     }
 
-    public Notification buildNotification(int typeOfNotification) {
-        Intent notificationIntent = new Intent(CrApp.getInstance(), ContactsListActivityMain.class);
-        PendingIntent tapNotificationPi = PendingIntent.getBroadcast(CrApp.getInstance(), 0, notificationIntent, 0);
+    public Notification buildNotification(int typeOfNotification, int message) {
+        Intent goToActivity = new Intent(CrApp.getInstance(), ContactsListActivityMain.class);
+        PendingIntent tapNotificationPi = PendingIntent.getActivity(CrApp.getInstance(), 0, goToActivity, 0);
+        Intent sendBroadcast = new Intent(CrApp.getInstance(), ControlRecordingReceiver.class);
         Resources res = CrApp.getInstance().getResources();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
@@ -131,32 +129,33 @@ public class RecorderService extends Service {
                 //a fost menținut deoarece în unele situații notificarea porneste prea devreme și isSpeakerphoneOn()
                 //returnează false.
                 if (audioManager.isSpeakerphoneOn() || speakerOn) {
-                    notificationIntent = new Intent(CrApp.getInstance(), ControlRecordingReceiver.class);
-                    notificationIntent.setAction(ACTION_STOP_SPEAKER);
-                    PendingIntent stopSpeakerPi = PendingIntent.getBroadcast(CrApp.getInstance(), 0, notificationIntent, 0);
-                    builder.addAction(new NotificationCompat.Action.Builder(R.drawable.speaker_phone_off,
-                            res.getString(R.string.stop_speaker), stopSpeakerPi).build() )
-                    .setContentText(res.getString(R.string.recording_speaker_on));
-                }
-                else {
-                    notificationIntent = new Intent(CrApp.getInstance(), ControlRecordingReceiver.class);
-                    notificationIntent.setAction(ACTION_START_SPEAKER);
-                    PendingIntent startSpeakerPi = PendingIntent.getBroadcast(CrApp.getInstance(), 0, notificationIntent, 0);
+                    sendBroadcast.setAction(ACTION_STOP_SPEAKER);
+                    PendingIntent stopSpeakerPi = PendingIntent.getBroadcast(CrApp.getInstance(), 0, sendBroadcast, 0);
+                    builder.addAction(new NotificationCompat.Action.Builder(R.drawable.speaker_phone_off, res.getString(R.string.stop_speaker), stopSpeakerPi).build())
+                            .setContentText(res.getString(R.string.recording_speaker_on));
+                } else {
+                    sendBroadcast.setAction(ACTION_START_SPEAKER);
+                    PendingIntent startSpeakerPi = PendingIntent.getBroadcast(CrApp.getInstance(), 0, sendBroadcast, 0);
                     builder.addAction(new NotificationCompat.Action.Builder(R.drawable.speaker_phone_on,
                             res.getString(R.string.start_speaker), startSpeakerPi).build() )
                             .setContentText(res.getString(R.string.recording_speaker_off));
                 }
                 break;
             case RECORD_ON_REQUEST:
-                notificationIntent = new Intent(CrApp.getInstance(), ControlRecordingReceiver.class);
-                notificationIntent.setAction(ACTION_START_RECORDING);
-                notificationIntent.putExtra(PHONE_NUMBER, receivedNumPhone != null ? receivedNumPhone : "private_phone");
-                PendingIntent startRecordingPi = PendingIntent.getBroadcast(CrApp.getInstance(), 0, notificationIntent, 0);
+                sendBroadcast.setAction(ACTION_START_RECORDING);
+                sendBroadcast.putExtra(PHONE_NUMBER, receivedNumPhone != null ? receivedNumPhone : "private_phone");
+                PendingIntent startRecordingPi = PendingIntent.getBroadcast(CrApp.getInstance(), 0, sendBroadcast, 0);
                 builder.addAction(new NotificationCompat.Action.Builder(R.drawable.recorder,
                                 res.getString(R.string.start_recording_notification), startRecordingPi).build() )
                         .setContentText(res.getString(R.string.start_recording_notification_text));
                 break;
-            case RECORD_ERROR: builder.setContentText(res.getString(R.string.error_recorder_notif));
+
+            case RECORD_ERROR: builder.setColor(Color.RED)
+                    .setColorized(true)
+                    .setSmallIcon(R.drawable.notification_icon_error)
+                    .setContentTitle(res.getString(R.string.error_notification_title))
+                    .setContentText(res.getString(message))
+                    .setAutoCancel(true);
         }
 
         return builder.build();
@@ -171,7 +170,8 @@ public class RecorderService extends Service {
         }
         catch (RecordingException e) {
             CrLog.log(CrLog.ERROR, "onStartCommand: unable to start recorder: " + e.getMessage() + " Stoping the service...");
-            Toast.makeText(getApplicationContext(), getResources().getString(R.string.error_recorder_fail), Toast.LENGTH_LONG).show();
+            if(nm != null)
+                nm.notify(NOTIFICATION_ID, buildNotification(RECORD_ERROR, R.string.error_recorder_cannot_start));
             return false;
         }
         return true;
@@ -229,12 +229,10 @@ public class RecorderService extends Service {
             if(privateCall) {
                 if(recordAutoPrivCalls || paranoidMode){
                     if(startRecording())
-                        startForeground(NOTIFICATION_ID, buildNotification(RECORD_AUTOMMATICALLY));
-                    else
-                        startForeground(NOTIFICATION_ID, buildNotification(RECORD_ERROR));
+                        startForeground(NOTIFICATION_ID, buildNotification(RECORD_AUTOMMATICALLY, 0));
                 }
                 else
-                    startForeground(NOTIFICATION_ID, buildNotification(RECORD_ON_REQUEST));
+                    startForeground(NOTIFICATION_ID, buildNotification(RECORD_ON_REQUEST, 0));
             }
             else { //normal call, number present.
                 if(match || paranoidMode) {
@@ -242,16 +240,14 @@ public class RecorderService extends Service {
                         shouldRecord = true;
                     if(shouldRecord) {
                         if(startRecording())
-                            startForeground(NOTIFICATION_ID, buildNotification(RECORD_AUTOMMATICALLY));
-                        else
-                            startForeground(NOTIFICATION_ID, buildNotification(RECORD_ERROR));
+                            startForeground(NOTIFICATION_ID, buildNotification(RECORD_AUTOMMATICALLY, 0));
                     }
                     else // shouldRecord este false. Deci nu este paranoid mode, deci este match. Tertium non datur.
                     //Dacă este match, contactNameIfMatch != null:
-                        startForeground(NOTIFICATION_ID, buildNotification(RECORD_ON_REQUEST));
+                        startForeground(NOTIFICATION_ID, buildNotification(RECORD_ON_REQUEST, 0));
                 }
                 else //nu este nici match nici paranoid mode.
-                    startForeground(NOTIFICATION_ID, buildNotification(RECORD_ON_REQUEST));
+                    startForeground(NOTIFICATION_ID, buildNotification(RECORD_ON_REQUEST, 0));
             }
         }
         else { //outgoing call
@@ -260,15 +256,13 @@ public class RecorderService extends Service {
                     shouldRecord = true;
                 if(shouldRecord) {
                     if(startRecording())
-                        startForeground(NOTIFICATION_ID, buildNotification(RECORD_AUTOMMATICALLY));
-                    else
-                        startForeground(NOTIFICATION_ID, buildNotification(RECORD_ERROR));
+                        startForeground(NOTIFICATION_ID, buildNotification(RECORD_AUTOMMATICALLY, 0));
                 }
                 else //ca mai sus
-                    startForeground(NOTIFICATION_ID, buildNotification(RECORD_ON_REQUEST));
+                    startForeground(NOTIFICATION_ID, buildNotification(RECORD_ON_REQUEST, 0));
             }
             else //nici match nici paranoid mode
-                startForeground(NOTIFICATION_ID, buildNotification(RECORD_ON_REQUEST));
+                startForeground(NOTIFICATION_ID, buildNotification(RECORD_ON_REQUEST, 0));
         }
         return START_NOT_STICKY;
     }
@@ -318,7 +312,7 @@ public class RecorderService extends Service {
         CrLog.log(CrLog.DEBUG, "RecorderService is stoping now...");
 
         putSpeakerOff();
-        if(!recorder.isRunning()) {
+        if(!recorder.isRunning() || recorder.hasError()) {
             resetState();
             return;
         }
