@@ -139,4 +139,5 @@
     <string name="error_recorder_failed">Recorder failed.</string>
     <string name="error_notification_title">The call is not recorded</string>
     <string name="info_source_label">Audio source:</string>
+    <string name="notification_success">The phone call was successfully recorded.</string>
 </resources>

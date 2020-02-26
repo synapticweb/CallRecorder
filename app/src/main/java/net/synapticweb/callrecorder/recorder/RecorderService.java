@@ -65,6 +65,7 @@ public class RecorderService extends Service {
     public static final int RECORD_AUTOMMATICALLY = 1;
     public static final int RECORD_ON_REQUEST = 3;
     public static final int RECORD_ERROR = 4;
+    public static final int RECORD_SUCCESS = 5;
     static final String ACTION_START_RECORDING = "net.synapticweb.callrecorder.START_RECORDING";
     static final String ACTION_STOP_SPEAKER = "net.synapticweb.callrecorder.STOP_SPEAKER";
     static final String ACTION_START_SPEAKER = "net.synapticweb.callrecorder.START_SPEAKER";
@@ -156,6 +157,11 @@ public class RecorderService extends Service {
                     .setContentTitle(res.getString(R.string.error_notification_title))
                     .setContentText(res.getString(message))
                     .setAutoCancel(true);
+                break;
+
+            case RECORD_SUCCESS: builder.setSmallIcon(R.drawable.notification_icon_success)
+                   .setContentText(res.getString(R.string.notification_success))
+                   .setAutoCancel(true);
         }
 
         return builder.build();
@@ -387,6 +393,8 @@ public class RecorderService extends Service {
         catch(SQLException exc) {
             CrLog.log(CrLog.ERROR, "SQL exception: " + exc.getMessage());
         }
+
+        nm.notify(NOTIFICATION_ID, buildNotification(RECORD_SUCCESS, 0));
 
         resetState();
         try {
