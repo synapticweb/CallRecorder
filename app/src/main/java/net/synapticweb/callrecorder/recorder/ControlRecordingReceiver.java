@@ -13,10 +13,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-
 import android.preference.PreferenceManager;
-import android.widget.Toast;
-
 import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.CrLog;
 import net.synapticweb.callrecorder.R;
@@ -40,26 +37,25 @@ public class ControlRecordingReceiver extends BroadcastReceiver {
                     if(settings.getBoolean(SettingsFragment.SPEAKER_USE, false))
                         service.putSpeakerOn();
                     if(nm != null)
-                        nm.notify(RecorderService.NOTIFICATION_ID, service.buildNotification(RecorderService.RECORD_AUTOMMATICALLY));
+                        nm.notify(RecorderService.NOTIFICATION_ID, service.buildNotification(RecorderService.RECORD_AUTOMMATICALLY, 0));
                 }
                 catch (RecordingException exc) {
                     CrLog.log(CrLog.ERROR, "ControlRecordingReceiver: unable to start recorder: "  + exc.getMessage());
-                    Toast.makeText(CrApp.getInstance(), CrApp.getInstance().getResources().getString(R.string.error_recorder_fail), Toast.LENGTH_LONG).show();
                     if(nm != null)
-                        nm.notify(RecorderService.NOTIFICATION_ID, service.buildNotification(RecorderService.RECORD_ERROR));
+                        nm.notify(RecorderService.NOTIFICATION_ID, service.buildNotification(RecorderService.RECORD_ERROR, R.string.error_recorder_cannot_start));
                 }
             }
         }
         else if(intent.getAction().equals(RecorderService.ACTION_STOP_SPEAKER)) {
             service.putSpeakerOff();
             if(nm != null)
-                nm.notify(RecorderService.NOTIFICATION_ID, service.buildNotification(RecorderService.RECORD_AUTOMMATICALLY));
+                nm.notify(RecorderService.NOTIFICATION_ID, service.buildNotification(RecorderService.RECORD_AUTOMMATICALLY, 0));
         }
 
         else if(intent.getAction().equals(RecorderService.ACTION_START_SPEAKER)) {
             service.putSpeakerOn();
             if(nm != null)
-                nm.notify(RecorderService.NOTIFICATION_ID, service.buildNotification(RecorderService.RECORD_AUTOMMATICALLY));
+                nm.notify(RecorderService.NOTIFICATION_ID, service.buildNotification(RecorderService.RECORD_AUTOMMATICALLY, 0));
         }
     }
 }

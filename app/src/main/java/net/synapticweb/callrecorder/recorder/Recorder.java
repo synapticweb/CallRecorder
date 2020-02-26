@@ -36,6 +36,7 @@ public class Recorder {
     public static final String AAC_BASIC_FORMAT = "aac_bas";
     static final String MONO = "mono";
     private int source;
+    private boolean hasError = false;
 
     private static final String ACRA_FORMAT = "format";
     private static final String ACRA_MODE = "mode";
@@ -105,7 +106,7 @@ public class Recorder {
             if(format.equals(WAV_FORMAT)) {
                 //în cazul în care a apărut o eroare în RecordingThreadWav și fișierul temporar nu există, această
                 //condiție va fi detectată în bucla try a CopyPcmToWav.run() și va fi raportată o eroare.
-                Thread copyPcmToWav = new Thread(new RecordingThreadWav.CopyPcmToWav(audioFile, mode));
+                Thread copyPcmToWav = new Thread(new RecordingThreadWav.CopyPcmToWav(audioFile, mode, this));
                 copyPcmToWav.start();
             }
         }
@@ -135,4 +136,7 @@ public class Recorder {
 
     public void setSource(int source) { this.source = source; }
 
+    public boolean hasError() { return hasError; }
+
+    void setHasError() { this.hasError = true; }
 }
