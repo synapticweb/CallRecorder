@@ -10,7 +10,6 @@ package net.synapticweb.callrecorder.recorder;
 
 import android.app.NotificationManager;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
@@ -73,10 +72,6 @@ abstract class RecordingThread {
     static void notifyOnError() {
         RecorderService service = RecorderService.getService();
         if (service != null) {
-            Intent stopIntent = new Intent(CrApp.getInstance(), RecorderService.class);
-            stopIntent.setComponent(CrApp.getServiceName());
-            CrApp.getInstance().stopService(stopIntent);
-
             NotificationManager nm = (NotificationManager) CrApp.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
             if (nm != null)
                 nm.notify(RecorderService.NOTIFICATION_ID,

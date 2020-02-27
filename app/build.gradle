@@ -9,8 +9,8 @@ android {
         applicationId "net.synapticweb.callrecorder"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 12
-        versionName "1.1.2-original"
+        versionCode 13
+        versionName "1.1.3-original"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     flavorDimensions "version"
