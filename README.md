@@ -1,6 +1,6 @@
-# Synaptic Call Recorder
+# SW Call Recorder
 
-Synaptic Call Recorder is an Android phone and tablet application that automatically records phone calls based on user selected phone numbers. 
+SW Call Recorder is an Android application that automatically records phone calls based on user selected phone numbers.
 It has the following main features:
 
 - The phone numbers are organized into contacts.

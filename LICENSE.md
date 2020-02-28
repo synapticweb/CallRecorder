@@ -1,4 +1,4 @@
-Synaptic Call Recorder license
+SW Call Recorder license
 ==============================
 
 1\. Definitions
@@ -9,7 +9,7 @@ through 10 of this document.
 
 **"Licensor"** shall mean the copyright owner.
 
-**"Application"** shall mean Synaptic Call Recorder mobile application.
+**"Application"** shall mean SW Call Recorder mobile application.
 
 **"Source form"** shall mean the preferred form for making
 modifications, including but not limited to software source code,
