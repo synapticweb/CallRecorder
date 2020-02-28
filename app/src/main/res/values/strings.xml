@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Synaptic Call Recorder</string>
+    <string name="app_name">SW Call Recorder</string>
     <string name="unkown_contact">UNKNOWN CONTACT</string>
     <string name="private_number_name">Hidden number</string>
     <!-- Fără CDATA tagurile HTML sunt șterse-->

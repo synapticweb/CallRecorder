@@ -2,8 +2,8 @@
  * Copyright (C) 2019 Eugen Rădulescu <synapticwebb@gmail.com> - All rights reserved.
  *
  * You may use, distribute and modify this code only under the conditions
- * stated in the Synaptic Call Recorder license. You should have received a copy of the
- * Synaptic Call Recorder license along with this file. If not, please write to <synapticwebb@gmail.com>.
+ * stated in the SW Call Recorder license. You should have received a copy of the
+ * SW Call Recorder license along with this file. If not, please write to <synapticwebb@gmail.com>.
  */
 
 package net.synapticweb.callrecorder;
@@ -33,7 +33,8 @@ import com.google.android.material.tabs.TabLayout;
 public class HelpActivity extends TemplateActivity {
     ViewPager pager;
     HelpPagerAdapter adapter;
-    static final int NUM_PAGES = 7;
+    static final int NUM_PAGES = 6;
+    public static final String APP_NAME_PLACEHOLDER = "APP_NAME";
     static String[] content = new String[NUM_PAGES];
     static String[] contentTitles = new String[NUM_PAGES];
 
@@ -52,14 +53,14 @@ public class HelpActivity extends TemplateActivity {
         content[1] = CrApp.rawHtmlToString(R.raw.help_playing_recordings);
         content[2] = CrApp.rawHtmlToString(R.raw.help_managing_recordings);
         content[3] = CrApp.rawHtmlToString(R.raw.help_about);
-        content[3] = String.format(content[3], res.getString(R.string.app_name), BuildConfig.VERSION_NAME,
-                res.getString(R.string.app_name), res.getString(R.string.dev_email), res.getString(R.string.dev_email),
+        content[3] = String.format(content[3], BuildConfig.VERSION_NAME,
+                res.getString(R.string.dev_email), res.getString(R.string.dev_email),
                 res.getString(R.string.send_devs));
         content[4] = CrApp.rawHtmlToString(R.raw.eula);
-        content[4] = String.format(content[4], res.getString(R.string.app_name));
-        content[5] = CrApp.rawHtmlToString(R.raw.privacy_policy);
-        content[5] = String.format(content[5], res.getString(R.string.app_name));
-        content[6] = CrApp.rawHtmlToString(R.raw.help_licences);
+        content[5] = CrApp.rawHtmlToString(R.raw.help_licences);
+
+        for(int i = 0; i < content.length; ++i)
+            content[i] = content[i].replace(APP_NAME_PLACEHOLDER, res.getString(R.string.app_name));
 
         if(getSettedTheme().equals(TemplateActivity.DARK_THEME)) {
             for(int i = 0; i < content.length; ++i)
@@ -71,8 +72,7 @@ public class HelpActivity extends TemplateActivity {
         contentTitles[2] = res.getString(R.string.help_title4);
         contentTitles[3] = res.getString(R.string.about_name);
         contentTitles[4] = res.getString(R.string.help_title5);
-        contentTitles[5] = res.getString(R.string.help_title6);
-        contentTitles[6] = res.getString(R.string.help_title7);
+        contentTitles[5] = res.getString(R.string.help_title7);
 
         setContentView(R.layout.help_activity);
         pager = findViewById(R.id.help_pager);
@@ -142,12 +142,9 @@ public class HelpActivity extends TemplateActivity {
                             .content(R.string.send_devs_question)
                             .positiveText(android.R.string.ok)
                             .negativeText(android.R.string.cancel)
-                            .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                @Override
-                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                    CrLog.sendLogs((AppCompatActivity) getActivity());
-                                }
-                            })
+                            .onPositive((@NonNull MaterialDialog dialog, @NonNull DialogAction which) ->
+                                    CrLog.sendLogs((AppCompatActivity) getActivity())
+                            )
                             .show();
 
                 }
