@@ -263,7 +263,7 @@ public class RecorderService extends Service {
 
         putSpeakerOff();
         if(!recorder.isRunning() || recorder.hasError()) {
-            resetState();
+            onDestroyCleanUp();
             return;
         }
 
@@ -285,6 +285,8 @@ public class RecorderService extends Service {
                 }
                 catch (SQLException  exc) {
                     CrLog.log(CrLog.ERROR, "SQL exception: " + exc.getMessage());
+                    onDestroyCleanUp();
+                    return ;
                 }
                 contactId = contact.getId();
             }
@@ -310,10 +312,15 @@ public class RecorderService extends Service {
         }
         catch(SQLException exc) {
             CrLog.log(CrLog.ERROR, "SQL exception: " + exc.getMessage());
+            onDestroyCleanUp();
+            return ;
         }
 
         nm.notify(NOTIFICATION_ID, buildNotification(RECORD_SUCCESS, 0));
+        onDestroyCleanUp();
+    }
 
+    private void onDestroyCleanUp() {
         resetState();
         try {
             ACRA.getErrorReporter().clearCustomData();
