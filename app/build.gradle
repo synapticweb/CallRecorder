@@ -47,12 +47,12 @@ dependencies {
     androidTestImplementation('androidx.test.espresso:espresso-core:3.1.1-beta01', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    implementation 'androidx.appcompat:appcompat:1.1.0-rc01'
+    implementation 'androidx.appcompat:appcompat:1.2.0-alpha02'
 //    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
-    implementation 'androidx.media:media:1.1.0-rc01'
+    implementation 'androidx.media:media:1.2.0-alpha01'
     testImplementation 'junit:junit:4.12'
-    implementation 'com.google.android.material:material:1.1.0-alpha09'
-    implementation 'androidx.recyclerview:recyclerview:1.1.0-beta03'
+    implementation 'com.google.android.material:material:1.2.0-alpha05'
+    implementation 'androidx.recyclerview:recyclerview:1.2.0-alpha01'
     implementation 'de.hdodenhof:circleimageview:2.2.0'
     implementation 'com.theartofdev.edmodo:android-image-cropper:2.8.0'
     implementation 'com.github.codekidX:storage-chooser:2.0.4.4'
@@ -60,7 +60,7 @@ dependencies {
     implementation 'com.googlecode.libphonenumber:libphonenumber:8.11.1'
 //    implementation 'androidx.cardview:cardview:1.0.0'
 //    implementation 'com.github.topjohnwu:libsu:2.0.2'
-    implementation 'androidx.preference:preference:1.1.0-rc01'
+    implementation 'androidx.preference:preference:1.1.0'
     implementation 'com.chibde:audiovisualizer:2.2.0'
     //Am renunțat la adăugarea dependenței din jitpack deoarece cînd am trecut la definirea dimensiunilor în
     // dimens.xml a apărut un bug: la label_size orice dimensiune puneam crăpa. Nu am făcut nicio modificare în
@@ -70,7 +70,7 @@ dependencies {
     implementation project(':Croller')
     //https://developers.google.com/analytics/devguides/collection/firebase/android/start
     //Firebase folosim numai în release, fără debug
-    releaseImplementation 'com.google.firebase:firebase-analytics:17.2.1'
+    releaseImplementation 'com.google.firebase:firebase-analytics:17.2.2'
     releaseImplementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
 
     def acraVersion = "5.5.0"
