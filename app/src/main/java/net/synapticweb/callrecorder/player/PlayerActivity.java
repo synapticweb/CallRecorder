@@ -22,6 +22,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import net.synapticweb.callrecorder.CrApp;
+import net.synapticweb.callrecorder.CrLog;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.TemplateActivity;
 import net.synapticweb.callrecorder.contactdetail.ContactDetailPresenter;
@@ -76,7 +77,14 @@ public class PlayerActivity extends TemplateActivity {
         visualizer.setColor(getResources().getColor(R.color.colorAccentLighter));
         visualizer.setDensity(getResources().getConfiguration().orientation ==
                 Configuration.ORIENTATION_PORTRAIT ? DENSITY_PORTRAIT : DENSITY_LANDSCAPE);
-        visualizer.setPlayer(AUDIO_SESSION_ID);
+        //crash report nr. 886:
+        try {
+            visualizer.setPlayer(AUDIO_SESSION_ID);
+        }
+        catch (Exception exc) {
+            CrLog.log(CrLog.ERROR, "Error initializing visualizer.");
+            visualizer = null;
+        }
         audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
 
         playPause = findViewById(R.id.test_player_play_pause);
@@ -165,10 +173,12 @@ public class PlayerActivity extends TemplateActivity {
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        if(newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE)
-            visualizer.setDensity(DENSITY_LANDSCAPE);
-        else
-            visualizer.setDensity(DENSITY_PORTRAIT);
+        if(visualizer != null) {
+            if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE)
+                visualizer.setDensity(DENSITY_LANDSCAPE);
+            else
+                visualizer.setDensity(DENSITY_PORTRAIT);
+        }
     }
 
     @Override
@@ -222,7 +232,8 @@ public class PlayerActivity extends TemplateActivity {
         editor.remove(IS_PLAYING);
         editor.remove(CURRENT_POS);
         editor.apply();
-        visualizer.release();
+        if(visualizer != null)
+            visualizer.release();
         if(audioManager != null)
             audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, phoneVolume, 0);
     }
