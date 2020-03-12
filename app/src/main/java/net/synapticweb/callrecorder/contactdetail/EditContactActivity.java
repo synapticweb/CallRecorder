@@ -151,7 +151,7 @@ public class EditContactActivity extends TemplateActivity implements AdapterView
             oldPhotoUri = savedInstanceState.getParcelable("oldPhotoUri");
         }
         else
-            contact = getIntent().getExtras().getParcelable(ContactDetailPresenter.EDIT_EXTRA_CONTACT);
+            contact = getIntent().getExtras().getParcelable(ContactDetailFragment.EDIT_EXTRA_CONTACT);
 
         ImageButton okButton = findViewById(R.id.edit_done);
         okButton.setOnClickListener(new View.OnClickListener() {
@@ -165,7 +165,7 @@ public class EditContactActivity extends TemplateActivity implements AdapterView
                             getContentResolver().delete(oldPhotoUri, null, null);
                     }
 
-                    contact.updateContact(EditContactActivity.this, false);
+                    contact.updateContact(false);
                     Intent intent = new Intent();
                     intent.putExtra(EDITED_CONTACT, contact);
                     setResult(RESULT_OK, intent);

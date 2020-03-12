@@ -28,6 +28,11 @@ public abstract class TemplateActivity extends AppCompatActivity {
         return settedTheme;
     }
 
+    public enum LayoutType {
+        SINGLE_PANE,
+        DOUBLE_PANE
+    }
+
     protected void insertFragment(int fragmentId) {
         FragmentManager fm = getSupportFragmentManager();
         Fragment fragment = fm.findFragmentById(fragmentId);
@@ -57,5 +62,14 @@ public abstract class TemplateActivity extends AppCompatActivity {
             setTheme();
             recreate();
         }
+    }
+
+    public LayoutType getLayoutType() {
+        boolean listBoxExists = findViewById(R.id.contacts_list_fragment_container) != null;
+        boolean detailBoxExists = findViewById(R.id.contact_detail_fragment_container) != null;
+        if(listBoxExists && detailBoxExists)
+            return LayoutType.DOUBLE_PANE;
+        else
+            return LayoutType.SINGLE_PANE;
     }
 }

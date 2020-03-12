@@ -94,8 +94,8 @@ public class Contact implements Comparable<Contact>, Parcelable {
         return null;
     }
 
-    public void updateContact(Context context, boolean byNumber) {
-        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(context);
+    public void updateContact(boolean byNumber) {
+        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(CrApp.getInstance());
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -136,7 +136,8 @@ public class Contact implements Comparable<Contact>, Parcelable {
         setId(db.insertOrThrow(ContactsContract.Contacts.TABLE_NAME, null, values));
     }
 
-    public void delete(Context context) throws SQLException {
+    public void delete() throws SQLException {
+        Context context = CrApp.getInstance();
         CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(context);
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
@@ -149,7 +150,7 @@ public class Contact implements Comparable<Contact>, Parcelable {
                     new Recording(cursor.getLong(cursor.getColumnIndex(RecordingsContract.Recordings._ID)), null,
                             cursor.getString(cursor.getColumnIndex(RecordingsContract.Recordings.COLUMN_NAME_PATH)),
                             null, null, null, null, null, null, null);
-           recording.delete(context);
+           recording.delete();
         }
 
         cursor.close();

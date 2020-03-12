@@ -15,7 +15,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.PowerManager;
-import android.provider.ContactsContract;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
@@ -32,7 +31,6 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.TemplateActivity;
@@ -42,7 +40,6 @@ import net.synapticweb.callrecorder.setup.SetupActivity;
 
 
 public class ContactsListActivityMain extends TemplateActivity {
-    private static final int REQUEST_PHONE_NUMBER = 1;
     private static final int SETUP_ACTIVITY = 3;
     public static final String HAS_ACCEPTED_EULA = "has_accepted_eula";
     public static final int EULA_NOT_ACCEPTED = 1;

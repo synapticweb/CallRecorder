@@ -25,6 +25,7 @@ import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.CrLog;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.TemplateActivity;
+import net.synapticweb.callrecorder.contactdetail.ContactDetailFragment;
 import net.synapticweb.callrecorder.contactdetail.ContactDetailPresenter;
 import net.synapticweb.callrecorder.data.Recording;
 
@@ -72,7 +73,7 @@ public class PlayerActivity extends TemplateActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        recording = getIntent().getParcelableExtra(ContactDetailPresenter.RECORDING_EXTRA);
+        recording = getIntent().getParcelableExtra(ContactDetailFragment.RECORDING_EXTRA);
         visualizer = findViewById(R.id.visualizer);
         visualizer.setColor(getResources().getColor(R.color.colorAccentLighter));
         visualizer.setDensity(getResources().getConfiguration().orientation ==
