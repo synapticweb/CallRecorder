@@ -143,9 +143,9 @@ public class Recording implements Parcelable {
         return new SimpleDateFormat("h:mm a", Locale.US).format(new Date(startTimestamp)); //3:45 PM
     }
 
-    public void delete(Context context) throws SQLException, SecurityException
+    public void delete() throws SQLException, SecurityException
     {
-        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(context);
+        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(CrApp.getInstance());
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
         if((db.delete(RecordingsContract.Recordings.TABLE_NAME,
                 RecordingsContract.Recordings._ID + "=" + getId(), null)) == 0)

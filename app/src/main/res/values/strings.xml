@@ -149,4 +149,6 @@
     <string name="error_notification_title">The call is not recorded</string>
     <string name="info_source_label">Audio source:</string>
     <string name="notification_success">The phone call was successfully recorded.</string>
+    <string name="error_deleting_recordings">An error occurred while attempting to delete the selected recordings.</string>
+    <string name="error_deleting_contact">An error occurred while attempting to delete the selected contact.</string>
 </resources>

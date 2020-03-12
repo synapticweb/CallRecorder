@@ -8,60 +8,28 @@
 
 package net.synapticweb.callrecorder.contactdetail;
 
-import android.os.Bundle;
-import android.view.View;
-
-
+import android.net.Uri;
+import net.synapticweb.callrecorder.contactdetail.ContactDetailPresenter.DialogInfo;
 import net.synapticweb.callrecorder.data.Contact;
 import net.synapticweb.callrecorder.data.Recording;
-
 import java.util.List;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.annotation.NonNull;
 
 public interface ContactDetailContract {
     interface View {
         void setContact(Contact contact);
-        Contact getContact();
         void paintViews(List<Recording> recordings);
-        void setSelectMode(boolean isSelectModeOn);
-        boolean isSelectModeOn();
-        void addToSelectedItems(int adapterPosition);
-        boolean removeIfPresentInSelectedItems(int adapterPosition);
-        void toggleSelectModeActionBar(boolean animateAlpha);
-        void toggleSelectModeRecording(android.view.View recording, boolean animate);
-        void selectRecording(android.view.View recording);
-        void deselectRecording(android.view.View recording);
-        boolean isEmptySelectedItems();
-        void clearSelectedMode();
-        List<Recording> getSelectedRecordings();
-        AppCompatActivity getParentActivity();
-        boolean isSinglePaneLayout();
-        void setActionBarTitleIfActivityDetail();
-        RecyclerView getRecordingsRecycler();
-        ContactDetailFragment.RecordingAdapter getRecordingsAdapter();
-        List<Integer> getSelectedItems();
-        void updateTitle();
-        void disableMoveBtn();
-        void enableMoveBtn();
-        int getSelectedItemsDeleted();
-        void setSelectedItemsDeleted(int selectedItemsDeleted);
+        boolean isInvalid();
+        void setInvalid(boolean invalid);
+        void removeRecording(Recording recording);
     }
 
     interface ContactDetailPresenter {
-        void deleteContact(final Contact contact);
-        void editContact(final Contact contact);
-        void onEditActivityResult(Bundle result);
         void loadRecordings(Contact contact);
-        void selectRecording(android.view.View recording, int adapterPosition, boolean exists);
-        void startPlayerActivity(Recording recording);
-        void deleteSelectedRecordings();
-        void moveSelectedRecordings(String path);
-        void callContact(Contact contact);
-        void toggleSelectAll();
-        void onInfoClick();
-        void onRenameClick();
-        void storageInfo();
+        DialogInfo deleteContact(Contact contact);
+        DialogInfo deleteRecordings(List<Recording> recordings);
+        DialogInfo renameRecording(CharSequence input, Recording recording);
+        DialogInfo assignToContact(Uri numberUri, List<Recording> recordings, @NonNull Contact contact);
+        DialogInfo assignToPrivate(List<Recording> recordings, @NonNull Contact contact);
     }
 }

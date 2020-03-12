@@ -119,10 +119,10 @@ public class ContactsListActivityMain extends TemplateActivity {
                         //rămîne selectMode on. Nu înțeleg de ce acest bug nu se manifestă și pe tabletă.
                         Fragment oldFragment = fm.findFragmentById(R.id.contacts_list_fragment_container);
                         if(oldFragment instanceof UnassignedRecordingsFragment){
-                            if(((UnassignedRecordingsFragment) oldFragment).isSelectModeOn()) {
-                                ((UnassignedRecordingsFragment) oldFragment).setSelectMode(false);
-                                ((UnassignedRecordingsFragment) oldFragment).toggleSelectModeActionBar(false);
-                            }
+//                            if(((UnassignedRecordingsFragment) oldFragment).isSelectModeOn()) {
+//                                ((UnassignedRecordingsFragment) oldFragment).clearSelectedMode();
+//                                ((UnassignedRecordingsFragment) oldFragment).toggleSelectMode(false);
+//                            }
                         }
                         fm.beginTransaction().replace(R.id.contacts_list_fragment_container, listContacts)
                                     .commit();
