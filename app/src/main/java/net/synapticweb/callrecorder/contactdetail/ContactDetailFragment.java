@@ -194,6 +194,11 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
     public void paintViews(List<Recording> recordings){
         if(selectMode)
             putInSelectMode(false);
+            //necesar pentru că 1: dacă în DOUBLE_PANE se clichează pe un contact în timp ce sunt selectate
+            //recordinguri, actionbar-ul rămîne în select mode. 2: rezolvă un alt bug: dacă există un
+            //contact hidden și se clickează pe el, apoi pe unul normal butoanele call și edit rămîn ascunse.
+        else
+            toggleSelectModeActionBar(false);
         typePhoneView.setText(CrApp.getSpannedText(String.format(getResources().getString(
                 R.string.detail_phonetype), contact.getPhoneTypeName()), null));
         phoneNumberView.setText(CrApp.getSpannedText(String.format(getResources().getString(
@@ -786,9 +791,8 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
             editContact.setVisibility(View.GONE);
         }
         else {
-            callContact.setVisibility(View.VISIBLE);
-            editContact.setVisibility(View.VISIBLE);
-
+            //nu e nevoie să pun pe visible aici butoanele call și edit deoarece apelez toggleSelectMode
+            //ActioBar la începutul painvViews() - vezi comentariul de acolo.
             callContact.setOnClickListener((View v) -> {
                 Intent intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", contact.getPhoneNumber(), null));
                 startActivity(intent);
