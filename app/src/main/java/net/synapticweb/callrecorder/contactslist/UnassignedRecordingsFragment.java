@@ -67,8 +67,12 @@ public class UnassignedRecordingsFragment extends ContactDetailFragment {
         if(selectMode) showView(closeBtn, animate); else hideView(closeBtn, animate);
         if(selectMode) showView(moveBtn, animate); else hideView(moveBtn, animate);
 
-        if(selectMode && checkIfSelectedRecordingsDeleted())
-            disableMoveBtn();
+        if(selectMode) {
+            if(checkIfSelectedRecordingsDeleted())
+                disableMoveBtn();
+            else
+                enableMoveBtn();
+        }
         if(selectMode) showView(selectAllBtn, animate); else hideView(selectAllBtn, animate);
         if(selectMode) showView(infoBtn, animate); else hideView(infoBtn, animate);
         if(selectMode) showView(menuRightSelectedBtn, animate); else hideView(menuRightSelectedBtn, animate);

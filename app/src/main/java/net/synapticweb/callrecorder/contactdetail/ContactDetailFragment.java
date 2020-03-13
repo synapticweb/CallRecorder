@@ -73,7 +73,7 @@ import net.synapticweb.callrecorder.CrApp.DialogInfo;
 
 
 public class ContactDetailFragment extends Fragment implements ContactDetailContract.View{
-    protected ContactDetailPresenter presenter;
+    private ContactDetailPresenter presenter;
     protected RecordingAdapter adapter;
     private TextView typePhoneView, phoneNumberView;
     private ImageView contactPhotoView;
@@ -288,8 +288,12 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
             if(selectMode) hideView(callBtn, animate); else showView(callBtn, animate);
         }
         if(selectMode) showView(moveBtn, animate); else hideView(moveBtn, animate);
-        if(selectMode && checkIfSelectedRecordingsDeleted())
-            disableMoveBtn();
+        if(selectMode) {
+            if(checkIfSelectedRecordingsDeleted())
+                disableMoveBtn();
+            else
+                enableMoveBtn();
+        }
         if(selectMode) showView(selectAllBtn, animate); else  hideView(selectAllBtn, animate);
         if(selectMode) showView(infoBtn, animate); else hideView(infoBtn, animate);
         if(selectMode) showView(menuRightSelectedBtn, animate); else hideView(menuRightSelectedBtn, animate);
@@ -328,7 +332,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
      * @param finalAlpha valoarea alpha la care se ajunge în final
      * @param finalVisibility vi***zibilitatea finală: View.VISIBLE sau View.GONE
      */
-    private void animateAlpha(View view, float finalAlpha, int finalVisibility) {
+    private void fadeEffect(View view, float finalAlpha, int finalVisibility) {
         view.animate()
                 .alpha(finalAlpha)
                 .setDuration(EFFECT_TIME)
@@ -351,7 +355,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
 
     protected void hideView(View view, boolean animate) {
         if(animate)
-            animateAlpha(view, 0.0f, View.GONE);
+            fadeEffect(view, 0.0f, View.GONE);
         else {
             view.setAlpha(0.0f); //poate lipsi?
             view.setVisibility(View.GONE);
@@ -360,7 +364,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
 
     protected void showView(View view, boolean animate) {
         if(animate)
-            animateAlpha(view, 1f, View.VISIBLE);
+            fadeEffect(view, 1f, View.VISIBLE);
         else {
             view.setAlpha(1f); //poate lipsi?
             view.setVisibility(View.VISIBLE);
@@ -417,7 +421,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         checkBox.setChecked(false);
     }
 
-    private void enableMoveBtn() {
+    protected void enableMoveBtn() {
         ImageButton moveBtn = parentActivity.findViewById(R.id.actionbar_select_move);
         moveBtn.setEnabled(true);
         moveBtn.setImageAlpha(255);
@@ -505,14 +509,10 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
      * lipsă pe disc. În caz că da va dezactiva mutarea recordingurilor.
      */
     protected boolean checkIfSelectedRecordingsDeleted() {
-        selectedItemsDeleted = 0;
-        for(Recording recording : adapter.getRecordings())
-            if(!recording.exists()) {
-                int index = adapter.getRecordings().indexOf(recording);
-                if(selectedItems.contains(index))
-                    selectedItemsDeleted++;
-            }
-            return selectedItemsDeleted > 0;
+        for(Recording recording : getSelectedRecordings())
+            if(!recording.exists())
+                return true;
+            return false;
     }
 
 
