@@ -16,7 +16,7 @@ import com.codekidlabs.storagechooser.StorageChooser;
 
 import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.R;
-import net.synapticweb.callrecorder.TemplateActivity;
+import net.synapticweb.callrecorder.BaseActivity;
 
 import java.io.File;
 import androidx.annotation.NonNull;
@@ -38,7 +38,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     public static final String MODE = "mode";
     public static final String ENABLED = "enabled";
     public static final String SOURCE = "source";
-    private TemplateActivity parentActivity;
+    private BaseActivity parentActivity;
     private SharedPreferences preferences;
 
     @Override
@@ -77,7 +77,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         RecyclerView recycler = getListView();
         recycler.addItemDecoration(new DividerItemDecoration(getContext(),
                 DividerItemDecoration.VERTICAL));
-        parentActivity = (TemplateActivity) getActivity();
+        parentActivity = (BaseActivity) getActivity();
     }
 
     @Override
@@ -98,7 +98,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 Content content = new Content();
                 content.setOverviewHeading(CrApp.getInstance().getResources().getString(R.string.choose_recordings_storage));
                 StorageChooser.Theme theme = new StorageChooser.Theme(getActivity());
-                theme.setScheme(parentActivity.getSettedTheme().equals(TemplateActivity.LIGHT_THEME) ?
+                theme.setScheme(parentActivity.getSettedTheme().equals(BaseActivity.LIGHT_THEME) ?
                         parentActivity.getResources().getIntArray(R.array.storage_chooser_theme_light) :
                         parentActivity.getResources().getIntArray(R.array.storage_chooser_theme_dark));
 

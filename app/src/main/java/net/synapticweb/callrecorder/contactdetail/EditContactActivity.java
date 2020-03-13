@@ -54,14 +54,14 @@ import net.synapticweb.callrecorder.Config;
 import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.CrLog;
 import net.synapticweb.callrecorder.R;
-import net.synapticweb.callrecorder.TemplateActivity;
+import net.synapticweb.callrecorder.BaseActivity;
 import net.synapticweb.callrecorder.data.Contact;
 
 import java.io.File;
 import java.io.IOException;
 
 
-public class EditContactActivity extends TemplateActivity implements AdapterView.OnItemSelectedListener {
+public class EditContactActivity extends BaseActivity implements AdapterView.OnItemSelectedListener {
     private Contact contact;
     private ImageView contactPhoto;
     private EditText contactName;
@@ -165,7 +165,7 @@ public class EditContactActivity extends TemplateActivity implements AdapterView
                             getContentResolver().delete(oldPhotoUri, null, null);
                     }
 
-                    contact.updateContact(false);
+                    contact.update(false);
                     Intent intent = new Intent();
                     intent.putExtra(EDITED_CONTACT, contact);
                     setResult(RESULT_OK, intent);

@@ -9,7 +9,6 @@
 package net.synapticweb.callrecorder.data;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.res.Resources;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
@@ -71,8 +70,8 @@ public class Recording implements Parcelable {
         return endTimestamp - startTimestamp;
     }
 
-    public void updateRecording(Context context) throws SQLException {
-        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(context);
+    public void update() throws SQLException {
+        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(CrApp.getInstance());
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(RecordingsContract.Recordings._ID, id);
@@ -90,8 +89,8 @@ public class Recording implements Parcelable {
                 RecordingsContract.Recordings._ID + "=" + id, null);
     }
 
-    public void insertInDatabase(Context context) throws SQLException {
-        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(context);
+    public void save() throws SQLException {
+        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(CrApp.getInstance());
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
 
@@ -173,7 +172,7 @@ public class Recording implements Parcelable {
         out.flush();
         new File(path).delete();
         path = new File(folderPath, fileName).getAbsolutePath();
-        updateRecording(CrApp.getInstance());
+        update();
     }
 
     public String getHumanReadingFormat() {

@@ -21,9 +21,9 @@ import androidx.fragment.app.Fragment;
 import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.HelpActivity;
 import net.synapticweb.callrecorder.R;
-import net.synapticweb.callrecorder.TemplateActivity;
+import net.synapticweb.callrecorder.BaseActivity;
 
-public class ShowEulaActivity extends TemplateActivity {
+public class ShowEulaActivity extends BaseActivity {
     @Override
     protected Fragment createFragment() {
         return null;

@@ -89,7 +89,7 @@ public class Contact implements Comparable<Contact>, Parcelable {
         return null;
     }
 
-    public void updateContact(boolean byNumber) {
+    public void update(boolean byNumber) {
         CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(CrApp.getInstance());
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
@@ -114,8 +114,8 @@ public class Contact implements Comparable<Contact>, Parcelable {
         }
     }
 
-    public void insertInDatabase(Context context) throws SQLException {
-        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(context);
+    public void save() throws SQLException {
+        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(CrApp.getInstance());
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
         ContentValues values = new ContentValues();

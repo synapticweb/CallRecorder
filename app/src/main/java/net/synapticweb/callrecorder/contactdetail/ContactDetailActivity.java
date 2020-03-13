@@ -14,7 +14,7 @@ import android.widget.TextView;
 
 
 import net.synapticweb.callrecorder.R;
-import net.synapticweb.callrecorder.TemplateActivity;
+import net.synapticweb.callrecorder.BaseActivity;
 import net.synapticweb.callrecorder.contactslist.ContactsListFragment;
 import net.synapticweb.callrecorder.data.Contact;
 
@@ -22,7 +22,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
-public class ContactDetailActivity extends TemplateActivity {
+public class ContactDetailActivity extends BaseActivity {
     Contact contact;
 
     @Override

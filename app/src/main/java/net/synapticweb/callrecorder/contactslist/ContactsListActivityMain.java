@@ -38,13 +38,13 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import net.synapticweb.callrecorder.R;
-import net.synapticweb.callrecorder.TemplateActivity;
+import net.synapticweb.callrecorder.BaseActivity;
 import net.synapticweb.callrecorder.HelpActivity;
 import net.synapticweb.callrecorder.settings.SettingsActivity;
 import net.synapticweb.callrecorder.setup.SetupActivity;
 
 
-public class ContactsListActivityMain extends TemplateActivity {
+public class ContactsListActivityMain extends BaseActivity {
     private static final int SETUP_ACTIVITY = 3;
     public static final String HAS_ACCEPTED_EULA = "has_accepted_eula";
     public static final int EULA_NOT_ACCEPTED = 1;

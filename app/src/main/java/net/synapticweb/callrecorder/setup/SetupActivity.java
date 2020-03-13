@@ -15,10 +15,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import net.synapticweb.callrecorder.R;
-import net.synapticweb.callrecorder.TemplateActivity;
+import net.synapticweb.callrecorder.BaseActivity;
 import net.synapticweb.callrecorder.contactslist.ContactsListActivityMain;
 
-public class SetupActivity extends TemplateActivity {
+public class SetupActivity extends BaseActivity {
     private int checkResult;
     public static final String EXIT_APP = "exit_app";
 

@@ -66,7 +66,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
             if(new File(recording.getPath()).renameTo(new File(parent, newFileName)) ) {
                 recording.setPath(new File(parent, newFileName).getAbsolutePath());
                 recording.setIsNameSet(true);
-                recording.updateRecording(CrApp.getInstance());
+                recording.update();
             }
             else
                 throw new Exception("File.renameTo() has returned false.");
@@ -168,7 +168,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
         if(contactId == 0) {
             Contact newContact = new Contact(null, phoneNumber, contactName, photoUri, phoneType);
             try {
-                newContact.insertInDatabase(CrApp.getInstance());
+                newContact.save();
             } catch (SQLException exc) {
                 CrLog.log(CrLog.ERROR, exc.getMessage());
                 return new DialogInfo(R.string.error_title,
@@ -180,7 +180,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
         for(Recording recording : recordings) {
             recording.setContactId(contactId);
             try {
-                recording.updateRecording(CrApp.getInstance());
+                recording.update();
                 view.removeRecording(recording);
             } catch (SQLException exc) {
                 CrLog.log(CrLog.ERROR, exc.getMessage());
@@ -212,7 +212,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
             Contact newContact = new Contact();
             newContact.setPrivateNumber(true);
             try {
-                newContact.insertInDatabase(CrApp.getInstance());
+                newContact.save();
             } catch (SQLException exc) {
                 CrLog.log(CrLog.ERROR, "SQL exception: " + exc.getMessage());
                 return new DialogInfo(R.string.error_title, R.string.assign_to_contact_err, R.drawable.error);
@@ -224,7 +224,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
         for (Recording recording : recordings) {
             recording.setContactId(id);
             try {
-                recording.updateRecording(CrApp.getInstance());
+                recording.update();
                 view.removeRecording(recording);
             } catch (SQLException exc) {
                 CrLog.log(CrLog.ERROR, exc.getMessage());

@@ -183,7 +183,7 @@ public class RecorderService extends Service {
                 }
 
                 try {
-                    contact.insertInDatabase(this);
+                    contact.save();
                 }
                 catch (SQLException exception) {
                     CrLog.log(CrLog.ERROR, "SQL exception: " + exception.getMessage());
@@ -281,7 +281,7 @@ public class RecorderService extends Service {
                 Contact contact =  new Contact();
                 contact.setPrivateNumber(true);
                 try {
-                    contact.insertInDatabase(this);
+                    contact.save();
                 }
                 catch (SQLException  exc) {
                     CrLog.log(CrLog.ERROR, "SQL exception: " + exc.getMessage());
@@ -308,7 +308,7 @@ public class RecorderService extends Service {
                 recorder.getSource());
 
         try {
-            recording.insertInDatabase(CrApp.getInstance());
+            recording.save();
         }
         catch(SQLException exc) {
             CrLog.log(CrLog.ERROR, "SQL exception: " + exc.getMessage());

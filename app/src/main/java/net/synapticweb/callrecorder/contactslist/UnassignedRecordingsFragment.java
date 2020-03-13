@@ -15,7 +15,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import net.synapticweb.callrecorder.R;
-import net.synapticweb.callrecorder.TemplateActivity;
+import net.synapticweb.callrecorder.BaseActivity;
 import net.synapticweb.callrecorder.contactdetail.ContactDetailFragment;
 import net.synapticweb.callrecorder.data.Recording;
 
@@ -55,7 +55,7 @@ public class UnassignedRecordingsFragment extends ContactDetailFragment {
         ImageButton hamburger = parentActivity.findViewById(R.id.hamburger);
         toggleTitle();
 
-        if(parentActivity.getLayoutType() == TemplateActivity.LayoutType.DOUBLE_PANE && selectMode) {
+        if(parentActivity.getLayoutType() == BaseActivity.LayoutType.DOUBLE_PANE && selectMode) {
             ImageButton editBtn = parentActivity.findViewById(R.id.edit_contact);
             ImageButton callBtn = parentActivity.findViewById(R.id.call_contact);
             ImageButton menuRightBtn = parentActivity.findViewById(R.id.contact_detail_menu);

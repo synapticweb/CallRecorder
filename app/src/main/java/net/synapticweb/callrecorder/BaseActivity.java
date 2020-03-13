@@ -18,7 +18,7 @@ import androidx.fragment.app.FragmentManager;
 import net.synapticweb.callrecorder.settings.SettingsFragment;
 
 
-public abstract class TemplateActivity extends AppCompatActivity {
+public abstract class BaseActivity extends AppCompatActivity {
     private String settedTheme;
     public static final String LIGHT_THEME = "light_theme";
     public static final String DARK_THEME = "dark_theme";
