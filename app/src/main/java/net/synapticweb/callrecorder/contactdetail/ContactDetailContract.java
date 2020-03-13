@@ -9,7 +9,7 @@
 package net.synapticweb.callrecorder.contactdetail;
 
 import android.net.Uri;
-import net.synapticweb.callrecorder.contactdetail.ContactDetailPresenter.DialogInfo;
+import net.synapticweb.callrecorder.CrApp.DialogInfo;
 import net.synapticweb.callrecorder.data.Contact;
 import net.synapticweb.callrecorder.data.Recording;
 import java.util.List;
@@ -29,7 +29,7 @@ public interface ContactDetailContract {
         DialogInfo deleteContact(Contact contact);
         DialogInfo deleteRecordings(List<Recording> recordings);
         DialogInfo renameRecording(CharSequence input, Recording recording);
-        DialogInfo assignToContact(Uri numberUri, List<Recording> recordings, @NonNull Contact contact);
-        DialogInfo assignToPrivate(List<Recording> recordings, @NonNull Contact contact);
+        DialogInfo assignToContact(Uri numberUri, List<Recording> recordings, Contact contact);
+        DialogInfo assignToPrivate(List<Recording> recordings, Contact contact);
     }
 }

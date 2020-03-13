@@ -69,7 +69,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import static net.synapticweb.callrecorder.contactslist.ContactsListFragment.ARG_CONTACT;
-import net.synapticweb.callrecorder.contactdetail.ContactDetailPresenter.DialogInfo;
+import net.synapticweb.callrecorder.CrApp.DialogInfo;
 
 
 public class ContactDetailFragment extends Fragment implements ContactDetailContract.View{
@@ -200,6 +200,11 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
     public void paintViews(List<Recording> recordings){
         if(selectMode)
             putInSelectMode(false);
+            //necesar pentru că 1: dacă în DOUBLE_PANE se clichează pe un contact în timp ce sunt selectate
+            //recordinguri, actionbar-ul rămîne în select mode. 2: rezolvă un alt bug: dacă există un
+            //contact hidden și se clickează pe el, apoi pe unul normal butoanele call și edit rămîn ascunse.
+        else
+            toggleSelectModeActionBar(false);
         typePhoneView.setText(CrApp.getSpannedText(String.format(getResources().getString(
                 R.string.detail_phonetype), contact.getPhoneTypeName()), null));
         phoneNumberView.setText(CrApp.getSpannedText(String.format(getResources().getString(
@@ -251,7 +256,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
      * Introduce fragmentul în modul selectOn.
      * @param animate Dacă transformarea actionBarului se va face cu animație sau fără.
      */
-    private void putInSelectMode(boolean animate) {
+    protected void putInSelectMode(boolean animate) {
         selectMode = true;
         toggleSelectModeActionBar(animate);
         redrawRecordings();
@@ -262,7 +267,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
      * @param animate Dacă afișările și disparițiile vor fi animate sau bruște. Cînd este apelat în paintView
      * nu e nevoie de animație. Cînd e apelat din onLongClick transformările sunt animate.
      */
-    private void toggleSelectModeActionBar(boolean animate) {
+    protected void toggleSelectModeActionBar(boolean animate) {
         ImageButton navigateBackBtn = parentActivity.findViewById(R.id.navigate_back);
         ImageButton closeBtn = parentActivity.findViewById(R.id.close_select_mode);
         ImageButton editBtn = parentActivity.findViewById(R.id.edit_contact);
@@ -299,7 +304,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
     /**
      * Modifică titlul și poziția actionBarului în funcție de selectMode și tipul de layout.
      */
-    private void toggleTitle() {
+    protected void toggleTitle() {
         TextView title = parentActivity.findViewById(R.id.actionbar_title);
         if(parentActivity.getLayoutType() == LayoutType.DOUBLE_PANE) {
             Toolbar.LayoutParams params = (Toolbar.LayoutParams) title.getLayoutParams();
@@ -344,7 +349,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
                 });
     }
 
-    private void hideView(View view, boolean animate) {
+    protected void hideView(View view, boolean animate) {
         if(animate)
             animateAlpha(view, 0.0f, View.GONE);
         else {
@@ -353,7 +358,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         }
     }
 
-    private void showView(View view, boolean animate) {
+    protected void showView(View view, boolean animate) {
         if(animate)
             animateAlpha(view, 1f, View.VISIBLE);
         else {
@@ -365,7 +370,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
     /**
      * Scoate fragmentul din modul selectOn.Transformarea actionBarului va fi întotdeauna animată.
      */
-    private void clearSelectMode() {
+    protected void clearSelectMode() {
         selectMode = false;
         toggleSelectModeActionBar(true);
         redrawRecordings();
@@ -418,7 +423,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         moveBtn.setImageAlpha(255);
     }
 
-    private void disableMoveBtn() {
+    protected void disableMoveBtn() {
         ImageButton moveBtn = parentActivity.findViewById(R.id.actionbar_select_move);
         moveBtn.setEnabled(false);
         moveBtn.setImageAlpha(75);
@@ -592,7 +597,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         onAssignViewActions(result);
     }
 
-    private void onAssignToPrivate() {
+    protected void onAssignToPrivate() {
         DialogInfo result = presenter.assignToPrivate(getSelectedRecordings(), contact);
         onAssignViewActions(result);
     }
@@ -620,7 +625,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         dialog.show();
     }
 
-    private void onRenameRecording() {
+    protected void onRenameRecording() {
         new MaterialDialog.Builder(parentActivity)
                 .title(R.string.rename_recording_title)
                 .inputType(InputType.TYPE_CLASS_TEXT)
@@ -644,7 +649,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
                 ).show();
     }
 
-    private void onDeleteSelectedRecordings() {
+    protected void onDeleteSelectedRecordings() {
         new MaterialDialog.Builder(parentActivity)
                 .title(R.string.delete_recording_confirm_title)
                 .content(String.format(getResources().getString(
@@ -676,7 +681,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
                 .show();
     }
 
-    private void onSelectAll() {
+    protected void onSelectAll() {
         List<Integer> notSelected = new ArrayList<>();
         for(int i = 0; i < adapter.getItemCount(); ++i)
             notSelected.add(i);
@@ -695,7 +700,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         toggleTitle();
     }
 
-    private void onRecordingInfo() {
+    protected void onRecordingInfo() {
         if (selectedItems.size() > 1) {
             long totalSize = 0;
             for (int position : selectedItems) {

@@ -165,7 +165,7 @@ public class EditContactActivity extends TemplateActivity implements AdapterView
                             getContentResolver().delete(oldPhotoUri, null, null);
                     }
 
-                    contact.updateContact(EditContactActivity.this, false);
+                    contact.updateContact(false);
                     Intent intent = new Intent();
                     intent.putExtra(EDITED_CONTACT, contact);
                     setResult(RESULT_OK, intent);

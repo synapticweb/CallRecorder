@@ -17,6 +17,7 @@ import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
 import net.synapticweb.callrecorder.CrApp;
+import net.synapticweb.callrecorder.CrApp.DialogInfo;
 import net.synapticweb.callrecorder.CrLog;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.data.Contact;
@@ -28,26 +29,12 @@ import net.synapticweb.callrecorder.data.RecordingsRepository;
 import java.io.File;
 import java.util.List;
 
-import androidx.annotation.NonNull;
 
 public class ContactDetailPresenter implements ContactDetailContract.ContactDetailPresenter {
     private ContactDetailContract.View view;
 
      ContactDetailPresenter(ContactDetailContract.View view) {
         this.view = view;
-    }
-
-    /**
-     * Ca să nu lansez dialoguri din presenter metodele de aici întorc un obiect care conține informații pe baza
-     * cărora se poate construi un dialog în fragment.
-     */
-    static class DialogInfo {
-          int title;
-          int message;
-          int icon;
-         DialogInfo(int title, int message, int icon) {
-            this.title = title; this.message = message; this.icon = icon;
-         }
     }
 
     @Override
@@ -120,7 +107,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
 
 
     @Override
-    public DialogInfo assignToContact(Uri numberUri, List<Recording> recordings, @NonNull  Contact contact) {
+    public DialogInfo assignToContact(Uri numberUri, List<Recording> recordings, Contact contact) {
         PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
         Phonenumber.PhoneNumber phoneNumberWrapper;
         Cursor cursor;
@@ -155,12 +142,13 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
                     R.string.number_invalid_message, R.drawable.warning);
         }
 
-        matchType = phoneUtil.isNumberMatch(phoneNumberWrapper, contact.getPhoneNumber());
-        if (matchType != PhoneNumberUtil.MatchType.NO_MATCH && matchType != PhoneNumberUtil.MatchType.NOT_A_NUMBER) {
-            return new DialogInfo(R.string.information_title,
-                    R.string.assign_to_same_contact, R.drawable.warning);
+        if(contact != null) {
+            matchType = phoneUtil.isNumberMatch(phoneNumberWrapper, contact.getPhoneNumber());
+            if (matchType != PhoneNumberUtil.MatchType.NO_MATCH && matchType != PhoneNumberUtil.MatchType.NOT_A_NUMBER) {
+                return new DialogInfo(R.string.information_title,
+                        R.string.assign_to_same_contact, R.drawable.warning);
+            }
         }
-
         CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(CrApp.getInstance());
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
         cursor = db.query(ContactsContract.Contacts.TABLE_NAME,
@@ -206,8 +194,8 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
     }
 
     @Override
-    public DialogInfo assignToPrivate(List<Recording> recordings, @NonNull Contact contact) {
-         if(contact.isPrivateNumber()) {
+    public DialogInfo assignToPrivate(List<Recording> recordings,  Contact contact) {
+         if(contact != null && contact.isPrivateNumber()) {
              return new DialogInfo(R.string.information_title, R.string.assign_to_same_contact, R.drawable.warning);
          }
 

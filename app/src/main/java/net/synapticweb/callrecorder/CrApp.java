@@ -213,4 +213,17 @@ public class CrApp extends Application {
         }
         return sb.toString();
     }
+
+    /**
+     * Ca să nu lansez dialoguri din presenter metodele de aici întorc un obiect care conține informații pe baza
+     * cărora se poate construi un dialog în fragment.
+     */
+    public static class DialogInfo {
+          public int title;
+          public int message;
+          public int icon;
+          public DialogInfo(int title, int message, int icon) {
+            this.title = title; this.message = message; this.icon = icon;
+         }
+    }
 }

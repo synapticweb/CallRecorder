@@ -27,6 +27,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.preference.PreferenceManager;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
@@ -50,11 +51,6 @@ public class ContactsListActivityMain extends TemplateActivity {
     public static final int PERMS_NOT_GRANTED = 2;
     public static final int POWER_OPTIMIZED = 4;
     public static final String SETUP_ARGUMENT = "setup_arg";
-    private BottomNavigationView bottomNav;
-
-    private boolean isSinglePaneLayout() {
-        return findViewById(R.id.contact_detail_fragment_container) == null;
-    }
 
     @Override
     protected Fragment createFragment() {
@@ -101,53 +97,46 @@ public class ContactsListActivityMain extends TemplateActivity {
         }
         //https://www.truiton.com/2017/01/android-bottom-navigation-bar-example/
         //https://guides.codepath.com/android/Bottom-Navigation-Views
-        bottomNav = findViewById(R.id.bottom_tab_nav);
-        bottomNav.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        BottomNavigationView bottomNav = findViewById(R.id.bottom_tab_nav);
+        bottomNav.setOnNavigationItemSelectedListener( (@NonNull MenuItem item) -> {
                 FragmentManager fm = getSupportFragmentManager();
+
                 switch (item.getItemId()) {
                     case R.id.bottom_nav_contacts:
                         Fragment listContacts = createFragment();
-                        if(!isSinglePaneLayout()) {
-                            toggleEditCallBtns(true);
-                            Fragment unassigned = fm.findFragmentById(R.id.tab_fragment_container);
-                            if (unassigned != null)
-                                fm.beginTransaction().remove(unassigned).commit();
+                        resetActionBar(BottomNavTabs.CONTACTS);
+
+                        if(getLayoutType() == LayoutType.DOUBLE_PANE) {
+                            Fragment unassignedToRemove = fm.findFragmentById(R.id.tab_fragment_container);
+                            if (unassignedToRemove != null) 
+                                fm.beginTransaction().remove(unassignedToRemove).commit();
                         }
-                    //Fără acest cod dacă se selectează un recording în unassigned și apoi se apasă pe Contacts
-                        //rămîne selectMode on. Nu înțeleg de ce acest bug nu se manifestă și pe tabletă.
-                        Fragment oldFragment = fm.findFragmentById(R.id.contacts_list_fragment_container);
-                        if(oldFragment instanceof UnassignedRecordingsFragment){
-//                            if(((UnassignedRecordingsFragment) oldFragment).isSelectModeOn()) {
-//                                ((UnassignedRecordingsFragment) oldFragment).clearSelectedMode();
-//                                ((UnassignedRecordingsFragment) oldFragment).toggleSelectMode(false);
-//                            }
-                        }
+                        
                         fm.beginTransaction().replace(R.id.contacts_list_fragment_container, listContacts)
                                     .commit();
                         break;
 
-                    case R.id.bottom_nav_recordings:
-                        Fragment unassigned = new UnassignedRecordingsFragment();
-                        if(isSinglePaneLayout())
-                            fm.beginTransaction().replace(R.id.contacts_list_fragment_container, unassigned)
+                    case R.id.bottom_nav_unassigned:
+                        Fragment unassignedToInsert = new UnassignedRecordingsFragment();
+                        resetActionBar(BottomNavTabs.UNASSIGNED);
+                        if(getLayoutType() == LayoutType.SINGLE_PANE) {
+                            fm.beginTransaction().replace(R.id.contacts_list_fragment_container, unassignedToInsert)
                                     .commit();
+                        }
                         else {
-                            toggleEditCallBtns(false);
-                            Fragment contactsList = fm.findFragmentById(R.id.contacts_list_fragment_container);
-                            Fragment contactDetail = fm.findFragmentById(R.id.contact_detail_fragment_container);
-                            if (contactsList != null)
-                                fm.beginTransaction().remove(contactsList).commit();
-                            if (contactDetail != null)
-                                fm.beginTransaction().remove(contactDetail).commit();
-                            fm.beginTransaction().add(R.id.tab_fragment_container, unassigned)
+                            Fragment oldListcontacts = fm.findFragmentById(R.id.contacts_list_fragment_container);
+                            Fragment oldDetail = fm.findFragmentById(R.id.contact_detail_fragment_container);
+                            if (oldListcontacts != null)
+                                fm.beginTransaction().remove(oldListcontacts).commit();
+                            if (oldDetail != null) 
+                                fm.beginTransaction().remove(oldDetail).commit();
+                            
+                            fm.beginTransaction().add(R.id.tab_fragment_container, unassignedToInsert)
                                     .commit();
                         }
                 }
                 return true;
-            }
-        });
+            });
 
         //În tablet view, unassigned tab, dacă erau recordinguri selectate și se răsturna ecranul în actionbar
         //apăreau butoanele din tabul Contacts. Se întîmpla asta pentru că metoda toggleSelectModeActionBar
@@ -170,16 +159,9 @@ public class ContactsListActivityMain extends TemplateActivity {
         params.width = navWidth;
         navigationView.setLayoutParams(params);
 
-        hamburger.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                drawer.openDrawer(GravityCompat.START);
-            }
-        });
+        hamburger.setOnClickListener( (View v) -> drawer.openDrawer(GravityCompat.START));
 
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        navigationView.setNavigationItemSelectedListener( (@NonNull MenuItem item) -> {
                 switch (item.getItemId()) {
                     case R.id.settings: startActivity(new Intent(ContactsListActivityMain.this, SettingsActivity.class));
                         break;
@@ -202,24 +184,45 @@ public class ContactsListActivityMain extends TemplateActivity {
                 }
                 drawer.closeDrawers();
                 return true;
-            }
-        });
+            });
     }
+    
+    enum BottomNavTabs { CONTACTS, UNASSIGNED }
 
-    private void toggleEditCallBtns(boolean visible) {
+    private void resetActionBar(BottomNavTabs tab) {
+        ImageButton hamburger =findViewById(R.id.hamburger);
+        ImageButton closeBtn = findViewById(R.id.close_select_mode);
         ImageButton editBtn = findViewById(R.id.edit_contact);
         ImageButton callBtn = findViewById(R.id.call_contact);
+        ImageButton moveBtn = findViewById(R.id.actionbar_select_move);
+        ImageButton selectAllBtn = findViewById(R.id.actionbar_select_all);
+        ImageButton infoBtn = findViewById(R.id.actionbar_info);
         ImageButton menuRightBtn = findViewById(R.id.contact_detail_menu);
+        ImageButton menuRightSelectedBtn = findViewById(R.id.contact_detail_selected_menu);
+        TextView actionBarTitle = findViewById(R.id.actionbar_title);
 
-        if(visible) {
-            editBtn.setVisibility(View.VISIBLE);
-            callBtn.setVisibility(View.VISIBLE);
-            menuRightBtn.setVisibility(View.VISIBLE);
-        }
-        else {
-            editBtn.setVisibility(View.GONE);
-            callBtn.setVisibility(View.GONE);
-            menuRightBtn.setVisibility(View.GONE);
+        hamburger.setVisibility(View.VISIBLE);
+        hamburger.setAlpha(1f);
+        closeBtn.setVisibility(View.GONE);
+        moveBtn.setVisibility(View.GONE);
+        selectAllBtn.setVisibility(View.GONE);
+        infoBtn.setVisibility(View.GONE);
+        menuRightSelectedBtn.setVisibility(View.GONE);
+        Toolbar.LayoutParams params = (Toolbar.LayoutParams) actionBarTitle.getLayoutParams();
+        params.gravity = Gravity.CENTER;
+        actionBarTitle.setLayoutParams(params);
+        actionBarTitle.setText(getResources().getString(R.string.app_name));
+
+        if(getLayoutType() == LayoutType.DOUBLE_PANE) {
+            if (tab == BottomNavTabs.CONTACTS) {
+                editBtn.setVisibility(View.VISIBLE);
+                callBtn.setVisibility(View.VISIBLE);
+                menuRightBtn.setVisibility(View.VISIBLE);
+            } else {
+                editBtn.setVisibility(View.GONE);
+                callBtn.setVisibility(View.GONE);
+                menuRightBtn.setVisibility(View.GONE);
+            }
         }
     }
 
@@ -241,12 +244,8 @@ public class ContactsListActivityMain extends TemplateActivity {
                 .content(R.string.exit_app_message)
                 .positiveText(android.R.string.ok)
                 .negativeText(android.R.string.cancel)
-                .onPositive(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        ContactsListActivityMain.super.onBackPressed();
-                    }
-                })
+                .onPositive((@NonNull MaterialDialog dialog, @NonNull DialogAction which) ->
+                        ContactsListActivityMain.super.onBackPressed())
                 .show();
     }
 

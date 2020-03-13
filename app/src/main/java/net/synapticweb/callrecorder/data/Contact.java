@@ -89,8 +89,8 @@ public class Contact implements Comparable<Contact>, Parcelable {
         return null;
     }
 
-    public void updateContact(Context context, boolean byNumber) {
-        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(context);
+    public void updateContact(boolean byNumber) {
+        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(CrApp.getInstance());
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
         ContentValues values = new ContentValues();
