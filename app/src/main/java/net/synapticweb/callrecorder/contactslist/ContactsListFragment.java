@@ -28,8 +28,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.CrApp.DialogInfo;
-import net.synapticweb.callrecorder.TemplateActivity;
-import net.synapticweb.callrecorder.TemplateActivity.LayoutType;
+import net.synapticweb.callrecorder.BaseActivity;
+import net.synapticweb.callrecorder.BaseActivity.LayoutType;
 import net.synapticweb.callrecorder.contactdetail.ContactDetailActivity;
 import net.synapticweb.callrecorder.contactdetail.ContactDetailContract;
 import net.synapticweb.callrecorder.contactdetail.ContactDetailFragment;
@@ -55,7 +55,7 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
      * ViewHolder.getAdapterPosition() cînd se clichează și e folosită la setarea detaliului curent și la
      * selectarea contactului curent în onBindViewHolder().*/
     private int currentPos = 0;
-    private TemplateActivity parentActivity;
+    private BaseActivity parentActivity;
     private int colorPointer = 0;
     @SuppressLint("UseSparseArrays")
     private Map<Long, Integer> contactsColors = new HashMap<>();
@@ -66,7 +66,7 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        parentActivity = (TemplateActivity) context;
+        parentActivity = (BaseActivity) context;
     }
 
     @Override
@@ -117,7 +117,7 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
         adapter = new ContactsAdapter(contacts);
         contactsRecycler.setAdapter(adapter);
         adapter.notifyDataSetChanged();
-        if(parentActivity.getLayoutType() == TemplateActivity.LayoutType.DOUBLE_PANE)
+        if(parentActivity.getLayoutType() == BaseActivity.LayoutType.DOUBLE_PANE)
             manageDetail();
 
         TextView noContent = parentActivity.findViewById(R.id.no_content_list);
@@ -131,7 +131,7 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
     private void realSelectContact(View contactSlot) {
         if(contactSlot != null) {
             contactSlot.findViewById(R.id.tablet_current_selection).setVisibility(View.VISIBLE);
-            if(parentActivity.getSettedTheme().equals(TemplateActivity.LIGHT_THEME))
+            if(parentActivity.getSettedTheme().equals(BaseActivity.LIGHT_THEME))
                 contactSlot.setBackgroundColor(getResources().getColor(R.color.slotLightSelected));
             else
                 contactSlot.setBackgroundColor(getResources().getColor(R.color.slotDarkSelected));
@@ -153,7 +153,7 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
         View contactSlot = contactsRecycler.getLayoutManager().findViewByPosition(position);
         if(contactSlot != null) {
             contactSlot.findViewById(R.id.tablet_current_selection).setVisibility(View.GONE);
-            if(parentActivity.getSettedTheme().equals(TemplateActivity.LIGHT_THEME))
+            if(parentActivity.getSettedTheme().equals(BaseActivity.LIGHT_THEME))
                 contactSlot.setBackgroundColor(getResources().getColor(R.color.slotLight));
             else
                 contactSlot.setBackgroundColor(getResources().getColor(R.color.slotAndDetailHeaderDark));

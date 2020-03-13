@@ -337,7 +337,7 @@ public class RecorderService extends Service {
                 Contact contact =  new Contact();
                 contact.setPrivateNumber(true);
                 try {
-                    contact.insertInDatabase(this);
+                    contact.save();
                 }
                 catch (SQLException  exc) {
                     CrLog.log(CrLog.ERROR, "SQL exception: " + exc.getMessage());
@@ -360,7 +360,7 @@ public class RecorderService extends Service {
             Contact contact;
             if((contact = Contact.queryNumberInPhoneContacts(receivedNumPhone, getApplicationContext())) != null) {
                 try {
-                    contact.insertInDatabase(this);
+                    contact.save();
                 }
                 catch (SQLException exception) {
                     CrLog.log(CrLog.ERROR, "SQL exception: " + exception.getMessage());
@@ -370,7 +370,7 @@ public class RecorderService extends Service {
             else { //numărul nu există nici contactele telefonului. Deci este unknown.
                 contact =  new Contact(null, receivedNumPhone, getResources().getString(R.string.unkown_contact), null, CrApp.UNKNOWN_TYPE_PHONE_CODE);
                 try {
-                    contact.insertInDatabase(this); //introducerea în db setează id-ul în obiect
+                    contact.save(); //introducerea în db setează id-ul în obiect
                 }
                 catch (SQLException exc) {
                     CrLog.log(CrLog.ERROR, "SQL exception: " + exc.getMessage());
@@ -390,7 +390,7 @@ public class RecorderService extends Service {
                 recorder.getSource());
 
         try {
-            recording.insertInDatabase(CrApp.getInstance());
+            recording.save();
         }
         catch(SQLException exc) {
             CrLog.log(CrLog.ERROR, "SQL exception: " + exc.getMessage());

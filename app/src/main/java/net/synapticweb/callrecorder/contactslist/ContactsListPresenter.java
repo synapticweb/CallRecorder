@@ -96,7 +96,7 @@ public class ContactsListPresenter implements ContactsListContract.ContactsListP
 
             Contact contact = new Contact(null, newNumber, contactName, photoUri, phoneType);
             try {
-                contact.insertInDatabase(CrApp.getInstance());
+                contact.save();
             }
             catch (SQLException exc) {
                 CrLog.log(CrLog.ERROR, "Error inserting contact in database: " + exc.getMessage());

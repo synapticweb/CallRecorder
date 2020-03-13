@@ -30,7 +30,7 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.android.material.tabs.TabLayout;
 
-public class HelpActivity extends TemplateActivity {
+public class HelpActivity extends BaseActivity {
     ViewPager pager;
     HelpPagerAdapter adapter;
     static final int NUM_PAGES = 6;
@@ -62,7 +62,7 @@ public class HelpActivity extends TemplateActivity {
         for(int i = 0; i < content.length; ++i)
             content[i] = content[i].replace(APP_NAME_PLACEHOLDER, res.getString(R.string.app_name));
 
-        if(getSettedTheme().equals(TemplateActivity.DARK_THEME)) {
+        if(getSettedTheme().equals(BaseActivity.DARK_THEME)) {
             for(int i = 0; i < content.length; ++i)
                 content[i] = content[i].replace("light", "dark");
         }

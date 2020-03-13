@@ -55,7 +55,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
             if(new File(recording.getPath()).renameTo(new File(parent, newFileName)) ) {
                 recording.setPath(new File(parent, newFileName).getAbsolutePath());
                 recording.setIsNameSet(true);
-                recording.updateRecording(CrApp.getInstance());
+                recording.update();
             }
             else
                 throw new Exception("File.renameTo() has returned false.");
@@ -97,7 +97,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
     @Override
     public void toggleShouldRecord(Contact contact) {
         contact.setShouldRecord(!contact.shouldRecord());
-        contact.updateContact(false);
+        contact.update(false);
         view.setContact(contact);
     }
 

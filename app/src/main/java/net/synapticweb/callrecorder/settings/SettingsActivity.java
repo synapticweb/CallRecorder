@@ -12,13 +12,13 @@ import android.os.Bundle;
 
 
 import net.synapticweb.callrecorder.R;
-import net.synapticweb.callrecorder.TemplateActivity;
+import net.synapticweb.callrecorder.BaseActivity;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import androidx.preference.PreferenceFragmentCompat;
 
-public class SettingsActivity extends TemplateActivity {
+public class SettingsActivity extends BaseActivity {
     @Override
     protected PreferenceFragmentCompat createFragment() {
         return null;

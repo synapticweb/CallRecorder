@@ -48,8 +48,8 @@ import com.codekidlabs.storagechooser.StorageChooser;
 import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.CrLog;
 import net.synapticweb.callrecorder.R;
-import net.synapticweb.callrecorder.TemplateActivity;
-import net.synapticweb.callrecorder.TemplateActivity.LayoutType;
+import net.synapticweb.callrecorder.BaseActivity;
+import net.synapticweb.callrecorder.BaseActivity.LayoutType;
 import net.synapticweb.callrecorder.contactslist.ContactsListFragment;
 import net.synapticweb.callrecorder.data.Contact;
 import net.synapticweb.callrecorder.data.Recording;
@@ -82,7 +82,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
     private Contact contact;
     private boolean selectMode = false;
     private List<Integer> selectedItems = new ArrayList<>();
-    private TemplateActivity parentActivity;
+    private BaseActivity parentActivity;
     /** Dacă există cel puțin un recording lipsă pe disc printre cele selectate, butonul de move se dezactivează.
      *  Cind sunt 0 recorduri lispă se reactivează.*/
     private int selectedItemsDeleted = 0;
@@ -142,7 +142,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        parentActivity = (TemplateActivity) context;
+        parentActivity = (BaseActivity) context;
     }
 
     @Override
@@ -265,7 +265,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         if(contact.shouldRecord()) {
             recordingStatusView.setText(R.string.rec_status_recording);
             recordingStatusView.setTextColor(getResources().getColor(
-                    parentActivity.getSettedTheme().equals(TemplateActivity.LIGHT_THEME) ?
+                    parentActivity.getSettedTheme().equals(BaseActivity.LIGHT_THEME) ?
                             R.color.green_light : R.color.green_dark));
         }
         else {
@@ -880,7 +880,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
                 Content content = new Content();
                 content.setOverviewHeading(parentActivity.getResources().getString(R.string.move_heading));
                 StorageChooser.Theme theme = new StorageChooser.Theme(parentActivity);
-                theme.setScheme(parentActivity.getSettedTheme().equals(TemplateActivity.LIGHT_THEME) ?
+                theme.setScheme(parentActivity.getSettedTheme().equals(BaseActivity.LIGHT_THEME) ?
                         parentActivity.getResources().getIntArray(R.array.storage_chooser_theme_light) :
                         parentActivity.getResources().getIntArray(R.array.storage_chooser_theme_dark));
 
@@ -986,23 +986,23 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
             final Recording recording = recordings.get(position);
             int adornRes;
             switch (recording.getFormat()) {
-                case Recorder.WAV_FORMAT: adornRes = parentActivity.getSettedTheme().equals(TemplateActivity.LIGHT_THEME) ?
+                case Recorder.WAV_FORMAT: adornRes = parentActivity.getSettedTheme().equals(BaseActivity.LIGHT_THEME) ?
                         R.drawable.sound_symbol_wav_light : R.drawable.sound_symbol_wav_dark;
                     break;
-                case Recorder.AAC_HIGH_FORMAT: adornRes = parentActivity.getSettedTheme().equals(TemplateActivity.LIGHT_THEME) ?
+                case Recorder.AAC_HIGH_FORMAT: adornRes = parentActivity.getSettedTheme().equals(BaseActivity.LIGHT_THEME) ?
                         R.drawable.sound_symbol_aac128_light : R.drawable.sound_symbol_aac128_dark;
                     break;
-                case Recorder.AAC_BASIC_FORMAT: adornRes = parentActivity.getSettedTheme().equals(TemplateActivity.LIGHT_THEME) ?
+                case Recorder.AAC_BASIC_FORMAT: adornRes = parentActivity.getSettedTheme().equals(BaseActivity.LIGHT_THEME) ?
                         R.drawable.sound_symbol_aac32_light : R.drawable.sound_symbol_aac32_dark;
                     break;
-                default:adornRes = parentActivity.getSettedTheme().equals(TemplateActivity.LIGHT_THEME) ?
+                default:adornRes = parentActivity.getSettedTheme().equals(BaseActivity.LIGHT_THEME) ?
                         R.drawable.sound_symbol_aac64_light : R.drawable.sound_symbol_aac64_dark;
             }
 
             holder.title.setText(recording.getName());
             if(contact == null || !contact.isPrivateNumber())
                 holder.recordingType.setImageResource(recording.isIncoming() ? R.drawable.incoming :
-                    parentActivity.getSettedTheme().equals(TemplateActivity.LIGHT_THEME) ?
+                    parentActivity.getSettedTheme().equals(BaseActivity.LIGHT_THEME) ?
                             R.drawable.outgoing_light : R.drawable.outgoing_dark);
             holder.recordingAdorn.setImageResource(adornRes);
             holder.checkBox.setOnClickListener((View view) ->
@@ -1022,7 +1022,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
             holder.exclamation.setVisibility(View.VISIBLE);
 //https://stackoverflow.com/questions/25454316/how-do-i-partially-gray-out-an-image-when-pressed
             //A se vedea și https://stackoverflow.com/questions/28308325/androidset-gray-scale-filter-to-imageview
-            int filter = parentActivity.getSettedTheme().equals(TemplateActivity.LIGHT_THEME) ?
+            int filter = parentActivity.getSettedTheme().equals(BaseActivity.LIGHT_THEME) ?
                     Color.argb(255,0,0,0) : Color.argb(255,255, 255, 255);
             holder.recordingAdorn.setColorFilter(filter);
             holder.recordingType.setColorFilter(filter);

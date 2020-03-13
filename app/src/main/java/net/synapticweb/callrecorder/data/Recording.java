@@ -17,7 +17,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import net.synapticweb.callrecorder.CrApp;
-import net.synapticweb.callrecorder.CrLog;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.contactdetail.MoveAsyncTask;
 
@@ -72,8 +71,8 @@ public class Recording implements Parcelable {
         return endTimestamp - startTimestamp;
     }
 
-    public void updateRecording(Context context) throws SQLException {
-        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(context);
+    public void update() throws SQLException {
+        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(CrApp.getInstance());
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(RecordingsContract.Recordings._ID, id);
@@ -91,8 +90,8 @@ public class Recording implements Parcelable {
                     RecordingsContract.Recordings._ID + "=" + id, null);
     }
 
-    public void insertInDatabase(Context context) throws SQLException {
-        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(context);
+    public void save() throws SQLException {
+        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(CrApp.getInstance());
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
 
@@ -174,7 +173,7 @@ public class Recording implements Parcelable {
         out.flush();
         new File(path).delete();
         path = new File(folderPath, fileName).getAbsolutePath();
-        updateRecording(CrApp.getInstance());
+        update();
     }
 
     public String getHumanReadingFormat() {

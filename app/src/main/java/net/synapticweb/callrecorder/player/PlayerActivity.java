@@ -15,7 +15,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
@@ -24,9 +23,8 @@ import android.widget.TextView;
 import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.CrLog;
 import net.synapticweb.callrecorder.R;
-import net.synapticweb.callrecorder.TemplateActivity;
+import net.synapticweb.callrecorder.BaseActivity;
 import net.synapticweb.callrecorder.contactdetail.ContactDetailFragment;
-import net.synapticweb.callrecorder.contactdetail.ContactDetailPresenter;
 import net.synapticweb.callrecorder.data.Recording;
 
 import androidx.annotation.NonNull;
@@ -38,7 +36,7 @@ import androidx.fragment.app.Fragment;
 import com.chibde.visualizer.LineBarVisualizer;
 import com.sdsmdg.harjot.crollerTest.Croller;
 
-public class PlayerActivity extends TemplateActivity {
+public class PlayerActivity extends BaseActivity {
     AudioPlayer player;
     Recording recording;
     ImageButton playPause, resetPlaying;
