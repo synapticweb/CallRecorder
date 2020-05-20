@@ -6,6 +6,8 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import net.synapticweb.callrecorder.CrApp;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -61,13 +63,24 @@ public class RepositoryImpl implements Repository {
     }
 
     @Override
-    public Contact getContact(long contactId) {
-        return null;
+    public Long getHiddenNumberContactId() {
+        Cursor cursor = database.query(ContactsContract.Contacts.TABLE_NAME, new String[]{ContactsContract.Contacts._ID},
+                ContactsContract.Contacts.COLUMN_NAME_PRIVATE_NUMBER + "=" + CrApp.SQLITE_TRUE, null, null, null, null);
+
+        if(cursor != null && cursor.moveToFirst()) {
+            long id = cursor.getLong(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+            cursor.close();
+            return id;
+        }
+        else
+            return null;
     }
 
-    private ContentValues createContactContentValues(Contact contact) {
-        ContentValues values = new ContentValues();
 
+    private ContentValues createContactContentValues(Contact contact, boolean isUpdate) {
+        ContentValues values = new ContentValues();
+        if(isUpdate)
+            values.put(ContactsContract.Contacts._ID, contact.getId());
         values.put(ContactsContract.Contacts.COLUMN_NAME_NUMBER, contact.getPhoneNumber());
         values.put(ContactsContract.Contacts.COLUMN_NAME_CONTACT_NAME, contact.getContactName());
         values.put(ContactsContract.Contacts.COLUMN_NAME_PHOTO_URI, contact.getPhotoUri() == null ?
@@ -79,7 +92,7 @@ public class RepositoryImpl implements Repository {
 
     @Override
     public void insertContact(Contact contact) throws SQLException {
-        ContentValues values = createContactContentValues(contact);
+        ContentValues values = createContactContentValues(contact, false);
         long rowId = database.insertOrThrow(ContactsContract.Contacts.TABLE_NAME, null, values);
         contact.setId(rowId);
     }
@@ -88,7 +101,7 @@ public class RepositoryImpl implements Repository {
     public void updateContact(Contact contact) throws SQLException, IllegalStateException {
         if(contact.getId() == 0)
             throw new IllegalStateException("This contact was not saved in database");
-        ContentValues values = createContactContentValues(contact);
+        ContentValues values = createContactContentValues(contact, true);
         int updatedRows = database.update(ContactsContract.Contacts.TABLE_NAME, values,
                 ContactsContract.Contacts._ID + "=" + contact.getId(), null);
         if(updatedRows != 1)
@@ -111,6 +124,7 @@ public class RepositoryImpl implements Repository {
         long contactId = cursor.getLong(cursor.getColumnIndex(RecordingsContract.Recordings.COLUMN_NAME_CONTACT_ID));
         recording.setContactId(contactId == 0 ? null : contactId);
         recording.setIncoming(cursor.getInt(cursor.getColumnIndex(RecordingsContract.Recordings.COLUMN_NAME_INCOMING)) == 1);
+        recording.setPath(cursor.getString(cursor.getColumnIndex(RecordingsContract.Recordings.COLUMN_NAME_PATH)));
         recording.setStartTimestamp(cursor.getLong(cursor.getColumnIndex(RecordingsContract.Recordings.COLUMN_NAME_START_TIMESTAMP)));
         recording.setEndTimestamp(cursor.getLong(cursor.getColumnIndex(RecordingsContract.Recordings.COLUMN_NAME_END_TIMESTAMP)));
         recording.setFormat(cursor.getString(cursor.getColumnIndex(RecordingsContract.Recordings.COLUMN_NAME_FORMAT)));
@@ -138,15 +152,11 @@ public class RepositoryImpl implements Repository {
         callback.onRecordingsLoaded(getRecordings(contact));
     }
 
-    @Override
-    public Recording getRecording(long recordingId) {
-        return null;
-    }
-
-    private ContentValues createRecordingContactValues(Recording recording) {
+    private ContentValues createRecordingContactValues(Recording recording, boolean isUpdate) {
         ContentValues values = new ContentValues();
-
-        values.put(RecordingsContract.Recordings.COLUMN_NAME_CONTACT_ID, recording.getId());
+        if(isUpdate)
+            values.put(RecordingsContract.Recordings._ID, recording.getId());
+        values.put(RecordingsContract.Recordings.COLUMN_NAME_CONTACT_ID, recording.getContactId());
         values.put(RecordingsContract.Recordings.COLUMN_NAME_PATH, recording.getPath());
         values.put(RecordingsContract.Recordings.COLUMN_NAME_INCOMING, recording.isIncoming());
         values.put(RecordingsContract.Recordings.COLUMN_NAME_START_TIMESTAMP, recording.getStartTimestamp());
@@ -160,7 +170,7 @@ public class RepositoryImpl implements Repository {
 
     @Override
     public void insertRecording(Recording recording) {
-        ContentValues values = createRecordingContactValues(recording);
+        ContentValues values = createRecordingContactValues(recording, false);
         long rowId = database.insertOrThrow(RecordingsContract.Recordings.TABLE_NAME, null, values);
         recording.setId(rowId);
     }
@@ -170,7 +180,7 @@ public class RepositoryImpl implements Repository {
         if(recording.getId() == 0)
             throw new IllegalStateException("This contact was not saved in database");
 
-        ContentValues values = createRecordingContactValues(recording);
+        ContentValues values = createRecordingContactValues(recording, true);
         int updatedRows = database.update(RecordingsContract.Recordings.TABLE_NAME, values,
                 RecordingsContract.Recordings._ID + "=" + recording.getId(), null);
         if(updatedRows != 1)

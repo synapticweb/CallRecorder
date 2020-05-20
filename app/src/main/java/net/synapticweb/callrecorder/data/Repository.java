@@ -13,7 +13,7 @@ public interface Repository {
 
     void getAllContacts(LoadContactsCallback callback);
 
-    Contact getContact(long contactId);
+    Long getHiddenNumberContactId();
 
     void insertContact(Contact contact);
 
@@ -29,8 +29,6 @@ public interface Repository {
     void getRecordings(Contact contact, LoadRecordingsCallback callback);
 
     List<Recording> getRecordings(Contact contact);
-
-    Recording getRecording(long recordingId);
 
     void insertRecording(Recording recording);
 
