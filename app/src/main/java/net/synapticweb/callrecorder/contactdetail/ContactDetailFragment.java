@@ -14,6 +14,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import android.content.res.Resources;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
@@ -50,9 +51,13 @@ import net.synapticweb.callrecorder.CrLog;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.BaseActivity;
 import net.synapticweb.callrecorder.BaseActivity.LayoutType;
+import net.synapticweb.callrecorder.ServiceProvider;
 import net.synapticweb.callrecorder.contactslist.ContactsListFragment;
+import net.synapticweb.callrecorder.data.CallRecorderDbHelper;
 import net.synapticweb.callrecorder.data.Contact;
 import net.synapticweb.callrecorder.data.Recording;
+import net.synapticweb.callrecorder.data.Repository;
+import net.synapticweb.callrecorder.data.RepositoryImpl;
 import net.synapticweb.callrecorder.player.PlayerActivity;
 import net.synapticweb.callrecorder.recorder.Recorder;
 
@@ -96,10 +101,16 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
     private static final int REQUEST_EDIT = 1;
     public static final String RECORDING_EXTRA = "recording_extra";
 
+    @Nullable
+    @Override
+    public Context getContext() {
+        return super.getContext();
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        presenter = new ContactDetailPresenter(this);
+        presenter = new ContactDetailPresenter(this, ServiceProvider.provideRepository(getContext()));
         adapter = new RecordingAdapter(new ArrayList<>(0));
         Bundle args = getArguments();
         if(args != null)
@@ -736,8 +747,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
             totalSize += new File(recording.getPath()).length();
         }
 
-        new MoveAsyncTask(path, totalSize, parentActivity).
-                execute(recordings.toArray(recordingsArray));
+        presenter.moveSelectedRecordings(path, totalSize, parentActivity, recordings.toArray(recordingsArray));
     }
 
     private void onShouldRecord() {

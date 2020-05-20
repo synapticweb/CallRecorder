@@ -8,6 +8,7 @@
 
 package net.synapticweb.callrecorder.contactslist;
 
+import android.content.Context;
 import android.content.Intent;
 
 import net.synapticweb.callrecorder.CrApp.DialogInfo;
@@ -23,6 +24,6 @@ public interface ContactsListContract {
 
     interface ContactsListPresenter {
         void loadContacts();
-        DialogInfo addContactResult(Intent intent);
+        DialogInfo addContactResult(Intent intent, Context context);
     }
 }

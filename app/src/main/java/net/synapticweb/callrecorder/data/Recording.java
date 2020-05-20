@@ -8,11 +8,8 @@
 
 package net.synapticweb.callrecorder.data;
 
-import android.content.ContentValues;
-import android.content.Context;
+
 import android.content.res.Resources;
-import android.database.SQLException;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -44,6 +41,8 @@ public class Recording implements Parcelable {
     private String mode;
     private String source;
 
+    public Recording() {}
+
     public Recording(Long id, Long contactId, String path, Boolean incoming, Long startTimestamp, Long endTimestamp,
                      String format, Boolean isNameSet, String mode, String source) {
         this.id = id;
@@ -71,41 +70,13 @@ public class Recording implements Parcelable {
         return endTimestamp - startTimestamp;
     }
 
-    public void update() throws SQLException {
-        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(CrApp.getInstance());
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(RecordingsContract.Recordings._ID, id);
-        values.put(RecordingsContract.Recordings.COLUMN_NAME_CONTACT_ID, contactId);
-        values.put(RecordingsContract.Recordings.COLUMN_NAME_PATH, path);
-        values.put(RecordingsContract.Recordings.COLUMN_NAME_INCOMING, incoming);
-        values.put(RecordingsContract.Recordings.COLUMN_NAME_START_TIMESTAMP, startTimestamp);
-        values.put(RecordingsContract.Recordings.COLUMN_NAME_END_TIMESTAMP, endTimestamp);
-        values.put(RecordingsContract.Recordings.COLUMN_NAME_IS_NAME_SET, isNameSet);
-        values.put(RecordingsContract.Recordings.COLUMN_NAME_FORMAT, format);
-        values.put(RecordingsContract.Recordings.COLUMN_NAME_MODE, mode);
-        values.put(RecordingsContract.Recordings.COLUMN_NAME_SOURCE, source);
 
-        db.update(RecordingsContract.Recordings.TABLE_NAME, values,
-                    RecordingsContract.Recordings._ID + "=" + id, null);
+    public void update(Repository repository){
+        repository.updateRecording(this);
     }
 
-    public void save() throws SQLException {
-        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(CrApp.getInstance());
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
-        ContentValues values = new ContentValues();
-
-        values.put(RecordingsContract.Recordings.COLUMN_NAME_CONTACT_ID, contactId);
-        values.put(RecordingsContract.Recordings.COLUMN_NAME_PATH, path);
-        values.put(RecordingsContract.Recordings.COLUMN_NAME_INCOMING, incoming);
-        values.put(RecordingsContract.Recordings.COLUMN_NAME_START_TIMESTAMP, startTimestamp);
-        values.put(RecordingsContract.Recordings.COLUMN_NAME_END_TIMESTAMP, endTimestamp);
-        values.put(RecordingsContract.Recordings.COLUMN_NAME_IS_NAME_SET, isNameSet);
-        values.put(RecordingsContract.Recordings.COLUMN_NAME_FORMAT, format);
-        values.put(RecordingsContract.Recordings.COLUMN_NAME_MODE, mode);
-        values.put(RecordingsContract.Recordings.COLUMN_NAME_SOURCE, source);
-
-        setId(db.insertOrThrow(RecordingsContract.Recordings.TABLE_NAME, null, values));
+    public void save(Repository repository) {
+        repository.insertRecording(this);
     }
 
     public String getName() {
@@ -143,18 +114,12 @@ public class Recording implements Parcelable {
         return new SimpleDateFormat("h:mm a", Locale.US).format(new Date(startTimestamp)); //3:45 PM
     }
 
-    public void delete() throws SQLException, SecurityException
-    {
-        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(CrApp.getInstance());
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
-        if((db.delete(RecordingsContract.Recordings.TABLE_NAME,
-                RecordingsContract.Recordings._ID + "=" + getId(), null)) == 0)
-            throw new SQLException("The Recording row was not deleted");
-
+    public void delete(Repository repository) throws SecurityException {
+        repository.deleteRecording(this);
         new File(path).delete();
     }
 
-    public void move(String folderPath, MoveAsyncTask asyncTask, long totalSize)
+    public void move(Repository repository, String folderPath, MoveAsyncTask asyncTask, long totalSize)
             throws IOException {
         String fileName = new File(path).getName();
         InputStream in = new FileInputStream(path);
@@ -173,7 +138,7 @@ public class Recording implements Parcelable {
         out.flush();
         new File(path).delete();
         path = new File(folderPath, fileName).getAbsolutePath();
-        update();
+        repository.updateRecording(this);
     }
 
     public String getHumanReadingFormat() {
@@ -239,6 +204,30 @@ public class Recording implements Parcelable {
     public String getSource() { return source; }
 
     public void setSource(String source) { this.source = source; }
+
+    public Long getStartTimestamp() {
+        return startTimestamp;
+    }
+
+    public Long getEndTimestamp() {
+        return endTimestamp;
+    }
+
+    public String getMode() {
+        return mode;
+    }
+
+    public void setStartTimestamp(Long startTimestamp) {
+        this.startTimestamp = startTimestamp;
+    }
+
+    public void setEndTimestamp(Long endTimestamp) {
+        this.endTimestamp = endTimestamp;
+    }
+
+    public void setMode(String mode) {
+        this.mode = mode;
+    }
 
     @Override
     public int describeContents() {

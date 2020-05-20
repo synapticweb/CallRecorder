@@ -8,6 +8,8 @@
 
 package net.synapticweb.callrecorder.contactdetail;
 
+import android.app.Activity;
+import android.content.Context;
 import net.synapticweb.callrecorder.CrApp.DialogInfo;
 import net.synapticweb.callrecorder.data.Contact;
 import net.synapticweb.callrecorder.data.Recording;
@@ -20,6 +22,7 @@ public interface ContactDetailContract {
         boolean isInvalid();
         void setInvalid(boolean invalid);
         void removeRecording(Recording recording);
+        Context getContext();
     }
 
     interface ContactDetailPresenter {
@@ -28,5 +31,6 @@ public interface ContactDetailContract {
         DialogInfo deleteRecordings(List<Recording> recordings);
         DialogInfo renameRecording(CharSequence input, Recording recording);
         void toggleShouldRecord(Contact contact);
+        void moveSelectedRecordings(String path, int totalsize, Activity parentActivity, Recording[] recordings);
     }
 }

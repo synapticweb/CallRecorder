@@ -8,28 +8,31 @@
 
 package net.synapticweb.callrecorder.contactdetail;
 
-import net.synapticweb.callrecorder.CrApp;
+
+import android.app.Activity;
 import net.synapticweb.callrecorder.CrLog;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.data.Contact;
 import net.synapticweb.callrecorder.data.Recording;
-import net.synapticweb.callrecorder.data.RecordingsRepository;
 import net.synapticweb.callrecorder.CrApp.DialogInfo;
+import net.synapticweb.callrecorder.data.Repository;
 
 import java.io.File;
 import java.util.List;
 
 public class ContactDetailPresenter implements ContactDetailContract.ContactDetailPresenter {
     private ContactDetailContract.View view;
+    private Repository repository;
 
-    ContactDetailPresenter(ContactDetailContract.View view) {
+     ContactDetailPresenter(ContactDetailContract.View view, Repository repository) {
         this.view = view;
+        this.repository = repository;
     }
 
     @Override
     public DialogInfo deleteContact(Contact contact) {
          try {
-             contact.delete();
+             contact.delete(repository, view.getContext());
          }
          catch (Exception exc) {
              CrLog.log(CrLog.ERROR, "Error deleting the contact: " + exc.getMessage());
@@ -55,7 +58,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
             if(new File(recording.getPath()).renameTo(new File(parent, newFileName)) ) {
                 recording.setPath(new File(parent, newFileName).getAbsolutePath());
                 recording.setIsNameSet(true);
-                recording.update();
+                recording.update(repository);
             }
             else
                 throw new Exception("File.renameTo() has returned false.");
@@ -70,7 +73,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
 
     @Override
     public void loadRecordings(Contact contact) {
-        RecordingsRepository.getRecordings(contact, (List<Recording> recordings) -> {
+       repository.getRecordings(contact,  recordings -> {
                 view.paintViews(recordings);
                 //aici ar trebui să fie cod care să pună tickuri pe recordingurile selectate cînd
                 //este întors device-ul. Dar dacă pun aici codul nu se execută pentru că nu vor fi gata
@@ -83,7 +86,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
     public DialogInfo deleteRecordings(List<Recording> recordings) {
         for(Recording recording :  recordings) {
             try {
-                recording.delete();
+                recording.delete(repository);
                 view.removeRecording(recording);
             }
             catch (Exception exc) {
@@ -97,8 +100,14 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
     @Override
     public void toggleShouldRecord(Contact contact) {
         contact.setShouldRecord(!contact.shouldRecord());
-        contact.update(false);
+        contact.update(repository);
         view.setContact(contact);
     }
 
+
+    @Override
+    public void moveSelectedRecordings(String path, int totalSize, Activity parentActivity, Recording[] recordings) {
+        new MoveAsyncTask(repository, path, totalSize, parentActivity).
+                execute(recordings);
+    }
 }

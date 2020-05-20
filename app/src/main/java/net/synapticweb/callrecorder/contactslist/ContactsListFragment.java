@@ -30,12 +30,12 @@ import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.CrApp.DialogInfo;
 import net.synapticweb.callrecorder.BaseActivity;
 import net.synapticweb.callrecorder.BaseActivity.LayoutType;
+import net.synapticweb.callrecorder.ServiceProvider;
 import net.synapticweb.callrecorder.contactdetail.ContactDetailActivity;
 import net.synapticweb.callrecorder.contactdetail.ContactDetailContract;
 import net.synapticweb.callrecorder.contactdetail.ContactDetailFragment;
 import net.synapticweb.callrecorder.data.Contact;
 import net.synapticweb.callrecorder.R;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -167,7 +167,7 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
             currentPos = savedInstanceState.getInt(CURRENT_POS_KEY);
         }
         this.adapter = new ContactsAdapter(new ArrayList<>(0));
-        this.presenter = new ContactsListPresenter(this);
+        this.presenter = new ContactsListPresenter(this, ServiceProvider.provideRepository(getContext()));
     }
 
     @Nullable
@@ -191,7 +191,7 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
     }
 
     private void onAddContactResult(Intent intent) {
-        DialogInfo result = presenter.addContactResult(intent);
+        DialogInfo result = presenter.addContactResult(intent, getContext());
         if(result != null)
             new MaterialDialog.Builder(parentActivity)
                     .title(result.title)
