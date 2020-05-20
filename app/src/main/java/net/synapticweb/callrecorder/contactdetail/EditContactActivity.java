@@ -55,7 +55,9 @@ import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.CrLog;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.BaseActivity;
+import net.synapticweb.callrecorder.ServiceProvider;
 import net.synapticweb.callrecorder.data.Contact;
+import net.synapticweb.callrecorder.data.Repository;
 
 import java.io.File;
 import java.io.IOException;
@@ -74,6 +76,7 @@ public class EditContactActivity extends BaseActivity implements AdapterView.OnI
     private static final int PICK_IMAGE_REQUEST = 1;
     private static final int TAKE_PICTURE = 2;
     public static final String EDITED_CONTACT = "edited_contact";
+    private Repository repository;
 
     @Override
     protected Fragment createFragment() {
@@ -137,6 +140,7 @@ public class EditContactActivity extends BaseActivity implements AdapterView.OnI
         setTheme();
         setContentView(R.layout.edit_contact_activity);
 
+        repository = ServiceProvider.provideRepository(this);
         Toolbar toolbar = findViewById(R.id.toolbar_edit);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
@@ -165,7 +169,7 @@ public class EditContactActivity extends BaseActivity implements AdapterView.OnI
                             getContentResolver().delete(oldPhotoUri, null, null);
                     }
 
-                    contact.update(false);
+                    contact.update(repository);
                     Intent intent = new Intent();
                     intent.putExtra(EDITED_CONTACT, contact);
                     setResult(RESULT_OK, intent);

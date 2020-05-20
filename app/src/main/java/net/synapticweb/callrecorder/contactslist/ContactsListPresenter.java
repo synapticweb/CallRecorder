@@ -8,22 +8,22 @@
 
 package net.synapticweb.callrecorder.contactslist;
 
-import net.synapticweb.callrecorder.data.Contact;
-import net.synapticweb.callrecorder.data.ContactsRepository;
-import java.util.List;
+import net.synapticweb.callrecorder.data.Repository;
 import androidx.annotation.NonNull;
 
 
 public class ContactsListPresenter implements ContactsListContract.ContactsListPresenter {
     @NonNull private ContactsListContract.View view;
+    private Repository repository;
 
-    ContactsListPresenter(@NonNull ContactsListContract.View view) {
+    ContactsListPresenter(@NonNull ContactsListContract.View view, Repository repository) {
         this.view = view;
+        this.repository = repository;
     }
 
     @Override
     public void loadContacts() {
-        ContactsRepository.getContacts((List<Contact> contacts) -> view.showContacts(contacts));
+        repository.getAllContacts(contacts -> view.showContacts(contacts));
     }
 
 }

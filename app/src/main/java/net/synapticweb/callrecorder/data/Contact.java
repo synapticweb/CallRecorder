@@ -27,7 +27,6 @@ import com.google.i18n.phonenumbers.PhoneNumberUtil;
 
 import net.synapticweb.callrecorder.Config;
 import net.synapticweb.callrecorder.CrApp;
-import net.synapticweb.callrecorder.CrLog;
 import net.synapticweb.callrecorder.R;
 
 import java.io.File;
@@ -39,7 +38,7 @@ import java.util.List;
 
 
 public class Contact implements Comparable<Contact>, Parcelable {
-    private Long id;
+    private Long id = 0L;
     private String phoneNumber = null;
     private int phoneType = CrApp.UNKNOWN_TYPE_PHONE_CODE;
     private String contactName = null;
@@ -58,26 +57,8 @@ public class Contact implements Comparable<Contact>, Parcelable {
         setPhoneType(phoneTypeCode);
     }
 
-    public static Contact queryNumberInAppContacts(String receivedPhoneNumber, Context context) {
-        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(context);
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
-
-        List<Contact> contacts = new ArrayList<>();
-        String[] projection = {ContactsContract.Contacts._ID,
-                ContactsContract.Contacts.COLUMN_NAME_NUMBER,
-                ContactsContract.Contacts.COLUMN_NAME_CONTACT_NAME };
-        Cursor cursor = db.query(
-                ContactsContract.Contacts.TABLE_NAME, projection, null, null, null, null, null);
-
-        while(cursor.moveToNext())
-        {
-            Long id = cursor.getLong(cursor.getColumnIndex(ContactsContract.Contacts._ID));
-            String number = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.COLUMN_NAME_NUMBER));
-            String contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.COLUMN_NAME_CONTACT_NAME));
-            Contact contact = new Contact(id, number, contactName, null, CrApp.UNKNOWN_TYPE_PHONE_CODE);
-            contacts.add(contact);
-        }
-        cursor.close();
+    public static Contact queryNumberInAppContacts(Repository repository, String receivedPhoneNumber, Context context) {
+        List<Contact> contacts = repository.getAllContacts();
 
         PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
         for (Contact contact : contacts) {
@@ -89,70 +70,22 @@ public class Contact implements Comparable<Contact>, Parcelable {
         return null;
     }
 
-    public void update(boolean byNumber) {
-        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(CrApp.getInstance());
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-        values.put(ContactsContract.Contacts.COLUMN_NAME_NUMBER, getPhoneNumber());
-        values.put(ContactsContract.Contacts.COLUMN_NAME_CONTACT_NAME, getContactName());
-        values.put(ContactsContract.Contacts.COLUMN_NAME_PHONE_TYPE, getPhoneTypeCode());
-        values.put(ContactsContract.Contacts.COLUMN_NAME_PHOTO_URI,
-                (getPhotoUri() == null) ? null : getPhotoUri().toString());
-        values.put(ContactsContract.Contacts.COLUMN_NAME_PRIVATE_NUMBER, isPrivateNumber());
-
-        try {
-            if(byNumber)
-                db.update(ContactsContract.Contacts.TABLE_NAME, values,
-                    ContactsContract.Contacts.COLUMN_NAME_NUMBER + "='" + getPhoneNumber() + "'", null);
-            else
-                db.update(ContactsContract.Contacts.TABLE_NAME, values,
-                        ContactsContract.Contacts._ID + "=" + getId(), null);
-        }
-        catch (SQLException exception) {
-            CrLog.log(CrLog.ERROR, "Error updating the contact: " + exception.getMessage());
-        }
+    public void update(Repository repository) {
+        repository.updateContact(this);
     }
 
-    public void save() throws SQLException {
-        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(CrApp.getInstance());
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-
-        values.put(ContactsContract.Contacts.COLUMN_NAME_NUMBER, phoneNumber);
-        values.put(ContactsContract.Contacts.COLUMN_NAME_CONTACT_NAME, contactName);
-        values.put(ContactsContract.Contacts.COLUMN_NAME_PHOTO_URI, photoUri == null ? null : photoUri.toString());
-        values.put(ContactsContract.Contacts.COLUMN_NAME_PHONE_TYPE, phoneType);
-        values.put(ContactsContract.Contacts.COLUMN_NAME_PRIVATE_NUMBER, privateNumber);
-
-        setId(db.insertOrThrow(ContactsContract.Contacts.TABLE_NAME, null, values));
+    public void save(Repository repository) throws SQLException {
+        repository.insertContact(this);
     }
 
-    public void delete() throws SQLException {
-        Context context = CrApp.getInstance();
-        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(context);
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+    public void delete(Repository repository, Context context) throws SQLException {
+        List<Recording> recordings = repository.getRecordings(this);
+        for(Recording recording : recordings)
+            recording.delete(repository);
 
-        Cursor cursor = db.query(RecordingsContract.Recordings.TABLE_NAME,
-                new String[]{RecordingsContract.Recordings._ID, RecordingsContract.Recordings.COLUMN_NAME_PATH},
-                RecordingsContract.Recordings.COLUMN_NAME_CONTACT_ID + "=" + getId(), null, null, null, null);
-
-        while(cursor.moveToNext()) {
-           Recording recording =
-                    new Recording(cursor.getLong(cursor.getColumnIndex(RecordingsContract.Recordings._ID)), null,
-                            cursor.getString(cursor.getColumnIndex(RecordingsContract.Recordings.COLUMN_NAME_PATH)),
-                            null, null, null, null, null, null, null);
-           recording.delete();
-        }
-
-        cursor.close();
         if(getPhotoUri() != null ) //întotdeauna este poza noastră.
             context.getContentResolver().delete(getPhotoUri(), null, null);
-        //dacă foloseam nr pentru a identifica contactul crăpa la numerele private
-     if((db.delete(ContactsContract.Contacts.TABLE_NAME, ContactsContract.Contacts._ID
-                + "=" + getId(), null)) == 0)
-         throw new SQLException("This Contacts row was not deleted");
+       repository.deleteContact(this);
     }
 
   @Nullable
@@ -267,6 +200,7 @@ public class Contact implements Comparable<Contact>, Parcelable {
             this.photoUri = Uri.parse(photoUriStr);
             String authority = photoUri.getAuthority();
             if(authority != null && !authority.equals(Config.FILE_PROVIDER)) {
+                //aici intră doar cînd copiază poza din contactele telefonului: queryNumberInPhoneContacts()
                 Context context = CrApp.getInstance();
                 try {
                     Bitmap originalPhotoBitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), photoUri);

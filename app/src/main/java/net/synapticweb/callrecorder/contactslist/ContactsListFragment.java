@@ -24,11 +24,15 @@ import android.widget.TextView;
 import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.BaseActivity;
 import net.synapticweb.callrecorder.BaseActivity.LayoutType;
+import net.synapticweb.callrecorder.ServiceProvider;
 import net.synapticweb.callrecorder.contactdetail.ContactDetailActivity;
 import net.synapticweb.callrecorder.contactdetail.ContactDetailContract;
 import net.synapticweb.callrecorder.contactdetail.ContactDetailFragment;
+import net.synapticweb.callrecorder.data.CallRecorderDbHelper;
 import net.synapticweb.callrecorder.data.Contact;
 import net.synapticweb.callrecorder.R;
+import net.synapticweb.callrecorder.data.Repository;
+import net.synapticweb.callrecorder.data.RepositoryImpl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -160,7 +164,7 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
             currentPos = savedInstanceState.getInt(CURRENT_POS_KEY);
         }
         this.adapter = new ContactsAdapter(new ArrayList<>(0));
-        this.presenter = new ContactsListPresenter(this);
+        this.presenter = new ContactsListPresenter(this, ServiceProvider.provideRepository(getContext()));
     }
 
     @Nullable

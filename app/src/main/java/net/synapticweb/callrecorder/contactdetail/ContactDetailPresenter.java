@@ -9,10 +9,14 @@
 package net.synapticweb.callrecorder.contactdetail;
 
 
+import android.app.Activity;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+
+import androidx.fragment.app.Fragment;
+
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
@@ -25,6 +29,7 @@ import net.synapticweb.callrecorder.data.ContactsContract;
 import net.synapticweb.callrecorder.data.Recording;
 import net.synapticweb.callrecorder.data.CallRecorderDbHelper;
 import net.synapticweb.callrecorder.data.RecordingsRepository;
+import net.synapticweb.callrecorder.data.Repository;
 
 import java.io.File;
 import java.util.List;
@@ -32,15 +37,17 @@ import java.util.List;
 
 public class ContactDetailPresenter implements ContactDetailContract.ContactDetailPresenter {
     private ContactDetailContract.View view;
+    private Repository repository;
 
-     ContactDetailPresenter(ContactDetailContract.View view) {
+     ContactDetailPresenter(ContactDetailContract.View view, Repository repository) {
         this.view = view;
+        this.repository = repository;
     }
 
     @Override
     public DialogInfo deleteContact(Contact contact) {
          try {
-             contact.delete();
+             contact.delete(repository, view.getContext());
          }
          catch (Exception exc) {
              CrLog.log(CrLog.ERROR, "Error deleting the contact: " + exc.getMessage());
@@ -66,7 +73,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
             if(new File(recording.getPath()).renameTo(new File(parent, newFileName)) ) {
                 recording.setPath(new File(parent, newFileName).getAbsolutePath());
                 recording.setIsNameSet(true);
-                recording.update();
+                recording.update(repository);
             }
             else
                 throw new Exception("File.renameTo() has returned false.");
@@ -94,7 +101,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
     public DialogInfo deleteRecordings(List<Recording> recordings) {
         for(Recording recording :  recordings) {
             try {
-                recording.delete();
+                recording.delete(repository);
                 view.removeRecording(recording);
             }
             catch (Exception exc) {
@@ -168,7 +175,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
         if(contactId == 0) {
             Contact newContact = new Contact(null, phoneNumber, contactName, photoUri, phoneType);
             try {
-                newContact.save();
+                newContact.save(repository);
             } catch (SQLException exc) {
                 CrLog.log(CrLog.ERROR, exc.getMessage());
                 return new DialogInfo(R.string.error_title,
@@ -180,7 +187,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
         for(Recording recording : recordings) {
             recording.setContactId(contactId);
             try {
-                recording.update();
+                recording.update(repository);
                 view.removeRecording(recording);
             } catch (SQLException exc) {
                 CrLog.log(CrLog.ERROR, exc.getMessage());
@@ -212,7 +219,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
             Contact newContact = new Contact();
             newContact.setPrivateNumber(true);
             try {
-                newContact.save();
+                newContact.save(repository);
             } catch (SQLException exc) {
                 CrLog.log(CrLog.ERROR, "SQL exception: " + exc.getMessage());
                 return new DialogInfo(R.string.error_title, R.string.assign_to_contact_err, R.drawable.error);
@@ -224,7 +231,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
         for (Recording recording : recordings) {
             recording.setContactId(id);
             try {
-                recording.update();
+                recording.update(repository);
                 view.removeRecording(recording);
             } catch (SQLException exc) {
                 CrLog.log(CrLog.ERROR, exc.getMessage());
@@ -234,4 +241,10 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
 
         return new DialogInfo(R.string.information_title, R.string.assign_to_contact_ok, R.drawable.success);
         }
+
+    @Override
+    public void moveSelectedRecordings(String path, int totalSize, Activity parentActivity, Recording[] recordings) {
+        new MoveAsyncTask(repository, path, totalSize, parentActivity).
+                execute(recordings);
+    }
 }

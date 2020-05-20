@@ -16,6 +16,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import net.synapticweb.callrecorder.CrLog;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.data.Recording;
+import net.synapticweb.callrecorder.data.Repository;
 
 import java.lang.ref.WeakReference;
 
@@ -47,11 +48,13 @@ public class MoveAsyncTask extends AsyncTask<Recording, Integer, Boolean> {
     private String path;
     private long totalSize;
     private MaterialDialog dialog;
+    private Repository repository;
     private WeakReference<Activity> activityRef; //http://sohailaziz05.blogspot.com/2014/10/asynctask-and-context-leaking.html
 
-    MoveAsyncTask(String folderPath, long totalSize, Activity activity) {
+    MoveAsyncTask(Repository repository, String folderPath, long totalSize, Activity activity) {
         this.path = folderPath;
         this.totalSize = totalSize;
+        this.repository = repository;
         activityRef = new WeakReference<>(activity);
     }
 
@@ -117,7 +120,7 @@ public class MoveAsyncTask extends AsyncTask<Recording, Integer, Boolean> {
     protected Boolean doInBackground(Recording...recordings) {
         for(Recording recording : recordings) {
             try {
-                recording.move(path, this, totalSize);
+                recording.move(repository, path, this, totalSize);
                 if(isCancelled())
                     break;
             }
