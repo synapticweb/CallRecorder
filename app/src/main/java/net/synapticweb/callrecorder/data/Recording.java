@@ -33,7 +33,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Recording implements Parcelable {
-    private Long id;
+    private Long id = 0L;
     private Long contactId;
     private String path;
     private Boolean incoming;

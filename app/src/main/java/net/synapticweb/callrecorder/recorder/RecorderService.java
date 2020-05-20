@@ -17,9 +17,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.database.Cursor;
 import android.database.SQLException;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.media.AudioManager;
 import android.os.Build;
@@ -31,11 +29,11 @@ import androidx.core.app.NotificationCompat;
 import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.CrLog;
 import net.synapticweb.callrecorder.R;
+import net.synapticweb.callrecorder.ServiceProvider;
 import net.synapticweb.callrecorder.contactslist.ContactsListActivityMain;
 import net.synapticweb.callrecorder.data.Contact;
-import net.synapticweb.callrecorder.data.ContactsContract.*;
 import net.synapticweb.callrecorder.data.Recording;
-import net.synapticweb.callrecorder.data.CallRecorderDbHelper;
+import net.synapticweb.callrecorder.data.Repository;
 import net.synapticweb.callrecorder.settings.SettingsFragment;
 
 import org.acra.ACRA;
@@ -54,6 +52,7 @@ public class RecorderService extends Service {
     private Contact contact = null;
     private String callIdentifier;
     private SharedPreferences settings;
+    private Repository repository;
 
     public static final int NOTIFICATION_ID = 1;
     private static final String CHANNEL_ID = "call_recorder_channel";
@@ -79,6 +78,7 @@ public class RecorderService extends Service {
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         nm = (NotificationManager) CrApp.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
         settings = PreferenceManager.getDefaultSharedPreferences(CrApp.getInstance());
+        repository = ServiceProvider.provideRepository(getApplicationContext());
         self = this;
     }
 
@@ -175,7 +175,7 @@ public class RecorderService extends Service {
 
         //se întîmplă numai la incoming, la outgoing totdeauna nr e null.
         if(receivedNumPhone != null) {
-            contact = Contact.queryNumberInAppContacts(receivedNumPhone, CrApp.getInstance());
+            contact = Contact.queryNumberInAppContacts(repository, receivedNumPhone, CrApp.getInstance());
             if(contact == null) {
                 contact = Contact.queryNumberInPhoneContacts(receivedNumPhone, CrApp.getInstance());
                 if(contact == null) {
@@ -183,7 +183,7 @@ public class RecorderService extends Service {
                 }
 
                 try {
-                    contact.save();
+                    contact.save(repository);
                 }
                 catch (SQLException exception) {
                     CrLog.log(CrLog.ERROR, "SQL exception: " + exception.getMessage());
@@ -268,20 +268,15 @@ public class RecorderService extends Service {
         }
 
         recorder.stopRecording();
-
-        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(getApplicationContext());
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
         Long contactId;
 
         if(privateCall) {
-            Cursor cursor = db.query(Contacts.TABLE_NAME, new String[]{Contacts._ID},
-                    Contacts.COLUMN_NAME_PRIVATE_NUMBER + "=" + CrApp.SQLITE_TRUE, null, null, null, null);
-
-            if(cursor.getCount() == 0) { //încă nu a fost înregistrat un apel de pe număr ascuns
+            contactId = repository.getHiddenNumberContactId();
+            if(contactId == null) { //încă nu a fost înregistrat un apel de pe număr ascuns
                 Contact contact =  new Contact();
                 contact.setPrivateNumber(true);
                 try {
-                    contact.save();
+                    contact.save(repository);
                 }
                 catch (SQLException  exc) {
                     CrLog.log(CrLog.ERROR, "SQL exception: " + exc.getMessage());
@@ -290,11 +285,6 @@ public class RecorderService extends Service {
                 }
                 contactId = contact.getId();
             }
-            else { //Avem cel puțin un apel de pe nr ascuns. Pentru teste: aici e de așteptat ca întotdeauna cursorul să conțină numai 1 element
-                cursor.moveToFirst();
-                contactId = cursor.getLong(cursor.getColumnIndex(Contacts._ID));
-            }
-            cursor.close();
         }
 
         else if(contact != null)
@@ -308,7 +298,7 @@ public class RecorderService extends Service {
                 recorder.getSource());
 
         try {
-            recording.save();
+            recording.save(repository);
         }
         catch(SQLException exc) {
             CrLog.log(CrLog.ERROR, "SQL exception: " + exc.getMessage());
