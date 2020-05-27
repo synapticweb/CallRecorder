@@ -5,14 +5,9 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-
-import net.synapticweb.callrecorder.CrApp;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import static net.synapticweb.callrecorder.CrApp.SQLITE_TRUE;
 
 public class RepositoryImpl implements Repository {
     private SQLiteDatabase database;
@@ -30,8 +25,6 @@ public class RepositoryImpl implements Repository {
     private Contact populateContact(Cursor cursor) {
         Contact contact = new Contact();
         contact.setPhoneNumber(cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.COLUMN_NAME_NUMBER)));
-        contact.setPrivateNumber(cursor.getInt(
-                cursor.getColumnIndex(ContactsContract.Contacts.COLUMN_NAME_PRIVATE_NUMBER)) == SQLITE_TRUE);
         contact.setContactName(
                 cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.COLUMN_NAME_CONTACT_NAME)));
         contact.setPhotoUri(
@@ -65,7 +58,7 @@ public class RepositoryImpl implements Repository {
     @Override
     public Long getHiddenNumberContactId() {
         Cursor cursor = database.query(ContactsContract.Contacts.TABLE_NAME, new String[]{ContactsContract.Contacts._ID},
-                ContactsContract.Contacts.COLUMN_NAME_PRIVATE_NUMBER + "=" + CrApp.SQLITE_TRUE, null, null, null, null);
+                ContactsContract.Contacts.COLUMN_NAME_NUMBER + "=" + null, null, null, null, null);
 
         if(cursor != null && cursor.moveToFirst()) {
             long id = cursor.getLong(cursor.getColumnIndex(ContactsContract.Contacts._ID));
@@ -86,7 +79,6 @@ public class RepositoryImpl implements Repository {
         values.put(ContactsContract.Contacts.COLUMN_NAME_PHOTO_URI, contact.getPhotoUri() == null ?
                 null : contact.getPhotoUri().toString());
         values.put(ContactsContract.Contacts.COLUMN_NAME_PHONE_TYPE, contact.getPhoneTypeCode());
-        values.put(ContactsContract.Contacts.COLUMN_NAME_PRIVATE_NUMBER, contact.isPrivateNumber());
         return values;
     }
 

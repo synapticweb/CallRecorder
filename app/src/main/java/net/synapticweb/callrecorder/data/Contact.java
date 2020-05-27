@@ -8,11 +8,9 @@
 
 package net.synapticweb.callrecorder.data;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Parcel;
@@ -33,17 +31,16 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.List;
 
 
 public class Contact implements Comparable<Contact>, Parcelable {
     private Long id = 0L;
-    private String phoneNumber = null;
+    private String phoneNumber = "";
     private int phoneType = CrApp.UNKNOWN_TYPE_PHONE_CODE;
-    private String contactName = null;
+    private String contactName = "";
     private Uri photoUri = null;
-    private boolean privateNumber = false;
+    private boolean shouldRecord = true;
     private Integer color = null;
 
     public Contact(){
@@ -118,11 +115,11 @@ public class Contact implements Comparable<Contact>, Parcelable {
 
 
     public boolean isPrivateNumber() {
-        return privateNumber;
+        return phoneNumber == null;
     }
 
-    public void setPrivateNumber(boolean privateNumber) {
-        this.privateNumber = privateNumber;
+    public void setIsPrivateNumber() {
+        this.phoneNumber = null;
     }
 
 
@@ -138,9 +135,6 @@ public class Contact implements Comparable<Contact>, Parcelable {
     }
 
     public void setPhoneNumber(String phoneNumber) {
-        if(phoneNumber == null)
-            this.phoneNumber = CrApp.getInstance().getResources().getString(R.string.private_number_name);
-        else
             this.phoneNumber = phoneNumber;
     }
 
@@ -251,7 +245,7 @@ public class Contact implements Comparable<Contact>, Parcelable {
         dest.writeInt(this.phoneType);
         dest.writeString(this.contactName);
         dest.writeParcelable(this.photoUri, flags);
-        dest.writeByte(this.privateNumber ? (byte) 1 : (byte) 0);
+        dest.writeByte(this.shouldRecord ? (byte) 1 : (byte) 0);
         dest.writeValue(this.color);
     }
 
@@ -261,7 +255,7 @@ public class Contact implements Comparable<Contact>, Parcelable {
         this.phoneType = in.readInt();
         this.contactName = in.readString();
         this.photoUri = in.readParcelable(Uri.class.getClassLoader());
-        this.privateNumber = in.readByte() != 0;
+        this.shouldRecord = in.readByte() != 0;
         this.color = (Integer) in.readValue(Integer.class.getClassLoader());
     }
 
