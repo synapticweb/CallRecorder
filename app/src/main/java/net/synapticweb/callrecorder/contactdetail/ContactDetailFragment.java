@@ -212,7 +212,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         typePhoneView.setText(CrApp.getSpannedText(String.format(getResources().getString(
                 R.string.detail_phonetype), contact.getPhoneTypeName()), null));
         phoneNumberView.setText(CrApp.getSpannedText(String.format(getResources().getString(
-                R.string.detail_phonenumber), contact.getPhoneNumber()), null));
+                R.string.detail_phonenumber), contact.isPrivateNumber() ? getString(R.string.private_number_name) : contact.getPhoneNumber()), null));
 
         if(contact.getPhotoUri() != null) {
             contactPhotoView.clearColorFilter();

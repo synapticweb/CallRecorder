@@ -330,7 +330,8 @@ public class RecorderService extends Service {
             contactId = repository.getHiddenNumberContactId();
             if(contactId == null) { //încă nu a fost înregistrat un apel de pe număr ascuns
                 Contact contact =  new Contact();
-                contact.setPrivateNumber(true);
+                contact.setIsPrivateNumber();
+                contact.setContactName(getApplicationContext().getString(R.string.private_number_name));
                 try {
                     contact.save(repository);
                 }
