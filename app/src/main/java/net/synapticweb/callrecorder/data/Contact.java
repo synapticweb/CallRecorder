@@ -11,26 +11,14 @@ package net.synapticweb.callrecorder.data;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.provider.MediaStore;
-
+import android.provider.ContactsContract;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.FileProvider;
-
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
-
-import net.synapticweb.callrecorder.Config;
 import net.synapticweb.callrecorder.CrApp;
-import net.synapticweb.callrecorder.R;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.List;
 
 
@@ -46,12 +34,12 @@ public class Contact implements Comparable<Contact>, Parcelable {
     public Contact(){
     }
 
-    public Contact(Long id, String phoneNumber, String contactName, String photoUriStr, int phoneTypeCode) {
-        setId(id);
-        setPhoneNumber(phoneNumber);
-        setContactName(contactName);
-        setPhotoUri(photoUriStr);
-        setPhoneType(phoneTypeCode);
+    public Contact(Long id, String phoneNumber, String contactName, String photoUriStr, Integer phoneTypeCode) {
+        if(id != null) setId(id);
+        if(phoneNumber != null) setPhoneNumber(phoneNumber);
+        if(contactName != null) setContactName(contactName);
+        if(photoUriStr != null) setPhotoUri(photoUriStr);
+        if(phoneTypeCode != null) setPhoneType(phoneTypeCode);
     }
 
 
@@ -105,9 +93,8 @@ public class Contact implements Comparable<Contact>, Parcelable {
               Contact contact = new Contact();
               contact.setPhoneType(cursor.getInt(cursor.getColumnIndex(android.provider.ContactsContract.PhoneLookup.TYPE)));
               contact.setContactName(cursor.getString(cursor.getColumnIndex(android.provider.ContactsContract.PhoneLookup.DISPLAY_NAME)));
-              contact.setPhotoUri(cursor.getString(cursor.getColumnIndex(android.provider.ContactsContract.PhoneLookup.PHOTO_URI)));
               contact.setPhoneNumber(cursor.getString(cursor.getColumnIndex(android.provider.ContactsContract.PhoneLookup.NUMBER)));
-
+              contact.setPhotoUri(cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.PHOTO_URI)));
               cursor.close();
               return contact;
           }
@@ -183,14 +170,7 @@ public class Contact implements Comparable<Contact>, Parcelable {
     }
 
     public void setContactName(String contactName) {
-        if(contactName == null) {
-            if(isPrivateNumber())
-                this.contactName = CrApp.getInstance().getResources().getString(R.string.private_number_name);
-            else
-                this.contactName = CrApp.getInstance().getResources().getString(R.string.unkown_contact);
-        }
-        else
-            this.contactName = contactName;
+        this.contactName = contactName;
     }
 
     public Uri getPhotoUri() {
@@ -198,25 +178,8 @@ public class Contact implements Comparable<Contact>, Parcelable {
     }
 
     public void setPhotoUri(String photoUriStr) {
-        if(photoUriStr != null) {
+        if(photoUriStr != null)
             this.photoUri = Uri.parse(photoUriStr);
-            String authority = photoUri.getAuthority();
-            if(authority != null && !authority.equals(Config.FILE_PROVIDER)) {
-                //aici intră doar cînd copiază poza din contactele telefonului: queryNumberInPhoneContacts()
-                Context context = CrApp.getInstance();
-                try {
-                    Bitmap originalPhotoBitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), photoUri);
-                    //am adăugat System.currentTimeMillis() pentru consistență cu EditContactActivity.setPhotoPath().
-                    File copiedPhotoFile = new File(context.getFilesDir(), getPhoneNumber() + System.currentTimeMillis() + ".jpg");
-                    OutputStream os = new FileOutputStream(copiedPhotoFile);
-                    originalPhotoBitmap.compress(Bitmap.CompressFormat.JPEG, 70, os);
-                    setPhotoUri(FileProvider.getUriForFile(context, Config.FILE_PROVIDER, copiedPhotoFile));
-                }
-                catch(IOException exception) {
-                   this.photoUri = null;
-                }
-            }
-        }
         else
             this.photoUri = null;
     }

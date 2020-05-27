@@ -70,10 +70,9 @@ public class RepositoryImpl implements Repository {
     }
 
 
-    private ContentValues createContactContentValues(Contact contact, boolean isUpdate) {
+    private ContentValues createContactContentValues(Contact contact) {
         ContentValues values = new ContentValues();
-        if(isUpdate)
-            values.put(ContactsContract.Contacts._ID, contact.getId());
+
         values.put(ContactsContract.Contacts.COLUMN_NAME_NUMBER, contact.getPhoneNumber());
         values.put(ContactsContract.Contacts.COLUMN_NAME_CONTACT_NAME, contact.getContactName());
         values.put(ContactsContract.Contacts.COLUMN_NAME_PHOTO_URI, contact.getPhotoUri() == null ?
@@ -84,7 +83,7 @@ public class RepositoryImpl implements Repository {
 
     @Override
     public void insertContact(Contact contact) throws SQLException {
-        ContentValues values = createContactContentValues(contact, false);
+        ContentValues values = createContactContentValues(contact);
         long rowId = database.insertOrThrow(ContactsContract.Contacts.TABLE_NAME, null, values);
         contact.setId(rowId);
     }
@@ -93,7 +92,8 @@ public class RepositoryImpl implements Repository {
     public void updateContact(Contact contact) throws SQLException, IllegalStateException {
         if(contact.getId() == 0)
             throw new IllegalStateException("This contact was not saved in database");
-        ContentValues values = createContactContentValues(contact, true);
+
+        ContentValues values = createContactContentValues(contact);
         int updatedRows = database.update(ContactsContract.Contacts.TABLE_NAME, values,
                 ContactsContract.Contacts._ID + "=" + contact.getId(), null);
         if(updatedRows != 1)
@@ -144,10 +144,9 @@ public class RepositoryImpl implements Repository {
         callback.onRecordingsLoaded(getRecordings(contact));
     }
 
-    private ContentValues createRecordingContactValues(Recording recording, boolean isUpdate) {
+    private ContentValues createRecordingContentValues(Recording recording) {
         ContentValues values = new ContentValues();
-        if(isUpdate)
-            values.put(RecordingsContract.Recordings._ID, recording.getId());
+
         values.put(RecordingsContract.Recordings.COLUMN_NAME_CONTACT_ID, recording.getContactId());
         values.put(RecordingsContract.Recordings.COLUMN_NAME_PATH, recording.getPath());
         values.put(RecordingsContract.Recordings.COLUMN_NAME_INCOMING, recording.isIncoming());
@@ -162,7 +161,7 @@ public class RepositoryImpl implements Repository {
 
     @Override
     public void insertRecording(Recording recording) {
-        ContentValues values = createRecordingContactValues(recording, false);
+        ContentValues values = createRecordingContentValues(recording);
         long rowId = database.insertOrThrow(RecordingsContract.Recordings.TABLE_NAME, null, values);
         recording.setId(rowId);
     }
@@ -172,7 +171,7 @@ public class RepositoryImpl implements Repository {
         if(recording.getId() == 0)
             throw new IllegalStateException("This contact was not saved in database");
 
-        ContentValues values = createRecordingContactValues(recording, true);
+        ContentValues values = createRecordingContentValues(recording);
         int updatedRows = database.update(RecordingsContract.Recordings.TABLE_NAME, values,
                 RecordingsContract.Recordings._ID + "=" + recording.getId(), null);
         if(updatedRows != 1)
