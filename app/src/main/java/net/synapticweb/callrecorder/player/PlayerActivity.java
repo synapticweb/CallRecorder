@@ -149,7 +149,7 @@ public class PlayerActivity extends BaseActivity {
 
         recordingInfo = findViewById(R.id.recording_info);
         recordingInfo.setText(String.format(getResources().getString(R.string.recording_info),
-                recording.getName(), recording.getHumanReadingFormat()));
+                recording.getName(), recording.getHumanReadingFormat(getApplicationContext())));
 
 //        Log.wtf(TAG, "Available width: " + getResources().getDisplayMetrics().widthPixels);
 //        Log.wtf(TAG, "Density: " + getResources().getDisplayMetrics().density);

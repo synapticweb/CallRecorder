@@ -616,7 +616,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         long sizePrivate = 0, sizePublic = 0;
         for(Recording recording : adapter.getRecordings()) {
             long size = new File(recording.getPath()).length();
-            if(recording.isSavedInPrivateSpace())
+            if(recording.isSavedInPrivateSpace(parentActivity))
                 sizePrivate += size;
             else
                 sizePublic += size;
@@ -744,11 +744,11 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         source.setText(recording.getSource());
 
         TextView format = dialog.getView().findViewById(R.id.info_format_data);
-        format.setText(recording.getHumanReadingFormat());
+        format.setText(recording.getHumanReadingFormat(parentActivity));
         TextView length = dialog.getView().findViewById(R.id.info_length_data);
         length.setText(CrApp.getDurationHuman(recording.getLength(), true));
         TextView path = dialog.getView().findViewById(R.id.info_path_data);
-        path.setText(recording.isSavedInPrivateSpace() ? CrApp.getInstance().getResources().
+        path.setText(recording.isSavedInPrivateSpace(parentActivity) ? CrApp.getInstance().getResources().
                 getString(R.string.private_storage) : recording.getPath());
         if(!recording.exists()) {
             path.setText(String.format("%s%s", path.getText(), CrApp.getInstance().getResources().
@@ -884,7 +884,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
 
         boolean allowMovePrivate = true;
         for(Recording recording : getSelectedRecordings())
-            if(recording.isSavedInPrivateSpace()) {
+            if(recording.isSavedInPrivateSpace(parentActivity)) {
                 allowMovePrivate = false;
                 break;
             }

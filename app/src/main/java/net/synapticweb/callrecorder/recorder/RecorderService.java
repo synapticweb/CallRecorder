@@ -23,7 +23,6 @@ import android.media.AudioManager;
 import android.os.Build;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import net.synapticweb.callrecorder.CrApp;
@@ -76,8 +75,8 @@ public class RecorderService extends Service {
         super.onCreate();
         recorder = new Recorder();
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        nm = (NotificationManager) CrApp.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
-        settings = PreferenceManager.getDefaultSharedPreferences(CrApp.getInstance());
+        nm = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+        settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         repository = ServiceProvider.provideRepository(getApplicationContext());
         self = this;
     }

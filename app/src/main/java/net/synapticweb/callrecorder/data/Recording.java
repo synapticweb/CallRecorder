@@ -8,17 +8,12 @@
 
 package net.synapticweb.callrecorder.data;
 
-import android.content.ContentValues;
+import android.content.Context;
 import android.content.res.Resources;
-import android.database.SQLException;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Parcel;
 import android.os.Parcelable;
-
-import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.contactdetail.MoveAsyncTask;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -47,25 +42,25 @@ public class Recording implements Parcelable {
 
     public Recording(Long id, Long contactId, String path, Boolean incoming, Long startTimestamp, Long endTimestamp,
                      String format, Boolean isNameSet, String mode, String source) {
-        this.id = id;
-        this.contactId = contactId;
-        this.path = path;
-        this.incoming = incoming;
-        this.startTimestamp = startTimestamp;
-        this.endTimestamp = endTimestamp;
-        this.isNameSet = isNameSet;
-        this.format = format;
-        this.mode = mode;
-        this.source = source;
+        if(id != null) this.id = id;
+        if(contactId != null) this.contactId = contactId;
+        if(path != null) this.path = path;
+        if(incoming != null) this.incoming = incoming;
+        if(startTimestamp != null) this.startTimestamp = startTimestamp;
+        if(endTimestamp != null) this.endTimestamp = endTimestamp;
+        if(isNameSet != null) this.isNameSet = isNameSet;
+        if(format != null) this.format = format;
+        if(mode != null) this.mode = mode;
+        if(source != null) this.source = source;
     }
 
     public boolean exists() {
         return new File(path).isFile();
     }
 
-    public boolean isSavedInPrivateSpace() {
+    public boolean isSavedInPrivateSpace(Context context) {
         return new File(path).getParentFile().
-                compareTo(CrApp.getInstance().getFilesDir()) == 0;
+                compareTo(context.getFilesDir()) == 0;
     }
 
     public long getLength() {
@@ -142,9 +137,9 @@ public class Recording implements Parcelable {
         repository.updateRecording(this);
     }
 
-    public String getHumanReadingFormat() {
+    public String getHumanReadingFormat(Context context) {
         final int wavBitrate = 705, aacHighBitrate = 128, aacMedBitrate = 64, aacBasBitrate = 32;
-        Resources res = CrApp.getInstance().getResources();
+        Resources res = context.getResources();
         switch (format) {
             case "wav":
                 return res.getString(R.string.lossless_quality) + " (WAV), 44khz 16bit WAV " + (mode.equals("mono") ? wavBitrate : wavBitrate * 2)
