@@ -75,4 +75,8 @@ dependencies {
 
     def acraVersion = "5.5.0"
     implementation "ch.acra:acra-http:$acraVersion"
+
+    def dagger_version = "2.27"
+    implementation "com.google.dagger:dagger:$dagger_version"
+    annotationProcessor "com.google.dagger:dagger-compiler:$dagger_version"
 }

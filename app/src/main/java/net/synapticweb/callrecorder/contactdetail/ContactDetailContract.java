@@ -27,13 +27,13 @@ public interface ContactDetailContract {
         Context getContext();
     }
 
-    interface ContactDetailPresenter {
+    interface Presenter {
         void loadRecordings(Contact contact);
         DialogInfo deleteContact(Contact contact);
         DialogInfo deleteRecordings(List<Recording> recordings);
         DialogInfo renameRecording(CharSequence input, Recording recording);
-        DialogInfo assignToContact(Uri numberUri, List<Recording> recordings, Contact contact);
-        DialogInfo assignToPrivate(List<Recording> recordings, Contact contact);
+        DialogInfo assignToContact(Context context, Uri numberUri, List<Recording> recordings, Contact contact);
+        DialogInfo assignToPrivate(Context context, List<Recording> recordings, Contact contact);
         void moveSelectedRecordings(String path, int totalsize, Activity parentActivity, Recording[] recordings);
     }
 }

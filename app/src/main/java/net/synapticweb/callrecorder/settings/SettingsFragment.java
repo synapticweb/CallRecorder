@@ -8,6 +8,7 @@
 
 package net.synapticweb.callrecorder.settings;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
@@ -40,6 +41,13 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     public static final String SOURCE = "source";
     private BaseActivity parentActivity;
     private SharedPreferences preferences;
+    private Context context;
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        this.context = getContext();
+    }
 
     @Override
     public void onResume() {
@@ -66,7 +74,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         }
         else {
             storagePath.setEnabled(false);
-            storagePath.setSummary(CrApp.getInstance().getResources().getString(R.string.private_storage));
+            storagePath.setSummary(context.getResources().getString(R.string.private_storage));
         }
     }
 
@@ -82,7 +90,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
     @Override
     public void onCreatePreferences(@Nullable Bundle savedInstanceState, String rootKey) {
-        preferences = PreferenceManager.getDefaultSharedPreferences(CrApp.getInstance());
+        preferences = PreferenceManager.getDefaultSharedPreferences(context);
         addPreferencesFromResource(R.xml.preferences);
 
         Preference themeOption = findPreference(APP_THEME);
@@ -96,7 +104,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             @Override
             public boolean onPreferenceClick(final Preference preference) {
                 Content content = new Content();
-                content.setOverviewHeading(CrApp.getInstance().getResources().getString(R.string.choose_recordings_storage));
+                content.setOverviewHeading(context.getResources().getString(R.string.choose_recordings_storage));
                 StorageChooser.Theme theme = new StorageChooser.Theme(getActivity());
                 theme.setScheme(parentActivity.getSettedTheme().equals(BaseActivity.LIGHT_THEME) ?
                         parentActivity.getResources().getIntArray(R.array.storage_chooser_theme_light) :

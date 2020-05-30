@@ -18,17 +18,24 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.database.SQLException;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.media.AudioManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
+
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
+import androidx.core.content.FileProvider;
+
+import net.synapticweb.callrecorder.Config;
 import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.CrLog;
 import net.synapticweb.callrecorder.R;
-import net.synapticweb.callrecorder.ServiceProvider;
+import net.synapticweb.callrecorder.Util;
 import net.synapticweb.callrecorder.contactslist.ContactsListActivityMain;
 import net.synapticweb.callrecorder.data.Contact;
 import net.synapticweb.callrecorder.data.Recording;
@@ -37,6 +44,12 @@ import net.synapticweb.callrecorder.settings.SettingsFragment;
 
 import org.acra.ACRA;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+
+import javax.inject.Inject;
 
 public class RecorderService extends Service {
     private  String receivedNumPhone = null;
@@ -51,15 +64,14 @@ public class RecorderService extends Service {
     private Contact contact = null;
     private String callIdentifier;
     private SharedPreferences settings;
-    private Repository repository;
+    @Inject
+    Repository repository;
 
     public static final int NOTIFICATION_ID = 1;
     private static final String CHANNEL_ID = "call_recorder_channel";
-    public static final String PHONE_NUMBER = "phone_number";
     public static final int RECORD_AUTOMMATICALLY = 1;
     public static final int RECORD_ERROR = 4;
     public static final int RECORD_SUCCESS = 5;
-    static final String ACTION_START_RECORDING = "net.synapticweb.callrecorder.START_RECORDING";
     static final String ACTION_STOP_SPEAKER = "net.synapticweb.callrecorder.STOP_SPEAKER";
     static final String ACTION_START_SPEAKER = "net.synapticweb.callrecorder.START_SPEAKER";
 
@@ -73,11 +85,11 @@ public class RecorderService extends Service {
 
     public void onCreate(){
         super.onCreate();
-        recorder = new Recorder();
+        recorder = new Recorder(getApplicationContext());
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         nm = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
         settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        repository = ServiceProvider.provideRepository(getApplicationContext());
+        ((CrApp) getApplication()).appComponent.inject(this);
         self = this;
     }
 
@@ -105,14 +117,14 @@ public class RecorderService extends Service {
     }
 
     public Notification buildNotification(int typeOfNotification, int message) {
-        Intent goToActivity = new Intent(CrApp.getInstance(), ContactsListActivityMain.class);
-        PendingIntent tapNotificationPi = PendingIntent.getActivity(CrApp.getInstance(), 0, goToActivity, 0);
-        Intent sendBroadcast = new Intent(CrApp.getInstance(), ControlRecordingReceiver.class);
-        Resources res = CrApp.getInstance().getResources();
+        Intent goToActivity = new Intent(getApplicationContext(), ContactsListActivityMain.class);
+        PendingIntent tapNotificationPi = PendingIntent.getActivity(getApplicationContext(), 0, goToActivity, 0);
+        Intent sendBroadcast = new Intent(getApplicationContext(), ControlRecordingReceiver.class);
+        Resources res = getApplicationContext().getResources();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             createChannel();
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(CrApp.getInstance(), CHANNEL_ID)
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
                 .setSmallIcon(R.drawable.notification_icon)
                 .setContentTitle(callIdentifier + (incoming ? " (incoming)" : " (outgoing)"))
                 .setContentIntent(tapNotificationPi);
@@ -130,7 +142,7 @@ public class RecorderService extends Service {
                             .setContentText(res.getString(R.string.recording_speaker_on));
                 } else {
                     sendBroadcast.setAction(ACTION_START_SPEAKER);
-                    PendingIntent startSpeakerPi = PendingIntent.getBroadcast(CrApp.getInstance(), 0, sendBroadcast, 0);
+                    PendingIntent startSpeakerPi = PendingIntent.getBroadcast(getApplicationContext(), 0, sendBroadcast, 0);
                     builder.addAction(new NotificationCompat.Action.Builder(R.drawable.speaker_phone_on,
                             res.getString(R.string.start_speaker), startSpeakerPi).build())
                             .setContentText(res.getString(R.string.recording_speaker_off));
@@ -180,6 +192,8 @@ public class RecorderService extends Service {
                 if(contact == null) {
                     contact = new Contact(null, receivedNumPhone, getResources().getString(R.string.unkown_contact), null, CrApp.UNKNOWN_TYPE_PHONE_CODE);
                 }
+                else if(contact.getPhotoUri() != null)
+                    Util.copyPhotoFromPhoneContacts(getApplicationContext(), contact);
 
                 try {
                     contact.save(repository);

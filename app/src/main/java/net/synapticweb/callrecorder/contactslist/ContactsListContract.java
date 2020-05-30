@@ -17,7 +17,7 @@ public interface ContactsListContract {
         void resetCurrentPosition();
     }
 
-    interface ContactsListPresenter {
+    interface Presenter {
         void loadContacts();
     }
 }

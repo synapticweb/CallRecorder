@@ -14,7 +14,6 @@ import android.content.Context;
 import android.content.Intent;
 
 import android.content.res.Resources;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
@@ -51,15 +50,13 @@ import net.synapticweb.callrecorder.CrLog;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.BaseActivity;
 import net.synapticweb.callrecorder.BaseActivity.LayoutType;
-import net.synapticweb.callrecorder.ServiceProvider;
+import net.synapticweb.callrecorder.contactdetail.di.ViewModule;
 import net.synapticweb.callrecorder.contactslist.ContactsListFragment;
-import net.synapticweb.callrecorder.data.CallRecorderDbHelper;
 import net.synapticweb.callrecorder.data.Contact;
 import net.synapticweb.callrecorder.data.Recording;
-import net.synapticweb.callrecorder.data.Repository;
-import net.synapticweb.callrecorder.data.RepositoryImpl;
 import net.synapticweb.callrecorder.player.PlayerActivity;
 import net.synapticweb.callrecorder.recorder.Recorder;
+import net.synapticweb.callrecorder.contactdetail.ContactDetailContract.Presenter;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -76,11 +73,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import static net.synapticweb.callrecorder.contactslist.ContactsListFragment.ARG_CONTACT;
 import net.synapticweb.callrecorder.CrApp.DialogInfo;
 
+import javax.inject.Inject;
 
-public class ContactDetailFragment extends Fragment implements ContactDetailContract.View{
-    private ContactDetailPresenter presenter;
+public class ContactDetailFragment extends Fragment implements ContactDetailContract.View {
+    @Inject
+    Presenter presenter;
     protected RecordingAdapter adapter;
-    private TextView typePhoneView, phoneNumberView;
+    private TextView typePhoneView, phoneNumberView, recordingStatusView;
     private ImageView contactPhotoView;
     protected RecyclerView recordingsRecycler;
     private RelativeLayout detailView;
@@ -111,7 +110,6 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        presenter = new ContactDetailPresenter(this, ServiceProvider.provideRepository(getContext()));
         adapter = new RecordingAdapter(new ArrayList<>(0));
         Bundle args = getArguments();
         if(args != null)
@@ -154,6 +152,9 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         parentActivity = (BaseActivity) context;
+        CrApp application = (CrApp) parentActivity.getApplication();
+        ViewModule viewModule = new ViewModule(this);
+        application.appComponent.contactDetailComponent().create(viewModule).inject(this);
     }
 
     @Override
@@ -208,6 +209,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
      */
     @Override
     public void paintViews(List<Recording> recordings){
+        adapter.replaceData(recordings);
         if(selectMode)
             putInSelectMode(false);
             //necesar pentru că 1: dacă în DOUBLE_PANE se clichează pe un contact în timp ce sunt selectate
@@ -236,8 +238,6 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         }
 
         TextView noContent = detailView.findViewById(R.id.no_content_detail);
-        adapter.replaceData(recordings);
-
         if(recordings.size() > 0)
             noContent.setVisibility(View.GONE);
         else
@@ -603,12 +603,12 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
 
     private void onAssignToContact(Uri numberUri) {
         List<Recording> recordings = getSelectedRecordings();
-        DialogInfo result = presenter.assignToContact(numberUri, recordings, contact);
+        DialogInfo result = presenter.assignToContact(parentActivity, numberUri, recordings, contact);
         onAssignViewActions(result);
     }
 
     protected void onAssignToPrivate() {
-        DialogInfo result = presenter.assignToPrivate(getSelectedRecordings(), contact);
+        DialogInfo result = presenter.assignToPrivate(parentActivity, getSelectedRecordings(), contact);
         onAssignViewActions(result);
     }
 
@@ -639,7 +639,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         new MaterialDialog.Builder(parentActivity)
                 .title(R.string.rename_recording_title)
                 .inputType(InputType.TYPE_CLASS_TEXT)
-                .input(CrApp.getInstance().getResources().getString(R.string.rename_recording_input_text),
+                .input(parentActivity.getResources().getString(R.string.rename_recording_input_text),
                         null, false, (@NonNull MaterialDialog dialog, CharSequence input) -> {
                             if(selectedItems.size() != 1) {
                                 CrLog.log(CrLog.WARN, "Calling onRenameClick when multiple recordings are selected");
@@ -719,7 +719,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
             }
             new MaterialDialog.Builder(parentActivity)
                     .title(R.string.recordings_info_title)
-                    .content(String.format(CrApp.getInstance().getResources().getString(R.string.recordings_info_text), CrApp.getFileSizeHuman(totalSize)))
+                    .content(String.format(parentActivity.getResources().getString(R.string.recordings_info_text), CrApp.getFileSizeHuman(totalSize)))
                     .positiveText(android.R.string.ok)
                     .show();
             return ;
@@ -748,12 +748,12 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         TextView length = dialog.getView().findViewById(R.id.info_length_data);
         length.setText(CrApp.getDurationHuman(recording.getLength(), true));
         TextView path = dialog.getView().findViewById(R.id.info_path_data);
-        path.setText(recording.isSavedInPrivateSpace(parentActivity) ? CrApp.getInstance().getResources().
+        path.setText(recording.isSavedInPrivateSpace(parentActivity) ? parentActivity.getResources().
                 getString(R.string.private_storage) : recording.getPath());
         if(!recording.exists()) {
-            path.setText(String.format("%s%s", path.getText(), CrApp.getInstance().getResources().
+            path.setText(String.format("%s%s", path.getText(), parentActivity.getResources().
                     getString(R.string.nonexistent_file)));
-            path.setTextColor(CrApp.getInstance().getResources().getColor(android.R.color.holo_red_light));
+            path.setTextColor(parentActivity.getResources().getColor(android.R.color.holo_red_light));
         }
         dialog.show();
     }
@@ -820,7 +820,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
             });
 
             editContact.setOnClickListener((View v) -> {
-                Intent intent = new Intent(CrApp.getInstance(), EditContactActivity.class);
+                Intent intent = new Intent(parentActivity, EditContactActivity.class);
                 intent.putExtra(EDIT_EXTRA_CONTACT, contact);
                 startActivityForResult(intent, REQUEST_EDIT);
                 }
@@ -968,7 +968,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
                 manageSelectRecording(v, this.getAdapterPosition(), recording.exists());
             else { //usual short click
                 if(recording.exists()) {
-                    Intent playIntent = new Intent(CrApp.getInstance(), PlayerActivity.class);
+                    Intent playIntent = new Intent(parentActivity, PlayerActivity.class);
                     playIntent.putExtra(RECORDING_EXTRA, recording);
                     startActivity(playIntent);
                 }

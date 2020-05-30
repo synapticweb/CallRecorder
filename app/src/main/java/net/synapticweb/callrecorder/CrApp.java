@@ -18,6 +18,9 @@ import android.text.Spanned;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import net.synapticweb.callrecorder.di.AppComponent;
+import net.synapticweb.callrecorder.di.DaggerAppComponent;
+
 import org.acra.ACRA;
 import org.acra.annotation.AcraCore;
 import org.acra.annotation.AcraHttpSender;
@@ -42,11 +45,14 @@ import java.util.concurrent.TimeUnit;
 @AcraHttpSender(uri = "http://crashes.infopsihologia.ro",
         httpMethod = HttpSender.Method.POST )
 public class CrApp extends Application {
+    public AppComponent appComponent;
+
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
         if(!BuildConfig.DEBUG)
             ACRA.init(this);
+        appComponent = DaggerAppComponent.factory().create(base);
     }
 
     public static final int SQLITE_TRUE = 1;

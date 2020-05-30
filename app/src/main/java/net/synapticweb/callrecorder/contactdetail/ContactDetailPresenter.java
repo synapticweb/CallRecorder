@@ -10,13 +10,10 @@ package net.synapticweb.callrecorder.contactdetail;
 
 
 import android.app.Activity;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-
-import androidx.fragment.app.Fragment;
-
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
@@ -24,21 +21,22 @@ import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.CrApp.DialogInfo;
 import net.synapticweb.callrecorder.CrLog;
 import net.synapticweb.callrecorder.R;
+import net.synapticweb.callrecorder.Util;
 import net.synapticweb.callrecorder.data.Contact;
-import net.synapticweb.callrecorder.data.ContactsContract;
 import net.synapticweb.callrecorder.data.Recording;
-import net.synapticweb.callrecorder.data.CallRecorderDbHelper;
-import net.synapticweb.callrecorder.data.RecordingsRepository;
 import net.synapticweb.callrecorder.data.Repository;
+import net.synapticweb.callrecorder.di.FragmentScope;
 
 import java.io.File;
 import java.util.List;
+import javax.inject.Inject;
 
-
-public class ContactDetailPresenter implements ContactDetailContract.ContactDetailPresenter {
+@FragmentScope
+public class ContactDetailPresenter implements ContactDetailContract.Presenter {
     private ContactDetailContract.View view;
     private Repository repository;
 
+     @Inject
      ContactDetailPresenter(ContactDetailContract.View view, Repository repository) {
         this.view = view;
         this.repository = repository;
@@ -88,7 +86,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
 
     @Override
     public void loadRecordings(Contact contact) {
-        RecordingsRepository.getRecordings(contact, (List<Recording> recordings) -> {
+        repository.getRecordings(contact, (List<Recording> recordings) -> {
                 view.paintViews(recordings);
                 //aici ar trebui să fie cod care să pună tickuri pe recordingurile selectate cînd
                 //este întors device-ul. Dar dacă pun aici codul nu se execută pentru că nu vor fi gata
@@ -114,7 +112,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
 
 
     @Override
-    public DialogInfo assignToContact(Uri numberUri, List<Recording> recordings, Contact contact) {
+    public DialogInfo assignToContact(Context context, Uri numberUri, List<Recording> recordings, Contact contact) {
         PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
         Phonenumber.PhoneNumber phoneNumberWrapper;
         Cursor cursor;
@@ -123,7 +121,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
         PhoneNumberUtil.MatchType matchType;
         long contactId = 0;
 
-        cursor = CrApp.getInstance().getContentResolver().
+        cursor = context.getContentResolver().
                 query(numberUri, new String[]{android.provider.ContactsContract.CommonDataKinds.Phone.NUMBER,
                                 android.provider.ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
                                 android.provider.ContactsContract.CommonDataKinds.Phone.PHOTO_URI,
@@ -156,22 +154,18 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
                         R.string.assign_to_same_contact, R.drawable.warning);
             }
         }
-        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(CrApp.getInstance());
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
-        cursor = db.query(ContactsContract.Contacts.TABLE_NAME,
-                new String[]{ContactsContract.Contacts._ID, ContactsContract.Contacts.COLUMN_NAME_NUMBER},
-                null, null, null, null, null);
+        List<Contact> contacts = repository.getAllContacts();
 
-        while(cursor.moveToNext()) {
-            String number = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.COLUMN_NAME_NUMBER));
-            long id = cursor.getLong(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+       for(Contact contact1 : contacts) {
+            String number = contact1.getPhoneNumber();
+            long id = contact1.getId();
             matchType = phoneUtil.isNumberMatch(phoneNumberWrapper, number);
             if(matchType != PhoneNumberUtil.MatchType.NO_MATCH && matchType != PhoneNumberUtil.MatchType.NOT_A_NUMBER) {
                 contactId = id;
                 break;
             }
         }
-        cursor.close();
+
         if(contactId == 0) {
             Contact newContact = new Contact(null, phoneNumber, contactName, photoUri, phoneType);
             try {
@@ -181,6 +175,8 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
                 return new DialogInfo(R.string.error_title,
                         R.string.assign_to_contact_err, R.drawable.error);
             }
+            if(newContact.getPhotoUri() != null)
+                Util.copyPhotoFromPhoneContacts(context, newContact);
             contactId = newContact.getId();
         }
 
@@ -201,23 +197,17 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
     }
 
     @Override
-    public DialogInfo assignToPrivate(List<Recording> recordings,  Contact contact) {
+    public DialogInfo assignToPrivate(Context context, List<Recording> recordings,  Contact contact) {
          if(contact != null && contact.isPrivateNumber()) {
              return new DialogInfo(R.string.information_title, R.string.assign_to_same_contact, R.drawable.warning);
          }
 
-        CallRecorderDbHelper mDbHelper = new CallRecorderDbHelper(CrApp.getInstance());
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
-        long id;
+        Long id = repository.getHiddenNumberContactId();
 
-        Cursor cursor = db.query(ContactsContract.Contacts.TABLE_NAME, new String[]{ContactsContract.Contacts._ID},
-                ContactsContract.Contacts.COLUMN_NAME_PRIVATE_NUMBER + "=" + CrApp.SQLITE_TRUE, null, null, null, null);
-
-        if (cursor.moveToFirst())
-            id = cursor.getLong(cursor.getColumnIndex(ContactsContract.Contacts._ID));
-        else {
+        if(id == null) {
             Contact newContact = new Contact();
-            newContact.setPrivateNumber(true);
+            newContact.setIsPrivateNumber();
+            newContact.setContactName(context.getString(R.string.private_number_name));
             try {
                 newContact.save(repository);
             } catch (SQLException exc) {
@@ -226,7 +216,6 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
             }
             id = newContact.getId();
         }
-        cursor.close();
 
         for (Recording recording : recordings) {
             recording.setContactId(id);

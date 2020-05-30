@@ -100,7 +100,6 @@ public class Contact implements Comparable<Contact>, Parcelable {
       return null;
     }
 
-
     public boolean isPrivateNumber() {
         return phoneNumber == null;
     }

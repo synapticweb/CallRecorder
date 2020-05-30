@@ -15,7 +15,6 @@ import android.content.SharedPreferences;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.preference.PreferenceManager;
-import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.CrLog;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.settings.SettingsFragment;
@@ -29,8 +28,10 @@ abstract class RecordingThread {
     final int bufferSize;
     final AudioRecord audioRecord;
     protected final Recorder recorder;
+    protected Context context;
 
-    RecordingThread(String mode, Recorder recorder) throws RecordingException {
+    RecordingThread(Context context, String mode, Recorder recorder) throws RecordingException {
+        this.context = context;
         channels = (mode.equals(Recorder.MONO) ? 1 : 2);
         this.recorder = recorder;
         bufferSize = AudioRecord.getMinBufferSize(SAMPLE_RATE, channels == 1 ? AudioFormat.CHANNEL_IN_MONO : AudioFormat.CHANNEL_IN_STEREO,
@@ -41,7 +42,7 @@ abstract class RecordingThread {
 
     private AudioRecord createAudioRecord() throws RecordingException {
         AudioRecord audioRecord;
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(CrApp.getInstance());
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
         int source = Integer.valueOf(settings.getString(SettingsFragment.SOURCE,
                 String.valueOf(VOICE_RECOGNITION)));
             try {
@@ -70,10 +71,10 @@ abstract class RecordingThread {
     }
 
     //e statică ca să poată fi apelată din CopyPcmToWav
-    static void notifyOnError() {
+    static void notifyOnError(Context context) {
         RecorderService service = RecorderService.getService();
         if (service != null) {
-            NotificationManager nm = (NotificationManager) CrApp.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
+            NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             if (nm != null)
                 nm.notify(RecorderService.NOTIFICATION_ID,
                         service.buildNotification(RecorderService.RECORD_ERROR,
