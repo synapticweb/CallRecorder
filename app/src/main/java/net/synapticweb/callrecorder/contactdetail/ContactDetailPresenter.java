@@ -16,14 +16,19 @@ import net.synapticweb.callrecorder.data.Contact;
 import net.synapticweb.callrecorder.data.Recording;
 import net.synapticweb.callrecorder.CrApp.DialogInfo;
 import net.synapticweb.callrecorder.data.Repository;
+import net.synapticweb.callrecorder.di.FragmentScope;
 
 import java.io.File;
 import java.util.List;
 
-public class ContactDetailPresenter implements ContactDetailContract.ContactDetailPresenter {
+import javax.inject.Inject;
+
+@FragmentScope
+public class ContactDetailPresenter implements ContactDetailContract.Presenter {
     private ContactDetailContract.View view;
     private Repository repository;
 
+     @Inject
      ContactDetailPresenter(ContactDetailContract.View view, Repository repository) {
         this.view = view;
         this.repository = repository;
@@ -99,7 +104,7 @@ public class ContactDetailPresenter implements ContactDetailContract.ContactDeta
 
     @Override
     public void toggleShouldRecord(Contact contact) {
-        contact.setShouldRecord(!contact.shouldRecord());
+        contact.setShouldRecord(!contact.getShouldRecord());
         contact.update(repository);
         view.setContact(contact);
     }

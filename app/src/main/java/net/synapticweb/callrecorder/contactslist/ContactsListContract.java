@@ -22,7 +22,7 @@ public interface ContactsListContract {
         void resetCurrentPosition();
     }
 
-    interface ContactsListPresenter {
+    interface Presenter {
         void loadContacts();
         DialogInfo addContactResult(Intent intent, Context context);
     }

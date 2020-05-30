@@ -25,7 +25,7 @@ public interface ContactDetailContract {
         Context getContext();
     }
 
-    interface ContactDetailPresenter {
+    interface Presenter {
         void loadRecordings(Contact contact);
         DialogInfo deleteContact(Contact contact);
         DialogInfo deleteRecordings(List<Recording> recordings);

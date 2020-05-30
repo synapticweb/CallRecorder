@@ -38,7 +38,6 @@ import net.synapticweb.callrecorder.Config;
 import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.CrLog;
 import net.synapticweb.callrecorder.R;
-import net.synapticweb.callrecorder.ServiceProvider;
 import net.synapticweb.callrecorder.contactslist.ContactsListActivityMain;
 import net.synapticweb.callrecorder.data.Contact;
 import net.synapticweb.callrecorder.data.Recording;
@@ -51,6 +50,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+
+import javax.inject.Inject;
 
 
 public class RecorderService extends Service {
@@ -67,7 +68,8 @@ public class RecorderService extends Service {
     private NotificationManager nm;
     private static RecorderService self;
     private boolean speakerOn = false;
-    private Repository repository;
+    @Inject
+    Repository repository;
 
     public static final int NOTIFICATION_ID = 1;
     private static final String CHANNEL_ID = "call_recorder_channel";
@@ -91,11 +93,11 @@ public class RecorderService extends Service {
 
     public void onCreate(){
         super.onCreate();
-        recorder = new Recorder();
+        recorder = new Recorder(getApplicationContext());
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         nm = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
         settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        repository = ServiceProvider.provideRepository(getApplicationContext());
+        ((CrApp) getApplication()).appComponent.inject(this);
         self = this;
     }
 
@@ -123,14 +125,14 @@ public class RecorderService extends Service {
     }
 
     public Notification buildNotification(int typeOfNotification, int message) {
-        Intent goToActivity = new Intent(CrApp.getInstance(), ContactsListActivityMain.class);
-        PendingIntent tapNotificationPi = PendingIntent.getActivity(CrApp.getInstance(), 0, goToActivity, 0);
-        Intent sendBroadcast = new Intent(CrApp.getInstance(), ControlRecordingReceiver.class);
-        Resources res = CrApp.getInstance().getResources();
+        Intent goToActivity = new Intent(getApplicationContext(), ContactsListActivityMain.class);
+        PendingIntent tapNotificationPi = PendingIntent.getActivity(getApplicationContext(), 0, goToActivity, 0);
+        Intent sendBroadcast = new Intent(getApplicationContext(), ControlRecordingReceiver.class);
+        Resources res = getApplicationContext().getResources();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             createChannel();
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(CrApp.getInstance(), CHANNEL_ID)
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
                 .setSmallIcon(R.drawable.notification_icon)
                 .setContentTitle(callIdentifier + (incoming ? " (incoming)" : " (outgoing)"))
                 .setContentIntent(tapNotificationPi);
@@ -143,12 +145,12 @@ public class RecorderService extends Service {
                 //returnează false.
                 if (audioManager.isSpeakerphoneOn() || speakerOn) {
                     sendBroadcast.setAction(ACTION_STOP_SPEAKER);
-                    PendingIntent stopSpeakerPi = PendingIntent.getBroadcast(CrApp.getInstance(), 0, sendBroadcast, 0);
+                    PendingIntent stopSpeakerPi = PendingIntent.getBroadcast(getApplicationContext(), 0, sendBroadcast, 0);
                     builder.addAction(new NotificationCompat.Action.Builder(R.drawable.speaker_phone_off, res.getString(R.string.stop_speaker), stopSpeakerPi).build())
                             .setContentText(res.getString(R.string.recording_speaker_on));
                 } else {
                     sendBroadcast.setAction(ACTION_START_SPEAKER);
-                    PendingIntent startSpeakerPi = PendingIntent.getBroadcast(CrApp.getInstance(), 0, sendBroadcast, 0);
+                    PendingIntent startSpeakerPi = PendingIntent.getBroadcast(getApplicationContext(), 0, sendBroadcast, 0);
                     builder.addAction(new NotificationCompat.Action.Builder(R.drawable.speaker_phone_on,
                             res.getString(R.string.start_speaker), startSpeakerPi).build() )
                             .setContentText(res.getString(R.string.recording_speaker_off));
@@ -157,7 +159,7 @@ public class RecorderService extends Service {
             case RECORD_ON_REQUEST:
                 sendBroadcast.setAction(ACTION_START_RECORDING);
                 sendBroadcast.putExtra(PHONE_NUMBER, receivedNumPhone != null ? receivedNumPhone : "private_phone");
-                PendingIntent startRecordingPi = PendingIntent.getBroadcast(CrApp.getInstance(), 0, sendBroadcast, 0);
+                PendingIntent startRecordingPi = PendingIntent.getBroadcast(getApplicationContext(), 0, sendBroadcast, 0);
                 builder.addAction(new NotificationCompat.Action.Builder(R.drawable.recorder,
                                 res.getString(R.string.start_recording_notification), startRecordingPi).build() )
                         .setContentText(res.getString(R.string.start_recording_notification_text));
@@ -209,24 +211,23 @@ public class RecorderService extends Service {
             ACRA.getErrorReporter().putCustomData(ACRA_PHONE_NUMBER, receivedNumPhone);
             ACRA.getErrorReporter().putCustomData(ACRA_INCOMING, incoming.toString());
         }
-        catch (IllegalStateException ignored) {
-        }
+        catch (IllegalStateException ignored) {}
         //în cazul în care nr primit e null înseamnă că se sună de pe nr privat
         privateCall = (receivedNumPhone == null);
 
         if(!privateCall) {//și nu trebuie să mai verificăm dacă nr este în baza de date sau, dacă nu
             // este în baza de date, dacă este în contacte.
             Contact contact;
-            match = ((contact = Contact.queryNumberInAppContacts(repository, receivedNumPhone, CrApp.getInstance())) != null);
+            match = ((contact = Contact.queryNumberInAppContacts(repository, receivedNumPhone, getApplicationContext())) != null);
             if(match) {
                 idIfMatch = contact.getId(); //pentru teste: idIfMatch nu trebuie să fie niciodată null dacă match == true
                 callIdentifier = contact.getContactName(); //posibil subiect pentru un test.
-                shouldRecord = contact.shouldRecord();
+                shouldRecord = contact.getShouldRecord();
             }
             else { //în caz de ussd serviciul se oprește
                 callIdentifier = receivedNumPhone;
                 PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
-                String countryCode = CrApp.getUserCountry(CrApp.getInstance());
+                String countryCode = CrApp.getUserCountry(getApplicationContext());
                 if(countryCode == null)
                     countryCode = "US";
                 try {
@@ -364,18 +365,19 @@ public class RecorderService extends Service {
             Contact contact;
             if((contact = Contact.queryNumberInPhoneContacts(receivedNumPhone, getApplicationContext())) != null) {
                 Uri photoUri = contact.getPhotoUri();
-                Context context = getApplicationContext();
-                try {
-                    Bitmap originalPhotoBitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), photoUri);
-                    //am adăugat System.currentTimeMillis() pentru consistență cu EditContactActivity.setPhotoPath().
-                    File copiedPhotoFile = new File(context.getFilesDir(), contact.getPhoneNumber() + System.currentTimeMillis() + ".jpg");
-                    OutputStream os = new FileOutputStream(copiedPhotoFile);
-                    originalPhotoBitmap.compress(Bitmap.CompressFormat.JPEG, 70, os);
-                    contact.setPhotoUri(FileProvider.getUriForFile(context, Config.FILE_PROVIDER, copiedPhotoFile));
-                }
-                catch(IOException exception) {
-                    CrLog.log(CrLog.ERROR, "IO exception: Could not copy photo from phone contacts: " + exception.getMessage());
-                    contact.setPhotoUri((Uri) null);
+                if(photoUri != null) {
+                    Context context = getApplicationContext();
+                    try {
+                        Bitmap originalPhotoBitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), photoUri);
+                        //am adăugat System.currentTimeMillis() pentru consistență cu EditContactActivity.setPhotoPath().
+                        File copiedPhotoFile = new File(context.getFilesDir(), contact.getPhoneNumber() + System.currentTimeMillis() + ".jpg");
+                        OutputStream os = new FileOutputStream(copiedPhotoFile);
+                        originalPhotoBitmap.compress(Bitmap.CompressFormat.JPEG, 70, os);
+                        contact.setPhotoUri(FileProvider.getUriForFile(context, Config.FILE_PROVIDER, copiedPhotoFile));
+                    } catch (IOException exception) {
+                        CrLog.log(CrLog.ERROR, "IO exception: Could not copy photo from phone contacts: " + exception.getMessage());
+                        contact.setPhotoUri((Uri) null);
+                    }
                 }
 
                 try {

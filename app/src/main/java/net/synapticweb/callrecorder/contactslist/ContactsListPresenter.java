@@ -22,15 +22,20 @@ import net.synapticweb.callrecorder.CrLog;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.data.Contact;
 import net.synapticweb.callrecorder.data.Repository;
+import net.synapticweb.callrecorder.di.FragmentScope;
+
 import androidx.annotation.NonNull;
 
 import java.util.List;
 
+import javax.inject.Inject;
 
-public class ContactsListPresenter implements ContactsListContract.ContactsListPresenter {
+@FragmentScope
+public class ContactsListPresenter implements ContactsListContract.Presenter {
     @NonNull private ContactsListContract.View view;
     private Repository repository;
 
+    @Inject
     ContactsListPresenter(@NonNull ContactsListContract.View view, Repository repository) {
         this.view = view;
         this.repository = repository;

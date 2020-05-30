@@ -1,6 +1,7 @@
 package net.synapticweb.callrecorder.data;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
@@ -9,17 +10,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class RepositoryImpl implements Repository {
     private SQLiteDatabase database;
-    private RepositoryImpl(SQLiteOpenHelper helper) {
-        this.database = helper.getWritableDatabase();
-    }
-    private static RepositoryImpl instance = null;
 
-    public static RepositoryImpl getInstance(SQLiteOpenHelper helper) {
-        if(instance == null)
-            instance = new RepositoryImpl(helper);
-        return instance;
+    @Inject
+    RepositoryImpl(Context context) {
+        SQLiteOpenHelper helper = new CallRecorderDbHelper(context);
+        this.database = helper.getWritableDatabase();
     }
 
     private Contact populateContact(Cursor cursor) {
@@ -32,6 +33,7 @@ public class RepositoryImpl implements Repository {
         contact.setPhoneType(
                 cursor.getInt(cursor.getColumnIndex(ContactsContract.Contacts.COLUMN_NAME_PHONE_TYPE)));
         contact.setId(cursor.getLong(cursor.getColumnIndex(ContactsContract.Contacts._ID)));
+        contact.setShouldRecord(cursor.getInt(cursor.getColumnIndex(ContactsContract.Contacts.COLUMN_NAME_SHOULD_RECORD)) == 1);
         return contact;
     }
 
@@ -58,7 +60,7 @@ public class RepositoryImpl implements Repository {
     @Override
     public Long getHiddenNumberContactId() {
         Cursor cursor = database.query(ContactsContract.Contacts.TABLE_NAME, new String[]{ContactsContract.Contacts._ID},
-                ContactsContract.Contacts.COLUMN_NAME_NUMBER + "=" + null, null, null, null, null);
+                ContactsContract.Contacts.COLUMN_NAME_NUMBER + " is " + "NULL", null, null, null, null);
 
         if(cursor != null && cursor.moveToFirst()) {
             long id = cursor.getLong(cursor.getColumnIndex(ContactsContract.Contacts._ID));
@@ -78,6 +80,7 @@ public class RepositoryImpl implements Repository {
         values.put(ContactsContract.Contacts.COLUMN_NAME_PHOTO_URI, contact.getPhotoUri() == null ?
                 null : contact.getPhotoUri().toString());
         values.put(ContactsContract.Contacts.COLUMN_NAME_PHONE_TYPE, contact.getPhoneTypeCode());
+        values.put(ContactsContract.Contacts.COLUMN_NAME_SHOULD_RECORD, contact.getShouldRecord());
         return values;
     }
 

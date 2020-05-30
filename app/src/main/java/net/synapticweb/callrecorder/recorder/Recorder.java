@@ -8,6 +8,7 @@
 
 package net.synapticweb.callrecorder.recorder;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import net.synapticweb.callrecorder.CrApp;
@@ -37,15 +38,17 @@ public class Recorder {
     static final String MONO = "mono";
     private int source;
     private boolean hasError = false;
+    private Context context;
 
     private static final String ACRA_FORMAT = "format";
     private static final String ACRA_MODE = "mode";
     private static final String ACRA_SAVE_PATH = "save_path";
 
-     Recorder() {
-        settings = PreferenceManager.getDefaultSharedPreferences(CrApp.getInstance());
-        format = settings.getString(SettingsFragment.FORMAT, "");
-        mode = settings.getString(SettingsFragment.MODE, "");
+     Recorder(Context context) {
+         this.context = context;
+         settings = PreferenceManager.getDefaultSharedPreferences(context);
+         format = settings.getString(SettingsFragment.FORMAT, "");
+         mode = settings.getString(SettingsFragment.MODE, "");
     }
 
     long getStartingTime() {
@@ -66,12 +69,12 @@ public class Recorder {
         File recordingsDir;
 
         if(settings.getString(SettingsFragment.STORAGE, "").equals("private"))
-            recordingsDir = CrApp.getInstance().getFilesDir();
+            recordingsDir = context.getFilesDir();
         else {
             String filePath = settings.getString(SettingsFragment.STORAGE_PATH, null);
-            recordingsDir = (filePath == null) ? CrApp.getInstance().getExternalFilesDir(null) : new File(filePath);
+            recordingsDir = (filePath == null) ? context.getExternalFilesDir(null) : new File(filePath);
             if(recordingsDir == null) //recordingsDir poate fi null în cazul în care getExternalFilesDir(null) returnează null, adică nu e montat (disponibil) un astfel de spațiu.
-                recordingsDir = CrApp.getInstance().getFilesDir();
+                recordingsDir = context.getFilesDir();
             }
 
         phoneNumber = phoneNumber.replaceAll("[()/.,* ;+]", "_");
@@ -90,9 +93,9 @@ public class Recorder {
         }
 
         if(format.equals(WAV_FORMAT))
-            recordingThread = new Thread(new RecordingThreadWav(mode, this));
+            recordingThread = new Thread(new RecordingThreadWav(context, mode, this));
         else
-            recordingThread = new Thread(new RecordingThreadAac(audioFile, format, mode, this));
+            recordingThread = new Thread(new RecordingThreadAac(context, audioFile, format, mode, this));
 
         recordingThread.start();
         startingTime = System.currentTimeMillis();
@@ -106,7 +109,7 @@ public class Recorder {
             if(format.equals(WAV_FORMAT)) {
                 //în cazul în care a apărut o eroare în RecordingThreadWav și fișierul temporar nu există, această
                 //condiție va fi detectată în bucla try a CopyPcmToWav.run() și va fi raportată o eroare.
-                Thread copyPcmToWav = new Thread(new RecordingThreadWav.CopyPcmToWav(audioFile, mode, this));
+                Thread copyPcmToWav = new Thread(new RecordingThreadWav.CopyPcmToWav(context, audioFile, mode, this));
                 copyPcmToWav.start();
             }
         }

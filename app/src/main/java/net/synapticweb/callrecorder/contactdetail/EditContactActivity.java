@@ -55,12 +55,13 @@ import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.CrLog;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.BaseActivity;
-import net.synapticweb.callrecorder.ServiceProvider;
 import net.synapticweb.callrecorder.data.Contact;
 import net.synapticweb.callrecorder.data.Repository;
 
 import java.io.File;
 import java.io.IOException;
+
+import javax.inject.Inject;
 
 
 public class EditContactActivity extends BaseActivity implements AdapterView.OnItemSelectedListener {
@@ -76,7 +77,8 @@ public class EditContactActivity extends BaseActivity implements AdapterView.OnI
     private static final int PICK_IMAGE_REQUEST = 1;
     private static final int TAKE_PICTURE = 2;
     public static final String EDITED_CONTACT = "edited_contact";
-    private Repository repository;
+    @Inject
+    Repository repository;
 
     @Override
     protected Fragment createFragment() {
@@ -136,11 +138,11 @@ public class EditContactActivity extends BaseActivity implements AdapterView.OnI
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        ((CrApp) getApplication()).appComponent.inject(this);
         super.onCreate(savedInstanceState);
         setTheme();
         setContentView(R.layout.edit_contact_activity);
 
-        repository = ServiceProvider.provideRepository(this);
         Toolbar toolbar = findViewById(R.id.toolbar_edit);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();

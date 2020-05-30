@@ -101,7 +101,7 @@ public class Contact implements Comparable<Contact>, Parcelable {
       return null;
     }
 
-    public boolean shouldRecord() {
+    public boolean getShouldRecord() {
         return shouldRecord;
     }
 

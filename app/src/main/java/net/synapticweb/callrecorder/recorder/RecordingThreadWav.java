@@ -8,6 +8,8 @@
 
 package net.synapticweb.callrecorder.recorder;
 
+import android.content.Context;
+
 import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.CrLog;
 
@@ -31,9 +33,9 @@ class RecordingThreadWav extends RecordingThread implements Runnable {
     private static final String TMP_FILE_NAME = "recordingtmp.raw";
     private File tmpFile;
 
-    RecordingThreadWav(String mode, Recorder recorder) throws RecordingException {
-        super(mode, recorder); //throws exception
-        tmpFile = new File(CrApp.getInstance().getFilesDir(), TMP_FILE_NAME);
+    RecordingThreadWav(Context context, String mode, Recorder recorder) throws RecordingException {
+        super(context, mode, recorder); //throws exception
+        tmpFile = new File(context.getFilesDir(), TMP_FILE_NAME);
     }
 
     @Override
@@ -55,7 +57,7 @@ class RecordingThreadWav extends RecordingThread implements Runnable {
             if(!tmpFile.delete())
                 CrLog.log(ERROR, "Cannot delete incomplete temp pcm file.");
             recorder.setHasError();
-            notifyOnError();
+            notifyOnError(context);
         }
         finally {
             disposeAudioRecord();
@@ -66,11 +68,13 @@ class RecordingThreadWav extends RecordingThread implements Runnable {
         private final File wavFile;
         private final int channels;
         private Recorder recorder;
+        private Context context;
 
-        CopyPcmToWav(File wavFile, String mode, Recorder recorder) {
+        CopyPcmToWav(Context context, File wavFile, String mode, Recorder recorder) {
             this.wavFile = wavFile;
             this.recorder = recorder;
             channels = mode.equals(Recorder.MONO) ? 1 : 2;
+            this.context = context;
         }
 
         @Override
@@ -78,7 +82,7 @@ class RecordingThreadWav extends RecordingThread implements Runnable {
             long totalAudioLen, totalDataLen;
             long byteRate = SAMPLE_RATE * channels * BITS_PER_SAMPLE / 8;
             byte[] buffer = new byte[1048576];
-            File tmpFile = new File(CrApp.getInstance().getFilesDir(), TMP_FILE_NAME);
+            File tmpFile = new File(context.getFilesDir(), TMP_FILE_NAME);
 
             try (FileInputStream tmpInput = new FileInputStream(tmpFile);
                  FileOutputStream wavOutput = new FileOutputStream(wavFile)
@@ -98,7 +102,7 @@ class RecordingThreadWav extends RecordingThread implements Runnable {
                 if(!wavFile.delete())
                     CrLog.log(ERROR, "Error while deleting wav file on exception.");
                 recorder.setHasError();
-                RecordingThread.notifyOnError();
+                notifyOnError(context);
             }
             finally {
                 if(!tmpFile.delete())

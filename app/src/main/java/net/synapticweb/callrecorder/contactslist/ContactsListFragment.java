@@ -30,12 +30,13 @@ import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.CrApp.DialogInfo;
 import net.synapticweb.callrecorder.BaseActivity;
 import net.synapticweb.callrecorder.BaseActivity.LayoutType;
-import net.synapticweb.callrecorder.ServiceProvider;
 import net.synapticweb.callrecorder.contactdetail.ContactDetailActivity;
 import net.synapticweb.callrecorder.contactdetail.ContactDetailContract;
 import net.synapticweb.callrecorder.contactdetail.ContactDetailFragment;
+import net.synapticweb.callrecorder.contactslist.di.ViewModule;
 import net.synapticweb.callrecorder.data.Contact;
 import net.synapticweb.callrecorder.R;
+import net.synapticweb.callrecorder.contactslist.ContactsListContract.Presenter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -47,8 +48,11 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import javax.inject.Inject;
+
 public class ContactsListFragment extends Fragment implements ContactsListContract.View {
-    private ContactsListPresenter presenter;
+    @Inject
+    Presenter presenter;
     private ContactsAdapter adapter;
     private RecyclerView contactsRecycler;
     /** Poziția curentă în adapter. Necesară doar în DOUBLE_PANE. Este setată din
@@ -67,6 +71,9 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
     public void onAttach(Context context) {
         super.onAttach(context);
         parentActivity = (BaseActivity) context;
+        CrApp application = (CrApp) parentActivity.getApplication();
+        ViewModule viewModule = new ViewModule(this);
+        application.appComponent.contactsListComponent().create(viewModule).inject(this);
     }
 
     @Override
@@ -111,7 +118,7 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
     }
 
     //e apelată de callback-ul pasat funcției ContactRepository::getContacts(), la rîndul ei apelată de
-    // ContactsListPresenter::loadContacts()
+    // Presenter::loadContacts()
     @Override
     public void showContacts(List<Contact> contacts) {
         adapter = new ContactsAdapter(contacts);
@@ -167,7 +174,6 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
             currentPos = savedInstanceState.getInt(CURRENT_POS_KEY);
         }
         this.adapter = new ContactsAdapter(new ArrayList<>(0));
-        this.presenter = new ContactsListPresenter(this, ServiceProvider.provideRepository(getContext()));
     }
 
     @Nullable
@@ -228,9 +234,9 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
             int previousPos = currentPos;
             currentPos = getAdapterPosition();
             if(parentActivity.getLayoutType() == LayoutType.SINGLE_PANE) {
-                Intent detailIntent = new Intent(CrApp.getInstance(), ContactDetailActivity.class);
+                Intent detailIntent = new Intent(getContext(), ContactDetailActivity.class);
                 detailIntent.putExtra(ARG_CONTACT, contact);
-                CrApp.getInstance().startActivity(detailIntent);
+                parentActivity.startActivity(detailIntent);
             }
             else {
                 setCurrentDetail(contact);

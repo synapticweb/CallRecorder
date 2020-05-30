@@ -24,7 +24,7 @@ import net.synapticweb.callrecorder.settings.SettingsFragment;
 public class ControlRecordingReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(CrApp.getInstance());
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
         NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         RecorderService service = RecorderService.getService();
 
