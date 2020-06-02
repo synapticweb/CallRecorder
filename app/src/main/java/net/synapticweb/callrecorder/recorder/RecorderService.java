@@ -215,10 +215,10 @@ public class RecorderService extends Service {
         //în cazul în care nr primit e null înseamnă că se sună de pe nr privat
         privateCall = (receivedNumPhone == null);
 
-        if(!privateCall) {//și nu trebuie să mai verificăm dacă nr este în baza de date sau, dacă nu
+        if(!privateCall) { //și nu trebuie să mai verificăm dacă nr este în baza de date sau, dacă nu
             // este în baza de date, dacă este în contacte.
             Contact contact;
-            match = ((contact = Contact.queryNumberInAppContacts(repository, receivedNumPhone, getApplicationContext())) != null);
+            match = ((contact = Contact.queryNumberInAppContacts(repository, receivedNumPhone)) != null);
             if(match) {
                 idIfMatch = contact.getId(); //pentru teste: idIfMatch nu trebuie să fie niciodată null dacă match == true
                 callIdentifier = contact.getContactName(); //posibil subiect pentru un test.
@@ -363,7 +363,7 @@ public class RecorderService extends Service {
 
         else { //dacă nu e nici match nici private atunci trebuie mai întîi verificat dacă nu cumva nr există totuși în contactele telefonului.
             Contact contact;
-            if((contact = Contact.queryNumberInPhoneContacts(receivedNumPhone, getApplicationContext())) != null) {
+            if((contact = Contact.queryNumberInPhoneContacts(receivedNumPhone, getApplicationContext().getContentResolver())) != null) {
                 Uri photoUri = contact.getPhotoUri();
                 if(photoUri != null) {
                     Context context = getApplicationContext();

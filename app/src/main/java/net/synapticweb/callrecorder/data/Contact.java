@@ -8,6 +8,7 @@
 
 package net.synapticweb.callrecorder.data;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
@@ -20,6 +21,7 @@ import androidx.annotation.Nullable;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import net.synapticweb.callrecorder.CrApp;
 import java.util.List;
+import java.util.Objects;
 
 
 public class Contact implements Comparable<Contact>, Parcelable {
@@ -42,8 +44,7 @@ public class Contact implements Comparable<Contact>, Parcelable {
         if(phoneTypeCode != null) setPhoneType(phoneTypeCode);
     }
 
-
-    public static Contact queryNumberInAppContacts(Repository repository, String receivedPhoneNumber, Context context) {
+    public static Contact queryNumberInAppContacts(Repository repository, String receivedPhoneNumber) {
         List<Contact> contacts = repository.getAllContacts();
 
         PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
@@ -75,7 +76,7 @@ public class Contact implements Comparable<Contact>, Parcelable {
     }
 
   @Nullable
-  static public Contact queryNumberInPhoneContacts(final String number, @NonNull final Context context) {
+  static public Contact queryNumberInPhoneContacts(final String number, @NonNull ContentResolver resolver) {
         //implementare probabil mai eficientă decît ce aveam eu:
       //https://stackoverflow.com/questions/3505865/android-check-phone-number-present-in-contact-list-phone-number-retrieve-fr
       Uri lookupUri = Uri.withAppendedPath(
@@ -86,8 +87,8 @@ public class Contact implements Comparable<Contact>, Parcelable {
               android.provider.ContactsContract.PhoneLookup.TYPE,
               android.provider.ContactsContract.PhoneLookup.DISPLAY_NAME,
               android.provider.ContactsContract.PhoneLookup.PHOTO_URI };
-      Cursor cursor = context.getContentResolver()
-              .query(lookupUri, projection, null, null, null);
+      //Matchingul este asigurat de android, aî merg numere în diverse formaturi. Nu este nevoie de PhoneNumberUtil.
+      Cursor cursor = resolver.query(lookupUri, projection, null, null, null);
 
           if(cursor != null && cursor.moveToFirst()) {
               Contact contact = new Contact();
@@ -125,7 +126,6 @@ public class Contact implements Comparable<Contact>, Parcelable {
 
 
     public String getPhoneNumber() {
-
         return phoneNumber;
     }
 
@@ -141,7 +141,6 @@ public class Contact implements Comparable<Contact>, Parcelable {
         for(CrApp.PhoneTypeContainer typeContainer : CrApp.PHONE_TYPES)
             if(typeContainer.getTypeCode() == this.phoneType)
                 return typeContainer.getTypeName();
-
         return null;
     }
 
@@ -203,6 +202,26 @@ public class Contact implements Comparable<Contact>, Parcelable {
     public void setColor(Integer color) {
         this.color = color;
     }
+
+    /** Necesară pentru comparațiile din teste. */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Contact contact = (Contact) o;
+        return phoneType == contact.phoneType &&
+                shouldRecord == contact.shouldRecord &&
+                Objects.equals(id, contact.id) &&
+                phoneNumber.equals(contact.phoneNumber) &&
+                contactName.equals(contact.contactName) &&
+                Objects.equals(photoUri, contact.photoUri);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(phoneNumber, contactName);
+    }
+
 
     @Override
     public int describeContents() {

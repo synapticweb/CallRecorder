@@ -709,7 +709,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
 
         Recording recording = adapter.getItem(selectedItems.get(0));
         TextView date = dialog.getView().findViewById(R.id.info_date_data);
-        date.setText(String.format("%s %s", recording.getDate(false), recording.getTime()));
+        date.setText(String.format("%s %s", recording.getDate(), recording.getTime()));
         TextView size = dialog.getView().findViewById(R.id.info_size_data);
         size.setText(CrApp.getFileSizeHuman(recording.getSize()));
         TextView source = dialog.getView().findViewById(R.id.info_source_data);
