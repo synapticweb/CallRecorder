@@ -12,6 +12,9 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import androidx.annotation.Nullable;
+
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.contactdetail.MoveAsyncTask;
 import java.io.File;
@@ -24,6 +27,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -77,7 +81,7 @@ public class Recording implements Parcelable {
 
     public String getName() {
         if(!isNameSet)
-            return getDate(false) + " " + getTime();
+            return getDate() + " " + getTime();
         String fileName = new File(path).getName();
         return fileName.substring(0, fileName.length() - 4);
     }
@@ -93,17 +97,10 @@ public class Recording implements Parcelable {
     }
 
 
-    public String getDate(boolean shortFormat) {
+    public String getDate() {
         Calendar recordingCal = Calendar.getInstance();
         recordingCal.setTimeInMillis(startTimestamp);
-        if(shortFormat) {
-            if (recordingCal.get(Calendar.YEAR) < Calendar.getInstance().get(Calendar.YEAR))
-                return new SimpleDateFormat("d MMM ''yy", Locale.US).format(new Date(startTimestamp)); //22 Aug '17
-            else
-                return new SimpleDateFormat("d MMM", Locale.US).format(new Date(startTimestamp));
-        }
-        else
-            return new SimpleDateFormat("d MMMM yyyy", Locale.US).format(new Date(startTimestamp));
+        return new SimpleDateFormat("d MMMM yyyy", Locale.US).format(new Date(startTimestamp));
     }
 
     public String getTime() {
@@ -115,7 +112,7 @@ public class Recording implements Parcelable {
         new File(path).delete();
     }
 
-    public void move(Repository repository, String folderPath, MoveAsyncTask asyncTask, long totalSize)
+    public void move(Repository repository, String folderPath, @Nullable MoveAsyncTask asyncTask, long totalSize)
             throws IOException {
         String fileName = new File(path).getName();
         InputStream in = new FileInputStream(path);
@@ -124,11 +121,13 @@ public class Recording implements Parcelable {
         byte[] buffer = new byte[1048576]; //dacă folosesc 1024 merge foarte încet
         int read;
         while ((read = in.read(buffer)) != -1) {
-            asyncTask.alreadyCopied += read;
             out.write(buffer, 0, read);
-            asyncTask.callPublishProgress(Math.round(100 * asyncTask.alreadyCopied / totalSize));
-            if(asyncTask.isCancelled())
-                break;
+            if(asyncTask != null) {
+                asyncTask.alreadyCopied += read;
+                asyncTask.callPublishProgress(Math.round(100 * asyncTask.alreadyCopied / totalSize));
+                if (asyncTask.isCancelled())
+                    break;
+            }
         }
         in.close();
         out.flush();
@@ -157,7 +156,7 @@ public class Recording implements Parcelable {
         return null;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
@@ -175,7 +174,7 @@ public class Recording implements Parcelable {
         this.path = path;
     }
 
-    public boolean isIncoming() {
+    public Boolean isIncoming() {
         return incoming;
     }
 
@@ -225,6 +224,29 @@ public class Recording implements Parcelable {
 
     public void setMode(String mode) {
         this.mode = mode;
+    }
+
+    /** Necesară pentru comparațiile din teste. */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Recording recording = (Recording) o;
+        return id.equals(recording.id) &&
+                Objects.equals(contactId, recording.contactId) &&
+                Objects.equals(path, recording.path) &&
+                Objects.equals(incoming, recording.incoming) &&
+                Objects.equals(startTimestamp, recording.startTimestamp) &&
+                Objects.equals(endTimestamp, recording.endTimestamp) &&
+                Objects.equals(isNameSet, recording.isNameSet) &&
+                Objects.equals(format, recording.format) &&
+                Objects.equals(mode, recording.mode) &&
+                Objects.equals(source, recording.source);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, path);
     }
 
     @Override

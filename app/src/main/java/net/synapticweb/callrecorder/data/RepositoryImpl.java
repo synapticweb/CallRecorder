@@ -6,6 +6,9 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import androidx.annotation.VisibleForTesting;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -18,8 +21,8 @@ public class RepositoryImpl implements Repository {
     private SQLiteDatabase database;
 
     @Inject
-    RepositoryImpl(Context context) {
-        SQLiteOpenHelper helper = new CallRecorderDbHelper(context);
+    public RepositoryImpl(Context context, String dbname) {
+        SQLiteOpenHelper helper = new CallRecorderDbHelper(context, dbname);
         this.database = helper.getWritableDatabase();
     }
 
@@ -54,6 +57,18 @@ public class RepositoryImpl implements Repository {
         List<Contact> contacts = getAllContacts();
         Collections.sort(contacts);
         callback.onContactsLoaded(contacts);
+    }
+
+    @VisibleForTesting
+    Contact getContact(Long id) {
+        Cursor cursor = database.query(ContactsContract.Contacts.TABLE_NAME, null, ContactsContract.Contacts._ID +
+                "=" + id, null, null, null, null);
+
+        Contact contact = null;
+        if(cursor != null && cursor.moveToFirst()) {
+           contact = populateContact(cursor);
+        }
+        return contact;
     }
 
     @Override
@@ -145,6 +160,18 @@ public class RepositoryImpl implements Repository {
         callback.onRecordingsLoaded(getRecordings(contact));
     }
 
+    @VisibleForTesting
+    Recording getRecording(Long id) {
+        Cursor cursor = database.query(RecordingsContract.Recordings.TABLE_NAME, null, RecordingsContract.Recordings._ID +
+                "=" + id, null, null, null, null);
+
+        Recording recording = null;
+        if(cursor != null && cursor.moveToFirst()) {
+            recording = populateRecording(cursor);
+        }
+        return recording;
+    }
+
     private ContentValues createRecordingContentValues(Recording recording) {
         ContentValues values = new ContentValues();
 
@@ -187,5 +214,10 @@ public class RepositoryImpl implements Repository {
                 RecordingsContract.Recordings._ID + "=" + recording.getId(), null);
         if(deletedRows != 1)
             throw new SQLException("The return value of deleting this recording was " + deletedRows);
+    }
+
+    @VisibleForTesting
+    void closeDb() {
+        database.close();
     }
 }

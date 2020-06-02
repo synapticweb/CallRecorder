@@ -18,20 +18,15 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.database.SQLException;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.media.AudioManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-import android.provider.MediaStore;
 
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
-import androidx.core.content.FileProvider;
 
-import net.synapticweb.callrecorder.Config;
 import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.CrLog;
 import net.synapticweb.callrecorder.R;
@@ -41,14 +36,7 @@ import net.synapticweb.callrecorder.data.Contact;
 import net.synapticweb.callrecorder.data.Recording;
 import net.synapticweb.callrecorder.data.Repository;
 import net.synapticweb.callrecorder.settings.SettingsFragment;
-
 import org.acra.ACRA;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-
 import javax.inject.Inject;
 
 public class RecorderService extends Service {
@@ -186,9 +174,9 @@ public class RecorderService extends Service {
 
         //se întîmplă numai la incoming, la outgoing totdeauna nr e null.
         if(receivedNumPhone != null) {
-            contact = Contact.queryNumberInAppContacts(repository, receivedNumPhone, CrApp.getInstance());
+            contact = Contact.queryNumberInAppContacts(repository, receivedNumPhone);
             if(contact == null) {
-                contact = Contact.queryNumberInPhoneContacts(receivedNumPhone, CrApp.getInstance());
+                contact = Contact.queryNumberInPhoneContacts(receivedNumPhone, getContentResolver());
                 if(contact == null) {
                     contact = new Contact(null, receivedNumPhone, getResources().getString(R.string.unkown_contact), null, CrApp.UNKNOWN_TYPE_PHONE_CODE);
                 }
