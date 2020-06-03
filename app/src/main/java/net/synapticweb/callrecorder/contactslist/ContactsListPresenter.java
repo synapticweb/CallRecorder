@@ -16,10 +16,11 @@ import android.net.Uri;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
-import net.synapticweb.callrecorder.CrApp;
-import net.synapticweb.callrecorder.CrApp.DialogInfo;
+
+import net.synapticweb.callrecorder.Util.DialogInfo;
 import net.synapticweb.callrecorder.CrLog;
 import net.synapticweb.callrecorder.R;
+import net.synapticweb.callrecorder.Util;
 import net.synapticweb.callrecorder.data.Contact;
 import net.synapticweb.callrecorder.data.Repository;
 import net.synapticweb.callrecorder.di.FragmentScope;
@@ -50,7 +51,7 @@ public class ContactsListPresenter implements ContactsListContract.Presenter {
     public DialogInfo addContactResult(Intent intent, Context context) {
         Uri numberUri;
         String newNumber = null, contactName = null, photoUri = null;
-        int phoneType = CrApp.UNKNOWN_TYPE_PHONE_CODE;
+        int phoneType = Util.UNKNOWN_TYPE_PHONE_CODE;
         Phonenumber.PhoneNumber phoneNumberWrapper;
 
         if(intent != null && (numberUri = intent.getData()) != null) {
@@ -70,7 +71,7 @@ public class ContactsListPresenter implements ContactsListContract.Presenter {
             }
 
             final PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
-            String countryCode = CrApp.getUserCountry(context);
+            String countryCode = Util.getUserCountry(context);
             if(countryCode == null)
                 countryCode = "US";
             try {

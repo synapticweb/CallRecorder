@@ -18,26 +18,22 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.database.SQLException;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.media.AudioManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-import android.provider.MediaStore;
 
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
-import androidx.core.content.FileProvider;
 
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 
-import net.synapticweb.callrecorder.Config;
 import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.CrLog;
 import net.synapticweb.callrecorder.R;
+import net.synapticweb.callrecorder.Util;
 import net.synapticweb.callrecorder.contactslist.ContactsListActivityMain;
 import net.synapticweb.callrecorder.data.Contact;
 import net.synapticweb.callrecorder.data.Recording;
@@ -45,11 +41,6 @@ import net.synapticweb.callrecorder.data.Repository;
 import net.synapticweb.callrecorder.settings.SettingsFragment;
 
 import org.acra.ACRA;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 
 import javax.inject.Inject;
 
@@ -227,7 +218,7 @@ public class RecorderService extends Service {
             else { //în caz de ussd serviciul se oprește
                 callIdentifier = receivedNumPhone;
                 PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
-                String countryCode = CrApp.getUserCountry(getApplicationContext());
+                String countryCode = Util.getUserCountry(getApplicationContext());
                 if(countryCode == null)
                     countryCode = "US";
                 try {
@@ -364,21 +355,7 @@ public class RecorderService extends Service {
         else { //dacă nu e nici match nici private atunci trebuie mai întîi verificat dacă nu cumva nr există totuși în contactele telefonului.
             Contact contact;
             if((contact = Contact.queryNumberInPhoneContacts(receivedNumPhone, getApplicationContext().getContentResolver())) != null) {
-                Uri photoUri = contact.getPhotoUri();
-                if(photoUri != null) {
-                    Context context = getApplicationContext();
-                    try {
-                        Bitmap originalPhotoBitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), photoUri);
-                        //am adăugat System.currentTimeMillis() pentru consistență cu EditContactActivity.setPhotoPath().
-                        File copiedPhotoFile = new File(context.getFilesDir(), contact.getPhoneNumber() + System.currentTimeMillis() + ".jpg");
-                        OutputStream os = new FileOutputStream(copiedPhotoFile);
-                        originalPhotoBitmap.compress(Bitmap.CompressFormat.JPEG, 70, os);
-                        contact.setPhotoUri(FileProvider.getUriForFile(context, Config.FILE_PROVIDER, copiedPhotoFile));
-                    } catch (IOException exception) {
-                        CrLog.log(CrLog.ERROR, "IO exception: Could not copy photo from phone contacts: " + exception.getMessage());
-                        contact.setPhotoUri((Uri) null);
-                    }
-                }
+                Util.copyPhotoFromPhoneContacts(getApplicationContext(), contact);
 
                 try {
                     contact.save(repository);
@@ -389,7 +366,7 @@ public class RecorderService extends Service {
                 contactId = contact.getId();
             }
             else { //numărul nu există nici contactele telefonului. Deci este unknown.
-                contact =  new Contact(null, receivedNumPhone, getResources().getString(R.string.unkown_contact), null, CrApp.UNKNOWN_TYPE_PHONE_CODE);
+                contact =  new Contact(null, receivedNumPhone, getResources().getString(R.string.unkown_contact), null, Util.UNKNOWN_TYPE_PHONE_CODE);
                 try {
                     contact.save(repository); //introducerea în db setează id-ul în obiect
                 }

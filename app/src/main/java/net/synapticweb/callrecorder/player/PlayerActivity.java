@@ -20,10 +20,10 @@ import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.CrLog;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.BaseActivity;
+import net.synapticweb.callrecorder.Util;
 import net.synapticweb.callrecorder.contactdetail.ContactDetailFragment;
 import net.synapticweb.callrecorder.data.Recording;
 
@@ -119,7 +119,7 @@ public class PlayerActivity extends BaseActivity {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if(fromUser)
                     userSelectedPosition = progress;
-                playedTime.setText(CrApp.getDurationHuman(progress, false));
+                playedTime.setText(Util.getDurationHuman(progress, false));
             }
 
             @Override
@@ -190,7 +190,7 @@ public class PlayerActivity extends BaseActivity {
         if(!player.loadMedia(recording.getPath()))
             return ;
 
-        totalTime.setText(CrApp.getDurationHuman(player.getTotalDuration(), false));
+        totalTime.setText(Util.getDurationHuman(player.getTotalDuration(), false));
         player.setGain(gainControl.getProgress());
 //        }
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);

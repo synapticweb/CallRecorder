@@ -11,7 +11,7 @@ package net.synapticweb.callrecorder.contactslist;
 import android.content.Context;
 import android.content.Intent;
 
-import net.synapticweb.callrecorder.CrApp.DialogInfo;
+import net.synapticweb.callrecorder.Util.DialogInfo;
 import net.synapticweb.callrecorder.data.Contact;
 import java.util.List;
 

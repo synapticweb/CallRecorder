@@ -19,7 +19,9 @@ import android.provider.ContactsContract;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
-import net.synapticweb.callrecorder.CrApp;
+
+import net.synapticweb.callrecorder.Util;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -27,7 +29,7 @@ import java.util.Objects;
 public class Contact implements Comparable<Contact>, Parcelable {
     private Long id = 0L;
     private String phoneNumber = "";
-    private int phoneType = CrApp.UNKNOWN_TYPE_PHONE_CODE;
+    private int phoneType = Util.UNKNOWN_TYPE_PHONE_CODE;
     private String contactName = "";
     private Uri photoUri = null;
     private boolean shouldRecord = true;
@@ -138,7 +140,7 @@ public class Contact implements Comparable<Contact>, Parcelable {
     }
 
     public String getPhoneTypeName(){
-        for(CrApp.PhoneTypeContainer typeContainer : CrApp.PHONE_TYPES)
+        for(Util.PhoneTypeContainer typeContainer : Util.PHONE_TYPES)
             if(typeContainer.getTypeCode() == this.phoneType)
                 return typeContainer.getTypeName();
         return null;
@@ -146,7 +148,7 @@ public class Contact implements Comparable<Contact>, Parcelable {
 
     public void setPhoneType(String phoneType)
     {
-        for(CrApp.PhoneTypeContainer typeContainer : CrApp.PHONE_TYPES)
+        for(Util.PhoneTypeContainer typeContainer : Util.PHONE_TYPES)
             if(typeContainer.getTypeName().equals(phoneType)) {
                 this.phoneType = typeContainer.getTypeCode();
                 break;
@@ -155,13 +157,13 @@ public class Contact implements Comparable<Contact>, Parcelable {
     }
 
     public void setPhoneType(int phoneTypeCode) {
-        for(CrApp.PhoneTypeContainer type : CrApp.PHONE_TYPES) {
+        for(Util.PhoneTypeContainer type : Util.PHONE_TYPES) {
             if (phoneTypeCode == type.getTypeCode()) {
                 this.phoneType = phoneTypeCode;
                 return;
             }
         }
-        this.phoneType = CrApp.UNKNOWN_TYPE_PHONE_CODE;
+        this.phoneType = Util.UNKNOWN_TYPE_PHONE_CODE;
     }
 
     public String getContactName() {

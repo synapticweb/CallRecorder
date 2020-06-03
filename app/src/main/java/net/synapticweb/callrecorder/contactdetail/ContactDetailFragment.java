@@ -50,6 +50,7 @@ import net.synapticweb.callrecorder.CrLog;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.BaseActivity;
 import net.synapticweb.callrecorder.BaseActivity.LayoutType;
+import net.synapticweb.callrecorder.Util;
 import net.synapticweb.callrecorder.contactdetail.di.ViewModule;
 import net.synapticweb.callrecorder.contactslist.ContactsListFragment;
 import net.synapticweb.callrecorder.data.Contact;
@@ -71,7 +72,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import static net.synapticweb.callrecorder.contactslist.ContactsListFragment.ARG_CONTACT;
-import net.synapticweb.callrecorder.CrApp.DialogInfo;
+import net.synapticweb.callrecorder.Util.DialogInfo;
 
 import javax.inject.Inject;
 
@@ -212,9 +213,9 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
             //contact hidden și se clickează pe el, apoi pe unul normal butoanele call și edit rămîn ascunse.
         else
             toggleSelectModeActionBar(false);
-        typePhoneView.setText(CrApp.getSpannedText(String.format(getResources().getString(
+        typePhoneView.setText(Util.getSpannedText(String.format(getResources().getString(
                 R.string.detail_phonetype), contact.getPhoneTypeName()), null));
-        phoneNumberView.setText(CrApp.getSpannedText(String.format(getResources().getString(
+        phoneNumberView.setText(Util.getSpannedText(String.format(getResources().getString(
                 R.string.detail_phonenumber), contact.isPrivateNumber() ? getString(R.string.private_number_name) : contact.getPhoneNumber()), null));
 
         if(contact.getPhotoUri() != null) {
@@ -599,10 +600,10 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
                 .customView(R.layout.info_storage_dialog, false)
                 .positiveText(android.R.string.ok).build();
         TextView privateStorage = dialog.getView().findViewById(R.id.info_storage_private_data);
-        privateStorage.setText(CrApp.getFileSizeHuman(sizePrivate));
+        privateStorage.setText(Util.getFileSizeHuman(sizePrivate));
 
         TextView publicStorage = dialog.getView().findViewById(R.id.info_storage_public_data);
-        publicStorage.setText(CrApp.getFileSizeHuman(sizePublic));
+        publicStorage.setText(Util.getFileSizeHuman(sizePublic));
 
         dialog.show();
     }
@@ -691,7 +692,7 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
             }
             new MaterialDialog.Builder(parentActivity)
                     .title(R.string.recordings_info_title)
-                    .content(String.format(parentActivity.getResources().getString(R.string.recordings_info_text), CrApp.getFileSizeHuman(totalSize)))
+                    .content(String.format(parentActivity.getResources().getString(R.string.recordings_info_text), Util.getFileSizeHuman(totalSize)))
                     .positiveText(android.R.string.ok)
                     .show();
             return ;
@@ -711,14 +712,14 @@ public class ContactDetailFragment extends Fragment implements ContactDetailCont
         TextView date = dialog.getView().findViewById(R.id.info_date_data);
         date.setText(String.format("%s %s", recording.getDate(), recording.getTime()));
         TextView size = dialog.getView().findViewById(R.id.info_size_data);
-        size.setText(CrApp.getFileSizeHuman(recording.getSize()));
+        size.setText(Util.getFileSizeHuman(recording.getSize()));
         TextView source = dialog.getView().findViewById(R.id.info_source_data);
         source.setText(recording.getSource());
 
         TextView format = dialog.getView().findViewById(R.id.info_format_data);
         format.setText(recording.getHumanReadingFormat(parentActivity));
         TextView length = dialog.getView().findViewById(R.id.info_length_data);
-        length.setText(CrApp.getDurationHuman(recording.getLength(), true));
+        length.setText(Util.getDurationHuman(recording.getLength(), true));
         TextView path = dialog.getView().findViewById(R.id.info_path_data);
         path.setText(recording.isSavedInPrivateSpace(parentActivity) ? parentActivity.getResources().
                 getString(R.string.private_storage) : recording.getPath());

@@ -10,7 +10,7 @@ package net.synapticweb.callrecorder.contactdetail;
 
 import android.app.Activity;
 import android.content.Context;
-import net.synapticweb.callrecorder.CrApp.DialogInfo;
+import net.synapticweb.callrecorder.Util.DialogInfo;
 import net.synapticweb.callrecorder.data.Contact;
 import net.synapticweb.callrecorder.data.Recording;
 import java.util.List;

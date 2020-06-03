@@ -14,7 +14,7 @@ import net.synapticweb.callrecorder.CrLog;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.data.Contact;
 import net.synapticweb.callrecorder.data.Recording;
-import net.synapticweb.callrecorder.CrApp.DialogInfo;
+import net.synapticweb.callrecorder.Util.DialogInfo;
 import net.synapticweb.callrecorder.data.Repository;
 import net.synapticweb.callrecorder.di.FragmentScope;
 
