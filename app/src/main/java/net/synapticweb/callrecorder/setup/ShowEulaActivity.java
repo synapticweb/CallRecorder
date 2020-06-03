@@ -18,10 +18,10 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
-import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.HelpActivity;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.BaseActivity;
+import net.synapticweb.callrecorder.Util;
 
 public class ShowEulaActivity extends BaseActivity {
     @Override
@@ -39,7 +39,7 @@ public class ShowEulaActivity extends BaseActivity {
         ActionBar actionBar = getSupportActionBar();
         if(actionBar != null)
             actionBar.setDisplayHomeAsUpEnabled(true);
-        String html = CrApp.rawHtmlToString(R.raw.eula);
+        String html = Util.rawHtmlToString(R.raw.eula);
         html = html.replace(HelpActivity.APP_NAME_PLACEHOLDER, getResources().getString(R.string.app_name));
 
         WebView eulaHtml = findViewById(R.id.eula_hmtl);

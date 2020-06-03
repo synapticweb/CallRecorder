@@ -18,7 +18,7 @@ import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
 import net.synapticweb.callrecorder.CrApp;
-import net.synapticweb.callrecorder.CrApp.DialogInfo;
+import net.synapticweb.callrecorder.Util.DialogInfo;
 import net.synapticweb.callrecorder.CrLog;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.Util;
@@ -117,7 +117,7 @@ public class ContactDetailPresenter implements ContactDetailContract.Presenter {
         Phonenumber.PhoneNumber phoneNumberWrapper;
         Cursor cursor;
         String phoneNumber = null, contactName = null, photoUri = null;
-        int phoneType = CrApp.UNKNOWN_TYPE_PHONE_CODE;
+        int phoneType = Util.UNKNOWN_TYPE_PHONE_CODE;
         PhoneNumberUtil.MatchType matchType;
         long contactId = 0;
 
@@ -136,7 +136,7 @@ public class ContactDetailPresenter implements ContactDetailContract.Presenter {
             cursor.close();
         }
 
-        String countryCode = CrApp.getUserCountry(CrApp.getInstance());
+        String countryCode = Util.getUserCountry(CrApp.getInstance());
         if(countryCode == null)
             countryCode = "US";
         try {

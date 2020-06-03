@@ -178,7 +178,7 @@ public class RecorderService extends Service {
             if(contact == null) {
                 contact = Contact.queryNumberInPhoneContacts(receivedNumPhone, getContentResolver());
                 if(contact == null) {
-                    contact = new Contact(null, receivedNumPhone, getResources().getString(R.string.unkown_contact), null, CrApp.UNKNOWN_TYPE_PHONE_CODE);
+                    contact = new Contact(null, receivedNumPhone, getResources().getString(R.string.unkown_contact), null, Util.UNKNOWN_TYPE_PHONE_CODE);
                 }
                 else if(contact.getPhotoUri() != null)
                     Util.copyPhotoFromPhoneContacts(getApplicationContext(), contact);

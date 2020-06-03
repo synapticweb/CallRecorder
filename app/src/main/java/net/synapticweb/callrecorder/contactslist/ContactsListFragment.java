@@ -24,6 +24,7 @@ import android.widget.TextView;
 import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.BaseActivity;
 import net.synapticweb.callrecorder.BaseActivity.LayoutType;
+import net.synapticweb.callrecorder.Util;
 import net.synapticweb.callrecorder.contactdetail.ContactDetailActivity;
 import net.synapticweb.callrecorder.contactdetail.ContactDetailContract;
 import net.synapticweb.callrecorder.contactdetail.ContactDetailFragment;
@@ -244,9 +245,9 @@ public class ContactsListFragment extends Fragment implements ContactsListContra
                 if(contactsColors.containsKey(contact.getId()))
                     color = contactsColors.get(contact.getId());
                 else {
-                    if(colorPointer == CrApp.colorList.size() - 1)
+                    if(colorPointer == Util.colorList.size() - 1)
                         colorPointer = 0;
-                    color = CrApp.colorList.get(colorPointer++);
+                    color = Util.colorList.get(colorPointer++);
                     contactsColors.put(contact.getId(), color);
                 }
                 contact.setColor(color);

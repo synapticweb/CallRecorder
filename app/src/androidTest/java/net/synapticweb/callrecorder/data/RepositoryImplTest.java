@@ -2,7 +2,8 @@ package net.synapticweb.callrecorder.data;
 
 import android.content.Context;
 import androidx.test.core.app.ApplicationProvider;
-import net.synapticweb.callrecorder.CrApp;
+
+import net.synapticweb.callrecorder.Util;
 import net.synapticweb.callrecorder.recorder.Recorder;
 
 import static org.junit.Assert.*;
@@ -21,7 +22,7 @@ public class RepositoryImplTest {
     private static final String CONTACT_NUMBER = "0744355665";
     private static final String CONTACT_NAME = "Contact name";
     private static String CONTACT_PHOTO_URI;
-    private static final int CONTACT_PHONE_TYPE = CrApp.UNKNOWN_TYPE_PHONE_CODE;
+    private static final int CONTACT_PHONE_TYPE = Util.UNKNOWN_TYPE_PHONE_CODE;
 
     private static String RECORDING_PATH;
     private static final boolean RECORDING_INCOMING = true;
@@ -72,7 +73,7 @@ public class RepositoryImplTest {
         String newNumber = "07444556444";
         String newName = "New contact name";
         String newUri = context.getFilesDir() + "new_test_photo.jpg";
-        int newType = CrApp.PHONE_TYPES.get(1).getTypeCode();
+        int newType = Util.PHONE_TYPES.get(1).getTypeCode();
         Contact contact = new Contact(null, CONTACT_NUMBER, CONTACT_NAME, CONTACT_PHOTO_URI,
                 CONTACT_PHONE_TYPE);
         repository.insertContact(contact);

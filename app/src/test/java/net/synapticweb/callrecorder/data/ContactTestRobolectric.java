@@ -9,7 +9,7 @@ import android.os.Build;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import net.synapticweb.callrecorder.CrApp;
+import net.synapticweb.callrecorder.Util;
 import net.synapticweb.callrecorder.data.FakePhoneLookupProvider.ContactData;
 
 import org.junit.Test;
@@ -32,7 +32,7 @@ public class ContactTestRobolectric {
     private static final String GOOD_NUMBER = "0736192257";
     private static final String BAD_NUMBER = "0744567889";
     private static final String CONTACT_NAME = "contact name";
-    private static final int CONTACT_TYPE = CrApp.UNKNOWN_TYPE_PHONE_CODE;
+    private static final int CONTACT_TYPE = Util.UNKNOWN_TYPE_PHONE_CODE;
     private static final String PHOTO_URI = "photo_uri";
 
     //Cod vechi, ideea de la care am pornit: https://github.com/juanmendez/android_dev/blob/master/16.observers/00.magazineAppWithRx/app/src/test/java/ContentProviderTest.java
@@ -75,7 +75,7 @@ public class ContactTestRobolectric {
                 android.provider.ContactsContract.PhoneLookup.PHOTO_URI };
         MatrixCursor emptyCursor = new MatrixCursor(columns);
         MatrixCursor dataCursor = new MatrixCursor(columns);
-        dataCursor.addRow(new Object[] {GOOD_NUMBER, CrApp.UNKNOWN_TYPE_PHONE_CODE, "NAME", null});
+        dataCursor.addRow(new Object[] {GOOD_NUMBER, Util.UNKNOWN_TYPE_PHONE_CODE, "NAME", null});
 
         when(resolver.query(eq(goodLookupUri), any(), any(), any(), any()))
                 .thenReturn(dataCursor);

@@ -49,15 +49,15 @@ public class HelpActivity extends BaseActivity {
         setTheme();
         Resources res = getResources();
 
-        content[0] = CrApp.rawHtmlToString(R.raw.help_recording_calls);
-        content[1] = CrApp.rawHtmlToString(R.raw.help_playing_recordings);
-        content[2] = CrApp.rawHtmlToString(R.raw.help_managing_recordings);
-        content[3] = CrApp.rawHtmlToString(R.raw.help_about);
+        content[0] = Util.rawHtmlToString(R.raw.help_recording_calls);
+        content[1] = Util.rawHtmlToString(R.raw.help_playing_recordings);
+        content[2] = Util.rawHtmlToString(R.raw.help_managing_recordings);
+        content[3] = Util.rawHtmlToString(R.raw.help_about);
         content[3] = String.format(content[3], BuildConfig.VERSION_NAME,
                 res.getString(R.string.dev_email), res.getString(R.string.dev_email),
                 res.getString(R.string.send_devs));
-        content[4] = CrApp.rawHtmlToString(R.raw.eula);
-        content[5] = CrApp.rawHtmlToString(R.raw.help_licences);
+        content[4] = Util.rawHtmlToString(R.raw.eula);
+        content[5] = Util.rawHtmlToString(R.raw.help_licences);
 
         for(int i = 0; i < content.length; ++i)
             content[i] = content[i].replace(APP_NAME_PLACEHOLDER, res.getString(R.string.app_name));

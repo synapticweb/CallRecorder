@@ -55,6 +55,7 @@ import net.synapticweb.callrecorder.CrApp;
 import net.synapticweb.callrecorder.CrLog;
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.BaseActivity;
+import net.synapticweb.callrecorder.Util;
 import net.synapticweb.callrecorder.data.Contact;
 import net.synapticweb.callrecorder.data.Repository;
 
@@ -242,17 +243,17 @@ public class EditContactActivity extends BaseActivity implements AdapterView.OnI
         //Pentru aceeași chestie cu baze de date: https://stackoverflow.com/questions/13413030/using-simplecursoradapter-with-spinner
         phoneType = findViewById(R.id.edit_types);
         phoneType.setOnItemSelectedListener(this);
-        ArrayAdapter<CrApp.PhoneTypeContainer> adapter =
-                new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, CrApp.PHONE_TYPES);
+        ArrayAdapter<Util.PhoneTypeContainer> adapter =
+                new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, Util.PHONE_TYPES);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         phoneType.setAdapter(adapter);
 
         int position;
-        for(position = 0; position < CrApp.PHONE_TYPES.size(); ++position)
-            if(CrApp.PHONE_TYPES.get(position).getTypeCode() == contact.getPhoneTypeCode())
+        for(position = 0; position < Util.PHONE_TYPES.size(); ++position)
+            if(Util.PHONE_TYPES.get(position).getTypeCode() == contact.getPhoneTypeCode())
                 break;
         //https://stackoverflow.com/questions/11072576/set-selected-item-of-spinner-programmatically
-        phoneType.setSelection(adapter.getPosition(CrApp.PHONE_TYPES.get(position)));
+        phoneType.setSelection(adapter.getPosition(Util.PHONE_TYPES.get(position)));
     }
 
     @Override
