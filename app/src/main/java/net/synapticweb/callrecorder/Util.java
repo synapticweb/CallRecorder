@@ -163,22 +163,6 @@ public class Util {
         return sb.toString();
     }
 
-    //https://stackoverflow.com/questions/5081145/android-how-do-you-check-if-a-particular-accessibilityservice-is-enabled
-    public static boolean isAccessibilityServiceEnabled(Class<? extends AccessibilityService> service) {
-        AccessibilityManager am = (AccessibilityManager) CrApp.getInstance().getSystemService(Context.ACCESSIBILITY_SERVICE);
-        List<AccessibilityServiceInfo> enabledServices = am != null ?
-                am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK) : null;
-
-        if (enabledServices != null) {
-            for (AccessibilityServiceInfo enabledService : enabledServices) {
-                ServiceInfo enabledServiceInfo = enabledService.getResolveInfo().serviceInfo;
-                if (enabledServiceInfo.packageName.equals(CrApp.getInstance().getPackageName()) && enabledServiceInfo.name.equals(service.getName()))
-                    return true;
-            }
-        }
-        return false;
-    }
-
     public static class PhoneTypeContainer {
 
         private int typeCode;
