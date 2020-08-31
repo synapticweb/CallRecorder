@@ -211,8 +211,7 @@ public class RecorderService extends Service {
         }
          catch (RecordingException e) {
              CrLog.log(CrLog.ERROR, "onStartCommand: unable to start recorder: " + e.getMessage() + " Stoping the service...");
-               if(nm != null)
-                   nm.notify(NOTIFICATION_ID, buildNotification(RECORD_ERROR, R.string.error_recorder_cannot_start));
+             startForeground(NOTIFICATION_ID, buildNotification(RECORD_ERROR, R.string.error_recorder_cannot_start));
          }
 
         return START_NOT_STICKY;
