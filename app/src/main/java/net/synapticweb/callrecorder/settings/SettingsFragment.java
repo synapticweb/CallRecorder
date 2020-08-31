@@ -146,12 +146,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             }
         });
 
-        storage.setSummaryProvider(new Preference.SummaryProvider<ListPreference>() {
-            @Override
-            public CharSequence provideSummary(ListPreference preference) {
-                return preference.getEntry();
-            }
-        });
+        storage.setSummaryProvider( preference -> ((ListPreference) preference).getEntry());
 
 
         themeOption.setSummaryProvider(new Preference.SummaryProvider<ListPreference>() {
