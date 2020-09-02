@@ -34,7 +34,6 @@ public class CallRecorderDbHelper extends SQLiteOpenHelper {
             Contacts.COLUMN_NAME_CONTACT_NAME + " TEXT, " +
             Contacts.COLUMN_NAME_PHOTO_URI + " TEXT, " +
             Contacts.COLUMN_NAME_PHONE_TYPE + " INTEGER NOT NULL, " +
-            Contacts.COLUMN_NAME_SHOULD_RECORD + " INTEGER NOT NULL DEFAULT  1, " +
             "CONSTRAINT no_duplicates UNIQUE(" + Contacts.COLUMN_NAME_NUMBER + ") )";
 
 
@@ -52,14 +51,14 @@ public class CallRecorderDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        String version2Sql = "ALTER TABLE " + Recordings.TABLE_NAME + " ADD COLUMN " + Recordings.COLUMN_NAME_SOURCE +
+        String version2 = "ALTER TABLE " + Recordings.TABLE_NAME + " ADD COLUMN " + Recordings.COLUMN_NAME_SOURCE +
                 " TEXT NOT NULL DEFAULT 'unknown'";
         String version3a = "ALTER TABLE " + Contacts.TABLE_NAME + " RENAME TO " + Contacts.TABLE_NAME + "_old";
-        String version3b = "INSERT INTO " + Contacts.TABLE_NAME + "(_id, phone_number, contact_name, photo_uri, phone_type, should_record) SELECT _id, phone_number, contact_name, photo_uri, phone_type, should_record FROM "
+        String version3b = "INSERT INTO " + Contacts.TABLE_NAME + "(_id, phone_number, contact_name, photo_uri, phone_type) SELECT _id, phone_number, contact_name, photo_uri, phone_type FROM "
                 + Contacts.TABLE_NAME + "_old";
         String version3c = "DROP TABLE " + Contacts.TABLE_NAME + "_old";
         if(oldVersion == 1) {
-            db.execSQL(version2Sql);
+            db.execSQL(version2);
             db.execSQL(version3a);
             db.execSQL(SQL_CREATE_CONTACTS);
             db.execSQL(version3b);
