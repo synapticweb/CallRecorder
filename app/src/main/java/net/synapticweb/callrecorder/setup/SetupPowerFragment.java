@@ -11,6 +11,7 @@ package net.synapticweb.callrecorder.setup;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
@@ -32,6 +33,8 @@ import com.afollestad.materialdialogs.MaterialDialog;
 
 import net.synapticweb.callrecorder.R;
 import net.synapticweb.callrecorder.contactslist.ContactsListActivityMain;
+
+import java.util.Objects;
 
 public class SetupPowerFragment extends Fragment{
     private SetupActivity parentActivity;
@@ -74,8 +77,11 @@ public class SetupPowerFragment extends Fragment{
             turnOffDoze.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    //pentru a rezolva crash-ul e86a71db-dca0-4064-9bb5-466c6fd9dfce
                     Intent intent = new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
-                    startActivity(intent);
+                    PackageManager pm = requireActivity().getPackageManager();
+                    if (intent.resolveActivity(pm) != null)
+                        startActivity(intent);
                 }
             });
         }
