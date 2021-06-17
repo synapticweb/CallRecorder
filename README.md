@@ -18,7 +18,7 @@ It has the following main features:
 
 Because of the restrictions imposed by Google on requesting permissions from the Call log permission group (https://play.google.com/about/privacy-security-deception/permissions/), the app is currently developed using two branches: the `original-app` branch and the `gpcompliant` (from "google play compliant") branch.
 
-The `gpcompliant` branch does not use the READ_CALL_LOG and PROCESS_OUTGOING_CALLS permissions and consequently the versions of the app compiled from this source cannot obtain the outgoing phone number in all supported versions of Android and cannot obtain the incoming phone number in Android versions 9 and above. This has consequences on the overall appearance and behavior of the app that are documented in the "Recording phone calls" section of the Help menu. Obviously, only the `gpcompliant` versions of the app can be downloaded from the Google Play marketplace. These versions have the substring 'gpcompliant' appended to the version string.
+The `gpcompliant` branch does not use the READ_CALL_LOG and PROCESS_OUTGOING_CALLS permissions and consequently the versions of the app compiled from this source cannot obtain the outgoing phone number in all supported versions of Android and cannot obtain the incoming phone number in Android versions 9 and above. This has consequences on the overall appearance and behavior of the app that are documented in the "Recording phone calls" section of the Help menu. These versions have the substring 'gpcompliant' appended to the version string.
 
 The `original-app` branch retains all the functions that were removed from the `gpcompliant` branch. The versions of the app compiled from this source have the substring 'original' appended to the version string.
 
